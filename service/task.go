@@ -11,6 +11,7 @@ import (
 	//"github.com/davecgh/go-spew/spew"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
+	"github.com/stephencheng/up/interface/impl"
 	"github.com/stephencheng/up/model"
 	u "github.com/stephencheng/up/utils"
 )
@@ -38,32 +39,10 @@ func ExecTask(taskname string) {
 			u.Pfvvvv("  loacated task-> %d [%s]: %s \n", idx+1, task.Name, task.Desc)
 			found = true
 			//spew.Dump(task)
-			var taskImpl model.TaskImpl
-			err := ms.Decode(task.Task, &taskImpl)
-
+			var steps model.Steps
+			err := ms.Decode(task.Task, &steps)
+			impl.StepsExec(&steps)
 			u.LogError("e:", err)
-			//spew.Dump(taskImpl)
-			for idx, step := range taskImpl {
-				u.Pfvvvv("  step(%3d): %s\n", idx+1, u.PP(step))
-				//u.Pfvvvv("%+v | length: %d\n", step.Do, len(step.Do.([]interface{})))
-
-				cmdCnt := len(step.Do.([]interface{}))
-				//u.P("cmd count:", cmdCnt)
-				if cmdCnt > 1 {
-					var cmds model.ShellCmds
-					err = ms.Decode(step.Do, &cmds)
-					u.LogError("e:", err)
-					for idx, cmd := range cmds {
-						u.Pfv("    cmd(%2d): %+v\n", idx+1, cmd)
-						u.P("      exec result:", u.MockRunCmd(cmd))
-					}
-				} else {
-					var cmd string
-					err = ms.Decode(step.Do, &cmd)
-					u.LogError("err:", err)
-					u.P("      exec result:", u.MockRunCmd(cmd))
-				}
-			}
 		}
 	}
 

@@ -10,12 +10,12 @@ package model
 type Tasks []Task
 
 type Task struct {
-	Task interface{} //TaskImpl
+	Task interface{} //Steps
 	Desc string
 	Name string
 }
 
-type TaskImpl []Step
+type Steps []Step
 
 type Step struct {
 	Do   interface{} //FuncImpl

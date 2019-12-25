@@ -43,7 +43,7 @@ func Test00001(t *testing.T) {
 			//parse task impl
 			assert.Equal(task.Name, "task1", "task1 name should be task1")
 			assert.Nil(task.Deps)
-			var taskImpl model.TaskImpl
+			var taskImpl model.Steps
 			err = ms.Decode(task.Task, &taskImpl)
 			t.Log("err:", err)
 			spew.Dump(taskImpl)
