@@ -1,0 +1,41 @@
+notes:
+  goal:
+    - xx
+
+tasks:
+
+  -
+    name: task2
+    task:
+      -
+        func: play
+        desc: say world
+        do:
+          params:
+            -
+              name: istio-k8s-install
+
+plays:
+  -
+    name: istio-k8s-install
+    desc: this is to provision istio installation into k8s
+    play:
+      -
+        name: step1
+        desc: do step1
+        step:
+          -
+            func: shell
+            desc: say hello
+            do:
+              - echo "hello"
+
+      -
+        name: step2
+        desc: do step2
+        task:
+          -
+            func: shell
+            desc: say world
+            do:
+              - echo "world"

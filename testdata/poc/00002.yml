@@ -1,0 +1,52 @@
+notes:
+  idea:
+    - use deps to refer to a list of tasks
+    - optionally, you can use async for the deps
+
+tasks:
+  -
+    name: task1
+    task:
+      -
+        func: shell
+        desc: say hello
+        do:
+          - echo "hello"
+
+  -
+    name: task2
+    task:
+      -
+        func: shell
+        desc: say world
+        do:
+          - echo "world"
+
+  -
+    name: task3
+    task:
+      -
+        func: task-refs
+        desc: run sequential tasks
+        do:
+          tasks:
+            - task1
+            - task2
+
+  -
+    name: task4
+    task:
+      -
+        func: task-deps
+        desc: run paralle tasks
+        do:
+          async: true #default it is not async
+          tasks:
+            - task1
+            - task2
+
+      -
+        func: shell
+        desc: say hello
+        do:
+          - echo "hello"

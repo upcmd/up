@@ -1,0 +1,7 @@
+build
+wip*.yml
+.envrc
+result
+functests-mock
+*_TODO*
+nix-container/
