@@ -12,6 +12,7 @@ import (
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/stephencheng/up/interface/impl/funcs"
 	"github.com/stephencheng/up/model"
+	"github.com/stephencheng/up/service"
 	td "github.com/stephencheng/up/testdata"
 	tl "github.com/stephencheng/up/tests"
 	"github.com/stretchr/testify/assert"
@@ -44,7 +45,7 @@ func Test00001(t *testing.T) {
 			//parse task impl
 			assert.Equal(task.Name, "task1", "task1 name should be task1")
 			assert.Nil(task.Deps)
-			var taskImpl model.Steps
+			var taskImpl service.Steps
 			err = ms.Decode(task.Task, &taskImpl)
 			t.Log("err:", err)
 			spew.Dump(taskImpl)

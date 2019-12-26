@@ -38,9 +38,10 @@ func ExecTask(taskname string) {
 			u.Pfvvvv("  loacated task-> %d [%s]: %s \n", idx+1, task.Name, task.Desc)
 			found = true
 			//spew.Dump(task)
-			var steps model.Steps
+			var steps Steps
 			err := ms.Decode(task.Task, &steps)
-			StepsExec(&steps)
+			steps.Exec()
+			//StepsExec(&steps)
 			u.LogError("e:", err)
 		}
 	}

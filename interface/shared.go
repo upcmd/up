@@ -7,7 +7,7 @@
 
 package impl
 
-type Func interface {
+type Do interface {
 	Exec()
 }
 
