@@ -8,6 +8,7 @@
 package impl
 
 type Do interface {
+	Adapt()
 	Exec()
 }
 

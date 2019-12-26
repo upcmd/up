@@ -8,11 +8,12 @@
 package funcs
 
 import (
+	ms "github.com/mitchellh/mapstructure"
 	u "github.com/stephencheng/up/utils"
 	"os/exec"
 )
 
-func RunCmd(cmd string) string {
+func runCmd(cmd string) string {
 	cmdExec := exec.Command("/bin/sh", "-c", cmd)
 	exec.Command("bash", "-c", cmd)
 	cmdOutput, err := cmdExec.Output()
@@ -21,12 +22,25 @@ func RunCmd(cmd string) string {
 }
 
 type ShellFuncAction struct {
+	Do   interface{}
 	Cmds []string
 }
 
-func (f *ShellFuncAction) Exec() {
-
+//adapt the abstract step.Do to concrete ShellFuncAction Cmds
+func (f *ShellFuncAction) Adapt() {
+	var cmds []string
+	err := ms.Decode(f.Do, &cmds)
+	u.LogError("e12:", err)
+	f.Cmds = cmds
 }
 
-type ShellCmds []string
+func (f *ShellFuncAction) Exec() {
+	u.P("shell func execed")
+
+	u.P(f.Cmds)
+	for idx, cmd := range f.Cmds {
+		u.Pfv("    cmd(%2d): %+v\n", idx+1, cmd)
+		u.P("      exec result:", runCmd(cmd))
+	}
+}
 

@@ -8,7 +8,7 @@
 package service
 
 import (
-	ms "github.com/mitchellh/mapstructure"
+	ic "github.com/stephencheng/up/interface"
 	"github.com/stephencheng/up/interface/impl/funcs"
 	u "github.com/stephencheng/up/utils"
 )
@@ -20,22 +20,17 @@ type Step struct {
 }
 
 func (step *Step) Exec() {
-	cmdCnt := len(step.Do.([]interface{}))
-	//u.P("cmd count:", cmdCnt)
-	if cmdCnt > 1 {
-		var cmds funcs.ShellCmds
-		err := ms.Decode(step.Do, &cmds)
-		u.LogError("e:", err)
-		for idx, cmd := range cmds {
-			u.Pfv("    cmd(%2d): %+v\n", idx+1, cmd)
-			u.P("      exec result:", funcs.RunCmd(cmd))
+	var action ic.Do
+	switch step.Func {
+	case "shell":
+		funcAction := funcs.ShellFuncAction{
+			Do: step.Do,
 		}
-	} else {
-		var cmd string
-		err := ms.Decode(step.Do, &cmd)
-		u.LogError("err:", err)
-		u.P("      exec result:", funcs.RunCmd(cmd))
+
+		action = ic.Do(&funcAction)
 	}
+	action.Adapt()
+	action.Exec()
 
 }
 
