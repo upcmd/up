@@ -10,6 +10,7 @@ package poc
 import (
 	"github.com/davecgh/go-spew/spew"
 	ms "github.com/mitchellh/mapstructure"
+	"github.com/stephencheng/up/interface/impl/funcs"
 	"github.com/stephencheng/up/model"
 	td "github.com/stephencheng/up/testdata"
 	tl "github.com/stephencheng/up/tests"
@@ -46,7 +47,7 @@ func Test00002(t *testing.T) {
 				cmdCnt := len(step.Do.([]interface{}))
 				assert.Equal(cmdCnt, 2, "there should be 2 commands defined")
 				if cmdCnt > 1 {
-					var cmds model.ShellCmds
+					var cmds funcs.ShellCmds
 					err = ms.Decode(step.Do, &cmds)
 					t.Log("err:", err)
 					for idx, cmd := range cmds {

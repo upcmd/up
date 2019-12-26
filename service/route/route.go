@@ -5,13 +5,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-package model
+package route
 
-type Tasks []Task
+//import "github.com/stephencheng/up/model"
 
-type Task struct {
-	Task interface{} //Steps
-	Desc string
-	Name string
-}
+//import (
+//	m "github.com/stephencheng/up/model"
+//)
+//
+//func (step *Step) Exec() {
+//	model.Step{}
+//}
 

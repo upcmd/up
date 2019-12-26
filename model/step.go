@@ -7,4 +7,19 @@
 
 package model
 
+type Step struct {
+	Do   interface{} //FuncImpl
+	Func string
+	Desc string
+}
+
+func (step *Step) Exec() {
+
+}
+
+type Steps []Step
+
+func (steps *Steps) Exec() {
+
+}
 

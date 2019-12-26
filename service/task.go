@@ -11,7 +11,6 @@ import (
 	//"github.com/davecgh/go-spew/spew"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
-	"github.com/stephencheng/up/interface/impl"
 	"github.com/stephencheng/up/model"
 	u "github.com/stephencheng/up/utils"
 )
@@ -41,7 +40,7 @@ func ExecTask(taskname string) {
 			//spew.Dump(task)
 			var steps model.Steps
 			err := ms.Decode(task.Task, &steps)
-			impl.StepsExec(&steps)
+			StepsExec(&steps)
 			u.LogError("e:", err)
 		}
 	}

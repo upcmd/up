@@ -7,7 +7,7 @@
 
 package impl
 
-type StepExec interface {
-	Do()
+type Func interface {
+	Exec()
 }
 

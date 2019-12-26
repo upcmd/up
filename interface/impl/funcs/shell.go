@@ -20,3 +20,12 @@ func RunCmd(cmd string) string {
 	return string(cmdOutput)
 }
 
+type ShellFunc struct {
+}
+
+func (f *ShellFunc) Do() {
+
+}
+
+type ShellCmds []string
+
