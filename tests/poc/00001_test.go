@@ -13,7 +13,6 @@ import (
 	"github.com/stephencheng/up/interface/impl/funcs"
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/service"
-	td "github.com/stephencheng/up/testdata"
 	tl "github.com/stephencheng/up/tests"
 	"github.com/stretchr/testify/assert"
 	"strings"
@@ -61,7 +60,7 @@ func Test00001(t *testing.T) {
 						t.Log("err:", err)
 						for idx, cmd := range cmds {
 							t.Logf("cmd => %d -> %+v", idx, cmd)
-							result := td.RunCmd(t, cmd)
+							result := tl.RunCmd(t, cmd)
 							if idx == 1 {
 								assert.Equal("world",
 									strings.Trim(result, "\n"), "command run should return world")
@@ -73,7 +72,7 @@ func Test00001(t *testing.T) {
 						err = ms.Decode(step.Do, &cmd)
 						t.Log("err:", err)
 						spew.Dump(cmd)
-						td.RunCmd(t, cmd)
+						tl.RunCmd(t, cmd)
 					}
 				}
 			}

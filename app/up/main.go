@@ -27,21 +27,25 @@ var (
 
 func main() {
 
+	u.SetConfigYamlDir("../..")
+	u.InitConfig()
+	u.CoreConfig.TaskFile = "00003"
+	u.ShowCoreConfig()
 	u.P(" :release version:", u.CoreConfig.Version)
 	u.P(" :verbose level:", u.CoreConfig.Verbose)
-
-	u.ShowCoreConfig()
 
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	case task.FullCommand():
 		if *taskName != "" {
 			u.P("-exec task:", *taskName)
+			svc.InitTasks()
 			svc.ExecTask(*taskName)
 		}
 	case list.FullCommand():
 		u.P("-list", *listTypeName)
 		switch *listTypeName {
 		case "task":
+			svc.InitTasks()
 			svc.ListTasks()
 		case "flow":
 		}

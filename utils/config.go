@@ -11,47 +11,45 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
-	"os"
 	"reflect"
 )
 
 var (
-	Config     = initConfig()
-	CoreConfig = GetCoreConfig()
+	Config         *viper.Viper
+	CoreConfig     *model.CoreConfig
+	configYamlDir  = ""
+	configYamlFile = ""
 )
 
-func initConfig() *viper.Viper {
-
-	viper.AddConfigPath(".")
-	viper.AddConfigPath("..")
-	viper.AddConfigPath("../../")
-	viper.AddConfigPath("../../testdata/poc")
-	viper.SetConfigType("yaml")
-	viper.SetConfigName("config")
-
-	err := viper.ReadInConfig()
-
-	if err != nil {
-		fmt.Println("Config file:config.yml not found...", err)
-		os.Exit(3)
-	}
-	return viper.GetViper()
-
+func SetConfigYamlDir(dir string) {
+	configYamlDir = dir
 }
 
-//env config is via the scope, so not to consider this for now
-//func GetCoreConfig(appEnvName string) model.CoreConfig {
-//
-//	var cfg model.CoreConfig
-//	cfgEntry := Config.Sub(appEnvName)
-//
-//	err := cfgEntry.Unmarshal(&cfg)
-//
-//	if err != nil {
-//		fmt.Println("unable to decode into struct:", err.Error())
-//	}
-//	return cfg
-//}
+func SetConfigYamlFile(filename string) {
+	configYamlFile = filename
+}
+
+func InitConfig() {
+	Config = YamlLoader("Config",
+		func() (s string) {
+			if configYamlDir == "" {
+				s = defaults["ConfigDir"]
+			} else {
+				s = configYamlDir
+			}
+			return
+		}(),
+		func() (s string) {
+			if configYamlFile == "" {
+				s = defaults["ConfigFile"]
+			} else {
+				s = configYamlFile
+			}
+			return
+		}())
+
+	CoreConfig = GetCoreConfig()
+}
 
 func GetCoreConfig() *model.CoreConfig {
 

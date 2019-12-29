@@ -13,12 +13,14 @@ import (
 	"os"
 )
 
-func YamlLoader(path, filename string) *viper.Viper {
+func YamlLoader(id, path, filename string) *viper.Viper {
+	Pf("loading [%s] yaml file:  %s/%s\n", id, path, filename)
 	newV := viper.New()
 	newV.AddConfigPath(path)
 	newV.SetConfigType("yaml")
 	newV.SetConfigName(filename)
 
+	//fmt.Println(path, filename)
 	err := newV.ReadInConfig()
 
 	if err != nil {

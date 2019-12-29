@@ -16,12 +16,13 @@ import (
 )
 
 var (
-	TaskYmlRoot *viper.Viper = u.YamlLoader(u.CoreConfig.TaskDir, u.CoreConfig.TaskFile)
+	TaskYmlRoot *viper.Viper
 	Tasks       model.Tasks
 )
 
-func init() {
-	LoadTasks()
+func InitTasks() {
+	TaskYmlRoot = u.YamlLoader("Task", u.CoreConfig.TaskDir, u.CoreConfig.TaskFile)
+	loadTasks()
 }
 
 func ListTasks() {
@@ -52,7 +53,7 @@ func ExecTask(taskname string) {
 
 }
 
-func LoadTasks() error {
+func loadTasks() error {
 	tasksData := TaskYmlRoot.Get("tasks")
 	err := ms.Decode(tasksData, &Tasks)
 	return err

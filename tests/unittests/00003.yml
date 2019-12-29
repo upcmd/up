@@ -1,0 +1,23 @@
+notes:
+  goal:
+    - to test the shell function can handle do but without using array
+
+tasks:
+  -
+    name: task1
+    desc: this is task1
+    task: #this comment will not be treated as desc of the task, removing # will invalid the yml
+      -
+        func: shell
+        desc: do step1 in shell func
+        do: echo "hello"
+  -
+    name: task2
+    desc: this is task1
+    task: #this comment will not be treated as desc of the task, removing # will invalid the yml
+      -
+        func: shell
+        desc: do step1 in shell func
+        do: |
+          echo "hello"
+          echo "world"

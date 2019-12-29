@@ -9,11 +9,13 @@ package utils
 
 var (
 	defaults map[string]string = map[string]string{
-		"TaskDir":  ".",
-		"TaskFile": "task",
-		"FlowDir":  ".",
-		"FlowFile": "flow",
-		"Verbose":  "v",
+		"TaskDir":    ".",
+		"TaskFile":   "task",
+		"FlowDir":    ".",
+		"FlowFile":   "flow",
+		"Verbose":    "v",
+		"ConfigDir":  ".",
+		"ConfigFile": "config",
 	}
 )
 

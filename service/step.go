@@ -21,7 +21,9 @@ type Step struct {
 
 func (step *Step) Exec() {
 	var action ic.Do
+
 	switch step.Func {
+
 	case "shell":
 		funcAction := funcs.ShellFuncAction{
 			Do: step.Do,

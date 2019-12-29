@@ -8,7 +8,7 @@
 package funcs
 
 import (
-	ms "github.com/mitchellh/mapstructure"
+	//ms "github.com/mitchellh/mapstructure"
 	u "github.com/stephencheng/up/utils"
 	"os/exec"
 )
@@ -28,14 +28,23 @@ type ShellFuncAction struct {
 
 //adapt the abstract step.Do to concrete ShellFuncAction Cmds
 func (f *ShellFuncAction) Adapt() {
+	var cmd string
 	var cmds []string
-	err := ms.Decode(f.Do, &cmds)
-	u.LogError("e12:", err)
+
+	switch f.Do.(type) {
+	case string:
+		cmd = f.Do.(string)
+		cmds = append(cmds, cmd)
+
+	case []string:
+		cmds = f.Do.([]string)
+	}
+
 	f.Cmds = cmds
 }
 
 func (f *ShellFuncAction) Exec() {
-	u.P("shell func execed")
+	//u.P("shell func execed")
 
 	u.P(f.Cmds)
 	for idx, cmd := range f.Cmds {

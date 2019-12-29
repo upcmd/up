@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/fatih/color"
+	"runtime"
 	"strings"
 )
 
@@ -23,6 +24,16 @@ func VVVV(a ...interface{}) {
 func Pfvvvv(format string, a ...interface{}) {
 	if CoreConfig.Verbose == "vvvv" {
 		fmt.Printf(format, a...)
+	}
+}
+
+func Trace() {
+	if CoreConfig.Verbose == "vvvvv" {
+		pc := make([]uintptr, 15)
+		n := runtime.Callers(2, pc)
+		frames := runtime.CallersFrames(pc[:n])
+		frame, _ := frames.Next()
+		fmt.Printf("  \\_%s:%d %s\n", frame.File, frame.Line, frame.Function)
 	}
 }
 
