@@ -78,6 +78,12 @@ func GetCoreConfig() *model.CoreConfig {
 	return cfg
 }
 
+func SetVerbose(cmdV string) {
+	if cmdV != "" {
+		CoreConfig.Verbose = cmdV
+	}
+}
+
 func ShowCoreConfig() {
 	e := reflect.ValueOf(CoreConfig).Elem()
 	et := reflect.Indirect(e).Type()

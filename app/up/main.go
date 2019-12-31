@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	app = kingpin.New("up", "UP: the ultimate provisioner")
+	app = kingpin.New("up", "UP: The Ultimate Provisioner")
 
 	task         = app.Command("task", "run a entry task")
 	taskName     = task.Arg("taskname", "task name to run").Required().String()
@@ -23,18 +23,20 @@ var (
 	listTypeName = list.Arg("typename", "list [ task | flow ]").Required().String()
 	play         = app.Command("play", "run a playbook with defined steps")
 	playFile     = play.Arg("playfile", "play step file to run").Required().String()
+	verbose      = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
 )
 
 func main() {
 
-	u.SetConfigYamlDir("../..")
 	u.InitConfig()
-	u.CoreConfig.TaskFile = "00003"
 	u.ShowCoreConfig()
 	u.P(" :release version:", u.CoreConfig.Version)
+
+	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
+	u.SetVerbose(*verbose)
 	u.P(" :verbose level:", u.CoreConfig.Verbose)
 
-	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
+	switch cmd {
 	case task.FullCommand():
 		if *taskName != "" {
 			u.P("-exec task:", *taskName)

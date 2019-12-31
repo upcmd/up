@@ -1,0 +1,4 @@
+
+runtask(){
+ go run app/up/*.go $@
+}

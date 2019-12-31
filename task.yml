@@ -1,0 +1,16 @@
+version: 1.0.0
+
+tasks:
+  -
+    name: build
+    desc: build binary
+    task:
+      -
+        func: shell
+        desc: build the binary to build directory
+        do:
+          - rm -rf ./build
+          - mkdir -p ./build
+          - ls -lrt ./app/abc
+#          - go build -o build/up app/ups/*.go
+#          - go build -o `pwd`/build/up `pwd`/app/up/*.go  &> out

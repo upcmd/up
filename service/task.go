@@ -26,6 +26,7 @@ func InitTasks() {
 }
 
 func ListTasks() {
+	u.P("---task list---")
 	for idx, task := range Tasks {
 		u.Pf("  %d [%s]: %s \n", idx+1, task.Name, task.Desc)
 	}
@@ -48,7 +49,7 @@ func ExecTask(taskname string) {
 	}
 
 	if !found {
-		u.P("Task is not defined!")
+		u.Pf("Task %s is not defined!", taskname)
 	}
 
 }

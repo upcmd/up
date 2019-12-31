@@ -23,7 +23,8 @@ func VVVV(a ...interface{}) {
 
 func Pfvvvv(format string, a ...interface{}) {
 	if CoreConfig.Verbose == "vvvv" {
-		fmt.Printf(format, a...)
+		//fmt.Printf(format, a...)
+		vvvvv_color_printf(format, a...)
 	}
 }
 
@@ -43,7 +44,7 @@ func Pfv(format string, a ...interface{}) {
 
 func LogError(mark string, err interface{}) {
 	if err != nil {
-		color.Red("      %s->%s", mark, err)
+		color.Red("      %s%s", mark, err)
 	}
 }
 

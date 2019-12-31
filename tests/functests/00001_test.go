@@ -5,27 +5,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-package unittests
+package functests
 
 import (
 	"github.com/stephencheng/up/tests"
-	"path"
-	"runtime"
-
 	//"github.com/stretchr/testify/assert"
+	svc "github.com/stephencheng/up/service"
 	"testing"
 )
-
-func getDirs() (string, string) {
-	_, filename, _, _ := runtime.Caller(1)
-	utilsDir := path.Dir(filename)
-	rootDir := path.Join(utilsDir, "..")
-	return rootDir, path.Join(rootDir, "./testdata/poc")
-}
 
 func Test00001(t *testing.T) {
 
 	tests.Setup(t)
+	svc.InitTasks()
+	svc.ListTasks()
+	svc.ExecTask("task1")
+
 	//assert := assert.New(t)
 
 	//svc.ExecTask("task1")

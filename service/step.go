@@ -24,7 +24,7 @@ func (step *Step) Exec() {
 
 	switch step.Func {
 
-	case "shell":
+	case funcs.FUNC_SHELL:
 		funcAction := funcs.ShellFuncAction{
 			Do: step.Do,
 		}

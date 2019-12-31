@@ -7,6 +7,8 @@
 
 package utils
 
+import "github.com/fatih/color"
+
 var (
 	defaults map[string]string = map[string]string{
 		"TaskDir":    ".",
@@ -17,5 +19,6 @@ var (
 		"ConfigDir":  ".",
 		"ConfigFile": "config",
 	}
+	vvvvv_color_printf = color.Magenta
 )
 
