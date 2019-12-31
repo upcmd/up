@@ -27,3 +27,16 @@ func Test00001(t *testing.T) {
 
 }
 
+func Test00002(t *testing.T) {
+
+	tests.Setup(t)
+	svc.InitTasks()
+	svc.ListTasks()
+	svc.ExecTask("task1")
+
+	//assert := assert.New(t)
+
+	//svc.ExecTask("task1")
+
+}
+

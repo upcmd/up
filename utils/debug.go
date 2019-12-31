@@ -23,7 +23,6 @@ func VVVV(a ...interface{}) {
 
 func Pfvvvv(format string, a ...interface{}) {
 	if CoreConfig.Verbose == "vvvv" {
-		//fmt.Printf(format, a...)
 		vvvvv_color_printf(format, a...)
 	}
 }

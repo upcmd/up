@@ -17,7 +17,7 @@ import (
 
 var (
 	TaskYmlRoot *viper.Viper
-	Tasks       model.Tasks
+	Tasks       *model.Tasks
 )
 
 func InitTasks() {
@@ -26,16 +26,17 @@ func InitTasks() {
 }
 
 func ListTasks() {
-	u.P("---task list---")
-	for idx, task := range Tasks {
-		u.Pf("  %d [%s]: %s \n", idx+1, task.Name, task.Desc)
+	u.P("-task list")
+	for idx, task := range *Tasks {
+		u.Pf("  %d %20s: %s \n", idx+1, task.Name, task.Desc)
 	}
+	u.P("-")
 
 }
 
 func ExecTask(taskname string) {
 	found := false
-	for idx, task := range Tasks {
+	for idx, task := range *Tasks {
 		if taskname == task.Name {
 			u.Pfvvvv("  loacated task-> %d [%s]: %s \n", idx+1, task.Name, task.Desc)
 			found = true
@@ -56,7 +57,9 @@ func ExecTask(taskname string) {
 
 func loadTasks() error {
 	tasksData := TaskYmlRoot.Get("tasks")
-	err := ms.Decode(tasksData, &Tasks)
+	var tasks model.Tasks
+	err := ms.Decode(tasksData, &tasks)
+	Tasks = &tasks
 	return err
 }
 

@@ -11,6 +11,15 @@ tasks:
         do:
           - rm -rf ./build
           - mkdir -p ./build
-          - ls -lrt ./app/abc
-#          - go build -o build/up app/ups/*.go
-#          - go build -o `pwd`/build/up `pwd`/app/up/*.go  &> out
+          - go build -o build/up app/ups/*.go
+
+  -
+    name: test
+    desc: test all the function tests
+    task:
+      -
+        func: shell
+        do:
+#          - go test ./tests/functests/*.go -v | sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' | sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/''
+          - go test ./tests/functests/*.go -v
+

@@ -1,4 +1,4 @@
 
-runtask(){
+goup(){
  go run app/up/*.go $@
 }

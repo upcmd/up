@@ -17,10 +17,10 @@ tasks:
           - echo "world"
           - echo "world"|grep non-exist
 
-      -
-        func: shell
-        desc: do step2 in shell func
-        do:
-          - echo "hello"
-          - echo "world"
-          - echo "world"|grep non-exist
+#      -
+#        func: shell
+#        desc: do step2 in shell func
+#        do:
+#          - echo "hello"
+#          - echo "world"
+#          - echo "world"|grep non-exist
