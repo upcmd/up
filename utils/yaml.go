@@ -14,7 +14,7 @@ import (
 )
 
 func YamlLoader(id, path, filename string) *viper.Viper {
-	Pf("loading [%s] yaml file:  %s/%s\n", id, path, filename)
+	Pf("loading [%s]:  %s/%s.yml\n", id, path, filename)
 	newV := viper.New()
 	newV.AddConfigPath(path)
 	newV.SetConfigType("yaml")

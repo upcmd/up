@@ -11,7 +11,7 @@ tasks:
         do:
           - rm -rf ./build
           - mkdir -p ./build
-          - go build -o build/up app/ups/*.go
+          - go build -o build/up app/up/*.go
 
   -
     name: test
