@@ -14,12 +14,20 @@ tasks:
           - go build -o build/up app/up/*.go
 
   -
-    name: test
+    name: testc
     desc: test all the function tests
     task:
       -
         func: shell
         do:
-#          - go test ./tests/functests/*.go -v | sed ''/PASS/s//$(printf "\033[32mPASS\033[0m")/'' | sed ''/FAIL/s//$(printf "\033[31mFAIL\033[0m")/''
-          - go test ./tests/functests/*.go -v
+          - gotest ./tests/functests/casec_test.go -v
+
+  -
+    name: testx
+    desc: test all the function tests
+    task:
+      -
+        func: shell
+        do:
+          - gotest ./tests/functests/00002_test.go -v
 

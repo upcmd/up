@@ -8,9 +8,8 @@
 package functests
 
 import (
-	"github.com/stephencheng/up/tests"
-	//"github.com/stretchr/testify/assert"
 	svc "github.com/stephencheng/up/service"
+	"github.com/stephencheng/up/tests"
 	"testing"
 )
 
@@ -21,22 +20,19 @@ func Test00001(t *testing.T) {
 	svc.ListTasks()
 	svc.ExecTask("task1")
 
-	//assert := assert.New(t)
-
-	//svc.ExecTask("task1")
-
 }
 
 func Test00002(t *testing.T) {
-
 	tests.Setup(t)
 	svc.InitTasks()
 	svc.ListTasks()
 	svc.ExecTask("task1")
+}
 
-	//assert := assert.New(t)
-
-	//svc.ExecTask("task1")
-
+func Test00003(t *testing.T) {
+	tests.Setup(t)
+	svc.InitTasks()
+	svc.ListTasks()
+	svc.ExecTask("task1")
 }
 

@@ -15,7 +15,7 @@ import (
 	"strings"
 )
 
-func VVVV(a ...interface{}) {
+func Pvvvv(a ...interface{}) {
 	if CoreConfig.Verbose == "vvvv" {
 		fmt.Println(a...)
 	}
@@ -39,6 +39,10 @@ func Trace() {
 
 func Pfv(format string, a ...interface{}) {
 	fmt.Printf(format, a...)
+}
+
+func Spfv(format string, a ...interface{}) string {
+	return fmt.Sprintf(format, a...)
 }
 
 func LogError(mark string, err interface{}) {

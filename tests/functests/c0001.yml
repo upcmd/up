@@ -6,8 +6,8 @@ notes:
 
 tasks:
   -
-    name: task1
-    desc: this is task1
+    name: task
+    desc: this is task
     task: #this comment will not be treated as desc of the task, removing # will invalid the yml
       -
         func: shell
@@ -16,11 +16,3 @@ tasks:
           - echo "hello"
           - echo "world"
           - echo "world"|grep non-exist
-
-#      -
-#        func: shell
-#        desc: do step2 in shell func
-#        do:
-#          - echo "hello"
-#          - echo "world"
-#          - echo "world"|grep non-exist

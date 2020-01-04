@@ -10,6 +10,9 @@ package tests
 import (
 	u "github.com/stephencheng/up/utils"
 	"os/exec"
+	"path"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -43,5 +46,32 @@ func Setup(t *testing.T) {
 
 	//svc.ExecTask("task1")
 
+}
+
+func Setupx(filename string) {
+
+	filenameonly := path.Base(filename)
+
+	filenoext := strings.TrimSuffix(filenameonly, filepath.Ext(filenameonly))
+	u.CoreConfig.TaskFile = GetTestName(filenoext)
+	u.ShowCoreConfig()
+	u.P(" :release version:", u.CoreConfig.Version)
+	u.P(" :verbose level:", u.CoreConfig.Verbose)
+
+}
+
+func GetUnitTestCollection() []string {
+	_, filename, _, _ := runtime.Caller(1)
+	dir := path.Dir(filename)
+
+	files, err := filepath.Glob(u.Spfv("%s/%s", dir, "c0*.yml"))
+	u.LogError("list func test cases", err)
+
+	//u.Pvvvv("-loading collection of test cases")
+	for _, f := range files {
+		u.P(f)
+	}
+
+	return files
 }
 
