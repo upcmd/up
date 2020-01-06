@@ -24,6 +24,8 @@ var (
 	play         = app.Command("play", "run a playbook with defined steps")
 	playFile     = play.Arg("playfile", "play step file to run").Required().String()
 	verbose      = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
+	taskdir      = app.Flag("taskdir", "task file directory").Short('d').String()
+	taskfile     = app.Flag("taskfile", "task file to load (without yml extension)").Short('t').String()
 )
 
 func main() {
@@ -34,6 +36,9 @@ func main() {
 
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	u.SetVerbose(*verbose)
+
+	u.SetTaskdir(*taskdir)
+	u.SetTaskfile(*taskfile)
 	u.Pfvvvv(" :verbose level:%s", u.CoreConfig.Verbose)
 
 	switch cmd {

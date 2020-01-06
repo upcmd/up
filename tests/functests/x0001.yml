@@ -1,18 +1,8 @@
-notes:
-  goal:
-    - to test using a simpler mode of data structure for tasks using array
-  why:
-    - array will allow you to put more attribute so that you can put desc
-
 tasks:
   -
     name: task
-    desc: this is task
-    task: #this comment will not be treated as desc of the task, removing # will invalid the yml
+    task:
       -
         func: shell
-        desc: do step1 in shell func
         do:
-          - echo "hello"
-          - echo "world"
-          - echo "world"|grep non-exist
+          - echo "hello, world"

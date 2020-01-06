@@ -50,7 +50,8 @@ func ExecTask(taskname string) {
 	}
 
 	if !found {
-		u.Pf("Task %s is not defined!", taskname)
+		u.Pferror("Task %s is not defined!", taskname)
+		ListTasks()
 	}
 
 }

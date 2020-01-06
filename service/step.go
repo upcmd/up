@@ -28,9 +28,16 @@ func (step *Step) Exec() {
 		funcAction := funcs.ShellFuncAction{
 			Do: step.Do,
 		}
-
 		action = ic.Do(&funcAction)
+
+	case funcs.FUNC_TASK_REF:
+		funcAction := funcs.TaskRefFuncAction{
+			Do: step.Do,
+		}
+		action = ic.Do(&funcAction)
+
 	}
+
 	action.Adapt()
 	action.Exec()
 

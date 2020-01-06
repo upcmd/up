@@ -41,6 +41,10 @@ func Pfv(format string, a ...interface{}) {
 	fmt.Printf(format, a...)
 }
 
+func Pferror(format string, a ...interface{}) {
+	verror_color_printf(format, a...)
+}
+
 func Spfv(format string, a ...interface{}) string {
 	return fmt.Sprintf(format, a...)
 }

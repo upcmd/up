@@ -19,7 +19,7 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 	exec.Command("bash", "-c", cmd)
 
 	cmdOutput, err := cmdExec.CombinedOutput()
-	var result Result
+	var result ShellExecResult
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			result.Code = exitError.ExitCode()
@@ -35,7 +35,7 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 	return string(cmdOutput)
 }
 
-type Result struct {
+type ShellExecResult struct {
 	Code   int
 	Output string
 	ErrMsg string
@@ -44,7 +44,7 @@ type Result struct {
 type ShellFuncAction struct {
 	Do     interface{}
 	Cmds   []string
-	Result Result
+	Result ShellExecResult
 }
 
 //adapt the abstract step.Do to concrete ShellFuncAction Cmds

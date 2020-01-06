@@ -29,5 +29,14 @@ tasks:
       -
         func: shell
         do:
-          - gotest ./tests/functests/00002_test.go -v
+          - gotest ./tests/functests/casex_test.go -v
+
+  -
+    name: testwip
+    desc: test wip
+    task:
+      -
+        func: shell
+        do:
+          - go run app/up/*.go task task -d ./tests/functests -t wip -v vvvv
 

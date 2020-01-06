@@ -19,6 +19,7 @@ var (
 		"ConfigDir":  ".",
 		"ConfigFile": "config",
 	}
-	vvvvv_color_printf = color.Magenta
+	vvvvv_color_printf  = color.Magenta
+	verror_color_printf = color.Red
 )
 

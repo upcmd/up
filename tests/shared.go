@@ -8,6 +8,7 @@
 package tests
 
 import (
+	svc "github.com/stephencheng/up/service"
 	u "github.com/stephencheng/up/utils"
 	"os/exec"
 	"path"
@@ -35,17 +36,18 @@ func RunCmd(t *testing.T, cmd string) string {
 }
 
 func Setup(t *testing.T) {
-
 	u.InitConfig()
-	u.CoreConfig.TaskFile = GetTestName(t.Name())
+	u.CoreConfig.TaskFile = GetTestName(u.Spfv("%s%s", "x", t.Name()))
 	u.ShowCoreConfig()
 	u.P(" :release version:", u.CoreConfig.Version)
 	u.P(" :verbose level:", u.CoreConfig.Verbose)
+}
 
-	//assert := assert.New(t)
-
-	//svc.ExecTask("task1")
-
+func TestT(t *testing.T) {
+	Setup(t)
+	svc.InitTasks()
+	svc.ListTasks()
+	svc.ExecTask("task")
 }
 
 func Setupx(filename string) {
@@ -67,7 +69,6 @@ func GetUnitTestCollection() []string {
 	files, err := filepath.Glob(u.Spfv("%s/%s", dir, "c0*.yml"))
 	u.LogError("list func test cases", err)
 
-	//u.Pvvvv("-loading collection of test cases")
 	for _, f := range files {
 		u.P(f)
 	}

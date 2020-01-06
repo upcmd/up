@@ -84,6 +84,18 @@ func SetVerbose(cmdV string) {
 	}
 }
 
+func SetTaskdir(taskdir string) {
+	if taskdir != "" {
+		CoreConfig.TaskDir = taskdir
+	}
+}
+
+func SetTaskfile(taskfile string) {
+	if taskfile != "" {
+		CoreConfig.TaskFile = taskfile
+	}
+}
+
 func ShowCoreConfig() {
 	e := reflect.ValueOf(CoreConfig).Elem()
 	et := reflect.Indirect(e).Type()
