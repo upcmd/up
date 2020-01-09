@@ -1,4 +1,12 @@
 
 goup(){
- go run app/up/*.go $@
+    go run app/up/*.go $@
+}
+
+wiptest(){
+    goup task task -d ./tests/functests -t wip
+}
+
+wiptestvvvv(){
+    goup task task -d ./tests/functests -t wip -v vvvv
 }

@@ -9,7 +9,7 @@ package main
 
 import (
 	"github.com/alecthomas/kingpin"
-	svc "github.com/stephencheng/up/service"
+	"github.com/stephencheng/up/interface/impl"
 	u "github.com/stephencheng/up/utils"
 	"os"
 )
@@ -45,15 +45,15 @@ func main() {
 	case task.FullCommand():
 		if *taskName != "" {
 			u.P("-exec task:", *taskName)
-			svc.InitTasks()
-			svc.ExecTask(*taskName)
+			impl.InitTasks()
+			impl.ExecTask(*taskName)
 		}
 	case list.FullCommand():
 		u.P("-list", *listTypeName)
 		switch *listTypeName {
 		case "task":
-			svc.InitTasks()
-			svc.ListTasks()
+			impl.InitTasks()
+			impl.ListTasks()
 		case "flow":
 		}
 	case play.FullCommand():

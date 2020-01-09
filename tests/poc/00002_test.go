@@ -10,9 +10,9 @@ package poc
 import (
 	"github.com/davecgh/go-spew/spew"
 	ms "github.com/mitchellh/mapstructure"
+	"github.com/stephencheng/up/interface/impl"
 	"github.com/stephencheng/up/interface/impl/funcs"
 	"github.com/stephencheng/up/model"
-	"github.com/stephencheng/up/service"
 	tl "github.com/stephencheng/up/tests"
 	"github.com/stretchr/testify/assert"
 	"strings"
@@ -37,7 +37,7 @@ func Test00002(t *testing.T) {
 
 			//parse task impl
 			assert.Equal(task.Name, "task1", "task1 name should be task1")
-			var taskImpl service.Steps
+			var taskImpl impl.Steps
 			err = ms.Decode(task.Task, &taskImpl)
 			t.Log("err:", err)
 			spew.Dump(taskImpl)

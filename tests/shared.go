@@ -8,7 +8,7 @@
 package tests
 
 import (
-	svc "github.com/stephencheng/up/service"
+	"github.com/stephencheng/up/interface/impl"
 	u "github.com/stephencheng/up/utils"
 	"os/exec"
 	"path"
@@ -45,9 +45,9 @@ func Setup(t *testing.T) {
 
 func TestT(t *testing.T) {
 	Setup(t)
-	svc.InitTasks()
-	svc.ListTasks()
-	svc.ExecTask("task")
+	impl.InitTasks()
+	impl.ListTasks()
+	impl.ExecTask("task")
 }
 
 func Setupx(filename string) {

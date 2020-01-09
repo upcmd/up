@@ -8,7 +8,7 @@
 package functests
 
 import (
-	svc "github.com/stephencheng/up/service"
+	"github.com/stephencheng/up/interface/impl"
 	"github.com/stephencheng/up/tests"
 	u "github.com/stephencheng/up/utils"
 
@@ -22,9 +22,9 @@ func TestC(t *testing.T) {
 	for _, x := range files {
 		u.P("testing:", x)
 		tests.Setupx(x)
-		svc.InitTasks()
-		svc.ListTasks()
-		svc.ExecTask("task")
+		impl.InitTasks()
+		impl.ListTasks()
+		impl.ExecTask("task")
 	}
 }
 

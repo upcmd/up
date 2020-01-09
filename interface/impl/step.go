@@ -5,11 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-package service
+package impl
 
 import (
 	ic "github.com/stephencheng/up/interface"
-	"github.com/stephencheng/up/interface/impl/funcs"
 	u "github.com/stephencheng/up/utils"
 )
 
@@ -24,14 +23,14 @@ func (step *Step) Exec() {
 
 	switch step.Func {
 
-	case funcs.FUNC_SHELL:
-		funcAction := funcs.ShellFuncAction{
+	case FUNC_SHELL:
+		funcAction := ShellFuncAction{
 			Do: step.Do,
 		}
 		action = ic.Do(&funcAction)
 
-	case funcs.FUNC_TASK_REF:
-		funcAction := funcs.TaskRefFuncAction{
+	case FUNC_TASK_REF:
+		funcAction := TaskRefFuncAction{
 			Do: step.Do,
 		}
 		action = ic.Do(&funcAction)
