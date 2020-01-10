@@ -1,0 +1,25 @@
+goal:
+  - to test using different yaml syntax
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do: [echo "hello", echo "world"]
+
+      -
+        func: shell
+        do: [
+          echo "hello",
+          echo "world"
+        ]
+
+      -
+        func: shell
+        do: [
+          echo "hello",
+          echo "world"]
+

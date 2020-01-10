@@ -1,0 +1,22 @@
+goal:
+  - to test out using vars
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        desc: to test display env vars from shell context
+        do:
+          - |
+            echo "aaa: $aaa"
+
+          - |
+            echo "bbb: $bbb"
+
+          - echo "aaa':' $aaa"
+          - echo "aaa":" $aaa"
+          - echo "aaa -> $aaa"
+

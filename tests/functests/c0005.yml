@@ -1,0 +1,52 @@
+notes:
+  goal:
+    - to ues task ref to achieve the goal of task composition
+  why:
+    - it is like dep but allow pre and post task using task ref
+
+tasks:
+  -
+    name: pre-task
+    desc: this is pre-task
+    task:
+      -
+        func: shell
+        do:
+          - echo "hello"
+
+  -
+    name: post-task
+    desc: this is post-task
+    task:
+      -
+        func: shell
+        desc: do step1 in shell func
+        do:
+          - echo "world"
+
+  -
+    name: 2ndtask
+    task:
+      -
+        func: shell
+        desc: to test multiple refs
+        do:
+          - echo "this is 2nd task"
+
+  -
+    name: task
+    desc: this is the task and expect the final message (hello I love this world)
+    task:
+      -
+        func: task_ref
+        do:
+          - pre-task
+      -
+        func: shell
+        do:
+          - echo " I love this "
+      -
+        func: task_ref
+        do:
+          - post-task
+          - 2ndtask

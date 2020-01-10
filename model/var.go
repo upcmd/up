@@ -7,11 +7,8 @@
 
 package model
 
-type Task struct {
-	Task interface{} //Steps
-	Desc string
-	Name string
+type Vars struct {
+	Scope   string
+	Varlist map[string]interface{}
 }
-
-type Tasks []Task
 
