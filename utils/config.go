@@ -51,6 +51,13 @@ func InitConfig() {
 	CoreConfig = GetCoreConfig()
 }
 
+//for unit test only
+func SetMockConfig() {
+	cfg := new(model.CoreConfig)
+	CoreConfig = cfg
+	CoreConfig.Verbose = "vvvv"
+}
+
 func GetCoreConfig() *model.CoreConfig {
 
 	cfg := new(model.CoreConfig)
