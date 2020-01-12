@@ -8,7 +8,6 @@
 package cache
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	u "github.com/stephencheng/up/utils"
 	"sync"
 )
@@ -23,7 +22,6 @@ var (
 func GetCache() *Cache {
 	if cacheMap == nil {
 		cacheMap = New()
-		spew.Dump(*cacheMap)
 	}
 	return cacheMap
 }

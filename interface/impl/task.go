@@ -8,21 +8,26 @@
 package impl
 
 import (
+	"github.com/davecgh/go-spew/spew"
 	//"github.com/davecgh/go-spew/spew"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
+	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 )
 
 var (
 	TaskYmlRoot *viper.Viper
 	Tasks       *model.Tasks
+	Scopes      *cache.Scopes
 )
 
 func InitTasks() {
 	TaskYmlRoot = u.YamlLoader("Task", u.CoreConfig.TaskDir, u.CoreConfig.TaskFile)
 	loadTasks()
+	loadScopes()
+	Scopes.InitContextInstances()
 }
 
 func ListTasks() {
@@ -61,6 +66,15 @@ func loadTasks() error {
 	var tasks model.Tasks
 	err := ms.Decode(tasksData, &tasks)
 	Tasks = &tasks
+	return err
+}
+
+func loadScopes() error {
+	scopesData := TaskYmlRoot.Get("scopes")
+	var scopes cache.Scopes
+	err := ms.Decode(scopesData, &scopes)
+	Scopes = &scopes
+	spew.Dump(scopes)
 	return err
 }
 

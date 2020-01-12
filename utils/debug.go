@@ -51,7 +51,7 @@ func Spfv(format string, a ...interface{}) string {
 
 func LogError(mark string, err interface{}) {
 	if err != nil {
-		color.Red("      %s%s", mark, err)
+		color.Red("      %s -> %s", mark, err)
 	}
 }
 
