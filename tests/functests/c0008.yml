@@ -1,0 +1,191 @@
+goal:
+  - to test out vars in scope
+  - vars should be merged in its own scope
+  - scope 1/2/3/4 are only for solution references
+  - plain string value for this case
+
+scopes:
+  -
+    name: global
+    vars:
+      a: global-a
+      b: global-b
+      c: global-c
+      d: global-d
+  -
+    name: prod
+    members: [dr,prod]
+    vars:
+      a: prod-a
+      c: prod-c
+
+  -
+    name: nonprod
+    members:
+      - dev
+      - st
+      - staging
+    vars:
+      a: non-prod-a
+      b: non-prod-b
+      c: non-prod-c
+
+  -
+    name: staging
+    vars:
+      a: staging-a
+      b: staging-b
+
+  -  name: dev
+     vars:
+       a: dev-a
+       c: dev-c
+
+scopes4:
+  -
+    name: global
+    vars:
+      a: global-a
+      b: global-b
+      c: global-c
+      d: global-d
+
+  -
+    name: nonprod
+    vars:
+      a: non-prod-a
+      b: non-prod-b
+      c: non-prod-c
+
+  -
+    name: prod
+    vars:
+      a: prod-group-a
+      c: prod-group-c
+
+  -
+    name: staging
+    group: nonprod
+    vars:
+      a: staging-a
+      b: staging-b
+
+  - name: dev
+    group: nonprod
+    vars:
+       a: dev-a
+       c: dev-c
+
+  - name: prod
+    group: prod
+    vars:
+      a: prod-a
+      c: prod-c
+
+scope3:
+  -
+    name: global
+    vars:
+      a: global-a
+      b: global-b
+      c: global-c
+      d: global-d
+  -
+    name: nonprod
+    members:
+      - dev
+      - st
+      - staging
+    vars:
+      a: non-prod-a
+      b: non-prod-b
+      c: non-prod-c
+
+  -
+    name: prod
+    members: [dr,prod]
+    vars:
+      a: prod-a
+      c: prod-c
+
+  -
+    name: staging
+    vars:
+      a: staging-a
+      b: staging-b
+
+  -  name: dev
+     vars:
+       a: dev-a
+       c: dev-c
+
+scope2:
+  vars:
+    a: global-a
+    b: global-b
+    c: global-c
+    d: global-d
+  nonprod:
+    members:
+      - dev
+      - st
+      - staging
+    vars:
+      a: non-prod-a
+      b: non-prod-b
+      c: non-prod-c
+  prod:
+    members: [dr,prod]
+    vars:
+      a: prod-a
+      c: prod-c
+  each:
+    staging:
+      vars:
+        a: staging-a
+        b: staging-b
+    dev:
+      vars:
+        a: dev-a
+        c: dev-c
+
+scope1:
+  vars:
+    a: global-a
+    b: global-b
+    c: global-c
+    d: global-d
+  nonprod:
+    members:
+      - dev
+      - st
+      - staging
+    vars:
+      a: non-prod-a
+      b: non-prod-b
+      c: non-prod-c
+  prod:
+    members: [dr,prod]
+    vars:
+      a: prod-a
+      c: prod-c
+  each:
+    staging:
+      vars:
+        a: staging-a
+        b: staging-b
+    dev:
+      vars:
+        a: dev-a
+        c: dev-c
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo "test out the var scopes only"
+

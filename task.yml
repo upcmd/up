@@ -24,7 +24,7 @@ tasks:
 
   -
     name: testx
-    desc: test all the function tests
+    desc: test specific the function test
     task:
       -
         func: shell

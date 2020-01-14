@@ -8,7 +8,6 @@
 package cache
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	"github.com/imdario/mergo"
 	"github.com/mohae/deepcopy"
 	u "github.com/stephencheng/up/utils"
@@ -16,21 +15,28 @@ import (
 )
 
 var (
-	contextInstances *ContextInstances
+	//expanded context only contains group and global scope, but not each instance vars
+	expandedContext  ExpandedContext   = ExpandedContext{}
 	GroupMembersList []string          = []string{}
 	MemberGroupMap   map[string]string = map[string]string{}
+	ScopeProfiles    *Scopes
 )
 
 type Scope struct {
 	Name    string
+	Ref     string
 	Members []string
 	Vars    Cache
 }
 
 type Scopes []Scope
 
-type ContextInstance map[string]Cache
-type ContextInstances []ContextInstance
+type ExpandedContext map[string]Cache
+type ContextInstances []ExpandedContext
+
+func SetScopeProfiles(sp *Scopes) {
+	ScopeProfiles = sp
+}
 
 /*
 Get the merged vars for specific scope instance
@@ -41,7 +47,6 @@ Validate the scopes
 */
 
 func (ss Scopes) InitContextInstances() {
-	var groupContextInstances = ContextInstances{}
 	var globalvars Cache
 
 	for _, s := range ss {
@@ -54,8 +59,6 @@ func (ss Scopes) InitContextInstances() {
 		}
 	}
 
-	u.Pfv("global address: %p\n", &globalvars)
-
 	for _, s := range ss {
 		if s.Members != nil {
 			for _, m := range s.Members {
@@ -67,32 +70,35 @@ func (ss Scopes) InitContextInstances() {
 				MemberGroupMap[m] = s.Name
 			}
 
-			u.P("-------group name:", s.Name)
 			var groupvars Cache = deepcopy.Copy(globalvars).(Cache)
-			u.Pfv("groupvars address: %p \n", &groupvars)
-			spew.Dump("group vars base:", groupvars)
-			spew.Dump("group vars:", s.Vars)
 			mergo.Merge(&groupvars, s.Vars, mergo.WithOverride)
-			spew.Dump("merged group vars:", groupvars)
-			groupContextInstance := ContextInstance{s.Name: groupvars}
-			groupContextInstances = append(groupContextInstances, groupContextInstance)
+			expandedContext[s.Name] = groupvars
 		}
 	}
 
-	groupContextInstances = append(groupContextInstances, ContextInstance{"global": globalvars})
-
-	contextInstances = &groupContextInstances
+	expandedContext["global"] = globalvars
 	ListContextInstances()
 }
 
 func ListContextInstances() {
-	u.P("---------group vars----------")
-	for _, gci := range *contextInstances {
-		spew.Dump(gci)
-		u.P("")
+	u.Pvvvv("---------group vars----------")
+	for k, v := range expandedContext {
+		u.Dvvvv(k, v)
+		u.Pvvvv("-")
 	}
-	u.P(GroupMembersList)
+	u.Pfvvvv("groups members:%s\n", GroupMembersList)
 
+}
+
+//get instance vars, eg dev
+func (ss Scopes) GetInstanceVars(instanceName string) *Cache {
+	for _, s := range ss {
+		if s.Name == instanceName {
+			return &s.Vars
+		}
+	}
+
+	return nil
 }
 
 /*pass in runtime id, if runtime id is in member list, eg dev -> nonprod
@@ -103,10 +109,25 @@ if runtime id (nonname) is not in member list,
 then merge runtimevars to global varss,
 then merge localvars to above merged result to get final runtime vars
 */
-func GetRuntimeInstanceVars(runtimeid string, runtimevars Cache, localvars Cache) Cache {
-	if runtimeid == "noname" {
-		//var globalvars Cache = deepcopy.Copy(contextInstances["global"]).(Cache)
+func GetRuntimeInstanceVars(runtimeid string, runtimeglobalvars Cache, localvars Cache) *Cache {
+	var runtimevars Cache
+	if u.Contains(GroupMembersList, runtimeid) {
+		groupname := MemberGroupMap[runtimeid]
+		runtimevars = deepcopy.Copy(expandedContext[groupname]).(Cache)
+
+		instanceVars := ScopeProfiles.GetInstanceVars(runtimeid)
+		if instanceVars != nil {
+			mergo.Merge(&runtimevars, instanceVars, mergo.WithOverride)
+		}
+	} else {
+		runtimevars = deepcopy.Copy(expandedContext["global"]).(Cache)
 	}
-	return nil
+
+	mergo.Merge(&runtimevars, runtimeglobalvars, mergo.WithOverride)
+	mergo.Merge(&runtimevars, localvars, mergo.WithOverride)
+
+	u.Pfvvvv("current instance[ %s ] runtime vars:", runtimeid)
+	u.Dvvvv(runtimevars)
+	return &runtimevars
 }
 

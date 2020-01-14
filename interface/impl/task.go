@@ -8,7 +8,6 @@
 package impl
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	//"github.com/davecgh/go-spew/spew"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
@@ -27,7 +26,8 @@ func InitTasks() {
 	TaskYmlRoot = u.YamlLoader("Task", u.CoreConfig.TaskDir, u.CoreConfig.TaskFile)
 	loadTasks()
 	loadScopes()
-	Scopes.InitContextInstances()
+	cache.ScopeProfiles.InitContextInstances()
+	cache.GetRuntimeInstanceVars("dev", cache.Cache{}, cache.Cache{})
 }
 
 func ListTasks() {
@@ -73,8 +73,8 @@ func loadScopes() error {
 	scopesData := TaskYmlRoot.Get("scopes")
 	var scopes cache.Scopes
 	err := ms.Decode(scopesData, &scopes)
-	Scopes = &scopes
-	spew.Dump(scopes)
+	//Scopes = &scopes
+	cache.SetScopeProfiles(&scopes)
 	return err
 }
 

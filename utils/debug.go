@@ -10,6 +10,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/fatih/color"
 	"runtime"
 	"strings"
@@ -17,7 +18,13 @@ import (
 
 func Pvvvv(a ...interface{}) {
 	if CoreConfig.Verbose == "vvvv" {
-		fmt.Println(a...)
+		vvvvv_color_printf("%s\n", fmt.Sprintln(a...))
+	}
+}
+
+func Dvvvv(a ...interface{}) {
+	if CoreConfig.Verbose == "vvvv" {
+		vvvvv_color_printf("%s\n", spew.Sdump(a...))
 	}
 }
 
