@@ -83,8 +83,8 @@ func (ss Scopes) InitContextInstances() {
 func ListContextInstances() {
 	u.Pvvvv("---------group vars----------")
 	for k, v := range expandedContext {
-		u.Dvvvv(k, v)
-		u.Pvvvv("-")
+		u.Pfvvvv("%s: %s", k, u.Spp(v))
+		u.Dvvvvv(k, v)
 	}
 	u.Pfvvvv("groups members:%s\n", GroupMembersList)
 
@@ -127,7 +127,7 @@ func GetRuntimeInstanceVars(runtimeid string, runtimeglobalvars Cache, localvars
 	mergo.Merge(&runtimevars, localvars, mergo.WithOverride)
 
 	u.Pfvvvv("current instance[ %s ] runtime vars:", runtimeid)
-	u.Dvvvv(runtimevars)
+	u.Spplnvvvv(runtimevars)
 	return &runtimevars
 }
 

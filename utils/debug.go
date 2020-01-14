@@ -16,26 +16,36 @@ import (
 	"strings"
 )
 
+func permitted(v string) bool {
+	vconfigured := len(CoreConfig.Verbose)
+	vallowed := len(v)
+	if vconfigured >= vallowed {
+		return true
+	} else {
+		return false
+	}
+}
+
 func Pvvvv(a ...interface{}) {
-	if CoreConfig.Verbose == "vvvv" {
+	if permitted("vvvv") {
 		vvvvv_color_printf("%s\n", fmt.Sprintln(a...))
 	}
 }
 
-func Dvvvv(a ...interface{}) {
-	if CoreConfig.Verbose == "vvvv" {
+func Dvvvvv(a ...interface{}) {
+	if permitted("vvvvv") {
 		vvvvv_color_printf("%s\n", spew.Sdump(a...))
 	}
 }
 
 func Pfvvvv(format string, a ...interface{}) {
-	if CoreConfig.Verbose == "vvvv" {
+	if permitted("vvvv") {
 		vvvvv_color_printf(format, a...)
 	}
 }
 
 func Trace() {
-	if CoreConfig.Verbose == "vvvvv" {
+	if permitted("vvvvv") {
 		pc := make([]uintptr, 15)
 		n := runtime.Callers(2, pc)
 		frames := runtime.CallersFrames(pc[:n])
@@ -45,7 +55,9 @@ func Trace() {
 }
 
 func Pfv(format string, a ...interface{}) {
-	fmt.Printf(format, a...)
+	if permitted("v") {
+		fmt.Printf(format, a...)
+	}
 }
 
 func Pferror(format string, a ...interface{}) {
@@ -62,7 +74,11 @@ func LogError(mark string, err interface{}) {
 	}
 }
 
-func PP(i interface{}) string {
+func Spplnvvvv(i interface{}) {
+	Pfvvvv("%s\n", Spp(i))
+}
+
+func Spp(i interface{}) string {
 	s, _ := json.MarshalIndent(i, "", "  ")
 	str := string(s)
 	fstr1 := strings.Replace(str, `\"`, "", -1)
@@ -72,13 +88,13 @@ func PP(i interface{}) string {
 
 //func PPfvvvv(format string, a interface{}) {
 //	if CoreConfig.Verbose == "vvvv" {
-//		fmt.Printf(format, PP(a))
+//		fmt.Printf(format, Spp(a))
 //	}
 //}
 //
 //func PPvvvv(a interface{}) {
 //	if CoreConfig.Verbose == "vvvv" {
-//		fmt.Println(PP(a))
+//		fmt.Println(Spp(a))
 //	}
 //}
 

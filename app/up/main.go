@@ -32,14 +32,14 @@ func main() {
 
 	u.InitConfig()
 	u.ShowCoreConfig()
-	u.Pfvvvv(" :release version:", u.CoreConfig.Version)
+	u.Pfvvvv(" :release version:20%s", u.CoreConfig.Version)
 
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	u.SetVerbose(*verbose)
 
 	u.SetTaskdir(*taskdir)
 	u.SetTaskfile(*taskfile)
-	u.Pfvvvv(" :verbose level:%s", u.CoreConfig.Verbose)
+	u.Pfvvvv(" :verbose level:20%s", u.CoreConfig.Verbose)
 
 	switch cmd {
 	case task.FullCommand():

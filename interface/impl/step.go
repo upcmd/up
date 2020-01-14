@@ -47,7 +47,7 @@ type Steps []Step
 func (steps *Steps) Exec() {
 
 	for idx, step := range *steps {
-		u.Pfvvvv("  step(%3d): %s\n", idx+1, u.PP(step))
+		u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Spp(step))
 		//u.Pfvvvv("%+v | length: %d\n", step.Do, len(step.Do.([]interface{})))
 		step.Exec()
 	}
