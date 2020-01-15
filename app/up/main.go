@@ -10,6 +10,7 @@ package main
 import (
 	"github.com/alecthomas/kingpin"
 	"github.com/stephencheng/up/interface/impl"
+	rt "github.com/stephencheng/up/model/runtime"
 	u "github.com/stephencheng/up/utils"
 	"os"
 )
@@ -26,20 +27,22 @@ var (
 	verbose      = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
 	taskdir      = app.Flag("taskdir", "task file directory").Short('d').String()
 	taskfile     = app.Flag("taskfile", "task file to load (without yml extension)").Short('t').String()
+	instanceName = app.Flag("instance", "instance name for execution").Short('i').String()
 )
 
 func main() {
 
 	u.InitConfig()
 	u.ShowCoreConfig()
-	u.Pfvvvv(" :release version:20%s", u.CoreConfig.Version)
+	u.Pfvvvv(" :release version:  %s", u.CoreConfig.Version)
 
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	u.SetVerbose(*verbose)
 
 	u.SetTaskdir(*taskdir)
 	u.SetTaskfile(*taskfile)
-	u.Pfvvvv(" :verbose level:20%s", u.CoreConfig.Verbose)
+	u.Pfvvvv(" :verbose level:  %s", u.CoreConfig.Verbose)
+	rt.SetInstanceName(*instanceName)
 
 	switch cmd {
 	case task.FullCommand():

@@ -8,10 +8,10 @@ wiptest(){
 }
 
 wiptestvvvv(){
-    goup task task -d ./tests/functests -t wip -v vvvv
+    goup task task -d ./tests/functests -t wip -i dev -v vvvv
 }
 
 wiptestdebug(){
-    goup task task -d ./tests/functests -t wip -v vvvvv
+    goup task task -d ./tests/functests -t wip -i dev -v vvvvv
 }
 

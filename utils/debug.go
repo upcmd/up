@@ -86,15 +86,3 @@ func Spp(i interface{}) string {
 	return color.YellowString("%s", fstr2)
 }
 
-//func PPfvvvv(format string, a interface{}) {
-//	if CoreConfig.Verbose == "vvvv" {
-//		fmt.Printf(format, Spp(a))
-//	}
-//}
-//
-//func PPvvvv(a interface{}) {
-//	if CoreConfig.Verbose == "vvvv" {
-//		fmt.Println(Spp(a))
-//	}
-//}
-

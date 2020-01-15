@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/cache"
+	rt "github.com/stephencheng/up/model/runtime"
 	u "github.com/stephencheng/up/utils"
 )
 
@@ -27,7 +28,7 @@ func InitTasks() {
 	loadTasks()
 	loadScopes()
 	cache.ScopeProfiles.InitContextInstances()
-	cache.GetRuntimeInstanceVars("dev", cache.Cache{}, cache.Cache{})
+	cache.GetRuntimeInstanceVars(rt.InstanceName, cache.Cache{}, cache.Cache{})
 }
 
 func ListTasks() {
