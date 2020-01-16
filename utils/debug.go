@@ -32,6 +32,12 @@ func Pvvvv(a ...interface{}) {
 	}
 }
 
+func Pvvvvv(a ...interface{}) {
+	if permitted("vvvvv") {
+		vvvvv_color_printf("%s\n", fmt.Sprintln(a...))
+	}
+}
+
 func Dvvvvv(a ...interface{}) {
 	if permitted("vvvvv") {
 		vvvvv_color_printf("%s\n", spew.Sdump(a...))
@@ -74,8 +80,14 @@ func LogError(mark string, err interface{}) {
 	}
 }
 
-func Spplnvvvv(i interface{}) {
+func Pplnvvvv(i interface{}) {
 	Pfvvvv("%s\n", Spp(i))
+}
+
+func Dpplnvvvv(i interface{}) {
+	if permitted("vvvvv") {
+		Pfvvvv("%s\n", Spp(i))
+	}
 }
 
 func Spp(i interface{}) string {

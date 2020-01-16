@@ -42,6 +42,7 @@ func main() {
 	u.SetTaskdir(*taskdir)
 	u.SetTaskfile(*taskfile)
 	u.Pfvvvv(" :verbose level:  %s", u.CoreConfig.Verbose)
+	u.Pfvvvv(" :instance name:  %s", *instanceName)
 	rt.SetInstanceName(*instanceName)
 
 	switch cmd {

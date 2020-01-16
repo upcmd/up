@@ -9,8 +9,11 @@ package cache
 
 import (
 	"github.com/imdario/mergo"
+	ms "github.com/mitchellh/mapstructure"
 	"github.com/mohae/deepcopy"
+	"github.com/spf13/viper"
 	u "github.com/stephencheng/up/utils"
+
 	"os"
 )
 
@@ -38,6 +41,15 @@ func SetScopeProfiles(sp *Scopes) {
 	ScopeProfiles = sp
 }
 
+func loadRefVars(yamlroot *viper.Viper) *Cache {
+	scopesData := yamlroot.Get("vars")
+	vars := Cache{}
+	err := ms.Decode(scopesData, &vars)
+	u.Dvvvvv(vars)
+	u.LogError("load ref vars", err)
+	return &vars
+}
+
 /*
 Get the merged vars for specific scope instance
 Validate the scopes
@@ -46,10 +58,30 @@ Validate the scopes
 3. for the scope with no members and name is not global, it is a final instance
 */
 
-func (ss Scopes) InitContextInstances() {
+func (ss *Scopes) InitContextInstances() {
 	var globalvars Cache
 
-	for _, s := range ss {
+	for idx, s := range *ss {
+
+		if s.Ref != "" && s.Vars != nil {
+			u.LogError("verify scope ref and member coexistence", "ref and members can not both exist")
+			u.Dvvvvv(s)
+			os.Exit(-1)
+		}
+		if s.Ref != "" {
+			yamlvarsroot := u.YamlLoader("ref vars", u.CoreConfig.TaskDir, s.Ref)
+			vars := *loadRefVars(yamlvarsroot)
+			u.Pvvvv("loading vars from:", s.Ref)
+			u.Pplnvvvv(vars)
+			(*ss)[idx].Vars = vars
+		}
+
+	}
+
+	u.Pvvvvv("-------full vars in scopes------")
+	u.Dpplnvvvv(ss)
+
+	for _, s := range *ss {
 		if s.Name == "global" {
 			if s.Members != nil {
 				u.LogError("scope expand", "global scope should not contains members")
@@ -59,7 +91,7 @@ func (ss Scopes) InitContextInstances() {
 		}
 	}
 
-	for _, s := range ss {
+	for _, s := range *ss {
 		if s.Members != nil {
 			for _, m := range s.Members {
 				if u.Contains(GroupMembersList, m) {
@@ -91,8 +123,8 @@ func ListContextInstances() {
 }
 
 //get instance vars, eg dev
-func (ss Scopes) GetInstanceVars(instanceName string) *Cache {
-	for _, s := range ss {
+func (ss *Scopes) GetInstanceVars(instanceName string) *Cache {
+	for _, s := range *ss {
 		if s.Name == instanceName {
 			return &s.Vars
 		}
@@ -127,7 +159,7 @@ func GetRuntimeInstanceVars(runtimeid string, runtimeglobalvars Cache, localvars
 	mergo.Merge(&runtimevars, localvars, mergo.WithOverride)
 
 	u.Pfvvvv("current instance[ %s ] runtime vars:", runtimeid)
-	u.Spplnvvvv(runtimevars)
+	u.Pplnvvvv(runtimevars)
 	return &runtimevars
 }
 
