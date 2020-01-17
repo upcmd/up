@@ -72,7 +72,7 @@ func (ss *Scopes) InitContextInstances() {
 			yamlvarsroot := u.YamlLoader("ref vars", u.CoreConfig.TaskDir, s.Ref)
 			vars := *loadRefVars(yamlvarsroot)
 			u.Pvvvv("loading vars from:", s.Ref)
-			u.Pplnvvvv(vars)
+			u.Ppmsgvvvv(vars)
 			(*ss)[idx].Vars = vars
 		}
 
@@ -117,7 +117,7 @@ func ListContextInstances() {
 	u.Pvvvv("---------group vars----------")
 	for k, v := range expandedContext {
 		u.Pfvvvv("%s: %s", k, u.Spp(v))
-		u.Dvvvvv(k, v)
+		//u.Dvvvvv(k, v)
 	}
 	u.Pfvvvv("groups members:%s\n", GroupMembersList)
 
@@ -160,8 +160,7 @@ func GetRuntimeInstanceVars(runtimeid string, runtimeglobalvars Cache, localvars
 	mergo.Merge(&runtimevars, localvars, mergo.WithOverride)
 
 	u.Pfvvvv("current instance[ %s ] runtime vars:", runtimeid)
-	//u.Pplnvvvv(runtimevars)
-
+	u.Ppmsgvvvv(runtimevars)
 	u.Dvvvvv(runtimevars)
 	return &runtimevars
 }

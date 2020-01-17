@@ -21,5 +21,7 @@ var (
 	}
 	vvvvv_color_printf  = color.Magenta
 	verror_color_printf = color.Red
+	msg_color_printf    = color.Yellow
+	msg_color_sprintf   = color.YellowString
 )
 

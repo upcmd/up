@@ -8,7 +8,7 @@
 package poc
 
 import (
-	"github.com/davecgh/go-spew/spew"
+	"github.com/stephencheng/go-spew/spew"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/stephencheng/up/interface/impl"
 	"github.com/stephencheng/up/interface/impl/funcs"

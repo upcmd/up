@@ -8,12 +8,18 @@
 package utils
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/fatih/color"
+	"github.com/stephencheng/go-spew/spew"
 	"runtime"
-	"strings"
+)
+
+var (
+	spewMsgState spew.ConfigState = spew.ConfigState{
+		DisableTypes:   true,
+		DisableLengths: true,
+		Indent:         "  ",
+	}
 )
 
 func permitted(v string) bool {
@@ -42,6 +48,32 @@ func Dvvvvv(a ...interface{}) {
 	if permitted("vvvvv") {
 		vvvvv_color_printf("%s\n", spew.Sdump(a...))
 	}
+}
+
+func Ppfmsgvvvv(format string, a ...interface{}) {
+	if permitted("vvvv") {
+		msg_color_printf(format, Spp(a...))
+	}
+}
+
+func Ppmsgvvvv(a ...interface{}) {
+	if permitted("vvvv") {
+		msg_color_printf("%s\n", spewMsgState.Sdump(a...))
+	}
+}
+
+//pretty print
+func Spp(a ...interface{}) string {
+	str := msg_color_sprintf("%s", spewMsgState.Sdump(a...))
+
+	//fstr1 := strings.Replace(str, ` "`, " ", -1)
+	//fstr2 := strings.Replace(fstr1, `\"`, `"`, -1)
+	//fstr3 := strings.Replace(fstr2, `",`, ",", -1)
+	//fstr4 := strings.Replace(fstr3, `""`, `"`, -1)
+	//fstr5 := strings.Replace(fstr4, `"$`, `"`, -1)
+	//fstr1 := strings.Replace(str, `\"`, "", -1)
+	//fstr2 := strings.Replace(fstr1, `"`, "", -1)
+	return str
 }
 
 func Pfvvvv(format string, a ...interface{}) {
@@ -78,24 +110,5 @@ func LogError(mark string, err interface{}) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
 	}
-}
-
-func Pplnvvvv(i interface{}) {
-	Pfvvvv("%s\n", Spp(i))
-}
-
-func Dpplnvvvv(i interface{}) {
-	if permitted("vvvvv") {
-		Pfvvvv("%s\n", Spp(i))
-	}
-}
-
-//pretty print simple struct object
-func Spp(i interface{}) string {
-	s, _ := json.MarshalIndent(i, "", "  ")
-	str := string(s)
-	fstr1 := strings.Replace(str, `\"`, "", -1)
-	fstr2 := strings.Replace(fstr1, `"`, "", -1)
-	return color.YellowString("%s", fstr2)
 }
 
