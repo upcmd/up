@@ -8,7 +8,7 @@
 package impl
 
 import (
-	//"github.com/davecgh/go-spew/spew"
+	"github.com/davecgh/go-spew/spew"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
@@ -31,10 +31,21 @@ func InitTasks() {
 	cache.GetRuntimeInstanceVars(rt.InstanceName, cache.Cache{}, cache.Cache{})
 }
 
+type Person struct {
+	Name string
+	Age  int
+}
+
 func ListTasks() {
+
 	u.P("-task list")
 	for idx, task := range *Tasks {
 		u.Pf("  %d %20s: %s \n", idx+1, task.Name, task.Desc)
+		//u.Dvvvvv(task)
+		spew.Dump(task)
+		u.Pplnvvvv(Person{"stephen", 23})
+		u.Pf("%+v\n", task)
+
 	}
 	u.P("-")
 
@@ -74,7 +85,6 @@ func loadScopes() error {
 	scopesData := TaskYmlRoot.Get("scopes")
 	var scopes cache.Scopes
 	err := ms.Decode(scopesData, &scopes)
-	//Scopes = &scopes
 	cache.SetScopeProfiles(&scopes)
 	return err
 }

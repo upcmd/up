@@ -1,0 +1,45 @@
+goal:
+  - to test out vars reference in yml file
+
+scopes:
+  -
+    name: global
+    ref: c0009-global
+
+  -
+    name: prod
+    members: [dr,prod]
+    vars:
+      a: prod-a
+      c: prod-c
+
+  -
+    name: nonprod
+    members:
+      - dev
+      - st
+      - staging
+    vars:
+      a: non-prod-a
+      b: non-prod-b
+      c: non-prod-c
+
+  -
+    name: staging
+    vars:
+      a: staging-a
+      b: staging-b
+
+  -  name: dev
+     ref: c0009-dev
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo "test out the var scopes only"
+

@@ -90,6 +90,7 @@ func Dpplnvvvv(i interface{}) {
 	}
 }
 
+//pretty print simple struct object
 func Spp(i interface{}) string {
 	s, _ := json.MarshalIndent(i, "", "  ")
 	str := string(s)

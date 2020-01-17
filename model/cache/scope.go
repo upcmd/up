@@ -79,7 +79,8 @@ func (ss *Scopes) InitContextInstances() {
 	}
 
 	u.Pvvvvv("-------full vars in scopes------")
-	u.Dpplnvvvv(ss)
+	//u.Dpplnvvvv(ss)
+	u.Dvvvvv(ss)
 
 	for _, s := range *ss {
 		if s.Name == "global" {
@@ -159,7 +160,9 @@ func GetRuntimeInstanceVars(runtimeid string, runtimeglobalvars Cache, localvars
 	mergo.Merge(&runtimevars, localvars, mergo.WithOverride)
 
 	u.Pfvvvv("current instance[ %s ] runtime vars:", runtimeid)
-	u.Pplnvvvv(runtimevars)
+	//u.Pplnvvvv(runtimevars)
+
+	u.Dvvvvv(runtimevars)
 	return &runtimevars
 }
 

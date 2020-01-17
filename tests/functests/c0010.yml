@@ -1,0 +1,89 @@
+goal:
+  - to test complex object and leaf nodes can be merged
+  - expected dev vars: |
+      (cache.Cache) (len=4) {
+       (string) (len=1) "a": (string) (len=5) "dev-a",
+       (string) (len=1) "b": (string) (len=10) "non-prod-b",
+       (string) (len=1) "c": (map[interface {}]interface {}) (len=7) {
+        (string) (len=2) "c1": (string) (len=6) "dev-c1",
+        (string) (len=2) "c2": (string) (len=6) "dev-c2",
+        (string) (len=2) "c3": (map[interface {}]interface {}) (len=3) {
+         (string) (len=3) "c31": (string) (len=10) "global-c31",
+         (string) (len=3) "c32": (string) (len=11) "nonprod-c32",
+         (string) (len=3) "c33": (string) (len=7) "dev-c33"
+        },
+        (string) (len=2) "c4": (string) (len=10) "nonprod-c4",
+        (string) (len=2) "c5": (string) (len=10) "nonprod-c5",
+        (string) (len=2) "c6": (string) (len=6) "dev-c6",
+        (string) (len=2) "c7": (string) (len=6) "dev-c7"
+       },
+       (string) (len=1) "d": (string) (len=8) "global-d"
+      }
+
+scopes:
+  -
+    name: global
+    vars:
+      a: global-a
+      b: global-b
+      c:
+        c1: global-c1
+        c2: global-c2
+        c3:
+          c31: global-c31
+          c32: global-c32
+          c33: global-c33
+        c4: global-c4
+      d: global-d
+
+  -
+    name: prod
+    members: [dr,prod]
+    vars:
+      a: prod-a
+      c: prod-c
+
+  -
+    name: nonprod
+    members:
+      - dev
+      - st
+      - staging
+    vars:
+      a: non-prod-a
+      b: non-prod-b
+      c:
+        c1: nonprod-c1
+        c2: nonprod-c2
+        c3:
+          c32: nonprod-c32
+          c33: nonprod-c33
+        c4: nonprod-c4
+        c5: nonprod-c5
+
+  -
+    name: staging
+    vars:
+      a: staging-a
+      b: staging-b
+
+  -  name: dev
+     vars:
+       a: dev-a
+       c:
+         c1: dev-c1
+         c2: dev-c2
+         c3:
+           c33: dev-c33
+         c6: dev-c6
+         c7: dev-c7
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo "test out the var scopes only"
