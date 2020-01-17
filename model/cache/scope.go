@@ -19,10 +19,12 @@ import (
 
 var (
 	//expanded context only contains group and global scope, but not each instance vars
-	expandedContext  ExpandedContext   = ExpandedContext{}
-	GroupMembersList []string          = []string{}
-	MemberGroupMap   map[string]string = map[string]string{}
-	ScopeProfiles    *Scopes
+	expandedContext   ExpandedContext   = ExpandedContext{}
+	GroupMembersList  []string          = []string{}
+	MemberGroupMap    map[string]string = map[string]string{}
+	ScopeProfiles     *Scopes
+	RuntimeVarsMerged *Cache
+	RuntimeGlobalVars *Cache
 )
 
 type Scope struct {
@@ -39,6 +41,10 @@ type ContextInstances []ExpandedContext
 
 func SetScopeProfiles(sp *Scopes) {
 	ScopeProfiles = sp
+}
+
+func SetRuntimeGlobalVars(vars *Cache) {
+	RuntimeGlobalVars = vars
 }
 
 func loadRefVars(yamlroot *viper.Viper) *Cache {
@@ -134,15 +140,19 @@ func (ss *Scopes) GetInstanceVars(instanceName string) *Cache {
 	return nil
 }
 
-/*pass in runtime id, if runtime id is in member list, eg dev -> nonprod
+/*
+This will generate a one off vars merged from top level down to runtime
+global and merge them all together,the result vars will be used to finally
+merge with local func vars to be used in runtime execution time
+
+pass in runtime id, if runtime id is in member list, eg dev -> nonprod
 then merge runtimevars to group(nonprod)'s varss,
-then merge localvars to above merged result to get final runtime vars
 
 if runtime id (nonname) is not in member list,
 then merge runtimevars to global varss,
-then merge localvars to above merged result to get final runtime vars
+
 */
-func GetRuntimeInstanceVars(runtimeid string, runtimeglobalvars Cache, localvars Cache) *Cache {
+func SetRuntimeVarsMerged(runtimeid string) *Cache {
 	var runtimevars Cache
 	if u.Contains(GroupMembersList, runtimeid) {
 		groupname := MemberGroupMap[runtimeid]
@@ -156,12 +166,27 @@ func GetRuntimeInstanceVars(runtimeid string, runtimeglobalvars Cache, localvars
 		runtimevars = deepcopy.Copy(expandedContext["global"]).(Cache)
 	}
 
-	mergo.Merge(&runtimevars, runtimeglobalvars, mergo.WithOverride)
-	mergo.Merge(&runtimevars, localvars, mergo.WithOverride)
+	mergo.Merge(&runtimevars, *RuntimeGlobalVars, mergo.WithOverride)
 
-	u.Pfvvvv("current instance[ %s ] runtime vars:", runtimeid)
+	u.Pfvvvv("merged[ %s ] runtime vars:", runtimeid)
 	u.Ppmsgvvvv(runtimevars)
 	u.Dvvvvv(runtimevars)
+
+	RuntimeVarsMerged = &runtimevars
 	return &runtimevars
+}
+
+/*
+merge localvars to above RuntimeVarsMerged to get final runtime exec vars
+*/
+func GetRuntimeExecVars(localvars *Cache) *Cache {
+	var execvars Cache
+	execvars = deepcopy.Copy(*RuntimeVarsMerged).(Cache)
+	mergo.Merge(&execvars, *localvars, mergo.WithOverride)
+
+	u.Pvvvv("current exec runtime vars:")
+	u.Ppmsgvvvv(execvars)
+	u.Dvvvvv(execvars)
+	return &execvars
 }
 

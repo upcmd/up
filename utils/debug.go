@@ -16,9 +16,13 @@ import (
 
 var (
 	spewMsgState spew.ConfigState = spew.ConfigState{
-		DisableTypes:   true,
-		DisableLengths: true,
-		Indent:         "  ",
+		DisableTypes:            true,
+		DisableLengths:          true,
+		DisablePointerAddresses: true,
+		DisableCapacities:       true,
+		DisableMethods:          true,
+		DisablePointerMethods:   true,
+		Indent:                  "  ",
 	}
 )
 

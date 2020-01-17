@@ -19,6 +19,26 @@ goal:
        },
        (string) (len=1) "d": (string) (len=8) "global-d"
       }
+  - vars: |
+      current instance[ dev ] runtime vars:
+      {
+        "c": {
+          "c4": "nonprod-c4",
+          "c5": "nonprod-c5",
+          "c1": "dev-c1",
+          "c2": "dev-c2",
+          "c3": {
+            "c32": "nonprod-c32",
+            "c33": "dev-c33",
+            "c31": "global-c31"
+          },
+          "c6": "dev-c6",
+          "c7": "dev-c7"
+        },
+        "d": "global-d",
+        "a": "dev-a",
+        "b": "non-prod-b"
+      }
 
 scopes:
   -

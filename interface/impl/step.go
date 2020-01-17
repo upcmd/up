@@ -9,13 +9,19 @@ package impl
 
 import (
 	ic "github.com/stephencheng/up/interface"
+	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 )
 
 type Step struct {
 	Do   interface{} //FuncImpl
 	Func string
+	Vars *cache.Cache
 	Desc string
+}
+
+func getExecVars() {
+
 }
 
 func (step *Step) Exec() {
@@ -25,13 +31,15 @@ func (step *Step) Exec() {
 
 	case FUNC_SHELL:
 		funcAction := ShellFuncAction{
-			Do: step.Do,
+			Do:   step.Do,
+			Vars: cache.GetRuntimeExecVars(step.Vars),
 		}
 		action = ic.Do(&funcAction)
 
 	case FUNC_TASK_REF:
 		funcAction := TaskRefFuncAction{
-			Do: step.Do,
+			Do:   step.Do,
+			Vars: cache.GetRuntimeExecVars(step.Vars),
 		}
 		action = ic.Do(&funcAction)
 

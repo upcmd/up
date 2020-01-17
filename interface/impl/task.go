@@ -26,13 +26,10 @@ func InitTasks() {
 	TaskYmlRoot = u.YamlLoader("Task", u.CoreConfig.TaskDir, u.CoreConfig.TaskFile)
 	loadTasks()
 	loadScopes()
+	loadRuntimeGlobalVars()
 	cache.ScopeProfiles.InitContextInstances()
-	cache.GetRuntimeInstanceVars(rt.InstanceName, cache.Cache{}, cache.Cache{})
-}
+	cache.SetRuntimeVarsMerged(rt.InstanceName)
 
-type Person struct {
-	Name string
-	Age  int
 }
 
 func ListTasks() {
@@ -81,6 +78,14 @@ func loadScopes() error {
 	var scopes cache.Scopes
 	err := ms.Decode(scopesData, &scopes)
 	cache.SetScopeProfiles(&scopes)
+	return err
+}
+
+func loadRuntimeGlobalVars() error {
+	varsData := TaskYmlRoot.Get("vars")
+	var vars cache.Cache
+	err := ms.Decode(varsData, &vars)
+	cache.SetRuntimeGlobalVars(&vars)
 	return err
 }
 

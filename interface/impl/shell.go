@@ -10,6 +10,7 @@ package impl
 import (
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
+	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	"os/exec"
 )
@@ -43,6 +44,7 @@ type ShellExecResult struct {
 
 type ShellFuncAction struct {
 	Do     interface{}
+	Vars   *cache.Cache
 	Cmds   []string
 	Result ShellExecResult
 }
@@ -83,5 +85,7 @@ func (f *ShellFuncAction) Exec() {
 			color.RedString("%s", f.Result.ErrMsg),
 		)
 	}
+
+	u.Ppmsgvvvv(f.Vars)
 }
 

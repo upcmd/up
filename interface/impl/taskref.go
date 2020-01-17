@@ -10,6 +10,7 @@ package impl
 import (
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
+	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 )
 
@@ -19,6 +20,7 @@ func runTask(f *TaskRefFuncAction, taskname string) {
 
 type TaskRefFuncAction struct {
 	Do   interface{}
+	Vars *cache.Cache
 	Refs []string
 }
 
