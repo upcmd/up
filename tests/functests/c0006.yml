@@ -1,5 +1,9 @@
 goal:
-  - to test out using vars
+  - to test out using env vars
+  - result:
+      - it takes env var properly
+      - the ":" is offending, please try to avoid using it
+      - or use it in text litera
 
 tasks:
 

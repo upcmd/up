@@ -80,12 +80,12 @@ func (f *ShellFuncAction) Exec() {
 			u.Pfv("      %s\n", color.RedString("%s", f.Result.ErrMsg))
 		}
 
-		u.Pfvvvv("      exec result:\ncode:%s\nerror:%s\n",
+		u.Pfvvvv("exec result: {\n  code:%s\n  error:%s\n}\n\n",
 			color.YellowString("%d", f.Result.Code),
 			color.RedString("%s", f.Result.ErrMsg),
 		)
 	}
 
-	u.Ppmsgvvvv(f.Vars)
+	//u.Ppmsgvvvv(f.Vars)
 }
 

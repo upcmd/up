@@ -179,14 +179,14 @@ func SetRuntimeVarsMerged(runtimeid string) *Cache {
 /*
 merge localvars to above RuntimeVarsMerged to get final runtime exec vars
 */
-func GetRuntimeExecVars(localvars *Cache) *Cache {
+func GetRuntimeExecVars(mark string, localvars *Cache) *Cache {
 	var execvars Cache
 	execvars = deepcopy.Copy(*RuntimeVarsMerged).(Cache)
 
 	if localvars != nil {
 		mergo.Merge(&execvars, *localvars, mergo.WithOverride)
 
-		u.Pvvvv("current exec runtime vars:")
+		u.Pfvvvv("current exec runtime[%s] vars:", mark)
 		u.Ppmsgvvvv(execvars)
 		u.Dvvvvv(execvars)
 	}

@@ -32,14 +32,14 @@ func (step *Step) Exec() {
 	case FUNC_SHELL:
 		funcAction := ShellFuncAction{
 			Do:   step.Do,
-			Vars: cache.GetRuntimeExecVars(step.Vars),
+			Vars: cache.GetRuntimeExecVars(FUNC_SHELL, step.Vars),
 		}
 		action = ic.Do(&funcAction)
 
 	case FUNC_TASK_REF:
 		funcAction := TaskRefFuncAction{
 			Do:   step.Do,
-			Vars: cache.GetRuntimeExecVars(step.Vars),
+			Vars: cache.GetRuntimeExecVars(FUNC_TASK_REF, step.Vars),
 		}
 		action = ic.Do(&funcAction)
 
