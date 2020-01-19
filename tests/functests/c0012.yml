@@ -1,0 +1,21 @@
+goal:
+  - to test vars without scope will still work
+
+vars:
+  a: runtime-a
+  e: runtime-e
+  k: runtime-k
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        desc: to test display env vars from shell context
+        vars:
+          studentname: Tom
+        do:
+          - echo "hello, world"
+

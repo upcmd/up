@@ -1,0 +1,91 @@
+goal:
+  - test runtime vars could be merged properly
+  - test local vars could be merged properly
+
+testresult: |
+
+  current exec runtime vars:
+
+    {
+      "a": "runtime-a",
+      "b": "non-prod-b",
+      "c": "dev-c",
+      "e": "local-e",
+      "k": "runtime-k",
+      "m": "local-m",
+      "d": "global-d"
+    }
+
+    executing shell commands
+  cmd( 1):
+    echo "test out the var scopes only"
+    test out the var scopes only
+
+  exec result:
+    code:0
+  error:
+    1001
+    (*cache.Cache)(0xc0000101f8)({
+  "a": "runtime-a",
+  "b": "non-prod-b",
+  "c": "dev-c",
+  "e": "local-e",
+  "k": "runtime-k",
+  "m": "local-m",
+  "d": "global-d"
+  })
+
+scopes:
+  -
+    name: global
+    vars:
+      a: global-a
+      b: global-b
+      c: global-c
+      d: global-d
+  -
+    name: prod
+    members: [dr,prod]
+    vars:
+      a: prod-a
+      c: prod-c
+
+  -
+    name: nonprod
+    members:
+      - dev
+      - st
+      - staging
+    vars:
+      a: non-prod-a
+      b: non-prod-b
+      c: non-prod-c
+
+  -
+    name: staging
+    vars:
+      a: staging-a
+      b: staging-b
+
+  -  name: dev
+     vars:
+       a: dev-a
+       c: dev-c
+
+vars:
+  a: runtime-a
+  e: runtime-e
+  k: runtime-k
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        vars:
+          e: local-e
+          m: local-m
+        do:
+          - echo "test out the var scopes only"

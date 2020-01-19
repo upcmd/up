@@ -182,11 +182,14 @@ merge localvars to above RuntimeVarsMerged to get final runtime exec vars
 func GetRuntimeExecVars(localvars *Cache) *Cache {
 	var execvars Cache
 	execvars = deepcopy.Copy(*RuntimeVarsMerged).(Cache)
-	mergo.Merge(&execvars, *localvars, mergo.WithOverride)
 
-	u.Pvvvv("current exec runtime vars:")
-	u.Ppmsgvvvv(execvars)
-	u.Dvvvvv(execvars)
+	if localvars != nil {
+		mergo.Merge(&execvars, *localvars, mergo.WithOverride)
+
+		u.Pvvvv("current exec runtime vars:")
+		u.Ppmsgvvvv(execvars)
+		u.Dvvvvv(execvars)
+	}
 	return &execvars
 }
 

@@ -1,0 +1,18 @@
+goal:
+  - to test empty vars in func will pass
+
+vars:
+  a: runtime-a
+  e: runtime-e
+  k: runtime-k
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        desc: to test display env vars from shell context
+        do:
+          - echo "hello, world"
