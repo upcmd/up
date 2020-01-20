@@ -50,7 +50,7 @@ func main() {
 		if *taskName != "" {
 			u.P("-exec task:", *taskName)
 			impl.InitTasks()
-			impl.ExecTask(*taskName)
+			impl.ExecTask(*taskName, nil)
 		}
 	case list.FullCommand():
 		u.P("-list", *listTypeName)

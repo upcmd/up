@@ -15,7 +15,7 @@ import (
 )
 
 func runTask(f *TaskRefFuncAction, taskname string) {
-	ExecTask(taskname)
+	ExecTask(taskname, f.Vars)
 }
 
 type TaskRefFuncAction struct {

@@ -8,8 +8,10 @@
 package impl
 
 import (
+	"github.com/imdario/mergo"
 	ic "github.com/stephencheng/up/interface"
 	"github.com/stephencheng/up/model/cache"
+	"github.com/stephencheng/up/model/stack"
 	u "github.com/stephencheng/up/utils"
 )
 
@@ -20,8 +22,16 @@ type Step struct {
 	Desc string
 }
 
-func getExecVars() {
+func getExecVars(funcname string, stepVars *cache.Cache) *cache.Cache {
+	vars := cache.GetRuntimeExecVars(funcname, stepVars)
+	callerVars := stack.ExecStack.GetTop().(*cache.Cache)
+	u.Ptmpdebug("callerVars", callerVars)
 
+	if callerVars != nil {
+		mergo.Merge(vars, callerVars, mergo.WithOverride)
+	}
+	u.Ptmpdebug("exec vars", vars)
+	return vars
 }
 
 func (step *Step) Exec() {
@@ -32,14 +42,16 @@ func (step *Step) Exec() {
 	case FUNC_SHELL:
 		funcAction := ShellFuncAction{
 			Do:   step.Do,
-			Vars: cache.GetRuntimeExecVars(FUNC_SHELL, step.Vars),
+			Vars: getExecVars(FUNC_SHELL, step.Vars),
 		}
 		action = ic.Do(&funcAction)
 
 	case FUNC_TASK_REF:
 		funcAction := TaskRefFuncAction{
-			Do:   step.Do,
-			Vars: cache.GetRuntimeExecVars(FUNC_TASK_REF, step.Vars),
+			Do: step.Do,
+			//TODO: see if we should allow recursive call
+			//Vars: cache.GetRuntimeExecVars(FUNC_TASK_REF, step.Vars),
+			Vars: getExecVars(FUNC_TASK_REF, step.Vars),
 		}
 		action = ic.Do(&funcAction)
 

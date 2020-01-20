@@ -66,6 +66,11 @@ func Ppmsgvvvv(a ...interface{}) {
 	}
 }
 
+func Ptmpdebug(mark string, a ...interface{}) {
+	hiColor := color.New(color.FgHiWhite, color.BgRed)
+	hiColor.Printf("------%s start-----\n%s\n------%s end-----\n\n", mark, spewMsgState.Sdump(a...), mark)
+}
+
 //pretty print
 func Spp(a ...interface{}) string {
 	str := msg_color_sprintf("%s", spewMsgState.Sdump(a...))

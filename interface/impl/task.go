@@ -13,6 +13,7 @@ import (
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/cache"
 	rt "github.com/stephencheng/up/model/runtime"
+	"github.com/stephencheng/up/model/stack"
 	u "github.com/stephencheng/up/utils"
 )
 
@@ -43,7 +44,7 @@ func ListTasks() {
 
 }
 
-func ExecTask(taskname string) {
+func ExecTask(taskname string, callerVars *cache.Cache) {
 	found := false
 	for idx, task := range *Tasks {
 		if taskname == task.Name {
@@ -52,7 +53,9 @@ func ExecTask(taskname string) {
 			//spew.Dump(task)
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
+			stack.ExecStack.Push(callerVars)
 			steps.Exec()
+			stack.ExecStack.Pop()
 			//StepsExec(&steps)
 			u.LogError("e:", err)
 		}

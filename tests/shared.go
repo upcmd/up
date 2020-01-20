@@ -47,7 +47,7 @@ func TestT(t *testing.T) {
 	Setup(t)
 	impl.InitTasks()
 	impl.ListTasks()
-	impl.ExecTask("task")
+	impl.ExecTask("task", nil)
 }
 
 func Setupx(filename string) {
