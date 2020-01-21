@@ -1,0 +1,40 @@
+goal:
+  - to test the interesting recursive call
+  - disable recurive calls
+  - result expected: |
+      Executing task stack layer: 3
+
+        Task exec stack layer check -> Too many layers of task executions, please fix your recursive ref-task configurations
+        exit status 255
+
+vars:
+  a: runtime-a
+  e: runtime-e
+  k: runtime-k
+
+tasks:
+  -
+    name: callee-task
+    desc: this is ref-task
+    task:
+      -
+        func: shell
+        vars:
+          a: callee-a
+          b: callee-b
+          c: callee-c
+        do:
+          - echo "exec ref-task"
+
+  -
+    name: task
+    desc:
+    task:
+      -
+        func: task_ref
+        vars:
+          a: caller-ref-a
+          b: caller-ref-b
+        do:
+          - task
+

@@ -13,6 +13,7 @@ import (
 	"github.com/stephencheng/up/model/cache"
 	"github.com/stephencheng/up/model/stack"
 	u "github.com/stephencheng/up/utils"
+	"os"
 )
 
 type Step struct {
@@ -36,7 +37,7 @@ func getExecVars(funcname string, stepVars *cache.Cache) *cache.Cache {
 
 func (step *Step) Exec() {
 	var action ic.Do
-
+	u.Ptmpdebug("step debug", step)
 	switch step.Func {
 
 	case FUNC_SHELL:
@@ -55,8 +56,13 @@ func (step *Step) Exec() {
 		}
 		action = ic.Do(&funcAction)
 
+	default:
+		u.Pvvvv("func name not recognised")
+		u.LogError("Step dispatch", "func is not implemented")
+		os.Exit(-1)
 	}
 
+	u.Ptmpdebug("null pointer", action)
 	action.Adapt()
 	action.Exec()
 
@@ -68,7 +74,6 @@ func (steps *Steps) Exec() {
 
 	for idx, step := range *steps {
 		u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Spp(step))
-		//u.Pfvvvv("%+v | length: %d\n", step.Do, len(step.Do.([]interface{})))
 		step.Exec()
 	}
 
