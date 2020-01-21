@@ -26,18 +26,18 @@ type Step struct {
 func getExecVars(funcname string, stepVars *cache.Cache) *cache.Cache {
 	vars := cache.GetRuntimeExecVars(funcname, stepVars)
 	callerVars := stack.ExecStack.GetTop().(*cache.Cache)
-	u.Ptmpdebug("callerVars", callerVars)
+	//u.Ptmpdebug("callerVars", callerVars)
 
 	if callerVars != nil {
 		mergo.Merge(vars, callerVars, mergo.WithOverride)
 	}
-	u.Ptmpdebug("exec vars", vars)
+	//u.Ptmpdebug("exec vars", vars)
 	return vars
 }
 
 func (step *Step) Exec() {
 	var action ic.Do
-	u.Ptmpdebug("step debug", step)
+	//u.Ptmpdebug("step debug", step)
 	switch step.Func {
 
 	case FUNC_SHELL:
@@ -62,7 +62,6 @@ func (step *Step) Exec() {
 		os.Exit(-1)
 	}
 
-	u.Ptmpdebug("null pointer", action)
 	action.Adapt()
 	action.Exec()
 

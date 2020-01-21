@@ -67,8 +67,10 @@ func Ppmsgvvvv(a ...interface{}) {
 }
 
 func Ptmpdebug(mark string, a ...interface{}) {
-	hiColor := color.New(color.FgHiWhite, color.BgRed)
-	hiColor.Printf("------%s start-----\n%s\n------%s end-----\n\n", mark, spewMsgState.Sdump(a...), mark)
+	if permitted("vvvv") {
+		hiColor := color.New(color.FgHiWhite, color.BgRed)
+		hiColor.Printf("------%s start-----\n%s\n------%s end-----\n\n", mark, spewMsgState.Sdump(a...), mark)
+	}
 }
 
 //pretty print

@@ -1,0 +1,17 @@
+goal:
+  - to test undefined func name handling
+  - expected: |
+      func name not recognised
+
+      Step dispatch -> func is not implemented
+
+tasks:
+
+  -
+    name: task
+    desc:
+    task:
+      -
+        func: non_exist_func_name
+        do:
+          - echo "exec ref-task2"
