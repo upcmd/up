@@ -1,0 +1,62 @@
+goal:
+  - to test vars applicable in task-ref exec time
+  - the caller task's vars should override the local vars in the ref task(callee)
+  - tested with only one embeded call but not recursive call
+  - callee-task exec vars: |
+      {
+        "a": "callee-a",
+        "e": "runtime-e",
+        "b": "callee-b",
+        "c": "callee-c",
+        "k": "runtime-k"
+      }
+
+  - caller-task exec vars: |
+      (*cache.Cache)({
+      "k": "runtime-k",
+      "a": "caller-ref-a",
+      "e": "runtime-e",
+      "b": "caller-ref-b"
+      })
+
+  - result expected: |
+      caller vars will override callee's
+      (*cache.Cache)({
+      "b": "caller-ref-b",
+      "c": "callee-c",
+      "k": "runtime-k",
+      "a": "caller-ref-a",
+      "e": "runtime-e"
+      })
+
+vars:
+  a: runtime-a
+  e: runtime-e
+  k: runtime-k
+
+tasks:
+  -
+    name: callee-task
+    desc: this is ref-task
+    task:
+      -
+        func: shell
+        vars:
+          a: callee-a
+          b: callee-b
+          c: callee-c
+        do:
+          - echo "exec ref-task"
+
+  -
+    name: task
+    desc:
+    task:
+      -
+        func: task_ref
+        vars:
+          a: caller-ref-a
+          b: caller-ref-b
+        do:
+          - callee-task
+

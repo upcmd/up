@@ -38,8 +38,13 @@ func (s *TaskExecStack) Pop() interface{} {
 	s.Stack.Remove(top)
 	return top.Value
 }
+
 func (s *TaskExecStack) GetTop() interface{} {
 	top := s.Stack.Front()
 	return top.Value
+}
+
+func (s *TaskExecStack) GetLen() int {
+	return s.Stack.Len()
 }
 

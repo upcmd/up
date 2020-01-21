@@ -15,6 +15,7 @@ import (
 	rt "github.com/stephencheng/up/model/runtime"
 	"github.com/stephencheng/up/model/stack"
 	u "github.com/stephencheng/up/utils"
+	"os"
 )
 
 var (
@@ -50,13 +51,16 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 		if taskname == task.Name {
 			u.Pfvvvv("  loacated task-> %d [%s]: %s \n", idx+1, task.Name, task.Desc)
 			found = true
-			//spew.Dump(task)
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
 			stack.ExecStack.Push(callerVars)
+			u.Pvvvv("Executing task stack layer:", stack.ExecStack.GetLen())
+			if stack.ExecStack.GetLen() > 2 {
+				u.LogError("Task exec stack layer check", "Too many layers of task executions, please fix your recursive ref-task configurations")
+				os.Exit(-1)
+			}
 			steps.Exec()
 			stack.ExecStack.Pop()
-			//StepsExec(&steps)
 			u.LogError("e:", err)
 		}
 	}
