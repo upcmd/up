@@ -44,6 +44,10 @@ func ListTasks() {
 	u.P("-")
 
 }
+func ValidateTask(taskname string) {
+	rt.SetDryrun()
+	ExecTask(taskname, nil)
+}
 
 func ExecTask(taskname string, callerVars *cache.Cache) {
 	found := false

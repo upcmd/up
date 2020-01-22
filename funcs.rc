@@ -15,3 +15,7 @@ wiptestdebug(){
     goup task task -d ./tests/functests -t wip -i dev -v vvvvv
 }
 
+wiptestvalidate(){
+    goup validate task task -d ./tests/functests -t wip -i dev -v vvvvv
+}
+

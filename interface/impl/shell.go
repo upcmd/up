@@ -11,7 +11,9 @@ import (
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/stephencheng/up/model/cache"
+	rt "github.com/stephencheng/up/model/runtime"
 	u "github.com/stephencheng/up/utils"
+
 	"os/exec"
 )
 
@@ -19,21 +21,27 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 	cmdExec := exec.Command("/bin/sh", "-c", cmd)
 	exec.Command("bash", "-c", cmd)
 
-	cmdOutput, err := cmdExec.CombinedOutput()
-	var result ShellExecResult
-	if err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
-			result.Code = exitError.ExitCode()
-			result.ErrMsg = string(cmdOutput)
-		}
+	if rt.Dryrun {
+		u.P("in dryrun mode")
+		return "dryrun result"
 	} else {
-		result.Code = 0
-		result.Output = string(cmdOutput)
-	}
 
-	f.Result = result
-	u.LogError("exec error:", err)
-	return string(cmdOutput)
+		cmdOutput, err := cmdExec.CombinedOutput()
+		var result ShellExecResult
+		if err != nil {
+			if exitError, ok := err.(*exec.ExitError); ok {
+				result.Code = exitError.ExitCode()
+				result.ErrMsg = string(cmdOutput)
+			}
+		} else {
+			result.Code = 0
+			result.Output = string(cmdOutput)
+		}
+
+		f.Result = result
+		u.LogError("exec error:", err)
+		return string(cmdOutput)
+	}
 }
 
 type ShellExecResult struct {

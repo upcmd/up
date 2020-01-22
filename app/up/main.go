@@ -18,16 +18,19 @@ import (
 var (
 	app = kingpin.New("up", "UP: The Ultimate Provisioner")
 
-	task         = app.Command("task", "run a entry task")
-	taskName     = task.Arg("taskname", "task name to run").Required().String()
-	list         = app.Command("list", "list tasks and plays")
-	listTypeName = list.Arg("typename", "list [ task | flow ]").Required().String()
-	play         = app.Command("play", "run a playbook with defined steps")
-	playFile     = play.Arg("playfile", "play step file to run").Required().String()
-	verbose      = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
-	taskdir      = app.Flag("taskdir", "task file directory").Short('d').String()
-	taskfile     = app.Flag("taskfile", "task file to load (without yml extension)").Short('t').String()
-	instanceName = app.Flag("instance", "instance name for execution").Short('i').String()
+	task               = app.Command("task", "run a entry task")
+	taskName           = task.Arg("taskname", "task name to run").Required().String()
+	list               = app.Command("list", "list tasks and plays")
+	listTypeName       = list.Arg("listtypename", "list [ task | flow ]").Required().String()
+	validate           = app.Command("validate", "validate tasks and plays")
+	validateTypeName   = validate.Arg("validatetypename", "list [ task | flow ]").Required().String()
+	validateObjectName = validate.Arg("validateobjectname", "taskname | flowname ]").Required().String()
+	play               = app.Command("play", "run a playbook with defined steps")
+	playFile           = play.Arg("playfile", "play step file to run").Required().String()
+	verbose            = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
+	taskdir            = app.Flag("taskdir", "task file directory").Short('d').String()
+	taskfile           = app.Flag("taskfile", "task file to load (without yml extension)").Short('t').String()
+	instanceName       = app.Flag("instance", "instance name for execution").Short('i').String()
 )
 
 func main() {
@@ -58,6 +61,16 @@ func main() {
 		case "task":
 			impl.InitTasks()
 			impl.ListTasks()
+		case "flow":
+		}
+	case validate.FullCommand():
+		u.P("-validate", *validateTypeName)
+		switch *validateTypeName {
+		case "task":
+			impl.InitTasks()
+			taskname := *validateObjectName
+			u.Pf("validate task: %s\n")
+			impl.ValidateTask(taskname)
 		case "flow":
 		}
 	case play.FullCommand():

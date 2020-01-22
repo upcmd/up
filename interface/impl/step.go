@@ -13,7 +13,6 @@ import (
 	"github.com/stephencheng/up/model/cache"
 	"github.com/stephencheng/up/model/stack"
 	u "github.com/stephencheng/up/utils"
-	"os"
 )
 
 type Step struct {
@@ -59,7 +58,12 @@ func (step *Step) Exec() {
 	default:
 		u.Pvvvv("func name not recognised")
 		u.LogError("Step dispatch", "func is not implemented")
-		os.Exit(-1)
+
+		f := u.MustConditionToContinueFunc(func() bool {
+			return action != nil
+		})
+
+		u.DryRunOrExit("Step Exec", f, "func name must be valid")
 	}
 
 	action.Adapt()

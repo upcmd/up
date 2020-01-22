@@ -9,6 +9,7 @@ package runtime
 
 var (
 	InstanceName string
+	Dryrun       bool
 )
 
 func SetInstanceName(id string) {
@@ -17,5 +18,9 @@ func SetInstanceName(id string) {
 	} else {
 		InstanceName = "nonamed"
 	}
+}
+
+func SetDryrun() {
+	Dryrun = true
 }
 

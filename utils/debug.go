@@ -11,6 +11,9 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/stephencheng/go-spew/spew"
+	rt "github.com/stephencheng/up/model/runtime"
+	"os"
+
 	"runtime"
 )
 
@@ -121,5 +124,24 @@ func LogError(mark string, err interface{}) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
 	}
+}
+
+type MustConditionToContinueFunc func() bool
+
+func DryRunOrExit(mark string, mustCondition MustConditionToContinueFunc, conditionDesc string) {
+
+	ok := mustCondition()
+
+	if rt.Dryrun {
+		color.Green("      %s -> %s", mark, "in dryrun, try to ignore")
+		if !ok {
+			color.Red("      %s -> %s", mark, "can not continue further due to critical condition not satisfied")
+			color.Red("      %s -> %s", mark, conditionDesc)
+			os.Exit(-1)
+		}
+	} else {
+		os.Exit(-1)
+	}
+
 }
 
