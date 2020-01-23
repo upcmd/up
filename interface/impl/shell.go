@@ -22,7 +22,7 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 	exec.Command("bash", "-c", cmd)
 
 	if rt.Dryrun {
-		u.P("in dryrun mode")
+		u.Pdryrun("in dryrun mode and skipping the actual commands")
 		return "dryrun result"
 	} else {
 

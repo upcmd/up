@@ -75,7 +75,6 @@ func main() {
 		}
 	case play.FullCommand():
 		u.P(*playFile)
-
 	}
 }
 

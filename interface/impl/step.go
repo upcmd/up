@@ -12,6 +12,8 @@ import (
 	ic "github.com/stephencheng/up/interface"
 	"github.com/stephencheng/up/model/cache"
 	"github.com/stephencheng/up/model/stack"
+	ee "github.com/stephencheng/up/utils/error"
+
 	u "github.com/stephencheng/up/utils"
 )
 
@@ -37,6 +39,9 @@ func getExecVars(funcname string, stepVars *cache.Cache) *cache.Cache {
 func (step *Step) Exec() {
 	var action ic.Do
 	//u.Ptmpdebug("step debug", step)
+
+	var bizErr *ee.Error = ee.New()
+
 	switch step.Func {
 
 	case FUNC_SHELL:
@@ -56,18 +61,31 @@ func (step *Step) Exec() {
 		action = ic.Do(&funcAction)
 
 	default:
-		u.Pvvvv("func name not recognised")
-		u.LogError("Step dispatch", "func is not implemented")
-
-		f := u.MustConditionToContinueFunc(func() bool {
-			return action != nil
-		})
-
-		u.DryRunOrExit("Step Exec", f, "func name must be valid")
+		u.LogError("Step dispatch", "func name is not recognised and implemented")
+		bizErr.Mark = "func name not implemented"
 	}
 
-	action.Adapt()
-	action.Exec()
+	//example to stop further steps
+	//f := u.MustConditionToContinueFunc(func() bool {
+	//	return action != nil
+	//})
+	//
+	//u.DryRunOrExit("Step Exec", f, "func name must be valid")
+
+	alloweErrors := []string{
+		"func name not implemented",
+	}
+
+	u.DryRunAndSkip(
+		bizErr.Mark,
+		alloweErrors,
+		u.ContinueFunc(
+			func() {
+				action.Adapt()
+				action.Exec()
+			}),
+		nil,
+	)
 
 }
 

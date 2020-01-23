@@ -23,5 +23,6 @@ var (
 	verror_color_printf = color.Red
 	msg_color_printf    = color.Yellow
 	msg_color_sprintf   = color.YellowString
+	dryrun_color_print  = color.Cyan
 )
 

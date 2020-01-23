@@ -12,6 +12,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/stephencheng/go-spew/spew"
 	rt "github.com/stephencheng/up/model/runtime"
+	ee "github.com/stephencheng/up/utils/error"
 	"os"
 
 	"runtime"
@@ -61,6 +62,14 @@ func Ppfmsgvvvv(format string, a ...interface{}) {
 	if permitted("vvvv") {
 		msg_color_printf(format, Spp(a...))
 	}
+}
+
+func Pfdryrun(format string, a ...interface{}) {
+	dryrun_color_print(format, a...)
+}
+
+func Pdryrun(a ...interface{}) {
+	dryrun_color_print("%s\n", a...)
 }
 
 func Ppmsgvvvv(a ...interface{}) {
@@ -143,5 +152,25 @@ func DryRunOrExit(mark string, mustCondition MustConditionToContinueFunc, condit
 		os.Exit(-1)
 	}
 
+}
+
+type ContinueFunc func()
+
+//if there is NoFault, then continue
+//or if there is a fault in the allowed list, then skip rest, do not run continueFunc
+//else the fault is not ignorable, then if use DryRunOrExitFunc
+func DryRunAndSkip(mark string, allowedErrors []string, continueFunc ContinueFunc, mustCondition MustConditionToContinueFunc) {
+	if mark == ee.NOFAULT {
+		continueFunc()
+	} else if Contains(allowedErrors, mark) {
+		//do nothing
+		if rt.Dryrun {
+			dryrun_color_print("in dry run and skip further")
+		}
+	} else {
+		if mustCondition != nil {
+			DryRunOrExit("mark", mustCondition, "trying to continue")
+		}
+	}
 }
 

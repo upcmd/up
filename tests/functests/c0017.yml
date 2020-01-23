@@ -1,0 +1,56 @@
+goal:
+  - to test multiple ref-task executions should pass
+
+vars:
+  a: runtime-a
+  e: runtime-e
+  k: runtime-k
+
+tasks:
+  -
+    name: callee-task1
+    task:
+      -
+        func: shell
+        vars:
+          a: callee-a
+          b: callee-b
+          c: callee-c
+        do:
+          - echo "exec ref-task1"
+
+  -
+    name: task
+    desc:
+    task:
+      -
+        func: task_ref
+        desc: task_ref1
+        vars:
+          a: caller-ref-1a
+          b: caller-ref-1b
+        do:
+          - callee-task1
+          - callee-task2
+
+      -
+        func: task_ref
+        desc: task_ref2
+        vars:
+          a: caller-ref-2a
+          b: caller-ref-2b
+        do:
+          - callee-task2
+          - callee-task1
+
+  -
+    name: callee-task2
+    task:
+      -
+        func: shell
+        vars:
+          a: callee-a
+          b: callee-b
+          c: callee-c
+        do:
+          - echo "exec ref-task2"
