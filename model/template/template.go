@@ -15,10 +15,10 @@ import (
 
 func Render(tstr string, obj interface{}) string {
 	tname := "step_item_exec"
-	t, err := template.New("step_item_exec").Parse(tstr)
-	u.LogError(tname, err)
+	t := template.Must(template.New("step_item_exec").Parse(tstr))
+
 	var result bytes.Buffer
-	err = t.Execute(&result, obj)
+	err := t.Execute(&result, obj)
 	u.LogError(tname, err)
 	return result.String()
 }

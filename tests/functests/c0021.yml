@@ -1,0 +1,34 @@
+goal:
+  - to show using template
+
+tasks:
+
+  - name: task
+    task:
+      -
+        func: shell
+        vars:
+          student: Tom
+          gender: Male
+          school: Sydney Grammar
+          info: |
+            student: Tom
+             gender: Male
+             school: Sydney Grammar
+        do:
+          - |
+            echo """my student: {{.student}}
+            student's gender: {{.gender}}
+             school's name: {{.school}}"""
+          - |
+            {{$info := .}}
+            echo """my student: {{$info.student}}
+            student's gender: {{$info.gender}}
+             school's name: {{$info.school}}"""
+          - |
+            {{$a := .student}}
+            {{$b := .gender}}
+            {{$c := .school}}
+            echo """my student: {{$a}}
+            student's gender: {{$b}}
+             school's name: {{$c}}"""

@@ -1,0 +1,34 @@
+goal:
+  - to show a design pattern using task_ref and callee task without local vars
+
+vars:
+  school: sydney grammar
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: task_ref
+        desc: call function with different vars
+        vars:
+          studentname: Tom
+          school: sydney grammar
+          gender: male
+        do:
+          - function
+
+  - name: function
+    desc: |
+      as a design pattern, this is a function task
+      it's better to not to use any local vars, in this
+      way, the vars are passed in from caller task_ref so
+      that this function could be used by multiple ref tasks
+    task:
+      -
+        func: shell
+        desc: show school and student info
+        do:
+          - echo "studentname -> {{.studentname}} | gender -> {{.gender}}"
+          - echo "school -> {{.school}}"
+

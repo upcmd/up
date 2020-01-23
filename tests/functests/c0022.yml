@@ -1,0 +1,20 @@
+goal:
+  - to show using the problem that it requires further var expanding to get real value
+
+tasks:
+
+  - name: task
+    task:
+      -
+        func: shell
+        vars:
+          student: Tom
+          gender: Male
+          school: Sydney Grammar
+          info: |
+            my student: {{.student}}
+            student's gender: {{.gender}}
+            school's name: {{.school}}
+        do:
+          - |
+            echo """{{.info}}"""
