@@ -1,0 +1,17 @@
+goal:
+  - to test dry run and validation
+  - validation is to do a dry run so that it fails fast before the real execution
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: shell-wrong-name1
+        do:
+          - echo "exec task step1"
+
+      -
+        func: shell
+        do:
+          - echo "exec task step2"
