@@ -1,0 +1,32 @@
+goal:
+  - to show complex object using dynamic var
+
+design:
+  - to make it simple, the dvar value is always a string
+  - |
+    the string could be a formated yaml, so that you can
+    convert it to yaml then a object
+  - register the object into that scope's vars list
+  - consider a modified name of -> a_smart_guy_obj to reference to
+
+vars:
+  student:
+    name: Tom
+    gender: Male
+    school: Sydney Grammar
+
+dvars:
+  - name: a_smart_guy
+    value: |
+      name: "{{.student.name}}"
+      sex: "{{.student.gender}}"
+      school: "{{.student.school}}"
+
+tasks:
+
+  - name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo """a smart guy=>{{.a_smart_guy}}"""

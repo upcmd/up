@@ -14,6 +14,7 @@ import (
 	rt "github.com/stephencheng/up/model/runtime"
 	t "github.com/stephencheng/up/model/template"
 	u "github.com/stephencheng/up/utils"
+	"strings"
 
 	"os/exec"
 )
@@ -28,7 +29,7 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 	} else {
 
 		cmdOutput, err := cmdExec.CombinedOutput()
-		var result ShellExecResult
+		var result ExecResult
 		if err != nil {
 			if exitError, ok := err.(*exec.ExitError); ok {
 				result.Code = exitError.ExitCode()
@@ -36,7 +37,7 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 			}
 		} else {
 			result.Code = 0
-			result.Output = string(cmdOutput)
+			result.Output = strings.TrimSpace(string(cmdOutput))
 		}
 
 		f.Result = result
@@ -45,17 +46,12 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 	}
 }
 
-type ShellExecResult struct {
-	Code   int
-	Output string
-	ErrMsg string
-}
-
 type ShellFuncAction struct {
 	Do     interface{}
 	Vars   *cache.Cache
 	Cmds   []string
-	Result ShellExecResult
+	Result ExecResult
+	Step   *Step
 }
 
 //adapt the abstract step.Do to concrete ShellFuncAction Cmds
@@ -100,5 +96,7 @@ func (f *ShellFuncAction) Exec() {
 	}
 
 	//u.Ppmsgvvvv(f.Vars)
+	u.Ppmsgvvvv(f.Result)
+	f.Step.Result = &f.Result
 }
 

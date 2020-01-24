@@ -1,0 +1,75 @@
+goal:
+  - to show dynamic vars
+  - dynamic vars suppport customisable level of expanding
+  - default expand level is 1
+  - use array so that sequence is known and reduce complexity and mess
+  - |
+    dvar name should not contiain - as it will conflict
+    with golang template var naming
+
+vars:
+  student: Tom
+  gender: Male
+  school: Sydney Grammar
+  a1: a1->{{.b2}}
+  b2: b2->{{.c3}}
+  c3: c3->{{.d4}}
+  d4: d4->{{.student}}
+
+dvars:
+  - name: from
+    value: "{{.school}}"
+    desc: |
+      default expanding level is 1
+      you will have to quote it if it starts the value of bracket since yaml uses it
+
+  - name: sex
+    value: "{{.gender}}"
+    expand: 1
+
+  - name: dependon_vars
+    value: "{{.sex}}"
+
+  - name: dependon_var_and_dvar
+    value: "{{.student}}-{{.sex}}"
+    desc: this is still 1 level expanding as .sex must be rendered and merged into runtimevars
+
+  - name: multple_render_var_level3
+    value: multple-render-var-> {{.b2}}
+    desc: |
+      you don't have to quote as bracket is not the start of the value and not conflict with yaml
+
+  - name: multple_render_var_level3_with_expand2
+    value: multple-render-var-> {{.b2}}
+    expand: 2
+
+  - name: multple_render_var_level3_with_expand3
+    value: multple-render-var-> {{.b2}}
+    expand: 3
+
+  - name: multple_render_var_level3_with_expand4
+    value: multple-render-var-> {{.b2}}
+    expand: 4
+
+  - name: multple_render_var_level5
+    value: multple-render-var-> {{.a1}}
+    expand: 5
+
+#  - name: invalid-name
+#    value: multple-render-var-> {{.a1}}
+
+tasks:
+
+  - name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo "student=>{{.student}}"
+          - echo "a1=> a1->{{.b2}}"
+          - echo "from->{{.from}}"
+          - echo "sex->{{.sex}}"
+          - echo "dependon_vars->{{.dependon_vars}}"
+          - echo "dependon_var_and_dvar->{{.dependon_var_and_dvar}}"
+          - echo "multple_render_var_level3->{{.multple_render_var_level3}}"
+          - echo "multple_render_var_level4->{{.multple_render_var_level4}}"

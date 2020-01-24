@@ -18,10 +18,13 @@ import (
 )
 
 type Step struct {
-	Do   interface{} //FuncImpl
-	Func string
-	Vars *cache.Cache
-	Desc string
+	Name   string
+	Do     interface{} //FuncImpl
+	Func   string
+	Vars   *cache.Cache
+	Desc   string
+	Reg    string
+	Result *ExecResult
 }
 
 //this is final merged exec vars the individual step will use
@@ -49,6 +52,7 @@ func (step *Step) Exec() {
 	case FUNC_SHELL:
 		funcAction := ShellFuncAction{
 			Do:   step.Do,
+			Step: step,
 			Vars: getExecVars(FUNC_SHELL, step.Vars),
 		}
 		action = ic.Do(&funcAction)
@@ -98,7 +102,14 @@ func (steps *Steps) Exec() {
 	for idx, step := range *steps {
 		u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Sppmsg(step))
 		step.Exec()
+		if step.Reg == "auto" {
+			cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s", step.Name), step.Result.Output)
+		} else if step.Reg != "" {
+			cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s", step.Reg), step.Result.Output)
+		}
 	}
+
+	u.Ptmpdebug("register test", cache.RuntimeVarsAndDvarsMerged)
 
 }
 

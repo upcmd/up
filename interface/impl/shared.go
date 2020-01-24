@@ -12,3 +12,9 @@ const (
 	FUNC_TASK_REF = "task_ref"
 )
 
+type ExecResult struct {
+	Code   int
+	Output string
+	ErrMsg string
+}
+

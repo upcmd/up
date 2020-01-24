@@ -1,0 +1,27 @@
+goal:
+  - to show complex object using dynamic var
+
+vars:
+  student:
+    name: Tom
+    gender: Male
+    school: Sydney Grammar
+
+dvars:
+  - name: studentname
+    value: "{{.student.name}}"
+
+  - name: studentgender
+    value: "{{.student.gender}}"
+
+tasks:
+
+  - name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo "student=>{{.student}}"
+          - echo "name=>{{.studentname}}"
+          - echo "gender=>{{.studentgender}}"
+          - echo "school=>{{.student.school}}"

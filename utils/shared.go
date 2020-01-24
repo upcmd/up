@@ -12,8 +12,9 @@ import (
 )
 
 var (
-	P  = fmt.Println
-	Pf = fmt.Printf
+	P   = fmt.Println
+	Pf  = fmt.Printf
+	Spf = fmt.Sprintf
 )
 
 // Contains tells whether a contains x.
