@@ -24,6 +24,8 @@ type Step struct {
 	Desc string
 }
 
+//this is final merged exec vars the individual step will use
+//this step will merge the vars with the caller's stack vars
 func getExecVars(funcname string, stepVars *cache.Cache) *cache.Cache {
 	vars := cache.GetRuntimeExecVars(funcname, stepVars)
 	callerVars := stack.ExecStack.GetTop().(*cache.Cache)
@@ -94,7 +96,7 @@ type Steps []Step
 func (steps *Steps) Exec() {
 
 	for idx, step := range *steps {
-		u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Spp(step))
+		u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Sppmsg(step))
 		step.Exec()
 	}
 

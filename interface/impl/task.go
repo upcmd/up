@@ -16,6 +16,7 @@ import (
 	"github.com/stephencheng/up/model/stack"
 	u "github.com/stephencheng/up/utils"
 	"os"
+	"strings"
 )
 
 var (
@@ -29,8 +30,10 @@ func InitTasks() {
 	loadTasks()
 	loadScopes()
 	loadRuntimeGlobalVars()
+	loadRuntimeDvars()
 	cache.ScopeProfiles.InitContextInstances()
 	cache.SetRuntimeVarsMerged(rt.InstanceName)
+	cache.SetRuntimeGlobalMergedWithDvars()
 
 }
 
@@ -76,6 +79,16 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 
 }
 
+///*
+//
+// */
+//func ValidateTasks() {
+//	for idx, task := range *Tasks {
+//
+//	}
+//
+//}
+//
 func loadTasks() error {
 	tasksData := TaskYmlRoot.Get("tasks")
 	var tasks model.Tasks
@@ -92,11 +105,36 @@ func loadScopes() error {
 	return err
 }
 
-func loadRuntimeGlobalVars() error {
+func loadRuntimeGlobalVars() {
 	varsData := TaskYmlRoot.Get("vars")
 	var vars cache.Cache
 	err := ms.Decode(varsData, &vars)
+	u.LogError("loadRuntimeGlobalVars", err)
 	cache.SetRuntimeGlobalVars(&vars)
-	return err
+}
+
+func loadRuntimeDvars() *cache.Dvars {
+	dvarsData := TaskYmlRoot.Get("dvars")
+	var dvars cache.Dvars
+	err := ms.Decode(dvarsData, &dvars)
+	//u.Ptmpdebug("check dvars:", dvars)
+	u.LogError("loadRuntimeDvars", err)
+
+	var identified bool
+	for _, dvar := range dvars {
+		if strings.Contains(dvar.Name, "-") {
+			identified = true
+			u.Pfvvvv("validating dvar name: %s invalid containing '-'", dvar.Name)
+		}
+	}
+
+	if identified {
+		u.LogError("dvar validate", "the dvar name identified above should be fixed before continue")
+		os.Exit(-1)
+	}
+
+	cache.SetRuntimeGlobalDvars(&dvars)
+	return &dvars
+
 }
 

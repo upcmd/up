@@ -19,12 +19,21 @@ import (
 
 var (
 	//expanded context only contains group and global scope, but not each instance vars
-	expandedContext   ExpandedContext   = ExpandedContext{}
-	GroupMembersList  []string          = []string{}
-	MemberGroupMap    map[string]string = map[string]string{}
-	ScopeProfiles     *Scopes
+	expandedContext ExpandedContext = ExpandedContext{}
+
+	GroupMembersList []string          = []string{}
+	MemberGroupMap   map[string]string = map[string]string{}
+	ScopeProfiles    *Scopes
+
+	//this is the merged vars from within scope: global, groups level (if there is), instance varss, then global runtime vars
 	RuntimeVarsMerged *Cache
-	RuntimeGlobalVars *Cache
+
+	//this is the merged vars and dvars to a vars cache from within scope: global, groups level (if there is), instance varss, then global runtime vars
+	//this vars should be used instead of RuntimeVarsMerged as it include both runtime vars and dvars except the local vars and dvars
+	RuntimeVarsAndDvarsMerged *Cache
+
+	RuntimeGlobalVars  *Cache
+	RuntimeGlobalDvars *Dvars
 )
 
 type Scope struct {
@@ -45,6 +54,28 @@ func SetScopeProfiles(sp *Scopes) {
 
 func SetRuntimeGlobalVars(vars *Cache) {
 	RuntimeGlobalVars = vars
+}
+
+func SetRuntimeGlobalDvars(dvars *Dvars) {
+	RuntimeGlobalDvars = dvars
+}
+
+func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
+	var mergedVars Cache
+	mergedVars = deepcopy.Copy(*RuntimeVarsMerged).(Cache)
+
+	//u.Ptmpdebug("xxx", RuntimeGlobalDvars)
+	expandedVars := RuntimeGlobalDvars.Expand(RuntimeVarsMerged)
+
+	if RuntimeGlobalDvars != nil {
+		mergo.Merge(&mergedVars, *expandedVars, mergo.WithOverride)
+	}
+
+	RuntimeVarsAndDvarsMerged = &mergedVars
+	u.Pfvvvv("runtime global final merged with dvars:")
+	u.Ppmsgvvvv(mergedVars)
+
+	return RuntimeVarsAndDvarsMerged
 }
 
 func loadRefVars(yamlroot *viper.Viper) *Cache {
@@ -122,14 +153,14 @@ func (ss *Scopes) InitContextInstances() {
 func ListContextInstances() {
 	u.Pvvvv("---------group vars----------")
 	for k, v := range expandedContext {
-		u.Pfvvvv("%s: %s", k, u.Spp(v))
+		u.Pfvvvv("%s: %s", k, u.Sppmsg(v))
 		//u.Dvvvvv(k, v)
 	}
 	u.Pfvvvv("groups members:%s\n", GroupMembersList)
 
 }
 
-//get instance vars, eg dev
+//get instance vars from scope definition, eg dev
 func (ss *Scopes) GetInstanceVars(instanceName string) *Cache {
 	for _, s := range *ss {
 		if s.Name == instanceName {
@@ -178,10 +209,11 @@ func SetRuntimeVarsMerged(runtimeid string) *Cache {
 
 /*
 merge localvars to above RuntimeVarsMerged to get final runtime exec vars
+the localvars is the vars in the step
 */
 func GetRuntimeExecVars(mark string, localvars *Cache) *Cache {
 	var execvars Cache
-	execvars = deepcopy.Copy(*RuntimeVarsMerged).(Cache)
+	execvars = deepcopy.Copy(*RuntimeVarsAndDvarsMerged).(Cache)
 
 	if localvars != nil {
 		mergo.Merge(&execvars, *localvars, mergo.WithOverride)

@@ -58,12 +58,6 @@ func Dvvvvv(a ...interface{}) {
 	}
 }
 
-func Ppfmsgvvvv(format string, a ...interface{}) {
-	if permitted("vvvv") {
-		msg_color_printf(format, Spp(a...))
-	}
-}
-
 func Pfdryrun(format string, a ...interface{}) {
 	dryrun_color_print(format, a...)
 }
@@ -78,25 +72,20 @@ func Ppmsgvvvv(a ...interface{}) {
 	}
 }
 
+func Sppmsg(a ...interface{}) string {
+	return msg_color_sprintf("%s\n", spewMsgState.Sdump(a...))
+}
+
+func Ppmsgvvvvhint(hint string, a ...interface{}) {
+	Pvvvv(hint)
+	Ppmsgvvvv(a...)
+}
+
 func Ptmpdebug(mark string, a ...interface{}) {
 	if permitted("vvvv") {
 		hiColor := color.New(color.FgHiWhite, color.BgRed)
 		hiColor.Printf("------%s start-----\n%s\n------%s end-----\n\n", mark, spewMsgState.Sdump(a...), mark)
 	}
-}
-
-//pretty print
-func Spp(a ...interface{}) string {
-	str := msg_color_sprintf("%s", spewMsgState.Sdump(a...))
-
-	//fstr1 := strings.Replace(str, ` "`, " ", -1)
-	//fstr2 := strings.Replace(fstr1, `\"`, `"`, -1)
-	//fstr3 := strings.Replace(fstr2, `",`, ",", -1)
-	//fstr4 := strings.Replace(fstr3, `""`, `"`, -1)
-	//fstr5 := strings.Replace(fstr4, `"$`, `"`, -1)
-	//fstr1 := strings.Replace(str, `\"`, "", -1)
-	//fstr2 := strings.Replace(fstr1, `"`, "", -1)
-	return str
 }
 
 func Pfvvvv(format string, a ...interface{}) {

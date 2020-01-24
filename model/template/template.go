@@ -20,6 +20,7 @@ func Render(tstr string, obj interface{}) string {
 	var result bytes.Buffer
 	err := t.Execute(&result, obj)
 	u.LogError(tname, err)
+
 	return result.String()
 }
 
