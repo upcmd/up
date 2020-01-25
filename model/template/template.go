@@ -9,17 +9,18 @@ package template
 
 import (
 	"bytes"
-	u "github.com/stephencheng/up/utils"
+	//u "github.com/stephencheng/up/utils"
 	"text/template"
 )
 
 func Render(tstr string, obj interface{}) string {
 	tname := "step_item_exec"
-	t := template.Must(template.New("step_item_exec").Parse(tstr))
+	t := template.Must(template.New(tname).Parse(tstr))
 
 	var result bytes.Buffer
-	err := t.Execute(&result, obj)
-	u.LogError(tname, err)
+	//err := t.Execute(&result, obj)
+	t.Execute(&result, obj)
+	//u.LogError(tname, err)
 
 	return result.String()
 }

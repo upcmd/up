@@ -12,6 +12,7 @@ import (
 	ic "github.com/stephencheng/up/interface"
 	"github.com/stephencheng/up/model/cache"
 	"github.com/stephencheng/up/model/stack"
+
 	ee "github.com/stephencheng/up/utils/error"
 
 	u "github.com/stephencheng/up/utils"
@@ -31,7 +32,7 @@ type Step struct {
 //this step will merge the vars with the caller's stack vars
 func getExecVars(funcname string, stepVars *cache.Cache) *cache.Cache {
 	vars := cache.GetRuntimeExecVars(funcname, stepVars)
-	callerVars := stack.ExecStack.GetTop().(*cache.Cache)
+	callerVars := stack.ExecStack.GetTop().(cache.RuntimeContext).CallerVars
 	//u.Ptmpdebug("callerVars", callerVars)
 
 	if callerVars != nil {
@@ -82,10 +83,10 @@ func (step *Step) Exec() {
 		"func name not implemented",
 	}
 
-	u.DryRunAndSkip(
+	DryRunAndSkip(
 		bizErr.Mark,
 		alloweErrors,
-		u.ContinueFunc(
+		ContinueFunc(
 			func() {
 				action.Adapt()
 				action.Exec()

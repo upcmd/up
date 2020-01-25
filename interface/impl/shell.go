@@ -11,7 +11,6 @@ import (
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/stephencheng/up/model/cache"
-	rt "github.com/stephencheng/up/model/runtime"
 	t "github.com/stephencheng/up/model/template"
 	u "github.com/stephencheng/up/utils"
 	"strings"
@@ -23,7 +22,7 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 	cmdExec := exec.Command("/bin/sh", "-c", cmd)
 	exec.Command("bash", "-c", cmd)
 
-	if rt.Dryrun {
+	if cache.Dryrun {
 		u.Pdryrun("in dryrun mode and skipping the actual commands")
 		return "dryrun result"
 	} else {
@@ -77,7 +76,7 @@ func (f *ShellFuncAction) Adapt() {
 func (f *ShellFuncAction) Exec() {
 	u.P("executing shell commands")
 	for idx, tcmd := range f.Cmds {
-		u.Pfv("    cmd(%2d):\n%+v\n", idx+1, color.HiBlueString("%s", tcmd))
+		u.Pfv("cmd(%2d):\n%+v\n", idx+1, color.HiBlueString("%s", tcmd))
 		//u.Pf("      exec result:\n%s\n", color.HiGreenString("%s", runCmd(f, tcmd)))
 
 		//u.Ptmpdebug("1001", tcmd)

@@ -10,7 +10,7 @@ package main
 import (
 	"github.com/alecthomas/kingpin"
 	"github.com/stephencheng/up/interface/impl"
-	rt "github.com/stephencheng/up/model/runtime"
+	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	"os"
 )
@@ -46,7 +46,7 @@ func main() {
 	u.SetTaskfile(*taskfile)
 	u.Pfvvvv(" :verbose level:  %s", u.CoreConfig.Verbose)
 	u.Pfvvvv(" :instance name:  %s", *instanceName)
-	rt.SetInstanceName(*instanceName)
+	cache.SetInstanceName(*instanceName)
 
 	switch cmd {
 	case task.FullCommand():
