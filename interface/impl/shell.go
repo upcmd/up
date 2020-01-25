@@ -22,7 +22,7 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 	cmdExec := exec.Command("/bin/sh", "-c", cmd)
 	exec.Command("bash", "-c", cmd)
 
-	if cache.Dryrun {
+	if Dryrun {
 		u.Pdryrun("in dryrun mode and skipping the actual commands")
 		return "dryrun result"
 	} else {
@@ -50,7 +50,6 @@ type ShellFuncAction struct {
 	Vars   *cache.Cache
 	Cmds   []string
 	Result ExecResult
-	Step   *Step
 }
 
 //adapt the abstract step.Do to concrete ShellFuncAction Cmds
@@ -94,8 +93,7 @@ func (f *ShellFuncAction) Exec() {
 		)
 	}
 
-	//u.Ppmsgvvvv(f.Vars)
 	u.Ppmsgvvvv(f.Result)
-	f.Step.Result = &f.Result
+	StepStack.GetTop().(*StepRuntimeContext).Result = &f.Result
 }
 

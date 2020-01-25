@@ -11,28 +11,25 @@ import (
 	"github.com/imdario/mergo"
 	ic "github.com/stephencheng/up/interface"
 	"github.com/stephencheng/up/model/cache"
-	"github.com/stephencheng/up/model/stack"
-
 	ee "github.com/stephencheng/up/utils/error"
 
 	u "github.com/stephencheng/up/utils"
 )
 
 type Step struct {
-	Name   string
-	Do     interface{} //FuncImpl
-	Func   string
-	Vars   *cache.Cache
-	Desc   string
-	Reg    string
-	Result *ExecResult
+	Name string
+	Do   interface{} //FuncImpl
+	Func string
+	Vars *cache.Cache
+	Desc string
+	Reg  string
 }
 
 //this is final merged exec vars the individual step will use
 //this step will merge the vars with the caller's stack vars
 func getExecVars(funcname string, stepVars *cache.Cache) *cache.Cache {
 	vars := cache.GetRuntimeExecVars(funcname, stepVars)
-	callerVars := stack.ExecStack.GetTop().(cache.RuntimeContext).CallerVars
+	callerVars := TaskStack.GetTop().(*TaskRuntimeContext).CallerVars
 	//u.Ptmpdebug("callerVars", callerVars)
 
 	if callerVars != nil {
@@ -53,7 +50,6 @@ func (step *Step) Exec() {
 	case FUNC_SHELL:
 		funcAction := ShellFuncAction{
 			Do:   step.Do,
-			Step: step,
 			Vars: getExecVars(FUNC_SHELL, step.Vars),
 		}
 		action = ic.Do(&funcAction)
@@ -102,12 +98,24 @@ func (steps *Steps) Exec() {
 
 	for idx, step := range *steps {
 		u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Sppmsg(step))
-		step.Exec()
-		if step.Reg == "auto" {
-			cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s", step.Name), step.Result.Output)
-		} else if step.Reg != "" {
-			cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s", step.Reg), step.Result.Output)
-		}
+
+		func() {
+			rtContext := StepRuntimeContext{
+				Stepname: step.Name,
+			}
+			StepStack.Push(&rtContext)
+			step.Exec()
+
+			result := StepStack.GetTop().(*StepRuntimeContext).Result
+			if step.Reg == "auto" {
+				cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s", step.Name), result.Output)
+			} else if step.Reg != "" {
+				cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s", step.Reg), result.Output)
+			}
+
+			StepStack.Pop()
+		}()
+
 	}
 
 	u.Ptmpdebug("register test", cache.RuntimeVarsAndDvarsMerged)

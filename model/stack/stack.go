@@ -12,39 +12,40 @@ import (
 )
 
 var (
-	ExecStack *TaskExecStack
+	Stacks map[string]*ExecStack = map[string]*ExecStack{}
 )
 
-type TaskExecStack struct {
+type ExecStack struct {
 	Stack *list.List
 }
 
-func init() {
-	ExecStack = New()
-}
-
-func New() *TaskExecStack {
-	return &TaskExecStack{
+func New(id string) *ExecStack {
+	s := &ExecStack{
 		Stack: list.New(),
 	}
+	Stacks[id] = s
+	return s
 }
 
-func (s *TaskExecStack) Push(v interface{}) {
+/*if you would like to use the object to be pushed and
+assign value to it, you must push a pointer
+*/
+func (s *ExecStack) Push(v interface{}) {
 	s.Stack.PushFront(v)
 }
 
-func (s *TaskExecStack) Pop() interface{} {
+func (s *ExecStack) Pop() interface{} {
 	top := s.Stack.Front()
 	s.Stack.Remove(top)
 	return top.Value
 }
 
-func (s *TaskExecStack) GetTop() interface{} {
+func (s *ExecStack) GetTop() interface{} {
 	top := s.Stack.Front()
 	return top.Value
 }
 
-func (s *TaskExecStack) GetLen() int {
+func (s *ExecStack) GetLen() int {
 	return s.Stack.Len()
 }
 

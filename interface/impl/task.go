@@ -12,7 +12,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/cache"
-	"github.com/stephencheng/up/model/stack"
 	u "github.com/stephencheng/up/utils"
 	"os"
 	"strings"
@@ -31,7 +30,7 @@ func InitTasks() {
 	loadRuntimeGlobalVars()
 	loadRuntimeDvars()
 	cache.ScopeProfiles.InitContextInstances()
-	cache.SetRuntimeVarsMerged(cache.InstanceName)
+	cache.SetRuntimeVarsMerged(InstanceName)
 	cache.SetRuntimeGlobalMergedWithDvars()
 
 }
@@ -47,7 +46,7 @@ func ListTasks() {
 
 }
 func ValidateTask(taskname string) {
-	cache.SetDryrun()
+	SetDryrun()
 	ExecTask(taskname, nil)
 }
 
@@ -62,18 +61,19 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 			u.LogError("e:", err)
 			func() {
 
-				rtContext := cache.RuntimeContext{
+				rtContext := TaskRuntimeContext{
 					Taskname:   taskname,
 					CallerVars: callerVars,
 				}
-				stack.ExecStack.Push(rtContext)
-				u.Pvvvv("Executing task stack layer:", stack.ExecStack.GetLen())
-				if stack.ExecStack.GetLen() > 2 {
+
+				TaskStack.Push(&rtContext)
+				u.Pvvvv("Executing task stack layer:", TaskStack.GetLen())
+				if TaskStack.GetLen() > 2 {
 					u.LogError("Task exec stack layer check", "Too many layers of task executions, please fix your recursive ref-task configurations")
 					os.Exit(-1)
 				}
 				steps.Exec()
-				stack.ExecStack.Pop()
+				TaskStack.Pop()
 			}()
 
 		}

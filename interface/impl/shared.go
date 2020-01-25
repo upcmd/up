@@ -20,6 +20,16 @@ const (
 	FUNC_TASK_REF = "task_ref"
 )
 
+type TaskRuntimeContext struct {
+	Taskname   string
+	CallerVars *cache.Cache
+}
+
+type StepRuntimeContext struct {
+	Stepname string
+	Result   *ExecResult
+}
+
 type ExecResult struct {
 	Code   int
 	Output string
@@ -32,7 +42,7 @@ func DryRunOrExit(mark string, mustCondition MustConditionToContinueFunc, condit
 
 	ok := mustCondition()
 
-	if cache.Dryrun {
+	if Dryrun {
 		color.Green("      %s -> %s", mark, "in dryrun, try to ignore")
 		if !ok {
 			color.Red("      %s -> %s", mark, "can not continue further due to critical condition not satisfied")
@@ -55,7 +65,7 @@ func DryRunAndSkip(mark string, allowedErrors []string, continueFunc ContinueFun
 		continueFunc()
 	} else if u.Contains(allowedErrors, mark) {
 		//do nothing
-		if cache.Dryrun {
+		if Dryrun {
 			u.Pdryrun("in dry run and skip further")
 		}
 	} else {
