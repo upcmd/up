@@ -107,10 +107,11 @@ func (steps *Steps) Exec() {
 			step.Exec()
 
 			result := StepStack.GetTop().(*StepRuntimeContext).Result
+			taskname := TaskStack.GetTop().(*TaskRuntimeContext).Taskname
 			if step.Reg == "auto" {
-				cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s", step.Name), result.Output)
+				cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
 			} else if step.Reg != "" {
-				cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s", step.Reg), result.Output)
+				cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Reg), result.Output)
 			}
 
 			StepStack.Pop()

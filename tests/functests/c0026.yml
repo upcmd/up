@@ -1,0 +1,33 @@
+goal:
+  - to test register a var/dvar into vars
+  - once registered, the later step can consume the registered vars
+
+design:
+  - if reg=auto, use the step.name as var name
+  - otherwise use the defined name as var name
+  - use name scope, eg register_taskname_stepname|(choosed name) as pattern
+
+tasks:
+
+  - name: task
+    task:
+      -
+        func: shell
+        name: sayhello
+        do:
+          - echo "hello,sayhello"
+        reg: auto
+
+      -
+        func: shell
+        name: woohoo
+        do:
+          - echo "woohoo"
+        reg: woohooyaa
+
+      -
+        func: shell
+        do:
+          - echo "hello,{{.register_task_woohooyaa}}"
+          - echo "{{.register_task_sayhello}}"
+
