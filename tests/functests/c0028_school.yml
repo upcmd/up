@@ -1,0 +1,6 @@
+address:
+  suburb:
+    name: {{.student.address.suburb.name}}
+    postcode: 2000
+    CBD: yes
+  school: {{.student.address.school}}

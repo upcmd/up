@@ -13,7 +13,9 @@ import (
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
+	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 )
 
@@ -131,10 +133,20 @@ func loadRuntimeDvars() *cache.Dvars {
 	)
 
 	var identified bool
-	for _, dvar := range dvars {
+	for idx, dvar := range dvars {
 		if strings.Contains(dvar.Name, "-") {
 			identified = true
 			u.Pfvvvv("validating dvar name: %s invalid containing '-'", dvar.Name)
+		}
+
+		if dvar.Ref != "" && dvar.Value != "" {
+			u.InvalidAndExit("validating dvar ref and value", "ref and value can not both exist at the same time")
+		}
+
+		if dvar.Ref != "" {
+			data, err := ioutil.ReadFile(path.Join(u.CoreConfig.TaskDir, dvar.Ref))
+			u.LogErrorAndExit("load dvar value from ref file", err, "please fix file loading problem")
+			dvars[idx].Value = string(data)
 		}
 	}
 
@@ -143,6 +155,7 @@ func loadRuntimeDvars() *cache.Dvars {
 		os.Exit(-1)
 	}
 
+	u.Ptmpdebug("aaa", dvars)
 	cache.SetRuntimeGlobalDvars(&dvars)
 	return &dvars
 

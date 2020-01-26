@@ -22,6 +22,7 @@ type Dvar struct {
 	Expand   int
 	Flags    []string
 	Rendered string
+	Ref      string
 }
 
 func (dvars *Dvars) Expand(vars *Cache) *Cache {
@@ -49,9 +50,5 @@ func (dvars *Dvars) Expand(vars *Cache) *Cache {
 	u.Ppmsgvvvvhint("dvar expanded result", *expandedVars)
 
 	return expandedVars
-}
-
-func (dvars *Dvars) MergeTo(vars *Cache) {
-
 }
 
