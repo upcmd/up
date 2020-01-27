@@ -16,18 +16,18 @@ import (
 type Dvars []Dvar
 
 type Dvar struct {
-	Name   string
-	Value  string
-	Desc   string
-	Expand int
+	Name     string
+	Value    string
+	Desc     string
+	Expand   int
+	Flags    []string
+	Rendered string
 }
 
 func (dvars *Dvars) Expand(vars *Cache) *Cache {
 	var expandedVars *Cache = New()
 
 	var tmpDvars Dvars
-	//u.Ptmpdebug("xxx", dvars)
-
 	tmpDvars = deepcopy.Copy(*dvars).(Dvars)
 	var tmpVars Cache = deepcopy.Copy(*vars).(Cache)
 
@@ -35,22 +35,17 @@ func (dvars *Dvars) Expand(vars *Cache) *Cache {
 		if dvar.Expand == 0 {
 			tmpDvars[idx].Expand = 1
 		}
-		//u.Ptmpdebug("dvar:", idx+1, tmpDvars[idx])
-
 		for i := 0; i < tmpDvars[idx].Expand; i++ {
-
 			tval := tmpDvars[idx].Value
-			//u.Ptmpdebug("1111", tval)
 			tmpDvars[idx].Value = t.Render(tval, tmpVars)
-			//u.Ptmpdebug("2222", tmpDvars[idx].Value)
 		}
 
 		rval := tmpDvars[idx].Value
 		tmpVars.Put(dvar.Name, rval)
+		(*dvars)[idx].Rendered = rval
 		expandedVars.Put(dvar.Name, rval)
 	}
 
-	//u.Ptmpdebug("dvar expanded result:", *expandedVars)
 	u.Ppmsgvvvvhint("dvar expanded result", *expandedVars)
 
 	return expandedVars

@@ -124,8 +124,11 @@ func loadRuntimeDvars() *cache.Dvars {
 	dvarsData := TaskYmlRoot.Get("dvars")
 	var dvars cache.Dvars
 	err := ms.Decode(dvarsData, &dvars)
-	//u.Ptmpdebug("check dvars:", dvars)
-	u.LogError("loadRuntimeDvars", err)
+	u.Ptmpdebug("check dvars:", dvars)
+	u.LogErrorAndExit("loadRuntimeDvars",
+		err,
+		"You must fix the data type to be string for a dvar value and try again",
+	)
 
 	var identified bool
 	for _, dvar := range dvars {

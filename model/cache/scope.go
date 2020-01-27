@@ -13,7 +13,7 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/spf13/viper"
 	u "github.com/stephencheng/up/utils"
-
+	"gopkg.in/yaml.v2"
 	"os"
 )
 
@@ -60,6 +60,28 @@ func SetRuntimeGlobalDvars(dvars *Dvars) {
 	RuntimeGlobalDvars = dvars
 }
 
+func procDvars() {
+
+	for _, dvar := range *RuntimeGlobalDvars {
+		//convert the yaml to object
+		if dvar.Flags != nil && len(dvar.Flags) != 0 {
+			if u.Contains(dvar.Flags, "to_object") {
+				rawyml := dvar.Rendered
+				obj := new(interface{})
+				err := yaml.Unmarshal([]byte(rawyml), obj)
+				u.LogErrorAndExit("dvar conversion to object:", err, "please validate the ymal content")
+
+				if dvar.Expand > 1 {
+					u.InvalidAndExit("dvar validation", "multiple expand > 1 is not allowed when to_object is set")
+				}
+				RuntimeVarsAndDvarsMerged.Put(u.Spf("%s_%s", dvar.Name, "object"), *obj)
+			}
+		}
+
+	}
+
+}
+
 func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
 	var mergedVars Cache
 	mergedVars = deepcopy.Copy(*RuntimeVarsMerged).(Cache)
@@ -74,6 +96,8 @@ func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
 	RuntimeVarsAndDvarsMerged = &mergedVars
 	u.Pfvvvv("runtime global final merged with dvars:")
 	u.Ppmsgvvvv(mergedVars)
+
+	procDvars()
 
 	return RuntimeVarsAndDvarsMerged
 }

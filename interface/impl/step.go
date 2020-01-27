@@ -119,7 +119,5 @@ func (steps *Steps) Exec() {
 
 	}
 
-	u.Ptmpdebug("register test", cache.RuntimeVarsAndDvarsMerged)
-
 }
 

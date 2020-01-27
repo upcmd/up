@@ -76,9 +76,6 @@ func (f *ShellFuncAction) Exec() {
 	u.P("executing shell commands")
 	for idx, tcmd := range f.Cmds {
 		u.Pfv("cmd(%2d):\n%+v\n", idx+1, color.HiBlueString("%s", tcmd))
-		//u.Pf("      exec result:\n%s\n", color.HiGreenString("%s", runCmd(f, tcmd)))
-
-		//u.Ptmpdebug("1001", tcmd)
 		cmd := t.Render(tcmd, f.Vars)
 
 		runCmd(f, cmd)
@@ -87,13 +84,10 @@ func (f *ShellFuncAction) Exec() {
 			u.Pfv("      %s\n", color.RedString("%s", f.Result.ErrMsg))
 		}
 
-		u.Pfvvvv("exec result: {\n  code:%s\n  error:%s\n}\n\n",
-			color.YellowString("%d", f.Result.Code),
-			color.RedString("%s", f.Result.ErrMsg),
-		)
+		u.Ppmsgvvvv(f.Result)
+
 	}
 
-	u.Ppmsgvvvv(f.Result)
 	StepStack.GetTop().(*StepRuntimeContext).Result = &f.Result
 }
 

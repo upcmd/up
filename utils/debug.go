@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"github.com/stephencheng/go-spew/spew"
+	"os"
 	"runtime"
 )
 
@@ -118,5 +119,18 @@ func LogError(mark string, err interface{}) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
 	}
+}
+
+func LogErrorAndExit(mark string, err interface{}, hint string) {
+	if err != nil {
+		color.Red("      %s -> %s", mark, err)
+		color.HiBlue("  ERROR: %s", hint)
+		os.Exit(-1)
+	}
+}
+
+func InvalidAndExit(mark string, hint string) {
+	color.Red("      %s: %s", mark, hint)
+	os.Exit(-3)
 }
 
