@@ -215,7 +215,7 @@ func (ss *Scopes) InitContextInstances() {
 		}
 	}
 
-	u.Ppmsgvvvvhint("999", expandedContext)
+	//u.Ppmsgvvvvhint("999", expandedContext)
 
 	expandedContext["global"] = globalvarsMergedWithDvars
 	ListContextInstances()
