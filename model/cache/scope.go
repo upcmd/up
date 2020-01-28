@@ -102,11 +102,30 @@ func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
 	return RuntimeVarsAndDvarsMerged
 }
 
-func GroupVarsMergedWithDvars(scope *Scope, groupVars *Cache) (vars *Cache) {
+func GlobalVarsMergedWithDvars(scope *Scope) (vars *Cache) {
+
 	var mergedVars Cache
 	mergedVars = deepcopy.Copy(scope.Vars).(Cache)
 
 	expandedVars := scope.Dvars.Expand(scope.Name, &scope.Vars)
+
+	if scope.Dvars != nil {
+		mergo.Merge(&mergedVars, *expandedVars, mergo.WithOverride)
+	}
+
+	u.Pfvvvv("scope[%s] merged: %s", scope.Name, u.Sppmsg(mergedVars))
+
+	procDvars(&scope.Dvars, &mergedVars)
+
+	return &mergedVars
+}
+
+func GroupVarsMergedWithDvars(scope *Scope, contextMergedVars *Cache) (vars *Cache) {
+
+	var mergedVars Cache
+	mergedVars = deepcopy.Copy(scope.Vars).(Cache)
+
+	expandedVars := scope.Dvars.Expand(scope.Name, contextMergedVars)
 
 	if scope.Dvars != nil {
 		mergo.Merge(&mergedVars, *expandedVars, mergo.WithOverride)
@@ -172,13 +191,8 @@ func (ss *Scopes) InitContextInstances() {
 	}
 
 	//expand dvars into global scope's vars space
-	//u.Ptmpdebug("98", globalScope)
-	//u.Ptmpdebug("99", globalScope.Vars)
-
-	globalvarsMergedWithDvars := GroupVarsMergedWithDvars(globalScope, &globalScope.Vars)
-	//u.Ptmpdebug("global merged vars:", *globalvarsMergedWithDvars)
-
-	for _, s := range *ss {
+	globalvarsMergedWithDvars := GlobalVarsMergedWithDvars(globalScope)
+	for idx, s := range *ss {
 		if s.Members != nil {
 			for _, m := range s.Members {
 				if u.Contains(GroupMembersList, m) {
@@ -193,12 +207,15 @@ func (ss *Scopes) InitContextInstances() {
 			mergo.Merge(&groupvars, s.Vars, mergo.WithOverride)
 
 			//expand dvars into group scope's vars space
-			groupvarsMergedWithDvars := GroupVarsMergedWithDvars(&s, &groupvars)
+			groupScope := &(*ss)[idx]
+			var groupvarsMergedWithDvars *Cache = GroupVarsMergedWithDvars(groupScope, &groupvars)
 
 			expandedContext[s.Name] = groupvarsMergedWithDvars
-			u.Ptmpdebug("group merged vars", s.Name, *groupvarsMergedWithDvars)
+			//u.Ptmpdebug("group merged vars", s.Name, *groupvarsMergedWithDvars)
 		}
 	}
+
+	u.Ppmsgvvvvhint("999", expandedContext)
 
 	expandedContext["global"] = globalvarsMergedWithDvars
 	ListContextInstances()
@@ -208,7 +225,6 @@ func ListContextInstances() {
 	u.Pvvvv("---------group vars----------")
 	for k, v := range expandedContext {
 		u.Pfvvvv("%s: %s", k, u.Sppmsg(*v))
-		//u.Dvvvvv(k, v)
 	}
 	u.Pfvvvv("groups members:%s\n", GroupMembersList)
 
@@ -245,18 +261,10 @@ func SetRuntimeVarsMerged(runtimeid string) *Cache {
 		groupname := MemberGroupMap[runtimeid]
 		mergo.Merge(&runtimevars, *expandedContext[groupname], mergo.WithOverride)
 
-		//runtimevars = deepcopy.Copy(*expandedContext[groupname]).(Cache)
-		//u.Ptmpdebug("903", runtimevars)
-
 		instanceVars := ScopeProfiles.GetInstanceVars(runtimeid)
 		if instanceVars != nil {
 			mergo.Merge(&runtimevars, instanceVars, mergo.WithOverride)
 		}
-
-		u.Ptmpdebug("901", runtimevars)
-	} else {
-		//runtimevars = deepcopy.Copy(*expandedContext["global"]).(Cache)
-		//u.Ptmpdebug("902", runtimevars)
 
 	}
 

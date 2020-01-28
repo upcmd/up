@@ -1,0 +1,59 @@
+goal:
+  - to test out dvars rendering in scope
+  - it loads global vars first, then render dvars and merge it with vars in global scope
+  - it then merge nonprod vars to global as runtimevars, then
+  - render dvars based on runtimevars, then
+  - continue same idea down to individual runtime intance vars/dvars process
+
+expected:
+  cmd1: da -> global-a
+  cmd2: dab -> global-a-and-global-b
+  cmd3: non-prod-a
+
+scopes:
+  -
+    name: global
+    vars:
+      a: global-a
+      b: global-b
+      c: global-c
+      e: global-e
+    dvars:
+      - name: da
+        value: "{{.a}}"
+      - name: dab
+        value: "{{.a}}-and-{{.b}}"
+
+  -
+    name: nonprod
+    members:
+      - dev
+      - staging
+    vars:
+      a: non-prod-a
+      b: non-prod-b
+      c: non-prod-c
+      d: non-prod-d
+    dvars:
+      - name: dvar_np_a
+        value: "{{.a}}"
+      - name: dab
+        value: "{{.a}}-and-{{.b}}"
+
+  -
+    name: staging
+    vars:
+      a: staging-a
+      b: staging-b
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo "cmd1:da -> {{.da}}"
+          - echo "cmd2:dab -> {{.dab}}"
+          - echo "cmd3:{{.dvar_np_a}}"
