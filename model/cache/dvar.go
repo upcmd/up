@@ -11,6 +11,10 @@ import (
 	"github.com/mohae/deepcopy"
 	t "github.com/stephencheng/up/model/template"
 	u "github.com/stephencheng/up/utils"
+	"io/ioutil"
+	"os"
+	"path"
+	"strings"
 )
 
 type Dvars []Dvar
@@ -25,7 +29,36 @@ type Dvar struct {
 	Ref      string
 }
 
-func (dvars *Dvars) Expand(vars *Cache) *Cache {
+func (dvars *Dvars) ValidateAndLoading() {
+	var identified bool
+	for idx, dvar := range *dvars {
+		if strings.Contains(dvar.Name, "-") {
+			identified = true
+			u.InvalidAndExit("validating dvar name", "dvar name can not contain '-', please use '_' instead")
+		}
+
+		if dvar.Ref != "" && dvar.Value != "" {
+			u.InvalidAndExit("validating dvar ref and value", "ref and value can not both exist at the same time")
+		}
+
+		if dvar.Ref != "" {
+			data, err := ioutil.ReadFile(path.Join(u.CoreConfig.TaskDir, dvar.Ref))
+			u.LogErrorAndExit("load dvar value from ref file", err, "please fix file loading problem")
+			(*dvars)[idx].Value = string(data)
+		}
+	}
+
+	if identified {
+		u.LogError("dvar validate", "the dvar name identified above should be fixed before continue")
+		os.Exit(-1)
+	}
+
+}
+
+//given a dvars with the vars context, it expands with rendered result
+func (dvars *Dvars) Expand(mark string, vars *Cache) *Cache {
+
+	dvars.ValidateAndLoading()
 	var expandedVars *Cache = New()
 
 	var tmpDvars Dvars
@@ -47,7 +80,7 @@ func (dvars *Dvars) Expand(vars *Cache) *Cache {
 		expandedVars.Put(dvar.Name, rval)
 	}
 
-	u.Ppmsgvvvvhint("dvar expanded result", *expandedVars)
+	u.Pfvvvv("[%s] dvar expanded result:\n%s\n", mark, u.Sppmsg(*expandedVars))
 
 	return expandedVars
 }

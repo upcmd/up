@@ -1,0 +1,37 @@
+goal:
+  - load dvar value from a file
+
+vars:
+  student:
+    name: Tom
+    gender: Male
+    address:
+      suburb:
+        name: sydney
+        postcode: 2000
+        CBD: yes
+      school: Sydney Grammar
+
+
+dvars:
+  - name: a_smart_guy
+    ref: c0028_smart_guy.yml
+    flags: [to_object,]
+
+  - name: school_address
+    ref: c0028_school.yml
+    flags: [to_object,]
+
+tasks:
+
+  - name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo """a smart guy=>{{.a_smart_guy}}"""
+          - echo """postcode=>{{.student.address.suburb.postcode}}"""
+          - echo """school address {{.school_address}}"""
+          - echo """this guy is in =>{{.a_smart_guy_object.school}} school"""
+          - echo """wrong ref here {{.school_address_object.suburb.name}}"""
+          - echo """school address object -> {{.school_address_object.address.suburb.name}}"""

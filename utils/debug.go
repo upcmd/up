@@ -131,7 +131,8 @@ func LogErrorAndExit(mark string, err interface{}, hint string) {
 }
 
 func InvalidAndExit(mark string, hint string) {
-	color.Red("      %s: %s", mark, hint)
+	hiColor := color.New(color.FgHiCyan, color.BgRed)
+	hiColor.Printf("  ERROR: %s [%s]\n", mark, hint)
 	os.Exit(-3)
 }
 

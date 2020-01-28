@@ -13,10 +13,7 @@ import (
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
-	"io/ioutil"
 	"os"
-	"path"
-	"strings"
 )
 
 var (
@@ -29,9 +26,9 @@ func InitTasks() {
 	TaskYmlRoot = u.YamlLoader("Task", u.CoreConfig.TaskDir, u.CoreConfig.TaskFile)
 	loadTasks()
 	loadScopes()
+	cache.ScopeProfiles.InitContextInstances()
 	loadRuntimeGlobalVars()
 	loadRuntimeDvars()
-	cache.ScopeProfiles.InitContextInstances()
 	cache.SetRuntimeVarsMerged(InstanceName)
 	cache.SetRuntimeGlobalMergedWithDvars()
 
@@ -106,12 +103,14 @@ func loadTasks() error {
 	return err
 }
 
-func loadScopes() error {
+func loadScopes() {
 	scopesData := TaskYmlRoot.Get("scopes")
 	var scopes cache.Scopes
 	err := ms.Decode(scopesData, &scopes)
 	cache.SetScopeProfiles(&scopes)
-	return err
+
+	u.LogErrorAndExit("load full scopes", err, "please assess your scope configuration carefully")
+	//u.Ptmpdebug("111", scopes)
 }
 
 func loadRuntimeGlobalVars() {
@@ -126,36 +125,12 @@ func loadRuntimeDvars() *cache.Dvars {
 	dvarsData := TaskYmlRoot.Get("dvars")
 	var dvars cache.Dvars
 	err := ms.Decode(dvarsData, &dvars)
-	u.Ptmpdebug("check dvars:", dvars)
 	u.LogErrorAndExit("loadRuntimeDvars",
 		err,
 		"You must fix the data type to be string for a dvar value and try again",
 	)
 
-	var identified bool
-	for idx, dvar := range dvars {
-		if strings.Contains(dvar.Name, "-") {
-			identified = true
-			u.Pfvvvv("validating dvar name: %s invalid containing '-'", dvar.Name)
-		}
-
-		if dvar.Ref != "" && dvar.Value != "" {
-			u.InvalidAndExit("validating dvar ref and value", "ref and value can not both exist at the same time")
-		}
-
-		if dvar.Ref != "" {
-			data, err := ioutil.ReadFile(path.Join(u.CoreConfig.TaskDir, dvar.Ref))
-			u.LogErrorAndExit("load dvar value from ref file", err, "please fix file loading problem")
-			dvars[idx].Value = string(data)
-		}
-	}
-
-	if identified {
-		u.LogError("dvar validate", "the dvar name identified above should be fixed before continue")
-		os.Exit(-1)
-	}
-
-	u.Ptmpdebug("aaa", dvars)
+	//dvars.ValidateAndLoading()
 	cache.SetRuntimeGlobalDvars(&dvars)
 	return &dvars
 
