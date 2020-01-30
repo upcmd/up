@@ -84,7 +84,7 @@ func (f *ShellFuncAction) Exec() {
 			u.Pfv("      %s\n", color.RedString("%s", f.Result.ErrMsg))
 		}
 
-		u.Ppmsgvvvv(f.Result)
+		u.Dvvvvv(f.Result)
 
 	}
 

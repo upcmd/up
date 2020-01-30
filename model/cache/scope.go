@@ -61,6 +61,7 @@ func SetRuntimeGlobalDvars(dvars *Dvars) {
 	RuntimeGlobalDvars = dvars
 }
 
+//validate and extend the features
 func procDvars(dvars *Dvars, mergeTarget *Cache) {
 
 	for _, dvar := range *dvars {
@@ -103,39 +104,31 @@ func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
 }
 
 func GlobalVarsMergedWithDvars(scope *Scope) (vars *Cache) {
-
-	var mergedVars Cache
-	mergedVars = deepcopy.Copy(scope.Vars).(Cache)
-
-	expandedVars := scope.Dvars.Expand(scope.Name, &scope.Vars)
-
-	if scope.Dvars != nil {
-		mergo.Merge(&mergedVars, *expandedVars, mergo.WithOverride)
-	}
-
-	u.Pfvvvv("scope[%s] merged: %s", scope.Name, u.Sppmsg(mergedVars))
-
-	procDvars(&scope.Dvars, &mergedVars)
-
-	return &mergedVars
+	return VarsMergedWithDvars(scope.Name, &scope.Vars, &scope.Dvars, nil)
 }
 
-func GroupVarsMergedWithDvars(scope *Scope, contextMergedVars *Cache) (vars *Cache) {
+func ScopeVarsMergedWithDvars(scope *Scope, contextMergedVars *Cache) *Cache {
+	return VarsMergedWithDvars(scope.Name, &scope.Vars, &scope.Dvars, contextMergedVars)
+}
 
+/*
+given vars as base vars space to expand from, expand dvars against contextVars
+*/
+func VarsMergedWithDvars(mark string, baseVars *Cache, dvars *Dvars, contextMergedVars *Cache) *Cache {
 	var mergedVars Cache
-	mergedVars = deepcopy.Copy(scope.Vars).(Cache)
+	mergedVars = deepcopy.Copy(*baseVars).(Cache)
 
-	expandedVars := scope.Dvars.Expand(scope.Name, contextMergedVars)
-
-	if scope.Dvars != nil {
+	if dvars != nil {
+		expandedVars := dvars.Expand(mark, contextMergedVars)
 		mergo.Merge(&mergedVars, *expandedVars, mergo.WithOverride)
 	}
 
-	u.Pfvvvv("scope[%s] merged: %s", scope.Name, u.Sppmsg(mergedVars))
+	u.Pfvvvv("scope[%s] merged: %s", mark, u.Sppmsg(mergedVars))
 
-	procDvars(&scope.Dvars, &mergedVars)
+	procDvars(dvars, &mergedVars)
 
 	return &mergedVars
+
 }
 
 func loadRefVars(yamlroot *viper.Viper) *Cache {
@@ -208,7 +201,7 @@ func (ss *Scopes) InitContextInstances() {
 
 			//expand dvars into group scope's vars space
 			groupScope := &(*ss)[idx]
-			var groupvarsMergedWithDvars *Cache = GroupVarsMergedWithDvars(groupScope, &groupvars)
+			var groupvarsMergedWithDvars *Cache = ScopeVarsMergedWithDvars(groupScope, &groupvars)
 
 			expandedContext[s.Name] = groupvarsMergedWithDvars
 			//u.Ptmpdebug("group merged vars", s.Name, *groupvarsMergedWithDvars)
@@ -252,6 +245,8 @@ then merge runtimevars to group(nonprod)'s varss,
 if runtime id (nonname) is not in member list,
 then merge runtimevars to global varss,
 
+This has chained dvar expansion through global to group then to instance level
+and finally merge with global var, except the global dvars
 */
 func SetRuntimeVarsMerged(runtimeid string) *Cache {
 	var runtimevars Cache
@@ -268,6 +263,25 @@ func SetRuntimeVarsMerged(runtimeid string) *Cache {
 
 	}
 
+	//merge dvars for the instance
+	var instanceScope *Scope
+	for idx, s := range *ScopeProfiles {
+		if s.Name == runtimeid {
+			instanceScope = &(*ScopeProfiles)[idx]
+		}
+	}
+
+	u.Ptmpdebug("bbb", runtimevars)
+	var instanceVarsMergedWithDvars *Cache
+	if instanceScope != nil {
+		instanceVarsMergedWithDvars = VarsMergedWithDvars(instanceScope.Name, &instanceScope.Vars, &instanceScope.Dvars, &runtimevars)
+	}
+
+	u.Ptmpdebug("aaa", *instanceVarsMergedWithDvars)
+	//merge back the expanded merged scope vars and dvars
+	mergo.Merge(&runtimevars, *instanceVarsMergedWithDvars, mergo.WithOverride)
+
+	//merge with global vars
 	mergo.Merge(&runtimevars, *RuntimeGlobalVars, mergo.WithOverride)
 
 	u.Pfvvvv("merged[ %s ] runtime vars:", runtimeid)
@@ -276,23 +290,5 @@ func SetRuntimeVarsMerged(runtimeid string) *Cache {
 
 	RuntimeVarsMerged = &runtimevars
 	return &runtimevars
-}
-
-/*
-merge localvars to above RuntimeVarsMerged to get final runtime exec vars
-the localvars is the vars in the step
-*/
-func GetRuntimeExecVars(mark string, localvars *Cache) *Cache {
-	var execvars Cache
-	execvars = deepcopy.Copy(*RuntimeVarsAndDvarsMerged).(Cache)
-
-	if localvars != nil {
-		mergo.Merge(&execvars, *localvars, mergo.WithOverride)
-
-		u.Pfvvvv("current exec runtime[%s] vars:", mark)
-		u.Ppmsgvvvv(execvars)
-		u.Dvvvvv(execvars)
-	}
-	return &execvars
 }
 

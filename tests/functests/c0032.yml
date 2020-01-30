@@ -1,0 +1,74 @@
+goal:
+  - dvars expand in instance level
+  - dvars object can merge in leaf level
+  - dvar in dev will override same name dvar in nonprod level
+
+expected:
+  - school object in nonprod could append new element and
+  - also override same name element
+
+scopes:
+  -
+    name: global
+    vars:
+      student:
+        name: Tom
+        gender: Male
+        address:
+          suburb:
+            name: sydney
+            postcode: 2000
+            CBD: yes
+          school: Sydney Grammar
+
+  -
+    name: nonprod
+    members:
+      - dev
+      - staging
+    vars:
+      a: non-prod-a
+      b: non-prod-b
+      c: non-prod-c
+      d: non-prod-d
+    dvars:
+      - name: school
+        value: |
+          address:
+            suburb:
+              name: {{.student.address.suburb.name}}
+              postcode: 2000
+              CBD: yes
+            school: {{.student.address.school}}
+        flags: [to_object]
+
+  -
+    name: dev
+    vars:
+      a: dev-a
+      b: dev-b
+    dvars:
+      - name: school
+        value: |
+          address:
+            suburb:
+              name: {{.student.address.suburb.name}}
+              postcode: 2000
+              CBD: no
+            school: {{.student.address.school}}
+          principal: Mr Peter
+        flags: [to_object]
+
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo """1.school -> {{.school}}"""
+          - echo """2.school object-> {{.school_object.address.suburb.CBD}}"""
+          - echo """3.school object-> {{.school_object.address.school}}"""
+          - echo """4.school object-> {{.school_object.principal}}"""

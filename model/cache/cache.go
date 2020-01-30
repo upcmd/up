@@ -41,6 +41,10 @@ func (c *Cache) List() {
 	}
 }
 
+func (c *Cache) Len() int {
+	return len(*c)
+}
+
 func (c *Cache) Get(key string) interface{} {
 	return (*c)[key]
 }

@@ -9,6 +9,7 @@ package impl
 
 import (
 	"github.com/imdario/mergo"
+	"github.com/mohae/deepcopy"
 	ic "github.com/stephencheng/up/interface"
 	"github.com/stephencheng/up/model/cache"
 	ee "github.com/stephencheng/up/utils/error"
@@ -17,18 +18,19 @@ import (
 )
 
 type Step struct {
-	Name string
-	Do   interface{} //FuncImpl
-	Func string
-	Vars *cache.Cache
-	Desc string
-	Reg  string
+	Name  string
+	Do    interface{} //FuncImpl
+	Func  string
+	Vars  cache.Cache
+	Dvars cache.Dvars
+	Desc  string
+	Reg   string
 }
 
 //this is final merged exec vars the individual step will use
 //this step will merge the vars with the caller's stack vars
-func getExecVars(funcname string, stepVars *cache.Cache) *cache.Cache {
-	vars := cache.GetRuntimeExecVars(funcname, stepVars)
+func (step *Step) GetExecVarsWithRefoverrided(funcname string) *cache.Cache {
+	vars := step.getRuntimeExecVars(funcname)
 	callerVars := TaskStack.GetTop().(*TaskRuntimeContext).CallerVars
 	//u.Ptmpdebug("callerVars", callerVars)
 
@@ -37,6 +39,32 @@ func getExecVars(funcname string, stepVars *cache.Cache) *cache.Cache {
 	}
 	//u.Ptmpdebug("exec vars", vars)
 	return vars
+}
+
+/*
+merge localvars to above RuntimeVarsAndDvarsMerged to get final runtime exec vars
+the localvars is the vars in the step
+*/
+func (step *Step) getRuntimeExecVars(mark string) *cache.Cache {
+	var execvars cache.Cache
+
+	execvars = deepcopy.Copy(*cache.RuntimeVarsAndDvarsMerged).(cache.Cache)
+
+	if step.Vars != nil {
+		mergo.Merge(&execvars, step.Vars, mergo.WithOverride)
+
+		u.Pfvvvv("current exec runtime[%s] vars:", mark)
+		u.Ppmsgvvvv(execvars)
+		u.Dvvvvv(execvars)
+	}
+
+	localVarsMergedWithDvars := cache.VarsMergedWithDvars("local", &step.Vars, &step.Dvars, &execvars)
+
+	if localVarsMergedWithDvars.Len() > 0 {
+		mergo.Merge(&execvars, localVarsMergedWithDvars, mergo.WithOverride)
+	}
+
+	return &execvars
 }
 
 func (step *Step) Exec() {
@@ -50,7 +78,7 @@ func (step *Step) Exec() {
 	case FUNC_SHELL:
 		funcAction := ShellFuncAction{
 			Do:   step.Do,
-			Vars: getExecVars(FUNC_SHELL, step.Vars),
+			Vars: step.GetExecVarsWithRefoverrided(FUNC_SHELL),
 		}
 		action = ic.Do(&funcAction)
 
@@ -59,7 +87,7 @@ func (step *Step) Exec() {
 			Do: step.Do,
 			//TODO: see if we should allow recursive call
 			//Vars: cache.GetRuntimeExecVars(FUNC_TASK_REF, step.Vars),
-			Vars: getExecVars(FUNC_TASK_REF, step.Vars),
+			Vars: step.GetExecVarsWithRefoverrided(FUNC_TASK_REF),
 		}
 		action = ic.Do(&funcAction)
 

@@ -56,28 +56,31 @@ func (dvars *Dvars) ValidateAndLoading() {
 }
 
 //given a dvars with the vars context, it expands with rendered result
-func (dvars *Dvars) Expand(mark string, vars *Cache) *Cache {
+func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 
 	dvars.ValidateAndLoading()
 	var expandedVars *Cache = New()
 
-	var tmpDvars Dvars
-	tmpDvars = deepcopy.Copy(*dvars).(Dvars)
-	var tmpVars Cache = deepcopy.Copy(*vars).(Cache)
+	if contextVars != nil {
 
-	for idx, dvar := range tmpDvars {
-		if dvar.Expand == 0 {
-			tmpDvars[idx].Expand = 1
-		}
-		for i := 0; i < tmpDvars[idx].Expand; i++ {
-			tval := tmpDvars[idx].Value
-			tmpDvars[idx].Value = t.Render(tval, tmpVars)
-		}
+		var tmpVars Cache = deepcopy.Copy(*contextVars).(Cache)
+		var tmpDvars Dvars
+		tmpDvars = deepcopy.Copy(*dvars).(Dvars)
 
-		rval := tmpDvars[idx].Value
-		tmpVars.Put(dvar.Name, rval)
-		(*dvars)[idx].Rendered = rval
-		expandedVars.Put(dvar.Name, rval)
+		for idx, dvar := range tmpDvars {
+			if dvar.Expand == 0 {
+				tmpDvars[idx].Expand = 1
+			}
+			for i := 0; i < tmpDvars[idx].Expand; i++ {
+				tval := tmpDvars[idx].Value
+				tmpDvars[idx].Value = t.Render(tval, tmpVars)
+			}
+
+			rval := tmpDvars[idx].Value
+			tmpVars.Put(dvar.Name, rval)
+			(*dvars)[idx].Rendered = rval
+			expandedVars.Put(dvar.Name, rval)
+		}
 	}
 
 	u.Pfvvvv("[%s] dvar expanded result:\n%s\n", mark, u.Sppmsg(*expandedVars))
