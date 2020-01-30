@@ -103,6 +103,10 @@ func SetTaskfile(taskfile string) {
 	}
 }
 
+func ShowCoreConfigMsg() {
+	Ppmsgvvvvhint("core config", CoreConfig)
+}
+
 func ShowCoreConfig() {
 	e := reflect.ValueOf(CoreConfig).Elem()
 	et := reflect.Indirect(e).Type()

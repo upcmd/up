@@ -184,7 +184,13 @@ func (ss *Scopes) InitContextInstances() {
 	}
 
 	//expand dvars into global scope's vars space
-	globalvarsMergedWithDvars := GlobalVarsMergedWithDvars(globalScope)
+	var globalvarsMergedWithDvars *Cache
+	if globalScope != nil {
+		globalvarsMergedWithDvars = GlobalVarsMergedWithDvars(globalScope)
+	} else {
+		globalvarsMergedWithDvars = New()
+	}
+
 	for idx, s := range *ss {
 		if s.Members != nil {
 			for _, m := range s.Members {
@@ -249,6 +255,7 @@ This has chained dvar expansion through global to group then to instance level
 and finally merge with global var, except the global dvars
 */
 func SetRuntimeVarsMerged(runtimeid string) *Cache {
+	u.Ptmpdebug("99", runtimeid)
 	var runtimevars Cache
 	runtimevars = deepcopy.Copy(*expandedContext["global"]).(Cache)
 
@@ -271,15 +278,15 @@ func SetRuntimeVarsMerged(runtimeid string) *Cache {
 		}
 	}
 
-	u.Ptmpdebug("bbb", runtimevars)
 	var instanceVarsMergedWithDvars *Cache
 	if instanceScope != nil {
 		instanceVarsMergedWithDvars = VarsMergedWithDvars(instanceScope.Name, &instanceScope.Vars, &instanceScope.Dvars, &runtimevars)
+		//merge back the expanded merged scope vars and dvars
+		mergo.Merge(&runtimevars, *instanceVarsMergedWithDvars, mergo.WithOverride)
 	}
 
-	u.Ptmpdebug("aaa", *instanceVarsMergedWithDvars)
-	//merge back the expanded merged scope vars and dvars
-	mergo.Merge(&runtimevars, *instanceVarsMergedWithDvars, mergo.WithOverride)
+	//u.Ptmpdebug("99", runtimevars)
+	//u.Ptmpdebug("92", *instanceVarsMergedWithDvars)
 
 	//merge with global vars
 	mergo.Merge(&runtimevars, *RuntimeGlobalVars, mergo.WithOverride)

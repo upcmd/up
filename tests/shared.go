@@ -39,11 +39,14 @@ func Setup(t *testing.T) {
 	u.InitConfig()
 	u.CoreConfig.TaskFile = GetTestName(u.Spfv("%s%s", "x", t.Name()))
 	u.ShowCoreConfig()
+
+	u.P(" :test task file:", u.CoreConfig.TaskFile)
 	u.P(" :release version:", u.CoreConfig.Version)
 	u.P(" :verbose level:", u.CoreConfig.Verbose)
 }
 
 func TestT(t *testing.T) {
+	impl.SetInstanceName("dev")
 	Setup(t)
 	impl.InitTasks()
 	impl.ListTasks()
@@ -57,6 +60,7 @@ func Setupx(filename string) {
 	filenoext := strings.TrimSuffix(filenameonly, filepath.Ext(filenameonly))
 	u.CoreConfig.TaskFile = GetTestName(filenoext)
 	u.ShowCoreConfig()
+	u.ShowCoreConfigMsg()
 	u.P(" :release version:", u.CoreConfig.Version)
 	u.P(" :verbose level:", u.CoreConfig.Verbose)
 

@@ -19,3 +19,15 @@ wiptestvalidate(){
     goup validate task task -d ./tests/functests -t wip -i dev -v vvvvv
 }
 
+uplist(){
+goup list task
+}
+
+uptestx(){
+echo "syntax: uptestx c0033"
+    goup task task -d ./tests/functests -t $1 -i dev -v vvvv
+}
+
+upregression(){
+  gotest ./tests/functests/casec_test.go -v
+}

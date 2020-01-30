@@ -29,7 +29,7 @@ type Step struct {
 
 //this is final merged exec vars the individual step will use
 //this step will merge the vars with the caller's stack vars
-func (step *Step) GetExecVarsWithRefoverrided(funcname string) *cache.Cache {
+func (step *Step) GetExecVarsWithRefOverrided(funcname string) *cache.Cache {
 	vars := step.getRuntimeExecVars(funcname)
 	callerVars := TaskStack.GetTop().(*TaskRuntimeContext).CallerVars
 	//u.Ptmpdebug("callerVars", callerVars)
@@ -37,7 +37,7 @@ func (step *Step) GetExecVarsWithRefoverrided(funcname string) *cache.Cache {
 	if callerVars != nil {
 		mergo.Merge(vars, callerVars, mergo.WithOverride)
 	}
-	//u.Ptmpdebug("exec vars", vars)
+	u.Ppmsgvvvvhint("overall final exec vars:", vars)
 	return vars
 }
 
@@ -78,16 +78,14 @@ func (step *Step) Exec() {
 	case FUNC_SHELL:
 		funcAction := ShellFuncAction{
 			Do:   step.Do,
-			Vars: step.GetExecVarsWithRefoverrided(FUNC_SHELL),
+			Vars: step.GetExecVarsWithRefOverrided(FUNC_SHELL),
 		}
 		action = ic.Do(&funcAction)
 
 	case FUNC_TASK_REF:
 		funcAction := TaskRefFuncAction{
-			Do: step.Do,
-			//TODO: see if we should allow recursive call
-			//Vars: cache.GetRuntimeExecVars(FUNC_TASK_REF, step.Vars),
-			Vars: step.GetExecVarsWithRefoverrided(FUNC_TASK_REF),
+			Do:   step.Do,
+			Vars: step.GetExecVarsWithRefOverrided(FUNC_TASK_REF),
 		}
 		action = ic.Do(&funcAction)
 
