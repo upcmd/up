@@ -22,6 +22,33 @@ tasks:
         do:
           - gotest ./tests/functests/casec_test.go -v
 
+
+  -
+    # name: testf
+    # desc: test the exit scenarios due to different types of validation
+    # task:
+    #   -
+    #     func: task_ref
+    #     do:
+    #       - go run app/up/*.go task task -d ./tests/functests -t {{.casename}} -v vvvv
+
+    name: testf
+    desc: test the exit scenarios due to different types of validation
+    task:
+      -
+        func: shell
+        name: getcases
+        do:
+          - ls ./tests/functests/f*.yml
+        reg: cases
+
+      -
+        func: shell
+        do:
+          - echo {{.register_testf_cases}}
+          # - go run app/up/*.go task task -d ./tests/functests -t {{.casename}} -v vvvv
+
+
   -
     name: testx
     desc: test specific the function test
@@ -33,10 +60,33 @@ tasks:
 
   -
     name: testwip
+    desc: test wip case
+    task:
+      -
+        func: shell
+        do:
+          - gotest ./tests/functests/wip_test.go -v
+
+
+  -
+    name: wiptest
     desc: test wip
     task:
       -
         func: shell
         do:
           - go run app/up/*.go task task -d ./tests/functests -t wip -v vvvv
+
+  -
+    name: testall
+    desc: test all differnt type of tests
+    task:
+      -
+        func: task_ref
+        do:
+          - testx
+          - testwip
+          - wiptest
+          - testc
+
 

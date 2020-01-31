@@ -7,6 +7,10 @@ wiptest(){
     goup task task -d ./tests/functests -t wip -i dev
 }
 
+wipfunctest(){
+    gotest ./tests/functests/wip_test.go -v
+}
+
 wiptestvvvv(){
     goup task task -d ./tests/functests -t wip -i dev -v vvvv
 }

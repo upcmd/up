@@ -35,9 +35,9 @@ func RunCmd(t *testing.T, cmd string) string {
 	return string(cmdOutput)
 }
 
-func Setup(t *testing.T) {
+func Setup(prefix string, t *testing.T) {
 	u.InitConfig()
-	u.CoreConfig.TaskFile = GetTestName(u.Spfv("%s%s", "x", t.Name()))
+	u.CoreConfig.TaskFile = GetTestName(u.Spfv("%s%s", prefix, t.Name()))
 	u.ShowCoreConfig()
 
 	u.P(" :test task file:", u.CoreConfig.TaskFile)
@@ -45,9 +45,9 @@ func Setup(t *testing.T) {
 	u.P(" :verbose level:", u.CoreConfig.Verbose)
 }
 
-func TestT(t *testing.T) {
+func TestT(prefix string, t *testing.T) {
 	impl.SetInstanceName("dev")
-	Setup(t)
+	Setup(prefix, t)
 	impl.InitTasks()
 	impl.ListTasks()
 	impl.ExecTask("task", nil)
@@ -61,6 +61,7 @@ func Setupx(filename string) {
 	u.CoreConfig.TaskFile = GetTestName(filenoext)
 	u.ShowCoreConfig()
 	u.ShowCoreConfigMsg()
+	u.P(" :test task file:", u.CoreConfig.TaskFile)
 	u.P(" :release version:", u.CoreConfig.Version)
 	u.P(" :verbose level:", u.CoreConfig.Verbose)
 

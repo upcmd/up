@@ -27,7 +27,7 @@ scopes:
 
     dvars:
       - name: school_global
-        ref: c0030_school.yml
+        ref: d0030_school.yml
         flags: [to_object]
 
   -
@@ -42,7 +42,7 @@ scopes:
       d: non-prod-d
     dvars:
       - name: school_nonprod
-        ref: c0030_school.yml
+        ref: d0030_school.yml
         flags: [to_object]
 
   -
@@ -56,7 +56,7 @@ scopes:
       d: prod-d
     dvars:
       - name: school_prod
-        ref: c0030_school.yml
+        ref: d0030_school.yml
         flags: [to_object]
 
   -
@@ -68,7 +68,7 @@ scopes:
 
 dvars:
   - name: sgp_address
-    ref: c0030_school.yml
+    ref: d0030_school.yml
     flags: [to_object]
 
 tasks:

@@ -61,7 +61,7 @@ scopes:
 
 dvars:
   - name: sgp_address
-    ref: c0030_school.yml
+    ref: d0030_school.yml
     flags: [to_object]
 
 tasks:

@@ -9,6 +9,7 @@ package functests
 
 import (
 	"github.com/stephencheng/up/interface/impl"
+	"github.com/stephencheng/up/model/cache"
 	"github.com/stephencheng/up/tests"
 	u "github.com/stephencheng/up/utils"
 
@@ -19,12 +20,14 @@ func TestC(t *testing.T) {
 	u.InitConfig()
 
 	files := tests.GetUnitTestCollection()
+	impl.SetInstanceName("dev")
 	for _, x := range files {
 		u.P("testing:", x)
 		tests.Setupx(x)
 		impl.InitTasks()
 		impl.ListTasks()
 		impl.ExecTask("task", nil)
+		cache.Unset()
 	}
 }
 

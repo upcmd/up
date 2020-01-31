@@ -12,7 +12,7 @@ import (
 	"testing"
 )
 
-func Testwip(t *testing.T) {
-	tests.TestT(t)
+func TestWip(t *testing.T) {
+	tests.TestT("", t)
 }
 

@@ -15,11 +15,11 @@ vars:
 
 dvars:
   - name: a_smart_guy
-    ref: c0028_smart_guy.yml
+    ref: d0028_smart_guy.yml
     flags: [to_object,]
 
   - name: school_address
-    ref: c0028_school.yml
+    ref: d0028_school.yml
     flags: [to_object,]
 
 tasks:

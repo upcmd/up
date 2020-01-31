@@ -49,6 +49,18 @@ type Scopes []Scope
 type ExpandedContext map[string]*Cache
 type ContextInstances []ExpandedContext
 
+//clear up everything in scope and cache
+func Unset() {
+	expandedContext = ExpandedContext{}
+	GroupMembersList = []string{}
+	MemberGroupMap = map[string]string{}
+	ScopeProfiles = nil
+	RuntimeVarsMerged = nil
+	RuntimeVarsAndDvarsMerged = nil
+	RuntimeGlobalVars = nil
+	RuntimeGlobalDvars = nil
+}
+
 func SetScopeProfiles(sp *Scopes) {
 	ScopeProfiles = sp
 }
@@ -255,7 +267,7 @@ This has chained dvar expansion through global to group then to instance level
 and finally merge with global var, except the global dvars
 */
 func SetRuntimeVarsMerged(runtimeid string) *Cache {
-	u.Ptmpdebug("99", runtimeid)
+	u.P("instance id:", runtimeid)
 	var runtimevars Cache
 	runtimevars = deepcopy.Copy(*expandedContext["global"]).(Cache)
 
