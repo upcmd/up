@@ -1,0 +1,228 @@
+goal:
+  - to test and show sprig funcs usage and examples
+  - ref to the doc link for more examples
+  - showcase encrpt and decrypt using dynamic var
+  - showcase dict/map/slice/b64/envexpand and more
+
+refs:
+  skip: lower, title, untitle
+  doc: http://masterminds.github.io/sprig/
+
+vars:
+  ns: prod
+  pod_name: web_app
+  ha: true
+  age: 34
+  old: 54
+  admins: [tom, jason, alice]
+  managers:
+    - tom
+    - jason
+    - alice
+  student:
+    name: Tom
+    gender: Male
+    teachers:
+      - tom
+      - jason
+      - alice
+    address:
+      suburb:
+        name: sydney
+        postcode: 2000
+        CBD: yes
+      school: Sydney Grammar
+
+
+
+dvars:
+
+  - name: sprig_trim
+    value: '{{ trim "  hello       "}}'
+    desc: The trim function removes space from either side of a string
+    flags: [vvvv,]
+
+  - name: sprig_trim_all
+    value: '{{ trimAll "$" "$5.00"}}'
+    desc: Remove given characters from the front or back of a string
+    flags: [vvvv,]
+
+  - name: sprig_trim_suffix
+    value: '{{ trimSuffix "-" "hello-"}}'
+    desc: Trim just the suffix from a string
+    flags: [vvvv,]
+
+  - name: sprig_trim_prefix
+    value: '{{ trimPrefix "-" "-hello"}}'
+    desc: Trim just the preffix from a string
+    flags: [vvvv,]
+
+  - name: sprig_upper
+    value: '{{ upper .pod_name}}'
+    flags: [vvvv,]
+
+  - name: sprig_repeat
+    value: '{{ repeat 3 .pod_name }}'
+    flags: [vvvv,]
+
+  - name: sprig_repeat_with_space
+    value: '{{ printf "%s%s%s" " [" .pod_name "] "}}'
+    flags: [vvvv,]
+
+  - name: sprig_repeat_with_space_repeat
+    value: '{{ printf "%s%s%s" " [" .pod_name "] " |repeat 3}}'
+    flags: [vvvv,]
+
+  - name: sprig_substring
+    value: '{{ substr 0 5 "hello world" }}'
+    flags: [vvvv,]
+
+  - name: sprig_nospace
+    value: '{{ nospace "hello w o r l d" }}'
+    flags: [vvvv,]
+
+  - name: sprig_flow_fail
+    value: '{{ fail "Please accept the end user license agreement" }}'
+    flags: [vvvv,]
+
+  - name: sprig_encrypt_AES
+    value: '{{ encryptAES "secretkey" "plaintext" }}'
+    flags: [vvvv,]
+
+  - name: sprig_decrypt_AES
+    value: '{{ print .sprig_encrypt_AES |decryptAES "secretkey" }}'
+    flags: [vvvv,]
+
+  - name: sprig_AES_key
+    value: '{{ printf "%s-%s" .pod_name .ns }}'
+    flags: [vvvv,]
+
+  - name: sprig_encrypt_AES_using_key_var
+    value: '{{ encryptAES .sprig_AES_key "plaintext" }}'
+    flags: [vvvv,]
+
+  - name: sprig_decrypt_AES_using_key_var
+    value: '{{ print .sprig_encrypt_AES_using_key_var |decryptAES .sprig_AES_key }}'
+    flags: [vvvv,]
+
+  - name: sprig_slice
+    value: '{{ slice .admins 1 3 }}'
+    flags: [vvvv,]
+
+  - name: sprig_slice_new
+    value: '{{  list 1 2 3 4 5 |print }}'
+    flags: [vvvv,]
+
+  - name: sprig_slice_assign
+    value: '{{ $myList := list 1 2 3 4 5 }}
+    {{  print $myList }}
+    '
+    flags: [vvvv,]
+
+
+  - name: sprig_slice_append
+    value: '{{ $myList := list 1 2 3 4 5 }}
+    {{  $newlist := append $myList 6 }}
+    {{  print $newlist }}
+    '
+    flags: [vvvv,]
+
+  - name: sprig_slice_concat
+    value: '{{ $myList := list 1 2 3 4 5 }}
+    {{  $newlist:=concat $myList ( list 6 7 ) ( list 8 ) }}
+    {{  print $newlist }}
+    '
+    flags: [vvvv,]
+
+  - name: sprig_slice_reverse
+    value: '{{  list 1 2 3 4 5 |reverse }}'
+    flags: [vvvv,]
+
+
+  - name: sprig_slice_uniq
+    value: '{{  list 1 4 2 3 3 4 5 |uniq }}'
+    flags: [vvvv,]
+
+  - name: var_slice_index
+    desc: check if the builtin will still work
+    value: "{{ index .admins 1 }}"
+    flags: [vvvv,]
+
+#  - name: sprig_slice_filter_out
+#    value: '{{  list 1 2 3 4 5 |without 1 3 }}'
+#    desc: how to use pipe out instead???
+#    flags: [vvvv,]
+
+  - name: sprig_slice_filter_out
+    value: '{{ $myList := list 1 2 3 4 5 }}
+    {{  without $myList 2 3 5 |print}}
+    '
+    flags: [vvvv,]
+
+  - name: sprig_slice_contains
+    value: '{{  list 1 2 3 4 5 |has 4 }}'
+    desc: Test to see if a list has a particular element
+    flags: [vvvv,]
+
+  - name: sprig_slice_compact
+    value: '{{  $list := list 1 "a" "foo" ""  }}
+            {{    $copy := compact $list  }}
+              {{   print $copy }}'
+    desc: compact will return a new list with the empty (i.e., “”) item removed
+    flags: [vvvv,]
+
+  - name: sprig_b64enc
+    value: '{{  .pod_name|b64enc }}'
+    flags: [vvvv,]
+
+  - name: sprig_b64dec
+    value: '{{ .sprig_b64enc |b64dec }} '
+    flags: [vvvv,]
+
+  - name: sprig_os_env
+    value: '{{ env "HOME"}}'
+    flags: [vvvv,]
+
+  - name: random_hello
+    value: '{{ hello }}'
+    flags: [vvvv,]
+
+  - name: random_hello_plain
+    value: '{{ "hi, tom"}}'
+    flags: [vvvv,]
+
+  - name: sprig_os_env_expand
+    value: '{{ expandenv "Your path is set to $PATH" }} '
+    flags: [vvvv,]
+
+  - name: sprig_dict
+    value: '
+    {{ $myDict := dict "name1" "value1" "name2" "value2" "name3" "value 3" }}
+    {{ println $myDict}}
+    {{ print $myDict.name2}}
+    '
+    flags: [vvvv,]
+
+  - name: sprig_dict_access
+    value: '
+    {{ println .student.address}}
+    '
+    flags: [vvvv,]
+
+  - name: sprig_dict_access_using_func
+    value: '
+    {{ get .student "address"}}
+    '
+    desc: checkout other dic/map funcs here http://masterminds.github.io/sprig/dicts.html
+    flags: [vvvv,]
+
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: shell
+        do:
+          - echo "check the value of other dvar using vvvv flag print out"

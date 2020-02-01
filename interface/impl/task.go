@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/cache"
+	t "github.com/stephencheng/up/model/template"
 	u "github.com/stephencheng/up/utils"
 	"os"
 	"strings"
@@ -25,6 +26,9 @@ var (
 
 func InitTasks() {
 	TaskYmlRoot = u.YamlLoader("Task", u.CoreConfig.TaskDir, u.CoreConfig.TaskFile)
+
+	//TODO: refactory of the runtime init after config is loaded to a proper place
+	t.FuncMapInit()
 	loadTasks()
 	loadScopes()
 	cache.ScopeProfiles.InitContextInstances()

@@ -1,0 +1,146 @@
+goal:
+  - to test and show that the local var is jailed in local space only
+  - test usage of buitin golang template funcs
+  - slice is not working as expected yet
+  - add auto logging flag vvvv to display value of dvar value
+
+
+vars:
+  ns: prod
+  pod_name: web_app
+  ha: true
+  age: 34
+  old: 54
+  admins: [tom, jason, alice]
+  managers:
+    - tom
+    - jason
+    - alice
+
+dvars:
+  - name: instance_full_name
+    value: "{{.ns}}-{{.pod_name}}"
+
+  - name: var_space_not_trimmed
+    value: "{{.ns}}       -            {{.pod_name}}"
+
+  - name: var_space_trimmed
+    value: "{{.ns -}}       -            {{- .pod_name}}"
+
+  - name: var_commented
+    value: "{{/*this is funny*/}} {{.ns}}-{{.pod_name}}"
+
+  - name: var_commented_trimmed
+    value: "{{- /*this is funny*/ -}}{{.ns}}-{{.pod_name}}"
+
+  - name: var_with_if
+    value: "{{if .ha }}{{.ns}}-{{.pod_name}}-HA{{end}}"
+
+#extra: {{if pipeline}} T1 {{else if pipeline}} T0 {{end}}
+  - name: var_with_range
+    value: "{{range .managers}} x {{end}}"
+    flags: [vvvv,]
+
+  - name: var_with_range_item
+    value: "{{range $x:=.managers}} {{$x}} {{end}}"
+    flags: [vvvv,]
+
+  - name: var_with_range_item_simpler
+    value: "{{range .managers}} {{.}} {{end}}"
+    flags: [vvvv,]
+
+  - name: var_with_ifelse
+    value: "{{if .ha }}{{.ns}}-{{.pod_name}}-HA{{else}}{{.ns}}-{{.pod_name}}{{end}}"
+
+  - name: var_with_ifelse_multilines
+    value: "
+      {{if .ha }}
+      {{.ns}}-{{.pod_name}}-HA
+      {{else}}
+      {{.ns}}-{{.pod_name}}
+      {{end}}"
+
+  - name: var_with_not
+    value: "{{if not .ha }}{{.ns}}-{{.pod_name}}{{else}}{{.ns}}-{{.pod_name}}{{end}}"
+    flags: [to_object,]
+
+  - name: var_length
+    value: "{{len .var_with_not}}"
+
+  - name: var_with_or
+    desc: return the first non-empty argument or the last argument
+    value: "{{or .ns .pod_name}}"
+
+  - name: var_with_print
+    value: "{{print .ns .pod_name}}"
+
+  - name: var_test_log_auto_print
+    value: "{{print .ns .pod_name}}"
+    flags: [vvvv,to_object]
+
+  - name: var_with_and
+    desc: and x y behaves as if x then y else x
+    value: "{{and .ns .pod_name}}"
+    flags: [vvvv,]
+
+
+  - name: var_slice_index
+    value: "{{ index .admins 1 }}"
+    flags: [vvvv,]
+
+  - name: var_slice
+    value: "{{ slice .managers 1 2}}"
+    flags: [vvvv,]
+
+  - name: var_equal
+    value: "{{ eq .ns .pod_name }}"
+    flags: [vvvv,]
+
+  - name: var_not_equal
+    value: "{{ ne .ns .pod_name }}"
+    flags: [vvvv,]
+
+  - name: var_greater
+    value: "{{ gt .ns .pod_name }}"
+    flags: [vvvv,]
+
+  - name: var_greater_and_equal
+    value: "{{ ge .old .age }}"
+    flags: [vvvv,]
+
+  - name: var_greater_and_equal
+    value: "{{ if ge .old .age }}hello{{end}}"
+    flags: [vvvv,]
+
+#extra: lt, le
+  - name: template_def
+    value: |
+      {{define "T1"}}ONE{{end}}
+      {{define "T2"}}TWO{{end}}
+      {{define "T3"}}{{template "T1"}} {{template "T2"}}{{end}}
+      {{template "T3"}}"
+    flags: [vvvv,]
+
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: shell
+        do:
+          - echo "{{.instance_full_name}}"
+          - echo "{{.var_space_not_trimmed}}"
+          - echo "{{.var_space_trimmed}}"
+          - echo "{{.var_commented}}"
+          - echo "{{.var_commented_trimmed}}"
+          - echo "{{.var_with_if}}"
+          - echo "{{.var_with_ifelse}}"
+          - echo "{{.var_with_ifelse_multilines}}"
+          - echo "{{.var_with_not}}"
+          - echo "{{.var_with_not_object}}"
+          - echo "{{.var_length}}"
+          - echo "{{.var_with_or}}"
+          - echo "{{.var_with_print}}"
+          - echo "check the value of other dvar using vvvv flag print out"
