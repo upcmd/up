@@ -6,7 +6,7 @@ notes:
 
 tasks:
   -
-    name: pre-task
+    name: pre_task
     desc: this is pre-task
     task:
       -
@@ -15,7 +15,7 @@ tasks:
           - echo "hello"
 
   -
-    name: post-task
+    name: post_task
     desc: this is post-task
     task:
       -
@@ -40,7 +40,7 @@ tasks:
       -
         func: task_ref
         do:
-          - pre-task
+          - pre_task
       -
         func: shell
         do:
@@ -48,5 +48,5 @@ tasks:
       -
         func: task_ref
         do:
-          - post-task
+          - post_task
           - 2ndtask

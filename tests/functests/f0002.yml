@@ -1,0 +1,24 @@
+goal:
+  - to test task and step validation
+  - no - allowed in task name, it must be _
+  - no - allowed in step name, it must be _
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        name: step-a
+        do:
+          - echo "hello, world"
+
+  -
+    name: task-b
+    task:
+      -
+        func: shell
+        name: step-b
+        do:
+          - echo "hello, world"

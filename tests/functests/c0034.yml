@@ -102,7 +102,7 @@ tasks:
           - show-school-details
 
   -
-    name: show-school-details
+    name: show_school_details
     task:
 
       -

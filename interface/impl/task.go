@@ -14,6 +14,7 @@ import (
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	"os"
+	"strings"
 )
 
 var (
@@ -59,7 +60,20 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 			err := ms.Decode(task.Task, &steps)
 			u.LogError("e:", err)
 			func() {
+				//step name validation
+				invalidNames := []string{}
+				for _, step := range steps {
+					if strings.Contains(step.Name, "-") {
+						invalidNames = append(invalidNames, step.Name)
+					}
+				}
 
+				if len(invalidNames) > 0 {
+					u.InvalidAndExit(u.Spf("validating step name fails: %s ", invalidNames), "task name can not contain '-', please use '_' instead, failed names:")
+				}
+			}()
+
+			func() {
 				rtContext := TaskRuntimeContext{
 					Taskname:   taskname,
 					CallerVars: callerVars,
@@ -71,6 +85,7 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 					u.LogError("Task exec stack layer check", "Too many layers of task executions, please fix your recursive ref-task configurations")
 					os.Exit(-1)
 				}
+
 				steps.Exec()
 				TaskStack.Pop()
 			}()
@@ -100,6 +115,20 @@ func loadTasks() error {
 	var tasks model.Tasks
 	err := ms.Decode(tasksData, &tasks)
 	Tasks = &tasks
+	func() {
+		//validation
+		invalidNames := []string{}
+		for _, task := range *Tasks {
+			if strings.Contains(task.Name, "-") {
+				invalidNames = append(invalidNames, task.Name)
+			}
+		}
+
+		if len(invalidNames) > 0 {
+			u.InvalidAndExit(u.Spf("validating task name fails: %s ", invalidNames), "task name can not contain '-', please use '_' instead, failed names:")
+		}
+	}()
+
 	return err
 }
 
