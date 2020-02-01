@@ -9,14 +9,15 @@ package template
 
 import (
 	"bytes"
+	"github.com/Masterminds/sprig/v3"
 	u "github.com/stephencheng/up/utils"
 	"text/template"
 )
 
 func Render(tstr string, obj interface{}) string {
 	tname := "step_item_exec"
-	t, err := template.New(tname).Parse(tstr)
-	//t, err := template.New(tname).Funcs(template.FuncMap{}).Parse(tstr)
+	//t, err := template.New(tname).Parse(tstr)
+	t, err := template.New(tname).Funcs(sprig.TxtFuncMap()).Parse(tstr)
 	u.LogErrorAndExit("template rendering", err, "Please fix the template issue and try again")
 
 	var result bytes.Buffer

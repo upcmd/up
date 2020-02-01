@@ -3,6 +3,7 @@ module github.com/stephencheng/up
 go 1.12
 
 require (
+	github.com/Masterminds/sprig/v3 v3.0.2
 	github.com/alecthomas/kingpin v2.2.6+incompatible
 	github.com/fatih/color v1.9.0
 	github.com/imdario/mergo v0.3.8
