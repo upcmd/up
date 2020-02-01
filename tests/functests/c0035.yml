@@ -1,0 +1,22 @@
+goal:
+  - to test and show that the local var is jailed in local space only
+
+tasks:
+
+  -
+
+    name: task
+    task:
+      -
+        func: shell
+        name: getcases
+        vars:
+          a: aaa
+          b: bbb
+        do:
+          - pwd
+
+      -
+        func: shell
+        do:
+          - echo "{{.a}}"

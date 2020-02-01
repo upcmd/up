@@ -79,6 +79,10 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 	for _, dvar := range *dvars {
 		//convert the yaml to object
 		if dvar.Flags != nil && len(dvar.Flags) != 0 {
+			if u.Contains(dvar.Flags, "vvvv") {
+				u.PpmsgvvvvhintHigh("dvar> "+dvar.Name, dvar.Rendered)
+			}
+
 			if u.Contains(dvar.Flags, "to_object") {
 				rawyml := dvar.Rendered
 				obj := new(interface{})
@@ -88,12 +92,15 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 				if dvar.Expand > 1 {
 					u.InvalidAndExit("dvar validation", "multiple expand > 1 is not allowed when to_object is set")
 				}
-				(*mergeTarget).Put(u.Spf("%s_%s", dvar.Name, "object"), *obj)
+				dvarObjName := u.Spf("%s_%s", dvar.Name, "object")
+				(*mergeTarget).Put(dvarObjName, *obj)
+
+				if u.Contains(dvar.Flags, "vvvv") {
+					u.PpmsgvvvvhintHigh("dvar> "+dvarObjName, *obj)
+				}
 			}
 		}
-
 	}
-
 }
 
 func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
