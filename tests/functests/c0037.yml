@@ -4,6 +4,29 @@ goal:
   - showcase encrpt and decrypt using dynamic var
   - showcase dict/map/slice/b64/envexpand and more
 
+notes:
+  - |
+    Pipeline is a unique Go templating feature, which
+    allows to declare expressions that can be executed
+    in a manner similar to shell pipeline. Formally, a
+    pipeline is a chained sequence of commands separated
+    by | symbol. A command can be a simple value or a
+    function call. The result of each command is passed
+    as the last argument to the following command. The
+    output of the final command in the pipeline is the
+    value of the whole pipeline.
+
+    A command is allowed to return one or two values,
+    the second of which must be of error type. If command
+    returns two values and the second value evaluates to
+    non-nil, execution terminates and the error is
+    returned to the caller of Execute.
+
+  - |
+    It means that you can't always use a func as pipe if
+    the result can not be served as last argument, then you
+    will have to use assignment and code
+
 refs:
   skip: lower, title, untitle
   doc: http://masterminds.github.io/sprig/

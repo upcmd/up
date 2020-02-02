@@ -150,6 +150,7 @@ func loadRuntimeGlobalVars() {
 	varsData := TaskYmlRoot.Get("vars")
 	var vars cache.Cache
 	err := ms.Decode(varsData, &vars)
+	//u.Ptmpdebug("111", vars)
 	u.LogError("loadRuntimeGlobalVars", err)
 	cache.SetRuntimeGlobalVars(&vars)
 }

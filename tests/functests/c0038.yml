@@ -1,0 +1,68 @@
+goal:
+  - to showcase template funcs from gtf
+  - sprig has avoided using same name func name, so there will be no duplication in sprig
+  - special treatment is done to avoid gtf's template same func name to be added to the funcmap
+
+refs:
+  doc: https://github.com/leekchan/gtf
+  benefits: |
+    gtf is a useful set of Golang Template Functions. The goal
+     of this project is implementing all built-in template
+     filters of Django & Jinja2
+
+vars:
+  ns: prod
+  pod_name: web_app
+  ha: true
+  age: 34
+  old: 54
+  admins: [tom, jason, alice]
+  managers:
+    - tom
+    - jason
+    - alice
+  student:
+    name: Tom
+    gender: Male
+    teachers:
+      - tom
+      - jason
+      - alice
+    address:
+      suburb:
+        name: sydney
+        postcode: 2000
+        CBD: yes
+      school: Sydney Grammar
+
+
+
+dvars:
+
+  - name: sprig_trim
+    value: '{{ trim "  hello       "}}'
+    desc: test if sprig is still working
+    flags: [vvvv,]
+
+  - name: var_slice_index
+    desc: check if the builtin is still working
+    value: "{{ index .admins 1 }}"
+    flags: [vvvv,]
+
+  - name: gtf_url_encoding
+    value: '{{ "http://www.example.org/foo?a=b&c=d" | urlencode}}'
+    flags: [vvvv,]
+
+  - name: gtf_ljust
+    value: '{{ hello | ljust 20}}'
+    flags: [vvvv,]
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: shell
+        do:
+          - echo "check the value of other dvar using vvvv flag print out"
