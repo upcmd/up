@@ -51,10 +51,6 @@ func FuncMapInit() {
 			return ""
 		},
 	}
-	//// Deprecated aliases for renamed functions.
-	//taskFuncs["FromSlash"] = taskFuncs["fromSlash"]
-	//taskFuncs["ToSlash"] = taskFuncs["toSlash"]
-	//taskFuncs["ExeExt"] = taskFuncs["exeExt"]
 
 	templateFuncs = sprig.TxtFuncMap()
 
@@ -82,5 +78,12 @@ func Render(tstr string, obj interface{}) string {
 	//u.LogError(tname, err)
 
 	return result.String()
+}
+
+func ListAllFuncs() {
+	for k, v := range templateFuncs {
+		u.Pf("%30s : %#v\n", k, v)
+	}
+
 }
 

@@ -14,7 +14,7 @@ vars:
 
 tasks:
   -
-    name: callee-task
+    name: callee_task
     desc: this is ref-task
     task:
       -

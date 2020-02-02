@@ -36,7 +36,7 @@ func InitTasks() {
 	loadRuntimeDvars()
 	cache.SetRuntimeVarsMerged(InstanceName)
 	cache.SetRuntimeGlobalMergedWithDvars()
-
+	//t.ListAllFuncs()
 }
 
 func ListTasks() {

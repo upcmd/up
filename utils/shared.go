@@ -14,6 +14,7 @@ import (
 var (
 	P   = fmt.Println
 	Pf  = fmt.Printf
+	Sp  = fmt.Sprint
 	Spf = fmt.Sprintf
 )
 
