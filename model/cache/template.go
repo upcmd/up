@@ -44,6 +44,13 @@ func FuncMapInit() {
 		"toSlash": func(path string) string {
 			return filepath.ToSlash(path)
 		},
+		"exeExt": func() string {
+			if runtime.GOOS == "windows" {
+				return ".exe"
+			}
+			return ""
+		},
+		//--------------------------------------------------------
 		"reg": func(varname string, object interface{}) string {
 			RuntimeVarsAndDvarsMerged.Put(varname, object)
 			return ""
@@ -52,9 +59,9 @@ func FuncMapInit() {
 			RuntimeVarsAndDvarsMerged.Delete(varname)
 			return ""
 		},
-		"exeExt": func() string {
-			if runtime.GOOS == "windows" {
-				return ".exe"
+		"validateMandatoryFailIfNone": func(varname, varvalue string) string {
+			if varvalue == "" {
+				u.InvalidAndExit("validateMandatoryFailIfNone", u.Spf("Required var:%s must not be empty, please fix it", varname))
 			}
 			return ""
 		},

@@ -132,7 +132,8 @@ func (steps *Steps) Exec() {
 
 	for idx, step := range *steps {
 		u.Pf("step(%3d):\n", idx+1)
-		u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Sppmsg(step))
+		//u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Sppmsg(step))
+		u.Ppmsgvvvv(step)
 
 		func() {
 			rtContext := StepRuntimeContext{

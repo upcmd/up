@@ -123,7 +123,7 @@ func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
 }
 
 func GlobalVarsMergedWithDvars(scope *Scope) (vars *Cache) {
-	return VarsMergedWithDvars(scope.Name, &scope.Vars, &scope.Dvars, nil)
+	return VarsMergedWithDvars(scope.Name, &scope.Vars, &scope.Dvars, &(scope.Vars))
 }
 
 func ScopeVarsMergedWithDvars(scope *Scope, contextMergedVars *Cache) *Cache {

@@ -1,0 +1,50 @@
+goal:
+  - to show that you can use empty do list
+  - introduce a new funcname noop to do var/dvar conversion
+  - in noop, you can also do reg/dereg var in dvar evaluation
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do: []
+
+      -
+        func: shell
+        #this would be totally fine
+        #this step could be served as skeleton work as DESIGN step
+        #and leave the implementation in future to be filled in
+        #you can add desc field to describe what to plan to implement
+
+      -
+        func: shell
+        desc: |
+          this would be totally fine too without shell commands
+          this step could be served as a intermediate step to
+          register a var into global var map, and it will be
+          avaiable after the next step
+        vars:
+          a: aa
+          b: bb
+        dvars:
+          - name: adebug
+            value: "{{.a}}"
+            flags: [vvvv,]
+
+      -
+        func: noop
+        desc: |
+          in noop, you can also do reg/dereg var in dvar evaluation
+          the noop func name makes more sense then shell func
+          if you really want to do var manipulation only
+        vars:
+          c: cc
+          d: dd
+        dvars:
+          - name: cdebug
+            value: "{{.c}}"
+            flags: [vvvv,]
+

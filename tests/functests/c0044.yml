@@ -1,0 +1,28 @@
+
+goal:
+  - showcase noop in a formal way
+
+tasks:
+
+  -
+    name: task
+    desc: test the exit scenarios due to different types of validation
+    task:
+      -
+        func: shell
+        desc: step1
+        do:
+          - echo hanks
+
+      -
+        func: noop
+        dvars:
+          - name: reg_hello
+            value: |
+              {{.last_task_result |reg "hellomsg" }}
+
+      -
+        func: shell
+        do:
+          - echo "{{.reg_hello}}"
+          - echo "{{.hellomsg}}"

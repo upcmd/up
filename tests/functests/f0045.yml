@@ -1,0 +1,22 @@
+
+goal:
+  - show that if required ENV var is empty and it will fail if this is empty
+
+storys:
+  - the env vars:
+      student_name: if it can not find it, it fails fast and execution stops
+
+scopes:
+
+  - name: global
+    dvars:
+      - name: student_name
+        desc: show that if required ENV var is empty and it will fail if this is empty
+        value: '{{ env "STUDENT_NAME" |validateMandatoryFailIfNone "student_name" }}'
+#same as below:
+#        value: '{{ expandenv "$STUDENT_NAME" |validateMandatoryFailIfNone "student_name" }}'
+
+tasks:
+
+  -
+    name: task
