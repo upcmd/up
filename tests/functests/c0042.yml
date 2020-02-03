@@ -1,0 +1,47 @@
+goal:
+  - add feature to use .last_task_result to have a quick shortcut access to last task result
+
+tasks:
+
+  -
+    name: task
+    desc: test the exit scenarios due to different types of validation
+    task:
+      -
+        func: shell
+        desc: step1
+        do:
+          - echo tom
+          - echo hanks
+
+      -
+        func: shell
+        desc: |
+          the last result of hanks will be registered as varname: hellomsg
+          however this will be availabe at the next step
+          as when it enters this step, it has already got a copied immutable var stack
+        dvars:
+          - name: reg_hello
+            value: |
+              hello: {{.last_task_result |reg "hellomsg" }}
+        do:
+          - echo "{{.hellomsg}}"
+
+      -
+        func: shell
+        desc: |
+          the hellomsg will be still availabe in this step
+          it is removed but will be unavailabe in the next step
+        dvars:
+          - name: reg_hello
+            value: |
+              {{dereg "hellomsg" }}
+        do:
+          - echo "{{.hellomsg}}"
+
+      -
+        func: shell
+        desc: |
+          now the hellomsg should be <no value>
+        do:
+          - echo "{{.hellomsg}}"

@@ -89,8 +89,16 @@ func (step *Step) Exec() {
 		}
 		action = ic.Do(&funcAction)
 
+	case FUNC_NOOP:
+		funcAction := NoopFuncAction{
+			Do:   step.Do,
+			Vars: step.GetExecVarsWithRefOverrided(FUNC_NOOP),
+		}
+		action = ic.Do(&funcAction)
+
 	default:
-		u.LogError("Step dispatch", "func name is not recognised and implemented")
+		//u.LogError("Step dispatch", "func name is not recognised and implemented")
+		u.InvalidAndExit("Step dispatch", "func name is not recognised and implemented")
 		bizErr.Mark = "func name not implemented"
 	}
 
@@ -123,6 +131,7 @@ type Steps []Step
 func (steps *Steps) Exec() {
 
 	for idx, step := range *steps {
+		u.Pf("step(%3d):\n", idx+1)
 		u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Sppmsg(step))
 
 		func() {
@@ -134,14 +143,15 @@ func (steps *Steps) Exec() {
 
 			result := StepStack.GetTop().(*StepRuntimeContext).Result
 			taskname := TaskStack.GetTop().(*TaskRuntimeContext).Taskname
-			if step.Reg == "auto" {
-				cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
-			} else if step.Reg != "" {
-				cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Reg), result.Output)
-			} else {
-				cache.RuntimeVarsAndDvarsMerged.Put("last_task_result", result.Output)
+			if u.Contains([]string{FUNC_SHELL, FUNC_TASK_REF}, step.Func) {
+				if step.Reg == "auto" {
+					cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
+				} else if step.Reg != "" {
+					cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Reg), result.Output)
+				} else {
+					cache.RuntimeVarsAndDvarsMerged.Put("last_task_result", result.Output)
+				}
 			}
-
 			StepStack.Pop()
 		}()
 

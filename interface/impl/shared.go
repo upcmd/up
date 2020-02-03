@@ -18,6 +18,7 @@ import (
 const (
 	FUNC_SHELL    = "shell"
 	FUNC_TASK_REF = "task_ref"
+	FUNC_NOOP     = "noop"
 )
 
 type TaskRuntimeContext struct {
