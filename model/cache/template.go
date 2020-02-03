@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-package template
+package cache
 
 import (
 	"bytes"
@@ -43,6 +43,14 @@ func FuncMapInit() {
 		},
 		"toSlash": func(path string) string {
 			return filepath.ToSlash(path)
+		},
+		"reg": func(varname string, object interface{}) string {
+			RuntimeVarsAndDvarsMerged.Put(varname, object)
+			return ""
+		},
+		"dereg": func(varname string) string {
+			RuntimeVarsAndDvarsMerged.Delete(varname)
+			return ""
 		},
 		"exeExt": func() string {
 			if runtime.GOOS == "windows" {

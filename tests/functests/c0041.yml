@@ -1,0 +1,37 @@
+goal:
+  - add feature of template func to register a var into global var map
+
+tasks:
+
+  -
+    name: task
+    desc: test the exit scenarios due to different types of validation
+    task:
+      -
+        func: shell
+        desc: step1
+        do:
+          - echo hello
+          - echo world
+
+      -
+        func: shell
+        desc: step2
+        do:
+          - echo tom
+          - echo "{{.last_task_result}}"
+          - echo hanks
+
+      -
+        func: shell
+        desc: step3
+        dvars:
+          - name: greet
+            value: |
+              hello: {{.last_task_result}}
+        do:
+          - echo tom
+          - echo "{{.last_task_result}}"
+          - echo hanks
+          - echo "{{.greet}}"
+

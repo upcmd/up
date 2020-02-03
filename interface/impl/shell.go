@@ -11,7 +11,6 @@ import (
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/stephencheng/up/model/cache"
-	t "github.com/stephencheng/up/model/template"
 	u "github.com/stephencheng/up/utils"
 	"strings"
 
@@ -76,7 +75,7 @@ func (f *ShellFuncAction) Exec() {
 	u.P("executing shell commands")
 	for idx, tcmd := range f.Cmds {
 		u.Pfv("cmd(%2d):\n%+v\n", idx+1, color.HiBlueString("%s", tcmd))
-		cmd := t.Render(tcmd, f.Vars)
+		cmd := cache.Render(tcmd, f.Vars)
 
 		runCmd(f, cmd)
 		u.Pfv("%s\n", color.HiGreenString("%s", f.Result.Output))

@@ -9,7 +9,6 @@ package cache
 
 import (
 	"github.com/mohae/deepcopy"
-	t "github.com/stephencheng/up/model/template"
 	u "github.com/stephencheng/up/utils"
 	"io/ioutil"
 	"os"
@@ -73,7 +72,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 			}
 			for i := 0; i < tmpDvars[idx].Expand; i++ {
 				tval := tmpDvars[idx].Value
-				tmpDvars[idx].Value = t.Render(tval, tmpVars)
+				tmpDvars[idx].Value = Render(tval, tmpVars)
 			}
 
 			rval := tmpDvars[idx].Value
