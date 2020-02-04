@@ -9,6 +9,7 @@ package cache
 
 import (
 	u "github.com/stephencheng/up/utils"
+	"strings"
 	"sync"
 )
 
@@ -43,6 +44,17 @@ func (c *Cache) List() {
 
 func (c *Cache) Len() int {
 	return len(*c)
+}
+
+func (c *Cache) GetPrefixMatched(prefix string) *Cache {
+	valueMap := New()
+	for k, v := range *c {
+		if strings.HasPrefix(k, prefix) {
+			varname := strings.Trim(k, prefix)
+			valueMap.Put(varname, v)
+		}
+	}
+	return valueMap
 }
 
 func (c *Cache) Get(key string) interface{} {

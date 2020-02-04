@@ -1,0 +1,44 @@
+
+goal:
+  - showcase the bare minimal entry point is just a named task only
+  - showcase how to gracefully manage the env vars
+  - continue of c0046
+
+storys:
+  - a cli script requires 2 input from env vars
+  - it should take the env var from current bash/shell environment
+  - the env vars:
+      student_name: |
+        if it can not find it, it fails fast and execution stops
+        ref to f0045 for the failed case
+      student_age: if it can not find it, defaul it to 18
+
+scopes:
+
+  - name: global
+    dvars:
+      - name: student_name
+        value: '{{ env "STUDENT_NAME" |default "Tom Hanks" }}'
+      - name: student_age
+        value: '{{ env "STUDENT_AGE" |default 28 }}'
+
+dvars:
+  - name: cli
+    desc: |
+      you can offload this lengthy value to a ref file instead
+      eventually the file will become a template file
+    value: |
+      echo """
+      student details:
+      name: {{.student_name}}
+      age: {{.student_age}}
+      """
+
+tasks:
+
+  -
+    name: task
+    task:
+      - func: shell
+        do:
+          - '{{.cli}}'

@@ -12,6 +12,7 @@ import (
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
+	"os"
 	"strings"
 
 	"os/exec"
@@ -19,7 +20,15 @@ import (
 
 func runCmd(f *ShellFuncAction, cmd string) string {
 	cmdExec := exec.Command("/bin/sh", "-c", cmd)
-	exec.Command("bash", "-c", cmd)
+
+	func() {
+		//inject the envvars
+		cmdExec.Env = os.Environ()
+		envvarObjMap := f.Vars.GetPrefixMatched("envvar_")
+		for k, v := range *envvarObjMap {
+			cmdExec.Env = append(cmdExec.Env, u.Spf("%s=%s", k, v.(string)))
+		}
+	}()
 
 	if Dryrun {
 		u.Pdryrun("in dryrun mode and skipping the actual commands")

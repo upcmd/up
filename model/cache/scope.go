@@ -99,6 +99,13 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 					u.PpmsgvvvvhintHigh("dvar> "+dvarObjName, *obj)
 				}
 			}
+
+			if u.Contains(dvar.Flags, "envvar") {
+				//u.PpmsgvvvvhintHigh("dvar> "+dvar.Name, dvar.Rendered)
+				envvarName := u.Spf("%s_%s", "envvar", dvar.Name)
+				(*mergeTarget).Put(envvarName, dvar.Rendered)
+			}
+
 		}
 	}
 }

@@ -23,7 +23,7 @@ type Dvar struct {
 	Value    string
 	Desc     string
 	Expand   int
-	Flags    []string
+	Flags    []string //supported: vvvv, to_object,envvar,
 	Rendered string
 	Ref      string
 }
