@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/viper"
 	u "github.com/stephencheng/up/utils"
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"os"
 )
 
@@ -101,11 +102,47 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 			}
 
 			if u.Contains(dvar.Flags, "envvar") {
-				//u.PpmsgvvvvhintHigh("dvar> "+dvar.Name, dvar.Rendered)
 				envvarName := u.Spf("%s_%s", "envvar", dvar.Name)
 				(*mergeTarget).Put(envvarName, dvar.Rendered)
 			}
 
+			//if u.Contains(dvar.Flags, "secure") {
+			//	//u.PpmsgvvvvhintHigh("dvar> "+dvar.Name, dvar.Rendered)
+			//	secureName := u.Spf("%s_%s", "secure", dvar.Name)
+			//	encrypted:=dvar.Rendered
+			//	(*mergeTarget).Put(secureName, )
+			//	data:=map[string]string{"enc_key":, "encrypted":encrypted}
+			//	Render("{{decryptAES .enc_key .encrypted}}")
+			//
+			//}
+
+		}
+
+		if dvar.Secure != nil {
+			s := dvar.Secure
+			u.Ptmpdebug("99", dvar.Secure)
+
+			var encryptionkey string
+			if s.KeyRef != "" {
+				data, err := ioutil.ReadFile(s.KeyRef)
+				u.LogErrorAndExit("load secure key from ref file", err, "please fix file loading problem")
+				encryptionkey = string(data)
+			}
+
+			if s.Key != "" {
+				encryptionkey = (*mergeTarget).Get(s.Key).(string)
+			}
+
+			encrypted := dvar.Rendered
+
+			if encrypted != "" && encryptionkey != "" {
+				data := map[string]string{"enc_key": encryptionkey, "encrypted": encrypted}
+				decrypted := Render("{{ decryptAES .enc_key .encrypted}}", data)
+				secureName := u.Spf("%s_%s", "secure", dvar.Name)
+				(*mergeTarget).Put(secureName, decrypted)
+			} else {
+				u.InvalidAndExit("dvar decrypt", u.Spf("please double check secure settings for [%s]", dvar.Name))
+			}
 		}
 	}
 }

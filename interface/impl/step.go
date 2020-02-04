@@ -150,7 +150,9 @@ func (steps *Steps) Exec() {
 				} else if step.Reg != "" {
 					cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Reg), result.Output)
 				} else {
-					cache.RuntimeVarsAndDvarsMerged.Put("last_task_result", result.Output)
+					if step.Func == FUNC_SHELL {
+						cache.RuntimeVarsAndDvarsMerged.Put("last_task_result", result.Output)
+					}
 				}
 			}
 			StepStack.Pop()

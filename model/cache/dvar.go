@@ -18,6 +18,12 @@ import (
 
 type Dvars []Dvar
 
+type SecureSetting struct {
+	Type   string
+	Key    string
+	KeyRef string
+}
+
 type Dvar struct {
 	Name     string
 	Value    string
@@ -25,6 +31,7 @@ type Dvar struct {
 	Expand   int
 	Flags    []string //supported: vvvv, to_object,envvar,
 	Rendered string
+	Secure   *SecureSetting
 	Ref      string
 }
 

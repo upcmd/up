@@ -85,7 +85,7 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 				TaskStack.Push(&rtContext)
 				u.Pvvvv("Executing task stack layer:", TaskStack.GetLen())
 				if TaskStack.GetLen() > 2 {
-					u.LogError("Task exec stack layer check", "Too many layers of task executions, please fix your recursive ref-task configurations")
+					u.LogError("Task exec stack layer check", "Too many layers of task executions, please fix your recursive .nv-task configurations")
 					os.Exit(-1)
 				}
 
@@ -160,7 +160,7 @@ func loadRuntimeDvars() *cache.Dvars {
 	err := ms.Decode(dvarsData, &dvars)
 	u.LogErrorAndExit("loadRuntimeDvars",
 		err,
-		"You must fix the data type to be string for a dvar value and try again",
+		"You must fix the data type to be\n string for a dvar value and try again\n or the name can not be single character 'y' or 'n' ",
 	)
 
 	//dvars.ValidateAndLoading()

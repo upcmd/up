@@ -136,7 +136,7 @@ func LogErrorAndExit(mark string, err interface{}, hint string) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
 		hiColor := color.New(color.FgHiCyan, color.BgRed)
-		hiColor.Printf("  ERROR: %s\n", hint)
+		hiColor.Printf("ERROR: %s\n", hint)
 		os.Exit(-1)
 	}
 }

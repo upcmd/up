@@ -1,0 +1,64 @@
+goal:
+  - to show dynamic vars usage
+  - you can use plain value in dvar, nothing preventing you doing so
+  - remember dvar value normally already evaluated so be careful with expand level
+
+vars:
+  school: Sydney Grammar
+
+dvars:
+
+#case 1: reference to dvar
+  - name: nv
+    value: "n=>{{.school}}"
+
+  - name: m
+    value: m=>{{.nv}}
+    expand: 1
+    desc: |
+      the expand should be 1 as n is already instanciated a actual value
+
+  - name: j
+    value: j=>{{.m}}
+    expand: 1
+    desc: |
+      the expand should be 1 as n is already instanciated a actual value
+
+#case 2: reference to var
+  - name: o
+    value: o=>{{.c}}
+    expand: 3
+    desc: |
+      the expand should be 3 as the reference in vars not evaluated yet
+      this eventually will be the value of school from vars
+
+#case 3: it allows you to put non templated string there as value in dvars
+  - name: z
+    value: i am zzz
+    desc: you can use plain string here too
+
+  - name: yv
+    value: y->{{.z}}
+
+  - name: x
+    value: x=>{{.yv}}
+    expand: 1
+    desc: |
+      you can't expect to use expand level 2 to get value z, as there is no need
+      to do so because y should be already rendered
+
+
+tasks:
+
+  - name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo "n->{{.nv}}"
+          - echo "m->{{.m}}"
+          - echo "j->{{.j}}"
+          - echo "o->{{.o}}"
+          - echo "z->{{.z}}"
+          - echo "y->{{.yv}}"
+          - echo "x->{{.x}}"

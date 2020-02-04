@@ -1,0 +1,63 @@
+
+goal:
+  - test the shell env var behaves the save that it could override in scopes
+
+scopes:
+  - name: global
+    dvars:
+      - name: SCHOOL
+        value: James Rules
+        flags: [envvar]
+
+dvars:
+  - name: STUDENT_NAME
+    value: James Bond
+    flags: [envvar]
+
+  - name: STUDENT_AGE
+    value: "18"
+    flags: [envvar]
+
+
+tasks:
+
+  -
+    name: task
+    task:
+      - func: shell
+        dvars:
+          - name: STUDENT_NAME
+            value: Tom Hanks
+            flags: [envvar]
+        do:
+          - env |grep STUDENT_NAME
+          - env |grep STUDENT_AGE
+
+      - func: shell
+        desc: |
+          since there is no local envvar for STUDENT_NAME
+          it should use global envvar value 'james bond'
+        do:
+          - env |grep STUDENT_NAME
+          - env |grep STUDENT_AGE
+          - env |grep SCHOOL
+
+results: |
+  executing shell commands
+  cmd( 1):
+  env |grep STUDENT_NAME
+  STUDENT_NAME=Tom Hanks
+  cmd( 2):
+  env |grep STUDENT_AGE
+  STUDENT_AGE=18
+  step(  2):
+  executing shell commands
+  cmd( 1):
+  env |grep STUDENT_NAME
+  STUDENT_NAME=James Bond
+  cmd( 2):
+  env |grep STUDENT_AGE
+  STUDENT_AGE=18
+  cmd( 3):
+  env |grep SCHOOL
+  SCHOOL=James Rules

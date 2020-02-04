@@ -1,0 +1,16 @@
+
+goal:
+  - test the shell env vars context and manage env vars in each session
+
+tasks:
+
+  -
+    name: task
+    task:
+      - func: shell
+        dvars:
+          - name: STUDENT_NAME
+            value: Tom Hanks
+            flags: [envvar]
+        do:
+          - env |grep STUDENT_NAME
