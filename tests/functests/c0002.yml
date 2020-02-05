@@ -19,6 +19,8 @@ tasks:
       -
         func: shell
         desc: do step2 in shell func
+        flags:
+          - ignore_error
         do:
           - echo "hello"
           - echo "world"|grep non-exist

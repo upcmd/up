@@ -1,6 +1,6 @@
 
 version: 1.0.0
-Verbose: vvvv
+Verbose: v
 Secure:
   Type: default_aes
   #the key value will be a var name used for the value

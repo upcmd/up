@@ -94,6 +94,15 @@ func (f *ShellFuncAction) Exec() {
 
 		u.Dvvvvv(f.Result)
 
+		func() {
+			flags := StepStack.GetTop().(*StepRuntimeContext).Flags
+			if !u.Contains(*flags, "ignore_error") {
+				if f.Result.Code != 0 {
+					u.InvalidAndExit("Failed And Not Ignored!", "You may want to continue and ignore the error")
+				}
+			}
+		}()
+
 	}
 
 	StepStack.GetTop().(*StepRuntimeContext).Result = &f.Result

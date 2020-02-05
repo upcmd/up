@@ -25,6 +25,7 @@ type Step struct {
 	Dvars cache.Dvars
 	Desc  string
 	Reg   string
+	Flags []string //ignore_error |
 }
 
 //this is final merged exec vars the individual step will use
@@ -138,6 +139,7 @@ func (steps *Steps) Exec() {
 		func() {
 			rtContext := StepRuntimeContext{
 				Stepname: step.Name,
+				Flags:    &step.Flags,
 			}
 			StepStack.Push(&rtContext)
 			step.Exec()

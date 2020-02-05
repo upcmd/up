@@ -59,10 +59,6 @@ dvars:
       - vvvv
       - secure
 
-  - name: another_way_of_the_name
-    value: '6HmsmiJIW1PfIXcF4WwOKOMDiL7PstgfKs2aRFajrwY='
-    flags: [vvvv, secure]
-
 tasks:
 
   -
