@@ -1,0 +1,85 @@
+goal:
+  - show an example to deal with secure var and how to encrypt and decrypt
+
+design:
+  - in real case, you can use bank_password_encrypted to get the encrypted value
+  - |
+    save the encrypted value as a password dvar,
+    eg 'bank_password' and this could be safely
+    commited into code repo
+  - use secure/type field to describe the encrypt/decrypt type
+  - use secure/key to link to a varname containing value of the encryption key
+  - optionall you can you secure/keyref to point to key file
+
+vars:
+  bank_acct: 1234-5678
+
+scopes:
+  - name: nonprod
+    members: [dev, staging]
+    vars:
+      #in real ci/cd case, this should comes from a secure location
+      #you can dynamically get it from ENV Var
+      #or you can use secure api call to a backend
+      enc_key: my_non_enc_key
+
+  - name: prod
+    members: [prod]
+    vars:
+      #in real ci/cd case, this should comes from a secure location
+      #you can dynamically get it from ENV Var
+      #or you can use secure api call to a backend
+      enc_key: my_prod_enc_key
+
+
+dvars:
+  - name: bank_password_encrypted
+    value: '{{ "mybankpassword" | encryptAES .enc_key }}'
+    flags: [vvvv]
+
+  - name: bank_password_decrypted
+    value: '{{.bank_password_encrypted |decryptAES .enc_key}}'
+    flags: [vvvv]
+
+  - name: bank_password
+    #this should be the final way to be configured
+    #or this value could be from a ref file
+    value: '6HmsmiJIW1PfIXcF4WwOKOMDiL7PstgfKs2aRFajrwY='
+    flags:
+      - vvvv
+    secure:
+      type: default_aes
+      #the key value will be a var name used for the value
+      key: enc_key
+#      keyref: /a/secure/location/key.file
+
+  - name: bank_password_using_defause_config
+    value: '6HmsmiJIW1PfIXcF4WwOKOMDiL7PstgfKs2aRFajrwY='
+    flags:
+      - vvvv
+      - secure
+
+  - name: another_way_of_the_name
+    value: '6HmsmiJIW1PfIXcF4WwOKOMDiL7PstgfKs2aRFajrwY='
+    flags: [vvvv, secure]
+
+tasks:
+
+  -
+    name: task
+    task:
+      - func: task_ref
+        do: task_generate_password
+
+  -
+    name: task_generate_password
+    task:
+      - func: shell
+        do:
+          - echo "bank account  [{{.bank_acct}}]"
+          - echo "bank password encrypted [{{.bank_password_encrypted}}]"
+          - echo "bank password [{{.bank_password}}]"
+          - echo "secure bank password [{{.secure_bank_password}}]"
+          - echo "bank password using default config [{{.bank_password_using_defause_config}}]"
+          - echo "secure bank password using default config [{{.secure_bank_password_using_defause_config}}]"
+

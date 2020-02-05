@@ -4,7 +4,7 @@ goup(){
 }
 
 wiptest(){
-    goup task task -d ./tests/functests -t wip -i dev
+    goup task task -d ./tests/functests -t wip -i dev --configdir=./tests/functests
 }
 
 wipfunctest(){
@@ -12,7 +12,7 @@ wipfunctest(){
 }
 
 wiptestvvvv(){
-    goup task task -d ./tests/functests -t wip -i dev -v vvvv
+    goup task task -d ./tests/functests -t wip -i dev -v vvvv --configdir=./tests/functests
 }
 
 wiptestdebug(){
@@ -29,7 +29,7 @@ goup list task
 
 uptestx(){
 echo "syntax: uptestx c0033"
-    goup task task -d ./tests/functests -t $1 -i dev -v vvvv
+    goup task task -d ./tests/functests -t $1 -i dev -v vvvv --configdir=./tests/functests
 }
 
 

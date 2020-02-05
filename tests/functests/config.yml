@@ -1,3 +1,8 @@
 
 version: 1.0.0
 Verbose: vvvv
+Secure:
+  Type: default_aes
+  #the key value will be a var name used for the value
+  Key: enc_key
+#      keyref: /a/secure/location/key.file

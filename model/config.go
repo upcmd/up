@@ -7,6 +7,12 @@
 
 package model
 
+type SecureSetting struct {
+	Type   string
+	Key    string
+	KeyRef string
+}
+
 type CoreConfig struct {
 	Version  string
 	TaskDir  string
@@ -14,5 +20,6 @@ type CoreConfig struct {
 	FlowDir  string
 	FlowFile string
 	Verbose  string
+	Secure   *SecureSetting
 }
 

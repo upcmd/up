@@ -9,6 +9,7 @@ package cache
 
 import (
 	"github.com/mohae/deepcopy"
+	"github.com/stephencheng/up/model"
 	u "github.com/stephencheng/up/utils"
 	"io/ioutil"
 	"os"
@@ -18,12 +19,6 @@ import (
 
 type Dvars []Dvar
 
-type SecureSetting struct {
-	Type   string
-	Key    string
-	KeyRef string
-}
-
 type Dvar struct {
 	Name     string
 	Value    string
@@ -31,7 +26,7 @@ type Dvar struct {
 	Expand   int
 	Flags    []string //supported: vvvv, to_object,envvar,
 	Rendered string
-	Secure   *SecureSetting
+	Secure   *model.SecureSetting
 	Ref      string
 }
 

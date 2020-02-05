@@ -30,15 +30,19 @@ var (
 	taskdir            = app.Flag("taskdir", "task file directory").Short('d').String()
 	taskfile           = app.Flag("taskfile", "task file to load (without yml extension)").Short('t').String()
 	instanceName       = app.Flag("instance", "instance name for execution").Short('i').String()
+	configDir          = app.Flag("configdir", "config file directory to load from|default .").String()
+	configFile         = app.Flag("configfile", "config file name to load without yml extension|default config").String()
 )
 
 func main() {
 
+	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
+	u.SetConfigYamlDir(*configDir)
+	u.SetConfigYamlFile(*configFile)
 	u.InitConfig()
 	u.ShowCoreConfig()
 	u.Pfvvvv(" :release version:  %s", u.CoreConfig.Version)
 
-	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 	u.SetVerbose(*verbose)
 
 	u.SetTaskdir(*taskdir)

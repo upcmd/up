@@ -22,11 +22,15 @@ var (
 )
 
 func SetConfigYamlDir(dir string) {
-	configYamlDir = dir
+	if dir != "" {
+		configYamlDir = dir
+	}
 }
 
 func SetConfigYamlFile(filename string) {
-	configYamlFile = filename
+	if filename != "" {
+		configYamlFile = filename
+	}
 }
 
 func InitConfig() {
@@ -62,6 +66,8 @@ func GetCoreConfig() *model.CoreConfig {
 
 	cfg := new(model.CoreConfig)
 	err := Config.Unmarshal(cfg)
+
+	//fmt.Printf("1025: %#v\n", Config.AllSettings())
 
 	if err != nil {
 		fmt.Println("unable to decode into struct:", err.Error())

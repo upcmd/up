@@ -12,6 +12,7 @@ import (
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/mohae/deepcopy"
 	"github.com/spf13/viper"
+	"github.com/stephencheng/up/model"
 	u "github.com/stephencheng/up/utils"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -106,45 +107,42 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 				(*mergeTarget).Put(envvarName, dvar.Rendered)
 			}
 
-			//if u.Contains(dvar.Flags, "secure") {
-			//	//u.PpmsgvvvvhintHigh("dvar> "+dvar.Name, dvar.Rendered)
-			//	secureName := u.Spf("%s_%s", "secure", dvar.Name)
-			//	encrypted:=dvar.Rendered
-			//	(*mergeTarget).Put(secureName, )
-			//	data:=map[string]string{"enc_key":, "encrypted":encrypted}
-			//	Render("{{decryptAES .enc_key .encrypted}}")
-			//
-			//}
-
+			if u.Contains(dvar.Flags, "secure") {
+				decryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget)
+			}
 		}
 
 		if dvar.Secure != nil {
-			s := dvar.Secure
-			u.Ptmpdebug("99", dvar.Secure)
-
-			var encryptionkey string
-			if s.KeyRef != "" {
-				data, err := ioutil.ReadFile(s.KeyRef)
-				u.LogErrorAndExit("load secure key from ref file", err, "please fix file loading problem")
-				encryptionkey = string(data)
-			}
-
-			if s.Key != "" {
-				encryptionkey = (*mergeTarget).Get(s.Key).(string)
-			}
-
-			encrypted := dvar.Rendered
-
-			if encrypted != "" && encryptionkey != "" {
-				data := map[string]string{"enc_key": encryptionkey, "encrypted": encrypted}
-				decrypted := Render("{{ decryptAES .enc_key .encrypted}}", data)
-				secureName := u.Spf("%s_%s", "secure", dvar.Name)
-				(*mergeTarget).Put(secureName, decrypted)
-			} else {
-				u.InvalidAndExit("dvar decrypt", u.Spf("please double check secure settings for [%s]", dvar.Name))
-			}
+			decryptAndRegister(dvar.Secure, &dvar, mergeTarget)
 		}
 	}
+}
+
+func decryptAndRegister(securetag *model.SecureSetting, dvar *Dvar, mergeTarget *Cache) {
+	s := securetag
+
+	var encryptionkey string
+	if s.KeyRef != "" {
+		data, err := ioutil.ReadFile(s.KeyRef)
+		u.LogErrorAndExit("load secure key from ref file", err, "please fix file loading problem")
+		encryptionkey = string(data)
+	}
+
+	if s.Key != "" {
+		encryptionkey = (*mergeTarget).Get(s.Key).(string)
+	}
+
+	encrypted := dvar.Rendered
+
+	if encrypted != "" && encryptionkey != "" {
+		data := map[string]string{"enc_key": encryptionkey, "encrypted": encrypted}
+		decrypted := Render("{{ decryptAES .enc_key .encrypted}}", data)
+		secureName := u.Spf("%s_%s", "secure", dvar.Name)
+		(*mergeTarget).Put(secureName, decrypted)
+	} else {
+		u.InvalidAndExit("dvar decrypt", u.Spf("please double check secure settings for [%s]", dvar.Name))
+	}
+
 }
 
 func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
@@ -347,9 +345,6 @@ func SetRuntimeVarsMerged(runtimeid string) *Cache {
 		//merge back the expanded merged scope vars and dvars
 		mergo.Merge(&runtimevars, *instanceVarsMergedWithDvars, mergo.WithOverride)
 	}
-
-	//u.Ptmpdebug("99", runtimevars)
-	//u.Ptmpdebug("92", *instanceVarsMergedWithDvars)
 
 	//merge with global vars
 	mergo.Merge(&runtimevars, *RuntimeGlobalVars, mergo.WithOverride)
