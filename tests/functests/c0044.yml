@@ -19,7 +19,7 @@ tasks:
         dvars:
           - name: reg_hello
             value: |
-              {{.last_task_result |reg "hellomsg" }}
+              {{.last_task_result.Output |reg "hellomsg" }}
 
       -
         func: shell

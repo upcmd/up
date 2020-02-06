@@ -1,0 +1,32 @@
+goal:
+  - test the if condition works for noop and task_ref
+
+tasks:
+  -
+    name: task
+    task:
+
+      - func: task_ref
+        do:
+          - taska
+        if: "false"
+
+      - func: noop
+        dvars:
+          - name: greet
+            value: hello
+            flags: [vvvv]
+        if: "true"
+
+      - func: task_ref
+        do:
+          - taska
+        if: "true"
+
+  - name: taska
+    task:
+      - func: shell
+        desc: greet var will be no value as it is a local var for noop step
+        do:
+          - echo "hello from taska"
+          - echo "{{.greet}} from taska"

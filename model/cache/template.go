@@ -81,6 +81,10 @@ func FuncMapInit() {
 	}
 }
 
+func ToJson(str string) string {
+	return Render("{{toJson .}}", str)
+}
+
 func Render(tstr string, obj interface{}) string {
 	tname := "step_item_exec"
 	//t, err := template.New(tname).Parse(tstr)
@@ -95,7 +99,41 @@ func Render(tstr string, obj interface{}) string {
 	return result.String()
 }
 
+//func init() {
+//	FuncMapInit()
+//	ListAllFuncs()
+//	os.Exit(0)
+//}
+
 func ListAllFuncs() {
+
+	var builtins = map[string]string{
+		"and":      "and",
+		"call":     "call",
+		"html":     "HTMLEscaper",
+		"index":    "index",
+		"js":       "JSEscaper",
+		"len":      "length",
+		"not":      "not",
+		"or":       "or",
+		"print":    "fmt.Sprint",
+		"printf":   "fmt.Sprintf",
+		"println":  "fmt.Sprintln",
+		"urlquery": "URLQueryEscaper",
+
+		// Comparisons
+		"eq": "eq", // ==
+		"ge": "ge", // >=
+		"gt": "gt", // >
+		"le": "le", // <=
+		"lt": "lt", // <
+		"ne": "ne", // !=
+	}
+
+	for k, v := range builtins {
+		u.Pf("%30s : %#v\n", k, v)
+	}
+
 	for k, v := range templateFuncs {
 		u.Pf("%30s : %#v\n", k, v)
 	}

@@ -1,0 +1,12 @@
+goal:
+  - add condition support
+
+tasks:
+  -
+    name: task
+    task:
+
+      - func: shell
+        do:
+          - echo "hello, world"
+        if: true

@@ -19,7 +19,7 @@ tasks:
         desc: step2
         do:
           - echo tom
-          - echo "{{.last_task_result}}"
+          - echo "{{.last_task_result.Output}}"
           - echo hanks
 
       -
@@ -28,10 +28,10 @@ tasks:
         dvars:
           - name: greet
             value: |
-              hello: {{.last_task_result}}
+              hello: {{.last_task_result.Output}}
         do:
           - echo tom
-          - echo "{{.last_task_result}}"
+          - echo "{{.last_task_result.Output}}"
           - echo hanks
           - echo "{{.greet}}"
 

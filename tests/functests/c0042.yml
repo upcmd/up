@@ -23,7 +23,7 @@ tasks:
         dvars:
           - name: reg_hello
             value: |
-              hello: {{.last_task_result |reg "hellomsg" }}
+              hello: {{.last_task_result.Output |reg "hellomsg" }}
         do:
           - echo "{{.hellomsg}}"
 

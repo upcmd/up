@@ -57,11 +57,11 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 	found := false
 	for idx, task := range *Tasks {
 		if taskname == task.Name {
-			u.Pfvvvv("  loacated task-> %d [%s]: %s \n", idx+1, task.Name, task.Desc)
+			u.Pfvvvv("  located task-> %d [%s]: %s \n", idx+1, task.Name, task.Desc)
 			found = true
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
-			u.LogError("e:", err)
+			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
 			func() {
 				//step name validation
 				invalidNames := []string{}

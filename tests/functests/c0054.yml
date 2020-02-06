@@ -1,0 +1,127 @@
+goal:
+  - add condition support
+
+supported:
+  true: ["1", "t", "T", "TRUE", "true", "True"]
+  false: ["0", "f", "F", "FALSE", "false", "False"]
+
+tasks:
+  -
+    name: task
+    task:
+
+      - func: shell
+        do:
+          - echo "hello, world"
+        if: "true"
+
+      - func: shell
+        do:
+          - echo "hello, world"
+        if: "false"
+
+      - func: shell
+        do:
+          - echo "hello, world"
+        if: "FALSE"
+
+      - func: shell
+        desc: |
+          note that for one step, there will be only one
+          return, which will be the last do cmd
+          in this case, since the step3 exit code is 0
+          the whole step will have the return code of 0
+          if you need to use the exit code of the step
+          you need to consider to reduce the number of do cmds
+          or put it to last step, this is not a bug
+          this is a feature
+        flags:
+          - ignore_error
+        do:
+          - echo "step1"
+          - echo "step2" |grep notexist
+          - echo "step3"
+
+      - func: shell
+        dvars:
+          - name: last_task_succeeded
+            value: "{{eq .last_task_result.Code 0}}"
+            flags: [vvvv]
+        do:
+          - echo "check last step"
+          - echo "{{.last_task_result|toJson}}"
+          - echo "{{.last_task_result|toPrettyJson}}"
+        if: "{{eq .last_task_result.Code 0}}"
+
+      - func: shell
+        flags:
+          - ignore_error
+        do:
+          - echo "step1"
+          - echo "step2" |grep notexist
+
+      - func: shell
+        do:
+          - echo "check last step"
+          - echo "{{.last_task_result|toJson}}"
+          - echo "{{.last_task_result|toPrettyJson}}"
+        if: "{{eq .last_task_result.Code 0}}"
+
+      - func: shell
+        vars:
+          student:
+            name: peter
+            sex: male
+            age: 23
+        dvars:
+          - name: condition
+            value: '{{eq .student.sex "male"}}'
+            flags: [vvvv]
+        do:
+          - echo "simple dvar as condition"
+        if: "{{.condition}}"
+
+      - func: shell
+        vars:
+          student:
+            name: peter
+            sex: male
+            age: 23
+        dvars:
+          - name: condition
+            value: '{{and (ge .student.age 18) (eq .student.sex "male") }}'
+            flags: [vvvv]
+        do:
+          - echo "complicated dvar evaluation as condition"
+        if: "{{.condition}}"
+
+      - func: shell
+        vars:
+          student:
+            name: peter
+            sex: male
+            age: 23
+        dvars:
+          - name: condition
+            value: |
+              {{- with .student -}}
+              {{and (ge .age 18) (eq .sex "male") }}
+              {{- end -}}
+            flags: [vvvv]
+        do:
+          - echo "a even more complicated condition but more readable"
+        if: "{{.condition}}"
+
+      - func: shell
+        vars:
+          student:
+            name: peter
+            sex: male
+            age: 23
+        do:
+          - echo "a complicated condition without dvar"
+        if: |
+          {{- with .student -}}
+          {{and (ge .age 18) (eq .sex "male") }}
+          {{- end -}}
+

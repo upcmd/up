@@ -1,0 +1,31 @@
+goal:
+  - workflow status management
+  - configurable to stop on fail
+  - configurable to ignore and continue
+
+tasks:
+
+  -
+    name: task
+    task:
+      - func: shell
+        flags:
+          - ignore_error
+        do:
+          - echo "step1"
+          - echo "step2" |grep notexist
+          - echo "step3"
+
+      - func: shell
+        flags:
+          - ignore_error
+        do:
+          - echo "step4"
+          - echo "step5" |grep notexist
+          - echo "step6"
+
+      - func: shell
+        do:
+          - echo "step7"
+          - echo "step8"
+          - echo "step9"
