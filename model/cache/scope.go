@@ -8,6 +8,8 @@
 package cache
 
 import (
+	"bufio"
+	"github.com/fatih/color"
 	"github.com/imdario/mergo"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/mohae/deepcopy"
@@ -109,6 +111,14 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 
 			if u.Contains(dvar.Flags, "secure") {
 				decryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget)
+			}
+
+			if u.Contains(dvar.Flags, "prompt") {
+				hiColor := color.New(color.FgHiWhite, color.BgBlack)
+				hiColor.Printf("Enter Value For Dvar: %s\n", dvar.Name)
+				reader := bufio.NewReader(os.Stdin)
+				dvarInputValue, _ := reader.ReadString('\n')
+				(*mergeTarget).Put(dvar.Name, dvarInputValue)
 			}
 		}
 

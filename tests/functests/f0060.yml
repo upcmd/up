@@ -1,0 +1,13 @@
+goal:
+  - introduce steps ref to externalise steps to yaml file
+
+test:
+  - ref and task node can not exist at the same time
+
+tasks:
+
+  -
+    name: task
+    ref: c0059-task-ref
+    task:
+      - name:

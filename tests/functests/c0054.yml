@@ -43,6 +43,10 @@ tasks:
           - echo "step3"
 
       - func: shell
+        do:
+          - echo "hello, world"
+
+      - func: shell
         dvars:
           - name: last_task_succeeded
             value: "{{eq .last_task_result.Code 0}}"
@@ -51,6 +55,7 @@ tasks:
           - echo "check last step"
           - echo "{{.last_task_result|toJson}}"
           - echo "{{.last_task_result|toPrettyJson}}"
+          - echo "{{eq .last_task_result.Code 0}}"
         if: "{{eq .last_task_result.Code 0}}"
 
       - func: shell

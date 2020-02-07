@@ -1,0 +1,15 @@
+goal:
+  - add dvar promot to get input value
+
+dvars:
+  - name: student
+    flags: [prompt,]
+
+tasks:
+  -
+    name: task
+    task:
+
+      - func: shell
+        do:
+          - echo "hello {{.student}}"

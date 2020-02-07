@@ -1,0 +1,8 @@
+goal:
+  - introduce steps ref to externalise steps to yaml file
+
+tasks:
+
+  -
+    name: task
+    ref: c0059-task-ref

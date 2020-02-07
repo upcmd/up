@@ -103,27 +103,30 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 
 }
 
-///*
-//
-// */
-//func ValidateTasks() {
-//	for idx, task := range *Tasks {
-//
-//	}
-//
-//}
-//
 func loadTasks() error {
 	tasksData := TaskYmlRoot.Get("tasks")
 	var tasks model.Tasks
 	err := ms.Decode(tasksData, &tasks)
 	Tasks = &tasks
+
 	func() {
 		//validation
 		invalidNames := []string{}
-		for _, task := range *Tasks {
+		for idx, task := range *Tasks {
 			if strings.Contains(task.Name, "-") {
 				invalidNames = append(invalidNames, task.Name)
+			}
+
+			//u.Ptmpdebug("99", task)
+			if task.Task != nil && task.Ref != "" {
+				u.InvalidAndExit("validate task node and ref", "task and ref can not coexist")
+			}
+
+			//load ref task
+			if task.Ref != "" {
+				yamlflowroot := u.YamlLoader("flow ref", u.CoreConfig.TaskDir, task.Ref)
+				flow := loadRefFlow(yamlflowroot)
+				(*Tasks)[idx].Task = flow
 			}
 		}
 
@@ -132,7 +135,17 @@ func loadTasks() error {
 		}
 	}()
 
+	//u.Ptmpdebug("222", Tasks)
+
 	return err
+}
+
+func loadRefFlow(yamlroot *viper.Viper) *Steps {
+	flowData := yamlroot.Get("flow")
+	var flow Steps
+	err := ms.Decode(flowData, &flow)
+	u.LogErrorAndExit("load ref flow", err, "flow of the steps has configuration problem, please fix it")
+	return &flow
 }
 
 func loadScopes() {
@@ -160,7 +173,7 @@ func loadRuntimeDvars() *cache.Dvars {
 	err := ms.Decode(dvarsData, &dvars)
 	u.LogErrorAndExit("loadRuntimeDvars",
 		err,
-		"You must fix the data type to be\n string for a dvar value and try again\n or the name can not be single character 'y' or 'n' ",
+		"You must fix the data type to be\n string for a dvar value and try again. possible problems:\nthe name can not be single character 'y' or 'n' ",
 	)
 
 	//dvars.ValidateAndLoading()

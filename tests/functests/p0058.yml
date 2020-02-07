@@ -1,0 +1,22 @@
+goal:
+  - add dvar promot to get input value
+  - show that the dvar is living in its own scope
+
+vars:
+  student: James
+
+tasks:
+  -
+    name: task
+    task:
+
+      - func: shell
+        do:
+          - echo "hello {{.student}}"
+
+      - func: shell
+        dvars:
+          - name: student
+            flags: [prompt,]
+        do:
+          - echo "hello {{.student}}"

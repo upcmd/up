@@ -11,6 +11,7 @@ type Task struct {
 	Task interface{} //Steps
 	Desc string
 	Name string
+	Ref  string
 }
 
 type Tasks []Task

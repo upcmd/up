@@ -45,6 +45,28 @@ tasks:
             {{end}}
 
   -
+    name: testp
+    desc: test user cases with prompt
+    task:
+      -
+        func: shell
+        name: getcases
+        do:
+          - cd ./tests/functests; ls p*.yml
+        reg: cases
+
+      -
+        func: shell
+        desc: a real showcase of how to loop using template
+        do:
+          - |
+            {{ range $idx, $file := .register_testp_cases | splitLines -}}
+            {{$casename :=  $file | replace ".yml" ""}}
+            echo "==========failure case test {{$idx |add1}}==============="
+            go run app/up/*.go task task -d ./tests/functests -t {{$casename}} -i dev -v vvvv
+            {{end}}
+
+  -
     name: testx
     desc: test specific the function test
     task:

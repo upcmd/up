@@ -1,0 +1,67 @@
+goal:
+  - add loop support
+
+design: |
+    loop takes either a list directly
+    or it takes a static var/dvar name to reference to
+    or a templated string to be evaluated and eventually
+    pointing to a var/dvar name
+
+consideration: |
+  do we need the while condition to stop the loop
+  maybe not
+  the reason is that you can always use dvar + noop func
+   to prepare the list for iteration
+
+vars:
+  countries:
+    - name: Australia
+      population: 20m
+
+    - name: British
+      population: 2000m
+
+    - name: China
+      population: 1.4b
+
+    - name: Danmark
+      population: 30m
+
+tasks:
+  -
+    name: task
+    task:
+
+      - func: shell
+        do:
+          - echo "hello {{.loopitem}}"
+        loop:
+          - tom
+          - peter
+          - james
+
+      - func: shell
+        do:
+          - echo "hello {{.loopitem}}"
+        loop: [Australia, British, China, Danmark]
+
+      - func: shell
+        desc: |
+          the loop point to a iteratable var countries
+        do:
+          - echo "hello {{.loopitem.name}}"
+          - echo "hello {{.loopitem.population}}"
+        loop: "countries"
+
+      - func: shell
+        desc: |
+          the templated value will be eventually a var/dvar name
+        dvars:
+          - name: listname
+            value: "countries"
+        do:
+          - echo "hello {{.loopindex}}"
+          - echo "hello {{.loopindex1}}"
+          - echo "hello {{.loopitem.name}}"
+          - echo "hello {{.loopitem.population}}"
+        loop: "{{.listname}}"

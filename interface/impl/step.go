@@ -33,9 +33,11 @@ type Step struct {
 	Loop interface{}
 }
 
+type Steps []Step
+
 //this is final merged exec vars the individual step will use
 //this step will merge the vars with the caller's stack vars
-func (step *Step) GetExecVarsWithRefOverrided(funcname string, loopItem *LoopItem) *cache.Cache {
+func (step *Step) GetExecVarsWithRefOverrided(funcname string) *cache.Cache {
 	vars := step.getRuntimeExecVars(funcname)
 	callerVars := TaskStack.GetTop().(*TaskRuntimeContext).CallerVars
 	//u.Ptmpdebug("callerVars", callerVars)
@@ -44,11 +46,6 @@ func (step *Step) GetExecVarsWithRefOverrided(funcname string, loopItem *LoopIte
 		mergo.Merge(vars, callerVars, mergo.WithOverride)
 	}
 
-	if loopItem != nil {
-		vars.Put("loopitem", loopItem.Item)
-		vars.Put("loopindex", loopItem.Index)
-		vars.Put("loopindex1", loopItem.Index1)
-	}
 	u.Ppmsgvvvvhint("overall final exec vars:", vars)
 	return vars
 }
@@ -91,11 +88,14 @@ func (step *Step) Exec() {
 
 	var bizErr *ee.Error = ee.New()
 	var stepExecVars *cache.Cache
-
-	plainExecVars := step.GetExecVarsWithRefOverrided("get plain exec vars", nil)
+	stepExecVars = step.GetExecVarsWithRefOverrided("get plain exec vars")
 
 	routeFuncType := func(loopItem *LoopItem) {
-		stepExecVars = step.GetExecVarsWithRefOverrided("step exec", loopItem)
+		if loopItem != nil {
+			stepExecVars.Put("loopitem", loopItem.Item)
+			stepExecVars.Put("loopindex", loopItem.Index)
+			stepExecVars.Put("loopindex1", loopItem.Index1)
+		}
 
 		switch step.Func {
 		case FUNC_SHELL:
@@ -149,9 +149,9 @@ func (step *Step) Exec() {
 								//toJsonTmp:="{{toJson .}}"
 								//cache.Render("{{toJson .}}", plainExecVars)
 
-								loopVarName := cache.Render(step.Loop.(string), plainExecVars)
+								loopVarName := cache.Render(step.Loop.(string), stepExecVars)
 
-								loopObj := plainExecVars.Get(loopVarName)
+								loopObj := stepExecVars.Get(loopVarName)
 								if reflect.TypeOf(loopObj).Kind() == reflect.Slice {
 									for idx, item := range loopObj.([]interface{}) {
 										routeFuncType(&LoopItem{idx, idx + 1, item})
@@ -190,7 +190,7 @@ func (step *Step) Exec() {
 		if step.If != "" {
 			IfEval := cache.Render(step.If, stepExecVars)
 			goahead, err := strconv.ParseBool(IfEval)
-			u.LogErrorAndExit("evaluate condition", err, "please fix if condition evaluation")
+			u.LogErrorAndExit("evaluate condition", err, u.Spf("please fix if condition evaluation: [%s]", IfEval))
 			if goahead {
 				dryRunOrContinue()
 			} else {
@@ -203,8 +203,6 @@ func (step *Step) Exec() {
 	}()
 
 }
-
-type Steps []Step
 
 func (steps *Steps) Exec() {
 

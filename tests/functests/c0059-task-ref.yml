@@ -1,0 +1,18 @@
+flow:
+  - func: shell
+    do:
+      - echo "step1"
+      - echo "step2"
+      - echo "step3"
+
+  - func: shell
+    do:
+      - echo "step4"
+      - echo "step5"
+      - echo "step6"
+
+  - func: shell
+    do:
+      - echo "step7"
+      - echo "step8"
+      - echo "step9"
