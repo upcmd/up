@@ -1,0 +1,75 @@
+goal:
+  - show a little bit more complicated use case with chained tasks and externalised tasks
+  - show how to use condition(basics)
+  - show how to use loop(basics)
+  - for details of condition/loop, check the comphensive case of them separately
+
+vars:
+  student_name: tom
+  classes: [1k,2b,3j,4s]
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo "task step 1"
+          - echo "task step 2"
+
+      -
+        func: task_ref
+        do:
+          - task_a
+          - task_c
+          - task_a
+        if: '{{eq .student_name "tom"}}'
+
+      -
+        func: task_ref
+        do:
+          - task_b
+        loop: "classes"
+        if: '{{eq .student_name "tom"}}'
+
+      -
+        func: shell
+        do:
+          - echo "task step 3"
+          - echo "task step 4"
+
+      -
+        func: task_ref
+        do:
+          - a_very_complicated_task
+
+  -
+    name: task_a
+    task:
+      -
+        func: shell
+        do:
+          - echo "task_a_step1"
+  -
+    name: task_c
+    task:
+      -
+        func: shell
+        do:
+          - echo "task_c_step1"
+
+  -
+    name: task_b
+    task:
+      -
+        func: shell
+        do:
+          - echo "task_b_step1"
+          - echo "{{.loopindex}} -> student nameed {{.student_name}} has been in class [{{.loopitem}}]"
+
+  -
+    name: a_very_complicated_task
+    desc: "a_very_complicated_task"
+    ref: c0060-task-ref

@@ -1,0 +1,32 @@
+flow:
+  -
+    func: shell
+    do:
+      - echo "task step 1"
+      - echo "task step 2"
+
+  -
+    func: task_ref
+    do:
+      - task_a
+      - task_c
+      - task_a
+    if: '{{eq .student_name "tom"}}'
+
+  -
+    func: task_ref
+    do:
+      - task_b
+    loop: "classes"
+    if: '{{eq .student_name "tom"}}'
+
+  -
+    func: shell
+    do:
+      - echo "task step 3"
+      - echo "task step 4"
+
+  -
+    func: task_ref
+    do:
+      - a_very_complicated_task

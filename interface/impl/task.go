@@ -103,39 +103,57 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 
 }
 
+func validateAndLoadTaskRef(taks *model.Tasks) {
+	//validation
+	invalidNames := []string{}
+	for idx, task := range *taks {
+		if strings.Contains(task.Name, "-") {
+			invalidNames = append(invalidNames, task.Name)
+		}
+
+		//u.Ptmpdebug("99", task)
+		if task.Task != nil && task.Ref != "" {
+			u.InvalidAndExit("validate task node and ref", "task and ref can not coexist")
+		}
+
+		//load ref task
+		if task.Ref != "" {
+			yamlflowroot := u.YamlLoader("flow ref", u.CoreConfig.TaskDir, task.Ref)
+			flow := loadRefFlow(yamlflowroot)
+			(*taks)[idx].Task = flow
+		}
+	}
+
+	if len(invalidNames) > 0 {
+		u.InvalidAndExit(u.Spf("validating task name fails: %s ", invalidNames), "task name can not contain '-', please use '_' instead, failed names:")
+	}
+}
+
+func loadRefTasks() {
+	tasksRefList := TaskYmlRoot.Get("tasksref")
+	for _, ref := range tasksRefList.([]interface{}) {
+		tasksYamlName := ref.(string)
+		tasksYmlRoot := u.YamlLoader(tasksYamlName, u.CoreConfig.TaskDir, tasksYamlName)
+
+		var tasks model.Tasks
+		tasksData := tasksYmlRoot.Get("tasks")
+		err := ms.Decode(tasksData, &tasks)
+		u.LogErrorAndExit(u.Spf("decode tasks:%s", tasksYamlName), err, "please fix configuration in tasks yaml file")
+		for _, task := range tasks {
+			*Tasks = append(*Tasks, task)
+		}
+	}
+}
+
 func loadTasks() error {
 	tasksData := TaskYmlRoot.Get("tasks")
 	var tasks model.Tasks
 	err := ms.Decode(tasksData, &tasks)
+	u.LogErrorAndExit("decode tasks:main", err, "please fix configuration in tasks yaml file")
 	Tasks = &tasks
 
-	func() {
-		//validation
-		invalidNames := []string{}
-		for idx, task := range *Tasks {
-			if strings.Contains(task.Name, "-") {
-				invalidNames = append(invalidNames, task.Name)
-			}
-
-			//u.Ptmpdebug("99", task)
-			if task.Task != nil && task.Ref != "" {
-				u.InvalidAndExit("validate task node and ref", "task and ref can not coexist")
-			}
-
-			//load ref task
-			if task.Ref != "" {
-				yamlflowroot := u.YamlLoader("flow ref", u.CoreConfig.TaskDir, task.Ref)
-				flow := loadRefFlow(yamlflowroot)
-				(*Tasks)[idx].Task = flow
-			}
-		}
-
-		if len(invalidNames) > 0 {
-			u.InvalidAndExit(u.Spf("validating task name fails: %s ", invalidNames), "task name can not contain '-', please use '_' instead, failed names:")
-		}
-	}()
-
-	//u.Ptmpdebug("222", Tasks)
+	loadRefTasks()
+	validateAndLoadTaskRef(Tasks)
 
 	return err
 }

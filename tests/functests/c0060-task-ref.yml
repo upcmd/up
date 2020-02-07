@@ -1,0 +1,11 @@
+flow:
+  - func: shell
+    do:
+      - echo "i am a very complicated flow of step1"
+      - echo "i am a very complicated flow of step2"
+      - echo "i am a very complicated flow of step3"
+
+  - func: shell
+    do:
+      - echo "i am a very complicated flow of step4"
+      - echo "{{.student_name}}"

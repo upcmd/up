@@ -1,0 +1,17 @@
+
+tasks:
+
+  -
+    name: task_a
+    task:
+      -
+        func: shell
+        do:
+          - echo "task_a_step1"
+  -
+    name: task_c
+    task:
+      -
+        func: shell
+        do:
+          - echo "task_c_step1"

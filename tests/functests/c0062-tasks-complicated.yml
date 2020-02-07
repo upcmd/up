@@ -1,0 +1,17 @@
+
+tasks:
+
+  -
+    name: a_very_complicated_task
+    desc: "a_very_complicated_task"
+    ref: c0061-task-complicate
+
+  -
+    name: task_b
+    task:
+      -
+        func: shell
+        do:
+          - echo "task_b_step1"
+          - echo "{{.loopindex}} -> student nameed {{.student_name}} has been in class [{{.loopitem}}]"
+

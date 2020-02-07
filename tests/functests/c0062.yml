@@ -1,0 +1,16 @@
+goal:
+  - add feature to externalise task file into separate yaml file
+
+vars:
+  student_name: tom
+  classes: [1k,2b,3j,4s]
+
+tasksref:
+  - c0062-tasks-simple
+  - c0062-tasks-complicated
+
+tasks:
+
+  -
+    name: task
+    ref: c0062-task-main
