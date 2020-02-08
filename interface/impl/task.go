@@ -131,16 +131,18 @@ func validateAndLoadTaskRef(taks *model.Tasks) {
 
 func loadRefTasks() {
 	tasksRefList := TaskYmlRoot.Get("tasksref")
-	for _, ref := range tasksRefList.([]interface{}) {
-		tasksYamlName := ref.(string)
-		tasksYmlRoot := u.YamlLoader(tasksYamlName, u.CoreConfig.TaskDir, tasksYamlName)
+	if tasksRefList != nil {
+		for _, ref := range tasksRefList.([]interface{}) {
+			tasksYamlName := ref.(string)
+			tasksYmlRoot := u.YamlLoader(tasksYamlName, u.CoreConfig.TaskDir, tasksYamlName)
 
-		var tasks model.Tasks
-		tasksData := tasksYmlRoot.Get("tasks")
-		err := ms.Decode(tasksData, &tasks)
-		u.LogErrorAndExit(u.Spf("decode tasks:%s", tasksYamlName), err, "please fix configuration in tasks yaml file")
-		for _, task := range tasks {
-			*Tasks = append(*Tasks, task)
+			var tasks model.Tasks
+			tasksData := tasksYmlRoot.Get("tasks")
+			err := ms.Decode(tasksData, &tasks)
+			u.LogErrorAndExit(u.Spf("decode tasks:%s", tasksYamlName), err, "please fix configuration in tasks yaml file")
+			for _, task := range tasks {
+				*Tasks = append(*Tasks, task)
+			}
 		}
 	}
 }

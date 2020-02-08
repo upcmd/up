@@ -74,6 +74,12 @@ func PpmsgvvvvhintHigh(hint string, a ...interface{}) {
 	himsg_color_printf("%s\n", spewMsgState.Sdump(a...))
 }
 
+func Ppromptvvvvv(valueName, hint string) {
+	hiColor := color.New(color.FgHiWhite, color.BgBlack)
+	hiColor.Printf("Enter Value For %s: \n%s\n", valueName, hint)
+
+}
+
 func Ppmsgvvvvv(hint string, a ...interface{}) {
 	if permitted("vvvvv") {
 		PpmsgvvvvhintHigh(hint, a...)
@@ -150,6 +156,12 @@ func LogErrorAndExit(mark string, err interface{}, hint string) {
 func InvalidAndExit(mark string, hint string) {
 	hiColor := color.New(color.FgHiCyan, color.BgRed)
 	hiColor.Printf("  ERROR: %s [%s]\n", mark, hint)
+	os.Exit(-3)
+}
+
+func GraceExit(mark string, hint string) {
+	hiColor := color.New(color.FgHiCyan, color.FgHiWhite)
+	hiColor.Printf("  Exit: %s [%s]\n", mark, hint)
 	os.Exit(-3)
 }
 

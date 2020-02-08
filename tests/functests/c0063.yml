@@ -1,0 +1,16 @@
+goal:
+  - add pause
+
+tasks:
+
+  -
+    name: task
+    task:
+      - func: shell
+        do:
+          - echo "hello 1"
+        flags: [pause]
+
+      - func: shell
+        do:
+          - echo "hello2"
