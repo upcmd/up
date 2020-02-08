@@ -29,7 +29,7 @@ type TaskRuntimeContext struct {
 type StepRuntimeContext struct {
 	Stepname string
 	Result   *ExecResult
-	Flags    *[]string
+	//Flags    *[]string
 }
 
 type ExecResult struct {

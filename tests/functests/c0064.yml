@@ -1,0 +1,34 @@
+goal:
+  - add cmd support for noop func
+
+vars:
+  student:
+    name: Tom
+    gender: Male
+    school: Sydney Grammar
+
+tasks:
+
+  -
+    name: task
+    task:
+      - func: shell
+        do:
+          - echo "hello 1"
+
+      - func: noop
+        do:
+          - name: print
+            desc: print some info
+            cmd: "hello, this is print commmand"
+
+          -
+            name: print
+            cmd: "hello, {{.student.school}}"
+
+          -
+            cmd: "hello, {{.student.school}}"
+
+      - func: shell
+        do:
+          - echo "hello2"

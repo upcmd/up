@@ -8,12 +8,15 @@
 package impl
 
 import (
+	"bufio"
 	"github.com/imdario/mergo"
 	"github.com/mohae/deepcopy"
 	ic "github.com/stephencheng/up/interface"
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	ee "github.com/stephencheng/up/utils/error"
+	"os"
+
 	//"gopkg.in/yaml.v2"
 	"reflect"
 	"strconv"
@@ -82,6 +85,11 @@ type LoopItem struct {
 	Item   interface{}
 }
 
+func chainAction(action *ic.Do) {
+	(*action).Adapt()
+	(*action).Exec()
+}
+
 func (step *Step) Exec() {
 	var action ic.Do
 	//u.Ptmpdebug("step debug", step)
@@ -146,17 +154,13 @@ func (step *Step) Exec() {
 						func() {
 							if reflect.TypeOf(step.Loop).Kind() == reflect.String {
 
-								//toJsonTmp:="{{toJson .}}"
-								//cache.Render("{{toJson .}}", plainExecVars)
-
 								loopVarName := cache.Render(step.Loop.(string), stepExecVars)
 
 								loopObj := stepExecVars.Get(loopVarName)
 								if reflect.TypeOf(loopObj).Kind() == reflect.Slice {
 									for idx, item := range loopObj.([]interface{}) {
 										routeFuncType(&LoopItem{idx, idx + 1, item})
-										action.Adapt()
-										action.Exec()
+										chainAction(&action)
 									}
 
 								} else {
@@ -165,8 +169,7 @@ func (step *Step) Exec() {
 							} else if reflect.TypeOf(step.Loop).Kind() == reflect.Slice {
 								for idx, item := range step.Loop.([]interface{}) {
 									routeFuncType(&LoopItem{idx, idx + 1, item})
-									action.Adapt()
-									action.Exec()
+									chainAction(&action)
 								}
 
 							} else {
@@ -176,8 +179,7 @@ func (step *Step) Exec() {
 
 					} else {
 						routeFuncType(nil)
-						action.Adapt()
-						action.Exec()
+						chainAction(&action)
 
 					}
 
@@ -214,7 +216,7 @@ func (steps *Steps) Exec() {
 		execStep := func() {
 			rtContext := StepRuntimeContext{
 				Stepname: step.Name,
-				Flags:    &step.Flags,
+				//Flags:    &step.Flags,
 			}
 			StepStack.Push(&rtContext)
 
@@ -222,6 +224,7 @@ func (steps *Steps) Exec() {
 
 			result := StepStack.GetTop().(*StepRuntimeContext).Result
 			taskname := TaskStack.GetTop().(*TaskRuntimeContext).Taskname
+
 			if u.Contains([]string{FUNC_SHELL, FUNC_TASK_REF}, step.Func) {
 				if step.Reg == "auto" {
 					cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
@@ -233,6 +236,35 @@ func (steps *Steps) Exec() {
 					}
 				}
 			}
+
+			//--
+			func() {
+				result := StepStack.GetTop().(*StepRuntimeContext).Result
+				if !u.Contains(step.Flags, "ignore_error") {
+					if result != nil && result.Code != 0 {
+						u.InvalidAndExit("Failed And Not Ignored!", "You may want to continue and ignore the error")
+					}
+				}
+				if u.Contains(step.Flags, "pause") {
+					u.Ppromptvvvvv("pause action to continue", " q: quit\n c: continue")
+					reader := bufio.NewReader(os.Stdin)
+					keyinput, _ := reader.ReadString('\n')
+
+					switch keyinput {
+					case "q\n":
+						u.GraceExit("puase action", "client choce to stop continuing the execution")
+					case "c\n":
+						//contine
+					default:
+						//continue
+
+					}
+
+				}
+
+			}()
+			//--
+
 			StepStack.Pop()
 		}
 

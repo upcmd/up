@@ -8,7 +8,6 @@
 package impl
 
 import (
-	"bufio"
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/stephencheng/up/model/cache"
@@ -94,33 +93,6 @@ func (f *ShellFuncAction) Exec() {
 		}
 
 		u.Dvvvvv(f.Result)
-
-		func() {
-			flags := StepStack.GetTop().(*StepRuntimeContext).Flags
-			if !u.Contains(*flags, "ignore_error") {
-				if f.Result.Code != 0 {
-					u.InvalidAndExit("Failed And Not Ignored!", "You may want to continue and ignore the error")
-				}
-			}
-			if u.Contains(*flags, "pause") {
-				u.Ppromptvvvvv("pause action to continue", " q: quit\n c: continue")
-				reader := bufio.NewReader(os.Stdin)
-				keyinput, _ := reader.ReadString('\n')
-
-				switch keyinput {
-				case "q\n":
-					u.GraceExit("puase action", "client choce to stop continuing the execution")
-				case "c\n":
-					//contine
-				default:
-					//continue
-
-				}
-
-			}
-
-		}()
-
 	}
 
 	StepStack.GetTop().(*StepRuntimeContext).Result = &f.Result

@@ -55,6 +55,12 @@ func Dvvvvv(a ...interface{}) {
 	}
 }
 
+func Dvvvv(a ...interface{}) {
+	if permitted("vvvv") {
+		vvvvv_color_printf("%s\n", spew.Sdump(a...))
+	}
+}
+
 func Pfdryrun(format string, a ...interface{}) {
 	dryrun_color_print(format, a...)
 }
@@ -99,6 +105,12 @@ func Sppmsg(a ...interface{}) string {
 func Ppmsgvvvvhint(hint string, a ...interface{}) {
 	Pvvvv(hint)
 	Ppmsgvvvv(a...)
+}
+
+func Ppmsgvvvvvhint(hint string, a ...interface{}) {
+	if permitted("vvvvv") {
+		Ppmsgvvvvhint(hint, a...)
+	}
 }
 
 func Ptmpdebug(mark string, a ...interface{}) {

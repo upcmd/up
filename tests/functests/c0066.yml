@@ -1,0 +1,82 @@
+goal:
+  - out parameter saves the cmd result to local func scope only, it is just like local var
+  - reg will automatically register it to global vars map
+  - the out won't gurantee the output of the cmd execution will be meaningful, it depends on how/what you do
+
+specs:
+  - reg:
+      cmd:
+        name: this is varname it will register to
+        value: this is the value, or dvar to be assigned to the varname
+        localonly: |
+          indicating if this var only availbe in the local scope within one func call
+          by default, it register the var to global scope
+
+  - dereg:
+      name: this is varname it will be removed from both local and global vars map
+
+design:
+  - the out takes a name of var and use it to save the result
+  - |
+      compare to the template pipeline reg/dereg command
+      the difference of these two command here reg and dereg the vars immediately
+        in the current func step, rather than the next func step
+
+vars:
+  student:
+    name: Tom
+    gender: Male
+    school: Sydney Grammar
+
+tasks:
+
+  -
+    name: task
+    task:
+      - func: shell
+        do:
+          - echo "hello 1"
+
+
+      - func: noop
+        do:
+          -
+            name: print
+            desc: demo of print command
+            cmd: "hello, {{.student.school}}"
+
+          -
+            name: reg
+            desc: demo of reg command
+            cmd:
+              name: greet
+              value: "hello, {{.student.school}}"
+
+          -
+            name: reg
+            desc: |
+              demo of reg command of a local var in noop func call
+              the greetlocal will not be availe in next func call
+            cmd:
+              name: greetlocal
+              value: "hello, {{.student.school}}"
+              localonly: true
+
+      - func: shell
+        desc: the greetlocal will not be availe in this func call
+        do:
+          - echo "hello 2"
+
+
+      - func: noop
+        do:
+
+          -
+            name: dereg
+            desc: demo of dereg command
+            cmd: greet
+
+      - func: shell
+        desc: you will see that greet var is removed from global var map
+        do:
+          - echo "hello 3"
