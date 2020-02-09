@@ -1,0 +1,29 @@
+goal:
+  - demo how to template a file
+
+vars:
+  student:
+    name: Tom
+    gender: Male
+    address:
+      suburb:
+        name: sydney
+        postcode: 2000
+        CBD: yes
+      school: Sydney Grammar
+
+dvars:
+
+  - name: school_address
+    ref: d0069.yml
+
+tasks:
+
+  - name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo """school address {{.school_address}}"""
+          - echo """school address {{.school_address}}""" > /tmp/school.txt
+          - cat /tmp/school.txt

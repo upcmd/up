@@ -237,7 +237,6 @@ func (steps *Steps) Exec() {
 				}
 			}
 
-			//--
 			func() {
 				result := StepStack.GetTop().(*StepRuntimeContext).Result
 				if !u.Contains(step.Flags, "ignore_error") {
@@ -263,7 +262,6 @@ func (steps *Steps) Exec() {
 				}
 
 			}()
-			//--
 
 			StepStack.Pop()
 		}

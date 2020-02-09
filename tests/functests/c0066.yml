@@ -39,6 +39,9 @@ tasks:
 
 
       - func: noop
+        dvars:
+          - name: school
+            value: "{{.student.school}}"
         do:
           -
             name: print
@@ -50,7 +53,7 @@ tasks:
             desc: demo of reg command
             cmd:
               name: greet
-              value: "hello, {{.student.school}}"
+              value: "from local dvars, {{.school}}"
 
           -
             name: reg
@@ -70,7 +73,6 @@ tasks:
 
       - func: noop
         do:
-
           -
             name: dereg
             desc: demo of dereg command

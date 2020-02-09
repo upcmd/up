@@ -1,0 +1,39 @@
+goal:
+  - demo use dvar ref to load common file only
+  - add noop cmd readfile and register to a named var
+  - add noop cmd write file to save to a file
+
+dvars:
+
+  - name: mystory
+    ref: d0070.txt
+
+tasks:
+
+  - name: task
+    task:
+      - func: noop
+        do:
+          -
+            name: print
+            cmd: "{{.mystory}}"
+
+          -
+            name: writefile
+            desc: write content to a file
+            cmd:
+              content: "{{.mystory}}"
+              filename: mystory.txt
+              dir: /tmp
+
+          -
+            name: readfile
+            desc: read content of a file and register it to a var
+            cmd:
+              filename: mystory.txt
+              dir: /tmp
+              reg: my_interesting_story
+
+          -
+            name: print
+            cmd: "{{.my_interesting_story}}"

@@ -1,0 +1,17 @@
+goal:
+  - demo use dvar ref to load common file only
+
+dvars:
+
+  - name: mystory
+    ref: d0070.txt
+
+tasks:
+
+  - name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo """school address {{.mystory}}""" > /tmp/mystory.txt
+          - cat /tmp/mystory.txt

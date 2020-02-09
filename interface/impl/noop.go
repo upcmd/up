@@ -12,6 +12,8 @@ import (
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
+	"io/ioutil"
+	"path"
 )
 
 type NoopFuncAction struct {
@@ -91,6 +93,85 @@ func (f *NoopFuncAction) Exec() {
 			})
 			u.Ppmsgvvvvvhint("after reg the var - global:", cache.RuntimeVarsAndDvarsMerged)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
+
+		case "readfile":
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+				var varname, filename, dir, raw string
+				var localonly bool
+				for k, v := range cmd {
+					switch k.(string) {
+					case "reg":
+						raw = v.(string)
+						varname = cache.Render(raw, f.Vars)
+					case "filename":
+						raw = v.(string)
+						filename = cache.Render(raw, f.Vars)
+					case "dir":
+						raw = v.(string)
+						dir = cache.Render(raw, f.Vars)
+					case "localonly":
+						localonly = v.(bool)
+					}
+				}
+				filepath := path.Join(dir, filename)
+
+				content, err := ioutil.ReadFile(filepath)
+				u.LogErrorAndExit("noop readfile", err, "please fix file path and name issues")
+
+				if localonly {
+					f.Vars.Put(varname, string(content))
+				} else {
+					cache.RuntimeVarsAndDvarsMerged.Put(varname, string(content))
+					f.Vars.Put(varname, string(content))
+				}
+
+			})
+
+			u.Ppmsgvvvvvhint("after reg the var - global:", cache.RuntimeVarsAndDvarsMerged)
+			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
+
+		case "writefile":
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+				var content, filename, dir, raw string
+				for k, v := range cmd {
+					switch k.(string) {
+					case "content":
+						contentRaw := v.(string)
+						content = cache.Render(contentRaw, f.Vars)
+					case "filename":
+						raw = v.(string)
+						filename = cache.Render(raw, f.Vars)
+					case "dir":
+						raw = v.(string)
+						dir = cache.Render(raw, f.Vars)
+					}
+				}
+				filepath := path.Join(dir, filename)
+				ioutil.WriteFile(filepath, []byte(content), 0644)
+			})
+
+		case "template":
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+				var src, dest, raw string
+				for k, v := range cmd {
+					switch k.(string) {
+					case "src":
+						raw = v.(string)
+						src = cache.Render(raw, f.Vars)
+					case "dest":
+						raw = v.(string)
+						dest = cache.Render(raw, f.Vars)
+					}
+				}
+
+				tbuf, err := ioutil.ReadFile(src)
+				rendered := cache.Render(string(tbuf), f.Vars)
+				u.LogErrorAndExit("noop template", err, "please fix file path and name issues")
+				ioutil.WriteFile(dest, []byte(rendered), 0644)
+			})
 
 		case "reg":
 			cmdItem.runCmd("map", func() {

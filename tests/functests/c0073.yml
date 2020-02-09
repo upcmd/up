@@ -1,0 +1,94 @@
+goal:
+  - demo yaml multiple line usage
+  - demo the line break could be controlled with different indicator
+  - it will be used in c0072
+
+notes: |
+  ref: https://yaml-multiline.info/
+  Block Scalars
+  A block scalar header has three parts:
+
+  Block Style Indicator: The block style indicates how newlines inside the block should behave. If you would like them to be kept as newlines, use the literal style, indicated by a pipe (|). If instead you want them to be replaced by spaces, use the folded style, indicated by a right angle bracket (>). (To get a newline using the folded style, leave a blank line by putting two newlines in. Lines with extra indentation are also not folded.)
+
+  Block Chomping Indicator: The chomping indicator controls what should happen with newlines at the end of the string. The default, clip, puts a single newline at the end of the string. To remove all newlines, strip them by putting a minus sign (-) after the style indicator. Both clip and strip ignore how many newlines are actually at the end of the block; to keep them all put a plus sign (+) after the style indicator.
+
+  Indentation Indicator: Ordinarily, the number of spaces you're using to indent a block will be automatically guessed from its first line. You may need a block indentation indicator if the first line of the block starts with extra spaces. In this case, simply put the number of spaces used for indentation (between 1 and 9) at the end of the header.
+
+vars:
+  my_interesting_story1: |
+    hello
+    world
+
+  my_interesting_story2:    hello
+    world
+
+  my_interesting_story3: >
+    hello
+    world
+
+  my_interesting_story4: |-
+    hello
+    world
+
+  my_interesting_story5: >-
+    hello
+    world
+
+  my_interesting_story6: |+
+    hello
+    world
+
+
+tasks:
+
+  - name: task
+    task:
+      - func: noop
+        vars:
+          isnew: false
+        do:
+          -
+            name: print
+            desc: literal style, there will be a line break
+            cmd: "[{{.my_interesting_story1}}]"
+
+          -
+            name: print
+            desc: there will be no a line break
+            cmd: "[{{.my_interesting_story2}}]"
+
+          -
+            name: print
+            desc: folded style
+            cmd: "[{{.my_interesting_story3}}]"
+
+          -
+            name: print
+            desc: literal style strip, the end line break is removed
+            cmd: "[{{.my_interesting_story4}}]"
+
+          - name: reg
+            cmd:
+              name: newstory_with_blank_space_front_and_tail
+              desc: you can't remove the empty space because it is from the folded feature of yaml
+              value: >-
+                {{if .isnew }}
+                this is a new story
+                {{else}}
+                same old story
+                {{end}}
+
+          - name: reg
+            cmd:
+              name: newstory_clean
+              value: >-
+                {{if .isnew}}this is a new story{{else}}same old story{{end}}
+
+
+      - func: shell
+        do:
+          - 'echo "[{{.my_interesting_story3}}]"'
+          - 'echo [{{.my_interesting_story5}}]'
+          - 'echo "[{{.my_interesting_story6}}]"'
+          - 'echo "[{{.newstory_with_blank_space_front_and_tail}}]"'
+          - 'echo "[{{.newstory_clean}}]"'

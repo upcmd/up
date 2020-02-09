@@ -39,7 +39,7 @@ uptestf(){
 
 
 upregression(){
-  gotest ./tests/functests/casec_test.go -v
+  GOTEST=true gotest ./tests/functests/casec_test.go -v
 }
 
 man_funclist(){

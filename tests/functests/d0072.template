@@ -1,0 +1,4 @@
+  My name is {{.name}}, my school is {{.school}}
+  Once when I was {{.age}} years old
+  In the book it said: {{.said}}
+  I pondered deeply, then, over the adventures of the jungle.
