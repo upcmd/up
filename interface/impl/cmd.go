@@ -16,13 +16,13 @@ import (
 	"path"
 )
 
-type NoopFuncAction struct {
+type CmdFuncAction struct {
 	Do   interface{}
 	Vars *cache.Cache
-	Cmds *NoopCmds
+	Cmds *CmdCmds
 }
 
-type NoopCmd struct {
+type CmdCmd struct {
 	Name string
 	Desc string
 	Cmd  interface{}
@@ -33,28 +33,28 @@ type GeneralCmd struct {
 	Value string
 }
 
-type NoopCmds []NoopCmd
+type CmdCmds []CmdCmd
 
-func (f *NoopFuncAction) Adapt() {
-	var cmds NoopCmds
+func (f *CmdFuncAction) Adapt() {
+	var cmds CmdCmds
 
 	switch f.Do.(type) {
 
 	case []interface{}:
 		err := ms.Decode(f.Do, &cmds)
-		u.LogErrorAndExit("Noop adapter", err, "please fix noop command configuration")
+		u.LogErrorAndExit("Cmd adapter", err, "please fix cmd command configuration")
 
 	default:
-		u.P("Not implemented!")
+		u.LogWarn("cmd", "Not implemented or void for no action!")
 	}
 
 	f.Cmds = &cmds
 
 }
 
-func (noopCmd *NoopCmd) runCmd(whichtype string, f func()) {
-	//u.Dvvvv("111", noopCmd.Cmd)
-	switch noopCmd.Cmd.(type) {
+func (cmdCmd *CmdCmd) runCmd(whichtype string, f func()) {
+	//u.Dvvvv("111", cmdCmd.Cmd)
+	switch cmdCmd.Cmd.(type) {
 	case string:
 		if whichtype == "string" {
 			f()
@@ -66,22 +66,33 @@ func (noopCmd *NoopCmd) runCmd(whichtype string, f func()) {
 		}
 
 	default:
-		u.P("Not implemented!")
+		u.LogWarn("cmd", "Not implemented or void for no action!")
 	}
 
 }
 
-func (f *NoopFuncAction) Exec() {
+func (f *CmdFuncAction) Exec() {
 
-	u.P("executing noop commands")
+	//u.P("executing cmd commands")
 	for idx, cmdItem := range *f.Cmds {
-		u.Pfv("noop cmdItem(%2d): %s (%s)\n%s\n", idx+1, cmdItem.Name, cmdItem.Desc, color.HiBlueString("%s", cmdItem.Cmd))
+		//u.Pfv("cmd cmdItem(%2d): %s (%s)\n%s\n", idx+1, cmdItem.Name, cmdItem.Desc, color.HiBlueString("%s", cmdItem.Cmd))
+		u.Pfv("cmd cmdItem(%2d): %s (%s)\n", idx+1, cmdItem.Name, cmdItem.Desc)
+		u.Pfvv("%s\n", color.MagentaString("%s", cmdItem.Cmd))
 
+		u.LogDesc("substep", cmdItem.Desc)
 		switch cmdItem.Name {
 		case "print":
 			cmdItem.runCmd("string", func() {
 				cmdRendered := cache.Render(cmdItem.Cmd.(string), f.Vars)
 				u.Pfv("%s\n", color.HiGreenString("%s", cmdRendered))
+			})
+
+		case "printobj":
+			u.Dvvvv(cmdItem.Cmd)
+			cmdItem.runCmd("string", func() {
+				objname := cache.Render(cmdItem.Cmd.(string), f.Vars)
+				obj := cache.RuntimeVarsAndDvarsMerged.Get(objname)
+				u.Ppfmsg(u.Spf("object: %s", objname), obj)
 			})
 
 		case "dereg":
@@ -117,7 +128,7 @@ func (f *NoopFuncAction) Exec() {
 				filepath := path.Join(dir, filename)
 
 				content, err := ioutil.ReadFile(filepath)
-				u.LogErrorAndExit("noop readfile", err, "please fix file path and name issues")
+				u.LogErrorAndExit("cmd readfile", err, "please fix file path and name issues")
 
 				if localonly {
 					f.Vars.Put(varname, string(content))
@@ -169,7 +180,7 @@ func (f *NoopFuncAction) Exec() {
 
 				tbuf, err := ioutil.ReadFile(src)
 				rendered := cache.Render(string(tbuf), f.Vars)
-				u.LogErrorAndExit("noop template", err, "please fix file path and name issues")
+				u.LogErrorAndExit("cmd template", err, "please fix file path and name issues")
 				ioutil.WriteFile(dest, []byte(rendered), 0644)
 			})
 
@@ -202,7 +213,7 @@ func (f *NoopFuncAction) Exec() {
 			u.Ppmsgvvvvvhint("after reg the var - global:", cache.RuntimeVarsAndDvarsMerged)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 		default:
-			u.Pferror("warrning: check noop cmd name:(%s),%s\n", cmdItem.Name, "cmd not implemented")
+			u.Pferror("warrning: check cmd name:(%s),%s\n", cmdItem.Name, "cmd not implemented")
 		}
 
 	}

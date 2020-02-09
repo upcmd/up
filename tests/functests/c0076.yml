@@ -1,0 +1,69 @@
+
+goal:
+  - showcase cmd in a formal way
+
+tasks:
+
+  -
+    name: task
+    desc: test the exit scenarios due to different types of validation
+    task:
+      -
+        func: shell
+        desc: step1
+        do:
+          - echo hanks
+
+      -
+        func: cmd
+        desc: test register a variable to global vars
+        dvars:
+          - name: reg_hello
+            value: |
+              {{.last_task_result.Output |reg "hellomsg" }}
+
+      -
+        func: shell
+        do:
+          - echo "{{.reg_hello}}"
+          - echo "{{.hellomsg}}"
+
+      -
+        func: cmd
+        desc: |
+          the reg_tom's value is a object, but since reg_tom is only a local, it
+          will probably not very useful
+        vars:
+          person:
+            name: tom
+            age: 18
+        dvars:
+          - name: local_tom
+            value: |-
+              my name is tom
+              {{.person |reg "tom" }}
+            flags: [vvv]
+        do:
+          - name: reg
+            cmd:
+              name: global_tom
+              value: '{{.local_tom}}'
+
+      -
+        func: cmd
+        desc: debug the results
+        vars:
+          objname: global_tom
+        do:
+          - name: print
+            desc: this local_tom should be <no value> as it is in scope of last step
+            cmd: "{{.local_tom}}"
+
+          - name: print
+            desc: get the object from register global space
+            cmd: "{{.tom}}"
+
+          - name: printobj
+            desc: "dynamically reference to global_tom object registered"
+            cmd: "{{.objname}}"
+

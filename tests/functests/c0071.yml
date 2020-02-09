@@ -1,7 +1,7 @@
 goal:
   - demo use dvar ref to load common file only
-  - add noop cmd readfile and register to a named var
-  - add noop cmd write file to save to a file
+  - add cmd cmd readfile and register to a named var
+  - add cmd cmd write file to save to a file
 
 dvars:
 
@@ -12,7 +12,7 @@ tasks:
 
   - name: task
     task:
-      - func: noop
+      - func: cmd
         do:
           -
             name: print

@@ -42,14 +42,14 @@ type Steps []Step
 //this step will merge the vars with the caller's stack vars
 func (step *Step) GetExecVarsWithRefOverrided(funcname string) *cache.Cache {
 	vars := step.getRuntimeExecVars(funcname)
-	callerVars := TaskStack.GetTop().(*TaskRuntimeContext).CallerVars
+	callerVars := cache.TaskStack.GetTop().(*cache.TaskRuntimeContext).CallerVars
 	//u.Ptmpdebug("callerVars", callerVars)
 
 	if callerVars != nil {
 		mergo.Merge(vars, callerVars, mergo.WithOverride)
 	}
 
-	u.Ppmsgvvvvhint("overall final exec vars:", vars)
+	u.Ppmsgvvvhint("overall final exec vars:", vars)
 	return vars
 }
 
@@ -98,6 +98,8 @@ func (step *Step) Exec() {
 	var stepExecVars *cache.Cache
 	stepExecVars = step.GetExecVarsWithRefOverrided("get plain exec vars")
 
+	cache.StepStack.GetTop().(*StepRuntimeContext).StepVars = &step.Vars
+
 	routeFuncType := func(loopItem *LoopItem) {
 		if loopItem != nil {
 			stepExecVars.Put("loopitem", loopItem.Item)
@@ -120,8 +122,8 @@ func (step *Step) Exec() {
 			}
 			action = ic.Do(&funcAction)
 
-		case FUNC_NOOP:
-			funcAction := NoopFuncAction{
+		case FUNC_CMD:
+			funcAction := CmdFuncAction{
 				Do:   step.Do,
 				Vars: stepExecVars,
 			}
@@ -211,6 +213,7 @@ func (steps *Steps) Exec() {
 	for idx, step := range *steps {
 		u.Pf("step(%3d):\n", idx+1)
 		//u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Sppmsg(step))
+		u.LogDesc("step", step.Desc)
 		u.Ppmsgvvvv(step)
 
 		execStep := func() {
@@ -218,12 +221,13 @@ func (steps *Steps) Exec() {
 				Stepname: step.Name,
 				//Flags:    &step.Flags,
 			}
-			StepStack.Push(&rtContext)
+			cache.StepStack.Push(&rtContext)
 
 			step.Exec()
 
-			result := StepStack.GetTop().(*StepRuntimeContext).Result
-			taskname := TaskStack.GetTop().(*TaskRuntimeContext).Taskname
+			result := cache.StepStack.GetTop().(*StepRuntimeContext).Result
+			taskname := cache.TaskStack.GetTop().(*cache.TaskRuntimeContext).Taskname
+			laststepVars := cache.StepStack.GetTop().(*StepRuntimeContext).StepVars
 
 			if u.Contains([]string{FUNC_SHELL, FUNC_TASK_REF}, step.Func) {
 				if step.Reg == "auto" {
@@ -237,8 +241,18 @@ func (steps *Steps) Exec() {
 				}
 			}
 
+			var laststep cache.Cache
+			laststep = deepcopy.Copy(*laststepVars).(cache.Cache)
+
+			cache.RuntimeVarsAndDvarsMerged.Put("laststep", laststep)
+
 			func() {
-				result := StepStack.GetTop().(*StepRuntimeContext).Result
+				result := cache.StepStack.GetTop().(*StepRuntimeContext).Result
+
+				if result != nil && result.Code == 0 {
+					u.LogOk(".")
+				}
+
 				if !u.Contains(step.Flags, "ignore_error") {
 					if result != nil && result.Code != 0 {
 						u.InvalidAndExit("Failed And Not Ignored!", "You may want to continue and ignore the error")
@@ -263,7 +277,7 @@ func (steps *Steps) Exec() {
 
 			}()
 
-			StepStack.Pop()
+			cache.StepStack.Pop()
 		}
 
 		execStep()

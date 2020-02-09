@@ -18,18 +18,14 @@ import (
 const (
 	FUNC_SHELL    = "shell"
 	FUNC_TASK_REF = "task_ref"
-	FUNC_NOOP     = "noop"
+	FUNC_CMD      = "cmd"
 )
-
-type TaskRuntimeContext struct {
-	Taskname   string
-	CallerVars *cache.Cache
-}
 
 type StepRuntimeContext struct {
 	Stepname string
 	Result   *ExecResult
 	//Flags    *[]string
+	StepVars *cache.Cache
 }
 
 type ExecResult struct {
@@ -44,7 +40,7 @@ func DryRunOrExit(mark string, mustCondition MustConditionToContinueFunc, condit
 
 	ok := mustCondition()
 
-	if Dryrun {
+	if cache.Dryrun {
 		color.Green("      %s -> %s", mark, "in dryrun, try to ignore")
 		if !ok {
 			color.Red("      %s -> %s", mark, "can not continue further due to critical condition not satisfied")
@@ -67,7 +63,7 @@ func DryRunAndSkip(mark string, allowedErrors []string, continueFunc ContinueFun
 		continueFunc()
 	} else if u.Contains(allowedErrors, mark) {
 		//do nothing
-		if Dryrun {
+		if cache.Dryrun {
 			u.Pdryrun("in dry run and skip further")
 		}
 	} else {

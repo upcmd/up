@@ -30,7 +30,7 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 		}
 	}()
 
-	if Dryrun {
+	if cache.Dryrun {
 		u.Pdryrun("in dryrun mode and skipping the actual commands")
 		return "dryrun result"
 	} else {
@@ -46,6 +46,8 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 			result.Code = 0
 			result.Output = strings.TrimSpace(string(cmdOutput))
 		}
+
+		u.SubStepStatus("..", result.Code)
 
 		f.Result = result
 		u.LogError("exec error:", err)
@@ -75,17 +77,18 @@ func (f *ShellFuncAction) Adapt() {
 		u.LogError("shell adapter", err)
 
 	default:
-		u.P("Not implemented!")
+		u.LogWarn("shell", "Not implemented or void for no action!")
 	}
 	f.Cmds = cmds
 }
 
 func (f *ShellFuncAction) Exec() {
-	u.P("executing shell commands")
+	//u.P("executing shell commands")
 	for idx, tcmd := range f.Cmds {
-		u.Pfv("cmd(%2d):\n%+v\n", idx+1, color.HiBlueString("%s", tcmd))
+		u.Pfv("cmd(%2d):\n", idx+1)
+		u.Pvv(tcmd)
 		cmd := cache.Render(tcmd, f.Vars)
-
+		u.Pfvvvv(" \\_ %+v\n", color.HiBlueString("%s", cmd))
 		runCmd(f, cmd)
 		u.Pfv("%s\n", color.HiGreenString("%s", f.Result.Output))
 		if f.Result.Code != 0 {
@@ -95,6 +98,6 @@ func (f *ShellFuncAction) Exec() {
 		u.Dvvvvv(f.Result)
 	}
 
-	StepStack.GetTop().(*StepRuntimeContext).Result = &f.Result
+	cache.StepStack.GetTop().(*StepRuntimeContext).Result = &f.Result
 }
 

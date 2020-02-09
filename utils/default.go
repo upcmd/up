@@ -12,12 +12,12 @@ import "github.com/fatih/color"
 var (
 	defaults map[string]string = map[string]string{
 		"TaskDir":    ".",
-		"TaskFile":   "task",
+		"TaskFile":   "up",
 		"FlowDir":    ".",
 		"FlowFile":   "flow",
 		"Verbose":    "v",
 		"ConfigDir":  ".",
-		"ConfigFile": "config",
+		"ConfigFile": "upconfig",
 	}
 	vvvvv_color_printf  = color.Magenta
 	verror_color_printf = color.Red

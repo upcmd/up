@@ -9,6 +9,7 @@ package tests
 
 import (
 	"github.com/stephencheng/up/interface/impl"
+	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	"os/exec"
 	"path"
@@ -46,7 +47,7 @@ func Setup(prefix string, t *testing.T) {
 }
 
 func TestT(prefix string, t *testing.T) {
-	impl.SetInstanceName("dev")
+	cache.SetInstanceName("dev")
 	Setup(prefix, t)
 	impl.InitTasks()
 	impl.ListTasks()

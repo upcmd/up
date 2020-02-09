@@ -39,7 +39,7 @@ func (f *TaskRefFuncAction) Adapt() {
 		u.LogError("taskref adapter", err)
 
 	default:
-		u.P("Not implemented!")
+		u.LogWarn("taskref", "Not implemented or void for no action!")
 	}
 	f.Refs = tasknames
 }

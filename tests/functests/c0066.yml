@@ -38,7 +38,7 @@ tasks:
           - echo "hello 1"
 
 
-      - func: noop
+      - func: cmd
         dvars:
           - name: school
             value: "{{.student.school}}"
@@ -58,7 +58,7 @@ tasks:
           -
             name: reg
             desc: |
-              demo of reg command of a local var in noop func call
+              demo of reg command of a local var in cmd func call
               the greetlocal will not be availe in next func call
             cmd:
               name: greetlocal
@@ -71,7 +71,7 @@ tasks:
           - echo "hello 2"
 
 
-      - func: noop
+      - func: cmd
         do:
           -
             name: dereg

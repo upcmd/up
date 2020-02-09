@@ -1,6 +1,6 @@
 
 goal:
-  - showcase noop in a formal way
+  - showcase cmd in a formal way
 
 tasks:
 
@@ -15,7 +15,7 @@ tasks:
           - echo hanks
 
       -
-        func: noop
+        func: cmd
         dvars:
           - name: reg_hello
             value: |

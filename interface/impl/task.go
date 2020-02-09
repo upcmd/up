@@ -33,7 +33,7 @@ func InitTasks() {
 	cache.ScopeProfiles.InitContextInstances()
 	loadRuntimeGlobalVars()
 	loadRuntimeDvars()
-	cache.SetRuntimeVarsMerged(InstanceName)
+	cache.SetRuntimeVarsMerged(cache.InstanceName)
 	cache.SetRuntimeGlobalMergedWithDvars()
 	//t.ListAllFuncs()
 }
@@ -49,7 +49,7 @@ func ListTasks() {
 
 }
 func ValidateTask(taskname string) {
-	SetDryrun()
+	cache.SetDryrun()
 	ExecTask(taskname, nil)
 }
 
@@ -57,7 +57,8 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 	found := false
 	for idx, task := range *Tasks {
 		if taskname == task.Name {
-			u.Pfvvvv("  located task-> %d [%s]: %s \n", idx+1, task.Name, task.Desc)
+			u.Pfvvvv("  located task-> %d [%s]: \n", idx+1, task.Name)
+			u.LogDesc("task", task.Desc)
 			found = true
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
@@ -77,20 +78,20 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 			}()
 
 			func() {
-				rtContext := TaskRuntimeContext{
+				rtContext := cache.TaskRuntimeContext{
 					Taskname:   taskname,
 					CallerVars: callerVars,
 				}
 
-				TaskStack.Push(&rtContext)
-				u.Pvvvv("Executing task stack layer:", TaskStack.GetLen())
-				if TaskStack.GetLen() > 2 {
+				cache.TaskStack.Push(&rtContext)
+				u.Pvvvv("Executing task stack layer:", cache.TaskStack.GetLen())
+				if cache.TaskStack.GetLen() > 2 {
 					u.LogError("Task exec stack layer check", "Too many layers of task executions, please fix your recursive .nv-task configurations")
 					os.Exit(-1)
 				}
 
 				steps.Exec()
-				TaskStack.Pop()
+				cache.TaskStack.Pop()
 			}()
 
 		}

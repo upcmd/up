@@ -1,7 +1,7 @@
 goal:
   - to show that you can use empty do list
-  - introduce a new funcname noop to do var/dvar conversion
-  - in noop, you can also do reg/dereg var in dvar evaluation
+  - introduce a new funcname cmd to do var/dvar conversion
+  - in cmd, you can also do reg/dereg var in dvar evaluation
 
 tasks:
 
@@ -35,10 +35,10 @@ tasks:
             flags: [vvvv,]
 
       -
-        func: noop
+        func: cmd
         desc: |
-          in noop, you can also do reg/dereg var in dvar evaluation
-          the noop func name makes more sense then shell func
+          in cmd, you can also do reg/dereg var in dvar evaluation
+          the cmd func name makes more sense then shell func
           if you really want to do var manipulation only
         vars:
           c: cc

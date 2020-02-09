@@ -1,0 +1,42 @@
+docs:
+  mddoc: |
+    this is to show validation error:
+    var validation [multiple expand > 1 is not allowed when to_object is set]
+
+vars:
+  complex_data_structure_template: |
+    school:
+      name: '{{.school_name}}'
+      address: '{{.school_address}}'
+    principals:
+    {{- range $_, $p :=.schoo_principals }}
+      - {{$p}}
+    {{- end}}
+    ranking: '{{.schoo_ranking}}'
+
+tasks:
+      -
+        func: cmd
+        desc: |
+          this is to show validation error:
+          var validation [multiple expand > 1 is not allowed when to_object is set]
+        vars:
+          school_name: sydney grammar
+          school_address: 1 fox road, sydney, nsw 2000
+          schoo_principals:
+            - peter
+            - tom
+            - jane
+          schoo_ranking: No 5
+        dvars:
+          - name: school_yml
+            desc: use dynamic expand == 2, so that the template will be rendered
+            value: '{{.complex_data_structure_template}}'
+            expand: 2
+            flags: [vvvv,to_object, ignore_error]
+        do:
+          - name: print
+            cmd: '{{.school_yml}}'
+          - name: print
+            cmd: '{{.school_yml_object}}'
+

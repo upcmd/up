@@ -13,6 +13,15 @@ tasks:
           - mkdir -p ./build
           - go build -o build/up app/up/*.go
 
+  - name: release_local
+    desc: release it to local path
+    task:
+      - func: task_ref
+        do: build
+
+      - func: shell
+        do: cp -f build/up /usr/local/bin/
+
   -
     name: testc
     desc: test all the function tests

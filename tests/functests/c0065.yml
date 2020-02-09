@@ -16,7 +16,7 @@ tasks:
         do:
           - echo "hello 1"
 
-      - func: noop
+      - func: cmd
         do:
           - name: print
             desc: print some info

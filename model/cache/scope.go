@@ -85,6 +85,10 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 			if u.Contains(dvar.Flags, "vvvv") {
 				u.PpmsgvvvvhintHigh("dvar> "+dvar.Name, dvar.Rendered)
 			}
+			if u.Contains(dvar.Flags, "vvv") {
+				u.Ptmpdebug("33", "hello")
+				u.PpmsgvvvhintHigh("dvar> "+dvar.Name, dvar.Rendered)
+			}
 
 			if u.Contains(dvar.Flags, "to_object") {
 				rawyml := dvar.Rendered
@@ -100,6 +104,9 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 
 				if u.Contains(dvar.Flags, "vvvv") {
 					u.PpmsgvvvvhintHigh("dvar> "+dvarObjName, *obj)
+				}
+				if u.Contains(dvar.Flags, "vvv") {
+					u.PpmsgvvvhintHigh("dvar> "+dvarObjName, *obj)
 				}
 			}
 
@@ -194,7 +201,7 @@ func VarsMergedWithDvars(mark string, baseVars *Cache, dvars *Dvars, contextMerg
 		mergo.Merge(&mergedVars, *expandedVars, mergo.WithOverride)
 	}
 
-	u.Pfvvvv("scope[%s] merged: %s", mark, u.Sppmsg(mergedVars))
+	u.Pfvvvvv("scope[%s] merged: %s", mark, u.Sppmsg(mergedVars))
 
 	procDvars(dvars, &mergedVars)
 

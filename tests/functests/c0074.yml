@@ -1,0 +1,49 @@
+docs:
+  goal:
+    - to test that I can parse this file to an object and use it in templating
+    - use the format like this to automate the docs generation
+
+  usecase:
+    - used to generate auto document for up project
+
+  usage:
+    - use docs as root element to document a functest or a test case
+    - two layers structure
+
+dvars:
+  - name: usecase
+    ref: wip.yml
+    flags: [to_object,]
+
+tasks:
+  -
+    name: task
+    desc:
+    task:
+      -
+        func: cmd
+        do:
+          -
+            name: print
+            cmd: "{{.usecase_object}}"
+
+          -
+            name: print
+            cmd: "{{.usecase_object.docs}}"
+
+          -
+            name: print
+            cmd: |-
+              {{range $case :=.usecase_object.docs}}
+              {{$case}}
+              {{end}}
+
+          -
+            name: print
+            cmd: |-
+              {{range $head,$items :=.usecase_object.docs}}
+              {{$head}}:
+                {{range $idx,$item :=$items}}
+                  * {{$idx|add1}}: {{$item}}
+                {{end}}
+              {{end}}

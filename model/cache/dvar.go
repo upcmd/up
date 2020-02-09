@@ -88,7 +88,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 	}
 	//}
 
-	u.Pfvvvv("[%s] dvar expanded result:\n%s\n", mark, u.Sppmsg(*expandedVars))
+	u.Pfvvvvv("[%s] dvar expanded result:\n%s\n", mark, u.Sppmsg(*expandedVars))
 
 	return expandedVars
 }

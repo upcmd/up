@@ -43,9 +43,21 @@ func Pvvvv(a ...interface{}) {
 	}
 }
 
+func Pvvv(a ...interface{}) {
+	if permitted("vvv") {
+		vvvvv_color_printf("%s\n", fmt.Sprintln(a...))
+	}
+}
+
+func Pvv(a ...interface{}) {
+	if permitted("vv") {
+		vvvvv_color_printf("%s\n", fmt.Sprintln(a...))
+	}
+}
+
 func Pvvvvv(a ...interface{}) {
 	if permitted("vvvvv") {
-		vvvvv_color_printf("%s\n", fmt.Sprintln(a...))
+		vvvvv_color_printf("%s", fmt.Sprint(a...))
 	}
 }
 
@@ -75,9 +87,32 @@ func Ppmsgvvvv(a ...interface{}) {
 	}
 }
 
+func Ppmsgvvv(a ...interface{}) {
+	if permitted("vvv") {
+		msg_color_printf("%s\n", spewMsgState.Sdump(a...))
+	}
+}
+
+func Ppmsg(a ...interface{}) {
+	msg_color_printf("%s\n", spewMsgState.Sdump(a...))
+}
+
+func Ppfmsg(mark string, a ...interface{}) {
+	msg_color_printf("%s: %s\n", mark, spewMsgState.Sdump(a...))
+}
+
 func PpmsgvvvvhintHigh(hint string, a ...interface{}) {
-	vvvvv_color_printf("%s:", hint)
-	himsg_color_printf("%s\n", spewMsgState.Sdump(a...))
+	if permitted("vvvv") {
+		vvvvv_color_printf("%s:", hint)
+		himsg_color_printf("%s\n", spewMsgState.Sdump(a...))
+	}
+}
+
+func PpmsgvvvhintHigh(hint string, a ...interface{}) {
+	if permitted("vvv") {
+		vvvvv_color_printf("%s:", hint)
+		himsg_color_printf("%s\n", spewMsgState.Sdump(a...))
+	}
 }
 
 func Ppromptvvvvv(valueName, hint string) {
@@ -107,6 +142,11 @@ func Ppmsgvvvvhint(hint string, a ...interface{}) {
 	Ppmsgvvvv(a...)
 }
 
+func Ppmsgvvvhint(hint string, a ...interface{}) {
+	Pvvv(hint)
+	Ppmsgvvv(a...)
+}
+
 func Ppmsgvvvvvhint(hint string, a ...interface{}) {
 	if permitted("vvvvv") {
 		Ppmsgvvvvhint(hint, a...)
@@ -114,14 +154,18 @@ func Ppmsgvvvvvhint(hint string, a ...interface{}) {
 }
 
 func Ptmpdebug(mark string, a ...interface{}) {
-	if permitted("vvvv") {
-		hiColor := color.New(color.FgHiWhite, color.BgRed)
-		hiColor.Printf("------%s start-----\n%s\n------%s end-----\n\n", mark, spewMsgState.Sdump(a...), mark)
-	}
+	hiColor := color.New(color.FgHiWhite, color.BgRed)
+	hiColor.Printf("------%s start-----\n%s\n------%s end-----\n\n", mark, spewMsgState.Sdump(a...), mark)
 }
 
 func Pfvvvv(format string, a ...interface{}) {
 	if permitted("vvvv") {
+		vvvvv_color_printf(format, a...)
+	}
+}
+
+func Pfvvvvv(format string, a ...interface{}) {
+	if permitted("vvvvv") {
 		vvvvv_color_printf(format, a...)
 	}
 }
@@ -142,6 +186,18 @@ func Pfv(format string, a ...interface{}) {
 	}
 }
 
+func Pfvvv(format string, a ...interface{}) {
+	if permitted("vvv") {
+		fmt.Printf(format, a...)
+	}
+}
+
+func Pfvv(format string, a ...interface{}) {
+	if permitted("vv") {
+		fmt.Printf(format, a...)
+	}
+}
+
 func Pferror(format string, a ...interface{}) {
 	verror_color_printf(format, a...)
 }
@@ -154,6 +210,36 @@ func LogError(mark string, err interface{}) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
 	}
+}
+
+func LogOk(mark string) {
+	color.HiGreen("%s ok", mark)
+}
+
+func LogDesc(descType string, desc string) {
+	if desc == "" {
+		desc = "N/A"
+	}
+	switch descType {
+	case "task":
+		color.HiBlue("==Task: [ %s ]", desc)
+	case "step":
+		color.HiBlue("--Step: [ %s ]", desc)
+	case "substep":
+		color.HiBlue("~~SubStep: [ %s ]", desc)
+	}
+}
+
+func SubStepStatus(mark string, statusCode int) {
+	if statusCode == 0 {
+		color.Green(" %s ok", mark)
+	} else {
+		color.Red(" %s failed(suppressed)", mark)
+	}
+}
+
+func LogWarn(mark string, reason string) {
+	color.Red(" WARN: [%s] - [%s]", mark, reason)
 }
 
 func LogErrorAndExit(mark string, err interface{}, hint string) {

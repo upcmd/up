@@ -10,7 +10,7 @@ design: |
 consideration: |
   do we need the while condition to stop the loop
   maybe not
-  the reason is that you can always use dvar + noop func
+  the reason is that you can always use dvar + cmd func
    to prepare the list for iteration
 
 vars:

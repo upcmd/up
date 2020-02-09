@@ -51,8 +51,11 @@ func FuncMapInit() {
 			return ""
 		},
 		//--------------------------------------------------------
+		//reg do not return any value, so do not expect the dvar value will be something other than empty
 		"reg": func(varname string, object interface{}) string {
 			RuntimeVarsAndDvarsMerged.Put(varname, object)
+			callerVars := TaskStack.GetTop().(*TaskRuntimeContext).CallerVars
+			callerVars.Put(varname, object)
 			return ""
 		},
 		"dereg": func(varname string) string {
@@ -61,9 +64,9 @@ func FuncMapInit() {
 		},
 		"validateMandatoryFailIfNone": func(varname, varvalue string) string {
 			if varvalue == "" {
-				u.InvalidAndExit("validateMandatoryFailIfNone", u.Spf("Required var:%s must not be empty, please fix it", varname))
+				u.InvalidAndExit("validateMandatoryFailIfNone", u.Spf("Required var:(%s) must not be empty, please fix it", varname))
 			}
-			return ""
+			return varvalue
 		},
 	}
 

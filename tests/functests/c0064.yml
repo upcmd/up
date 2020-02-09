@@ -1,5 +1,5 @@
 goal:
-  - add cmd support for noop func
+  - add cmd support for cmd func
 
 vars:
   student:
@@ -16,7 +16,7 @@ tasks:
         do:
           - echo "hello 1"
 
-      - func: noop
+      - func: cmd
         do:
           - name: print
             desc: print some info

@@ -1,5 +1,5 @@
 goal:
-  - test the if condition works for noop and task_ref
+  - test the if condition works for cmd and task_ref
 
 tasks:
   -
@@ -11,7 +11,7 @@ tasks:
           - taska
         if: "false"
 
-      - func: noop
+      - func: cmd
         dvars:
           - name: greet
             value: hello
@@ -26,7 +26,7 @@ tasks:
   - name: taska
     task:
       - func: shell
-        desc: greet var will be no value as it is a local var for noop step
+        desc: greet var will be no value as it is a local var for cmd step
         do:
           - echo "hello from taska"
           - echo "{{.greet}} from taska"

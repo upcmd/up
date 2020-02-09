@@ -20,7 +20,7 @@ func TestC(t *testing.T) {
 	u.InitConfig()
 
 	files := tests.GetUnitTestCollection()
-	impl.SetInstanceName("dev")
+	cache.SetInstanceName("dev")
 	for _, x := range files {
 		u.P("testing:", x)
 		tests.Setupx(x)

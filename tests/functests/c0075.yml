@@ -1,0 +1,53 @@
+
+docs: |
+  When execution begins, $ is set to the data argument passed to Execute, that is,
+   to the starting value of dot.
+
+  {{with .Inner}}
+  Outer: {{$.OuterValue}}
+  Inner: {{.InnerValue}}
+  {{end}}
+
+vars:
+  person: peter
+  managers:
+    - tom
+    - jason
+    - alice
+
+dvars:
+
+#extra: {{if pipeline}} T1 {{else if pipeline}} T0 {{end}}
+  - name: var_with_range
+    value: "{{range .managers}} x {{end}}"
+    flags: [vvvv,]
+
+  - name: var_with_range_item
+    value: "{{range $x:=.managers}} {{$x}} {{end}}"
+    flags: [vvvv,]
+
+  - name: var_with_range_item_simpler
+    value: "{{range .managers}} {{.}} {{end}}"
+    flags: [vvvv,]
+
+  - name: var_to_ref_to_outside_of_range_from_within_range
+    desc: |
+      the direct reference to try to access out of scope in range will not work
+    value: "{{range $x:=.managers}} {{.person}} {{end}}"
+    flags: [vvvv,]
+
+  - name: var_directly_ref_to
+    value: "{{.person}}"
+    flags: [vvvv,]
+
+  - name: var_to_ref_to_outside_of_range_from_within_range_fixed
+    desc: |
+      use $. to access out of scope variable
+    value: "{{range $x:=.managers}} {{$.person}} {{end}}"
+    flags: [vvvv,]
+
+
+tasks:
+  -
+    name: task
+    task:
