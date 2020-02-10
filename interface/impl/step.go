@@ -98,8 +98,6 @@ func (step *Step) Exec() {
 	var stepExecVars *cache.Cache
 	stepExecVars = step.GetExecVarsWithRefOverrided("get plain exec vars")
 
-	cache.StepStack.GetTop().(*StepRuntimeContext).StepVars = &step.Vars
-
 	routeFuncType := func(loopItem *LoopItem) {
 		if loopItem != nil {
 			stepExecVars.Put("loopitem", loopItem.Item)
@@ -227,24 +225,18 @@ func (steps *Steps) Exec() {
 
 			result := cache.StepStack.GetTop().(*StepRuntimeContext).Result
 			taskname := cache.TaskStack.GetTop().(*cache.TaskRuntimeContext).Taskname
-			laststepVars := cache.StepStack.GetTop().(*StepRuntimeContext).StepVars
 
 			if u.Contains([]string{FUNC_SHELL, FUNC_TASK_REF}, step.Func) {
 				if step.Reg == "auto" {
 					cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
 				} else if step.Reg != "" {
-					cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Reg), result.Output)
+					cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("%s", step.Reg), result.Output)
 				} else {
 					if step.Func == FUNC_SHELL {
 						cache.RuntimeVarsAndDvarsMerged.Put("last_task_result", result)
 					}
 				}
 			}
-
-			var laststep cache.Cache
-			laststep = deepcopy.Copy(*laststepVars).(cache.Cache)
-
-			cache.RuntimeVarsAndDvarsMerged.Put("laststep", laststep)
 
 			func() {
 				result := cache.StepStack.GetTop().(*StepRuntimeContext).Result

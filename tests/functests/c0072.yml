@@ -24,7 +24,7 @@ tasks:
         do:
           - echo "?intest ->  {{.intest}}"
           - pwd
-        reg: root
+        reg: register_task_root
 
       - func: cmd
         do:

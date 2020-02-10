@@ -1,0 +1,9 @@
+
+{{ with .school }}
+My school name is: {{.name}}, it is located
+at {{.address}}
+{{ end }}
+
+We have got {{ range $principal := .principals }} {{$principal}}, {{end}} as our principals
+
+Our school ranking last year is {{.ranking}}

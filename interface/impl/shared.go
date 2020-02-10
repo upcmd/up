@@ -25,7 +25,6 @@ type StepRuntimeContext struct {
 	Stepname string
 	Result   *ExecResult
 	//Flags    *[]string
-	StepVars *cache.Cache
 }
 
 type ExecResult struct {

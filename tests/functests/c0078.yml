@@ -1,0 +1,29 @@
+docs:
+  mddoc: |
+    demo how to make the dvar auto extend to global wide accessible
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        vars:
+          school_name: sydney grammar
+          school_address: 1 fox road, sydney, nsw 2000
+        dvars:
+          - name: school_details
+            value: '{{.school_name}} : {{.school_address}}'
+            flags: [reg]
+        do:
+          - name: print
+            cmd: '{{.school_name}}'
+
+          - name: print
+            cmd: '{{.school_details}}'
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.school_address}}'

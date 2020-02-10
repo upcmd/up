@@ -1,0 +1,39 @@
+docs:
+  mddoc: |
+    extend c0080 to use composible main tasks using externised flow configuration
+     to make the whole task and flow clearer and modular
+
+vars:
+  complex_data_structure_template: |
+    school:
+      name: '{{.school_name}}'
+      address: '{{.school_address}}'
+    principals:
+    {{- range $_, $p :=.schoo_principals }}
+      - {{$p}}
+    {{- end}}
+    ranking: '{{.schoo_ranking}}'
+
+dvars:
+  - name: intest
+    value: '{{ env "GOTEST" |default "false" }}'
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: task_ref
+        do:
+          - compose_required_object
+          - render
+
+  -
+    name: compose_required_object
+    desc: prepare the data object for rendering
+    ref: c0081_task_compose_required_object
+
+  -
+    name: render
+    desc: render data
+    ref: c0081_task_render.yml

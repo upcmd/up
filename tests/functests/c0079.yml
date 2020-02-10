@@ -1,0 +1,137 @@
+docs:
+  mddoc: |
+    show how to use the design pattern of composibility to form a data structure
+
+    ## Firstly, the proper way using UP cmd is to use defined template to gradually stubstitue
+    all the required variables, then register it with a formal name, remember the yaml doc is a
+     text, also it's convertable to become a object, so that you can use it in your template
+
+    ## The reason why the school_* vars are defined in local func scope is to show that this var
+    could be obtained in runtime in complex scenarios
+
+vars:
+  complex_data_structure_template: |
+    school:
+      name: '{{.school_name}}'
+      address: '{{.school_address}}'
+    principals:
+    {{- range $_, $p :=.schoo_principals }}
+      - {{$p}}
+    {{- end}}
+    ranking: '{{.schoo_ranking}}'
+
+dvars:
+  - name: intest
+    value: '{{ env "GOTEST" |default "false" }}'
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        vars:
+          school_name: sydney grammar
+          school_address: 1 fox road, sydney, nsw 2000
+          schoo_principals:
+            - peter
+            - tom
+            - jane
+          schoo_ranking: No 5
+        dvars:
+          - name: school_string
+            desc: use default expand == 1
+            value: '{{.complex_data_structure_template}}'
+        do:
+          - name: print
+            cmd: '{{.school_string}}'
+
+      -
+        func: cmd
+        vars:
+          school_name: sydney grammar
+          school_address: 1 fox road, sydney, nsw 2000
+          schoo_principals:
+            - peter
+            - tom
+            - jane
+          schoo_ranking: No 5
+        dvars:
+          - name: school_yml
+            desc: use dynamic expand == 2, so that the template will be rendered
+            value: '{{.complex_data_structure_template}}'
+            expand: 2
+            flags: [reg]
+        do:
+          - name: print
+            cmd: '{{.school_yml}}'
+
+      -
+        func: cmd
+        desc: |
+          show global school_yml var
+          convert the yml to object so that it could be used in template later
+        dvars:
+          - name: school_details
+            desc: use dynamic expand == 2, so that the template will be rendered
+            value: '{{.school_yml}}'
+            flags: [vvv, to_object, reg]
+        do:
+          - name: print
+            cmd: '{{.school_yml}}'
+          - name: printobj
+            cmd: 'school_details'
+          - name: print
+            cmd: '{{.school_details}}'
+          - name: printobj
+            cmd: 'school_details_object'
+
+      - func: shell
+        do:
+          - echo "?intest ->  {{.intest}}"
+          - pwd
+        reg: register_task_root
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: 'intest is: [{{.intest}}]'
+
+          - name: reg
+            cmd:
+              name: correct_working_dir
+              desc: the value of .intest is string but not bool so you can not simple use if .intest for condition
+              value: >-
+                {{if eq .intest "true" }}{{.register_task_root}}/../..{{else}}{{.register_task_root}}{{end}}
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: 'root dir is: [{{.register_task_root}}]'
+
+          - name: print
+            cmd: 'correct working dir is: [{{.correct_working_dir}}]'
+
+      -
+        func: cmd
+        desc: render final result using template
+        do:
+          - name: template
+            desc: render the template file using above dynamic variable from defined var
+            cmd:
+              src: '{{.correct_working_dir}}/tests/functests/d0079.template'
+              dest: /tmp/myschool.txt
+              data: "school_details_object"
+
+      - func: cmd
+        do:
+          - name: readfile
+            desc: read content of a file and register it to a var
+            cmd:
+              filename: myschool.txt
+              dir: /tmp
+              reg: my_school
+
+          - 
+            name: print
+            cmd: "{{.my_school}}"

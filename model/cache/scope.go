@@ -86,7 +86,6 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 				u.PpmsgvvvvhintHigh("dvar> "+dvar.Name, dvar.Rendered)
 			}
 			if u.Contains(dvar.Flags, "vvv") {
-				u.Ptmpdebug("33", "hello")
 				u.PpmsgvvvhintHigh("dvar> "+dvar.Name, dvar.Rendered)
 			}
 
@@ -102,6 +101,10 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 				dvarObjName := u.Spf("%s_%s", dvar.Name, "object")
 				(*mergeTarget).Put(dvarObjName, *obj)
 
+				if u.Contains(dvar.Flags, "reg") {
+					RuntimeVarsAndDvarsMerged.Put(dvarObjName, *obj)
+				}
+
 				if u.Contains(dvar.Flags, "vvvv") {
 					u.PpmsgvvvvhintHigh("dvar> "+dvarObjName, *obj)
 				}
@@ -113,6 +116,10 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 			if u.Contains(dvar.Flags, "envvar") {
 				envvarName := u.Spf("%s_%s", "envvar", dvar.Name)
 				(*mergeTarget).Put(envvarName, dvar.Rendered)
+			}
+
+			if u.Contains(dvar.Flags, "reg") {
+				RuntimeVarsAndDvarsMerged.Put(dvar.Name, dvar.Rendered)
 			}
 
 			if u.Contains(dvar.Flags, "secure") {

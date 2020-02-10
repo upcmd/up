@@ -1,0 +1,51 @@
+
+flow:
+      - func: shell
+        do:
+          - echo "?intest ->  {{.intest}}"
+          - pwd
+        reg: register_render_root
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: 'intest is: [{{.intest}}]'
+
+          - name: reg
+            cmd:
+              name: correct_working_dir
+              desc: the value of .intest is string but not bool so you can not simple use if .intest for condition
+              value: >-
+                {{if eq .intest "true" }}{{.register_render_root}}/../..{{else}}{{.register_render_root}}{{end}}
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: 'root dir is: [{{.register_render_root}}]'
+
+          - name: print
+            cmd: 'correct working dir is: [{{.correct_working_dir}}]'
+
+      -
+        func: cmd
+        desc: render final result using template
+        do:
+          - name: template
+            desc: render the template file using above dynamic variable from defined var
+            cmd:
+              src: '{{.correct_working_dir}}/tests/functests/d0079.template'
+              dest: /tmp/myschool.txt
+              data: "school_details_object"
+
+      - func: cmd
+        do:
+          - name: readfile
+            desc: read content of a file and register it to a var
+            cmd:
+              filename: myschool.txt
+              dir: /tmp
+              reg: my_school
+
+          -
+            name: print
+            cmd: "{{.my_school}}"

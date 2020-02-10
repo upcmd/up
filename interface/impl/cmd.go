@@ -91,8 +91,9 @@ func (f *CmdFuncAction) Exec() {
 			u.Dvvvv(cmdItem.Cmd)
 			cmdItem.runCmd("string", func() {
 				objname := cache.Render(cmdItem.Cmd.(string), f.Vars)
-				obj := cache.RuntimeVarsAndDvarsMerged.Get(objname)
-				u.Ppfmsg(u.Spf("object: %s", objname), obj)
+				//obj := cache.RuntimeVarsAndDvarsMerged.Get(objname)
+				obj := f.Vars.Get(objname)
+				u.Ppfmsg(u.Spf("object:\n %s", objname), obj)
 			})
 
 		case "dereg":
@@ -166,12 +167,17 @@ func (f *CmdFuncAction) Exec() {
 		case "template":
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
-				var src, dest, raw string
+				var src, dest, raw, datakey, rendered string
+				var data interface{}
 				for k, v := range cmd {
 					switch k.(string) {
 					case "src":
 						raw = v.(string)
 						src = cache.Render(raw, f.Vars)
+					case "data":
+						raw = v.(string)
+						datakey = cache.Render(raw, f.Vars)
+						data = f.Vars.Get(datakey)
 					case "dest":
 						raw = v.(string)
 						dest = cache.Render(raw, f.Vars)
@@ -179,7 +185,12 @@ func (f *CmdFuncAction) Exec() {
 				}
 
 				tbuf, err := ioutil.ReadFile(src)
-				rendered := cache.Render(string(tbuf), f.Vars)
+				if data == nil || data == "" {
+					rendered = cache.Render(string(tbuf), f.Vars)
+				} else {
+					rendered = cache.Render(string(tbuf), data)
+				}
+
 				u.LogErrorAndExit("cmd template", err, "please fix file path and name issues")
 				ioutil.WriteFile(dest, []byte(rendered), 0644)
 			})
