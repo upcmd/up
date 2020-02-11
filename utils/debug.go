@@ -251,6 +251,14 @@ func LogErrorAndExit(mark string, err interface{}, hint string) {
 	}
 }
 
+func LogErrorAndContinue(mark string, err interface{}, hint string) {
+	if err != nil {
+		color.Red("      %s -> %s", mark, err)
+		hiColor := color.New(color.FgHiYellow, color.BgHiMagenta)
+		hiColor.Printf("WARN: %s\n", hint)
+	}
+}
+
 func InvalidAndExit(mark string, hint string) {
 	hiColor := color.New(color.FgHiCyan, color.BgRed)
 	hiColor.Printf("  ERROR: %s [%s]\n", mark, hint)

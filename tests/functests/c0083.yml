@@ -1,0 +1,220 @@
+goal:
+  - spike on the auto documentation
+
+vars:
+
+  doc_meta: |
+    folder: spike
+    title: doco auto generation
+    head: this is to prototype doco auto generation
+    head_content: |
+      this is to prototype doco auto generation, provided all these meta data, up cmd can help generate
+      a auto doco
+
+    sections:
+      - title: intro
+        content: |
+          the up project uses auto generate doco, for community memebers, if you would like to contribute
+          use case or any interesting usage of up cmd, you could raise a pull request and commit your func
+          test case and do complete your test and automated regression tests
+
+      - title: How to use?
+        content: |
+          config docs->meta data configuration
+          add reference link
+        refs:
+          - title: main task file
+            link: {{.doc_dir}}/wip.yml
+
+      - title: Steps
+        content: |
+          * Firstly, it will try to create the folder if it does not exist
+          add reference link
+        refs:
+          - title: main task file
+            link: {{.doc_dir}}/wip.yml
+
+    related:
+      refs:
+        - title: main task file
+          link: main.html
+
+  doc_templatex: |
+     {{.head}}
+
+  doc_template: |
+    ---
+    title: "{{.title}}"
+    date: {{.datetime}}
+    draft: false
+    ---
+
+    # {{.head}}
+
+    {{.head_content}}
+
+    {{- range $x :=.sections }}
+    ## {{$x.title}}
+
+    {{$x.content}}
+
+    ### Refs:
+      {{- range $ref :=.refs }}
+    #### {{$ref.title}}
+
+    ```yml
+    {{$ref.link |filecontent}}
+    ```
+      {{- end}}
+
+    {{- end}}
+
+    Other references:
+    {{ with .related }}
+      {{- range $ref :=.refs }}
+    {{$ref.title}}: {{$ref.link}}
+      {{- end}}
+    {{ end }}
+
+dvars:
+  - name: intest
+    value: '{{ env "GOTEST" |default "false" }}'
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: task_ref
+        do:
+          - setup
+          - compose_required_object
+          - render
+
+  -
+    name: compose_required_object
+    desc: prepare the data object for rendering
+    task:
+      -
+        func: cmd
+        dvars:
+          - name: doc_meta_yml
+            expand: 2
+            value: '{{.doc_meta}}'
+            flags: [reg, to_object]
+        do:
+          - name: print
+            cmd: '{{.doc_meta_yml}}'
+
+      -
+        func: cmd
+        do:
+          - name: print
+            desc: shows that reg has set this var to global space
+            cmd: '{{.doc_meta_yml}}'
+          - name: printobj
+            cmd: doc_meta_yml_object
+
+  -
+    name: setup
+    task:
+
+      - func: shell
+        do:
+          - echo "?intest ->  {{.intest}}"
+          - pwd
+        reg: register_render_root
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: 'intest is: [{{.intest}}]'
+
+          - name: reg
+            cmd:
+              name: correct_working_dir
+              desc: the value of .intest is string but not bool so you can not simple use if .intest for condition
+              value: >-
+                {{if eq .intest "true" }}{{.register_render_root}}/../..{{else}}{{.register_render_root}}{{end}}
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: 'root dir is: [{{.register_render_root}}]'
+
+          - name: print
+            cmd: 'correct working dir is: [{{.correct_working_dir}}]'
+
+          - name: reg
+            cmd:
+              name: doc_dir
+              desc: register a doc_dir to be used in rendering template
+              value: '{{.correct_working_dir}}/tests/functests'
+
+          - name: print
+            cmd: 'doc dir is: [{{.doc_dir}}]'
+
+  -
+    name: render
+    task:
+
+      -
+        func: cmd
+        desc: debug and print doc_template
+        dvars:
+          - name: doc_rendered
+            value: '{{.doc_template}}'
+        do:
+          -
+            name: print
+            cmd: "{{.doc_template}}"
+
+          -
+            name: print
+            cmd: "{{.doc_rendered}}"
+
+      -
+        func: cmd
+        desc: |
+          debug and print doc_template
+          it is expected no value will be rendered as the
+          template expecting a data object
+        dvars:
+          - name: doc_rendered
+            value: '{{.doc_template}}'
+            expand: 2
+        do:
+
+          -
+            name: print
+            desc: it will not be rendered as the variable is not in global space
+            cmd: "{{.doc_rendered}}"
+
+      -
+        func: cmd
+        desc: |
+          render using doc_meta_yml_object as data rather than the default vas in global space
+          what happens here is that it will do regular 1 layer expand, then apply another expand
+          using the specified data object, so you do not need to specify expand: 2 as implicitly
+          there are actually 2 expansion
+        dvars:
+          - name: doc_rendered
+            value: '{{.doc_template}}'
+            data: doc_meta_yml_object
+        do:
+          -
+            name: print
+            cmd: "{{.doc_rendered}}"
+          -
+            name: writefile
+            cmd:
+              content: "{{.doc_rendered}}"
+              filename: spike_doc.md
+              dir: '{{env "SPIKE_DOC_PATH"}}/'
+
+          -
+            name: readfile
+            cmd:
+              content: "{{.doc_rendered}}"
+              filename: spike_doc.md
+              dir: /tmp

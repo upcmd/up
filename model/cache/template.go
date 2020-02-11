@@ -11,6 +11,7 @@ import (
 	"bytes"
 	"github.com/Masterminds/sprig/v3"
 	u "github.com/stephencheng/up/utils"
+	"io/ioutil"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -62,6 +63,13 @@ func FuncMapInit() {
 			RuntimeVarsAndDvarsMerged.Delete(varname)
 			return ""
 		},
+		"filecontent": func(filepath string) string {
+			content, err := ioutil.ReadFile(filepath)
+			if err != nil {
+				u.LogWarn("template readfile", "please fix file path and name issues")
+			}
+			return string(content)
+		},
 		"validateMandatoryFailIfNone": func(varname, varvalue string) string {
 			if varvalue == "" {
 				u.InvalidAndExit("validateMandatoryFailIfNone", u.Spf("Required var:(%s) must not be empty, please fix it", varname))
@@ -91,10 +99,12 @@ func ToJson(str string) string {
 func Render(tstr string, obj interface{}) string {
 	tname := "step_item_exec"
 	t, err := template.New(tname).Funcs(templateFuncs).Parse(tstr)
-	u.LogErrorAndExit("template rendering", err, "Please fix the template issue and try again")
+	u.LogErrorAndExit("template creating", err, "Please fix the template issue and try again")
 
 	var result bytes.Buffer
-	t.Execute(&result, obj)
+	err = t.Execute(&result, obj)
+	u.LogErrorAndContinue("template rendering", err, "Please fix the template issue and try again")
+
 	return result.String()
 }
 

@@ -95,9 +95,9 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 				err := yaml.Unmarshal([]byte(rawyml), obj)
 				u.LogErrorAndExit("dvar conversion to object:", err, "please validate the ymal content")
 
-				if dvar.Expand > 1 {
-					u.InvalidAndExit("dvar validation", "multiple expand > 1 is not allowed when to_object is set")
-				}
+				//if dvar.Expand > 1 {
+				//	u.InvalidAndExit("dvar validation", "multiple expand > 1 is not allowed when to_object is set")
+				//}
 				dvarObjName := u.Spf("%s_%s", dvar.Name, "object")
 				(*mergeTarget).Put(dvarObjName, *obj)
 

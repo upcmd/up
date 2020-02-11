@@ -1,0 +1,36 @@
+goal:
+  - showcase the dvar to render value using data field as
+    source rather the global var name space
+
+vars:
+  student:
+    name: Tom
+    gender: Male
+    school: Sydney Grammar
+  aaa: aaa
+  datapointer: student
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        dvars:
+          - name: student_info
+            value: 'my name is:{{.name}} and I am in {{.school}}'
+            data: student
+            flags: [vvv]
+        do:
+          - name: print
+            cmd: '{{.student_info}}'
+      -
+        func: cmd
+        dvars:
+          - name: student_info
+            value: 'my name is:{{.name}} and I am in {{.school}}'
+            data: '{{.datapointer}}'
+            flags: [vvv]
+        do:
+          - name: print
+            cmd: '{{.student_info}}'

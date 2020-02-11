@@ -28,6 +28,7 @@ type Dvar struct {
 	Rendered string
 	Secure   *model.SecureSetting
 	Ref      string
+	Data     string
 }
 
 func (dvars *Dvars) ValidateAndLoading() {
@@ -66,11 +67,13 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 		contextVars = New()
 	}
 
-	//if contextVars != nil {
-
 	var tmpVars Cache = deepcopy.Copy(*contextVars).(Cache)
 	var tmpDvars Dvars
 	tmpDvars = deepcopy.Copy(*dvars).(Dvars)
+
+	//var datasource *Cache
+	var datasource interface{}
+	//var datasource map[string]interface{}
 
 	for idx, dvar := range tmpDvars {
 		if dvar.Expand == 0 {
@@ -81,12 +84,21 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 			tmpDvars[idx].Value = Render(tval, tmpVars)
 		}
 
-		rval := tmpDvars[idx].Value
+		var rval string
+
+		//the rendering using the data is the post rendering process
+		if dvar.Data != "" {
+			datakey := Render(dvar.Data, tmpVars)
+			datasource = tmpVars.Get(datakey)
+			rval = Render(tmpDvars[idx].Value, datasource)
+		} else {
+			rval = tmpDvars[idx].Value
+		}
+
 		tmpVars.Put(dvar.Name, rval)
 		(*dvars)[idx].Rendered = rval
 		expandedVars.Put(dvar.Name, rval)
 	}
-	//}
 
 	u.Pfvvvvv("[%s] dvar expanded result:\n%s\n", mark, u.Sppmsg(*expandedVars))
 
