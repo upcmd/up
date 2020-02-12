@@ -1,0 +1,79 @@
+goal:
+  - |
+    add feature dvar void var, which is a name that doing something,
+    eg reg a var but makes no sense to be used globally at all
+
+vars:
+  lines: |-
+    hello
+    this
+    is a
+    beautiful world
+
+tasks:
+  -
+    name: task
+    desc: generate logs
+    task:
+
+      -
+        func: shell
+        dvars:
+          - name: linelist
+            desc: |
+              it does not make sense that the result in local of linelist is empty
+              so we do not need this var to be registered either in local or global
+            value: '{{ .lines | splitLines | reg "linelist_object" }}'
+            flags: [vvv]
+        do:
+          - echo '{{.lines}}'
+          - echo '{{.linelist}}'
+          - echo '{{.linelist_object}}'
+
+      -
+        func: shell
+        dvars:
+          - name: void
+            desc: |
+              now this var name will not be shown in local automatically
+              or in global if you register it
+            value: '{{ .lines | splitLines | reg "linelist_object" }}'
+            flags: [vvv]
+        do:
+          - echo '{{.lines}}'
+          - echo '{{.linelist}}'
+          - echo '{{.linelist_object}}'
+
+      -
+        func: shell
+        dvars:
+          - name: void
+            desc: |
+              now this var name will not be shown in local automatically
+              or in global if you register it
+            value: '{{ .lines | splitLines | reg "linelist_object" }}'
+            flags: [vvv, reg]
+        do:
+          - echo '{{.lines}}'
+          - echo '{{.linelist}}'
+          - echo '{{.linelist_object}}'
+
+      -
+        func: shell
+        do:
+          - echo '{{.lines}}'
+          - echo '{{.linelist}}'
+          - echo '{{.linelist_object}}'
+
+      -
+        func: shell
+        dvars:
+          - name: void
+            desc: |
+              now this var name will not be shown in local automatically
+              or in global if you register it
+            value: |-
+              person:
+                name: tom
+                age: "18"
+            flags: [vvv, reg, to_object]

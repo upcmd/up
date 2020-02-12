@@ -218,7 +218,7 @@ func LogOk(mark string) {
 
 func LogDesc(descType string, desc string) {
 	if desc == "" {
-		desc = "N/A"
+		desc = "unamed"
 	}
 	switch descType {
 	case "task":

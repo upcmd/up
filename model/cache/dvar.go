@@ -97,7 +97,10 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 
 		tmpVars.Put(dvar.Name, rval)
 		(*dvars)[idx].Rendered = rval
-		expandedVars.Put(dvar.Name, rval)
+
+		if dvar.Name != "void" {
+			expandedVars.Put(dvar.Name, rval)
+		}
 	}
 
 	u.Pfvvvvv("[%s] dvar expanded result:\n%s\n", mark, u.Sppmsg(*expandedVars))

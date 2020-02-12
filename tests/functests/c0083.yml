@@ -5,34 +5,36 @@ vars:
 
   doc_meta: |
     folder: spike
-    title: doco auto generation
-    head: this is to prototype doco auto generation
-    head_content: |
-      this is to prototype doco auto generation, provided all these meta data, up cmd can help generate
+    title: Doco auto generation
+    head: This is to prototype doco auto generation
+    head_content: |-
+      This is to prototype doco auto generation, provided all these meta data, up cmd can help generate
       a auto doco
 
     sections:
-      - title: intro
+      - title: Intro
         content: |
-          the up project uses auto generate doco, for community memebers, if you would like to contribute
+          The up project uses auto generate doco, for community memebers, if you would like to contribute
           use case or any interesting usage of up cmd, you could raise a pull request and commit your func
           test case and do complete your test and automated regression tests
 
       - title: How to use?
         content: |
-          config docs->meta data configuration
+          Config docs->meta data configuration
           add reference link
         refs:
           - title: main task file
-            link: {{.doc_dir}}/wip.yml
+            type: yml
+            link: {{.doc_dir}}/c0083.yml
 
       - title: Steps
         content: |
           * Firstly, it will try to create the folder if it does not exist
           add reference link
         refs:
-          - title: main task file
-            link: {{.doc_dir}}/wip.yml
+          - title: logfile
+            type: txt
+            link: {{.doc_dir}}/c0083.log
 
     related:
       refs:
@@ -45,31 +47,32 @@ vars:
   doc_template: |
     ---
     title: "{{.title}}"
-    date: {{.datetime}}
+    date: {{now}}
     draft: false
+
     ---
 
-    # {{.head}}
+    ## {{.head}}
 
     {{.head_content}}
 
     {{- range $x :=.sections }}
-    ## {{$x.title}}
+
+    ### {{$x.title}}
 
     {{$x.content}}
 
-    ### Refs:
       {{- range $ref :=.refs }}
-    #### {{$ref.title}}
+    ##### ref: {{$ref.title}}
 
-    ```yml
-    {{$ref.link |filecontent}}
+    ```
+    {{$ref.link |filecontent|indent 4}}
     ```
       {{- end}}
 
     {{- end}}
 
-    Other references:
+    ### Other references:
     {{ with .related }}
       {{- range $ref :=.refs }}
     {{$ref.title}}: {{$ref.link}}
@@ -202,9 +205,9 @@ tasks:
             value: '{{.doc_template}}'
             data: doc_meta_yml_object
         do:
-          -
-            name: print
-            cmd: "{{.doc_rendered}}"
+#          -
+#            name: print
+#            cmd: "{{.doc_rendered}}"
           -
             name: writefile
             cmd:
@@ -218,3 +221,4 @@ tasks:
               content: "{{.doc_rendered}}"
               filename: spike_doc.md
               dir: /tmp
+              reg: loaded_doc

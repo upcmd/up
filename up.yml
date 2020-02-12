@@ -32,6 +32,31 @@ tasks:
           - gotest ./tests/functests/casec_test.go -v
 
   -
+    name: log_gen
+    desc: generate logs
+    task:
+
+      -
+        func: shell
+        name: getcases
+        do:
+          - cd ./tests/functests; ls c????.yml
+        reg: cases
+
+      -
+        func: shell
+        dvars:
+          - name: caselist
+            value: '{{ print .cases | splitLines |reg}}'
+            flags: [vvv]
+
+        do:
+          - echo $HUGO_DOC_LOG_DIR
+          # - gotest ./tests/functests/casex_test.go -v > $HUGO_DOC_LOG_DIR/
+          - echo "processing {{.loopitem}}"
+#        loop: '{{.caselist_object}}'
+#  reg "caselist_object"
+  -
     name: testf
     desc: test the exit scenarios due to different types of validation
     task:
@@ -47,7 +72,7 @@ tasks:
         desc: a real showcase of how to loop using template
         do:
           - |
-            {{ range $idx, $file := .register_testf_cases | splitLines -}}
+            {{ range $idx, $file := .cases | splitLines -}}
             {{$casename :=  $file | replace ".yml" ""}}
             echo "==========failure case test {{$idx |add1}}==============="
             go run app/up/*.go task task -d ./tests/functests -t {{$casename}} -i dev -v vvvv
@@ -69,7 +94,7 @@ tasks:
         desc: a real showcase of how to loop using template
         do:
           - |
-            {{ range $idx, $file := .register_testp_cases | splitLines -}}
+            {{ range $idx, $file := .cases | splitLines -}}
             {{$casename :=  $file | replace ".yml" ""}}
             echo "==========failure case test {{$idx |add1}}==============="
             go run app/up/*.go task task -d ./tests/functests -t {{$casename}} -i dev -v vvvv

@@ -7,7 +7,9 @@
 
 package cache
 
-import "github.com/stephencheng/up/model/stack"
+import (
+	"github.com/stephencheng/up/model/stack"
+)
 
 var (
 	InstanceName string
@@ -31,5 +33,16 @@ func SetDryrun() {
 type TaskRuntimeContext struct {
 	Taskname   string
 	CallerVars *Cache
+}
+
+type StepRuntimeContext struct {
+	Stepname string
+	Result   *ExecResult
+}
+
+type ExecResult struct {
+	Code   int
+	Output string
+	ErrMsg string
 }
 

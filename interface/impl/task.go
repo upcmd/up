@@ -20,7 +20,6 @@ import (
 var (
 	TaskYmlRoot *viper.Viper
 	Tasks       *model.Tasks
-	Scopes      *cache.Scopes
 )
 
 func InitTasks() {

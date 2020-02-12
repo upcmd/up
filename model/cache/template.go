@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	//"path/filepath"
 	//"runtime"
@@ -52,11 +53,18 @@ func FuncMapInit() {
 			return ""
 		},
 		//--------------------------------------------------------
+		"now": func() string {
+			t := time.Now()
+			return t.Format("2006-01-02T15:04:05+11:00")
+		},
+		"printobj": func(obj interface{}) string {
+			//u.Ppfmsg(u.Spf("object:\n %s", objname), obj)
+			u.Ppmsg(obj)
+			return u.Sppmsg(obj)
+		},
 		//reg do not return any value, so do not expect the dvar value will be something other than empty
 		"reg": func(varname string, object interface{}) string {
 			RuntimeVarsAndDvarsMerged.Put(varname, object)
-			callerVars := TaskStack.GetTop().(*TaskRuntimeContext).CallerVars
-			callerVars.Put(varname, object)
 			return ""
 		},
 		"dereg": func(varname string) string {

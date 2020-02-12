@@ -36,7 +36,7 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 	} else {
 
 		cmdOutput, err := cmdExec.CombinedOutput()
-		var result ExecResult
+		var result cache.ExecResult
 		if err != nil {
 			if exitError, ok := err.(*exec.ExitError); ok {
 				result.Code = exitError.ExitCode()
@@ -59,7 +59,7 @@ type ShellFuncAction struct {
 	Do     interface{}
 	Vars   *cache.Cache
 	Cmds   []string
-	Result ExecResult
+	Result cache.ExecResult
 }
 
 //adapt the abstract step.Do to concrete ShellFuncAction Cmds
@@ -98,6 +98,6 @@ func (f *ShellFuncAction) Exec() {
 		u.Dvvvvv(f.Result)
 	}
 
-	cache.StepStack.GetTop().(*StepRuntimeContext).Result = &f.Result
+	cache.StepStack.GetTop().(*cache.StepRuntimeContext).Result = &f.Result
 }
 

@@ -99,10 +99,17 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 				//	u.InvalidAndExit("dvar validation", "multiple expand > 1 is not allowed when to_object is set")
 				//}
 				dvarObjName := u.Spf("%s_%s", dvar.Name, "object")
-				(*mergeTarget).Put(dvarObjName, *obj)
+				if dvar.Name != "void" {
+					(*mergeTarget).Put(dvarObjName, *obj)
+				}
 
 				if u.Contains(dvar.Flags, "reg") {
-					RuntimeVarsAndDvarsMerged.Put(dvarObjName, *obj)
+					if dvar.Name != "void" {
+						RuntimeVarsAndDvarsMerged.Put(dvarObjName, *obj)
+					} else {
+						u.LogWarn("?reg a void", "you can't register a object with void name, use a proper name instead or split to multiple steps")
+					}
+
 				}
 
 				if u.Contains(dvar.Flags, "vvvv") {
@@ -119,7 +126,9 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 			}
 
 			if u.Contains(dvar.Flags, "reg") {
-				RuntimeVarsAndDvarsMerged.Put(dvar.Name, dvar.Rendered)
+				if dvar.Name != "void" {
+					RuntimeVarsAndDvarsMerged.Put(dvar.Name, dvar.Rendered)
+				}
 			}
 
 			if u.Contains(dvar.Flags, "secure") {

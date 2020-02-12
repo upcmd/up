@@ -1,0 +1,70 @@
+goal:
+  - splitLine test
+
+vars:
+  workers:
+    - peter
+    - tom
+    - james
+
+  lines: |-
+    hello
+    this
+    is a
+    beautiful world
+
+tasks:
+  -
+    name: task
+    desc: generate logs
+    task:
+
+
+      -
+        func: shell
+        dvars:
+          - name: linelist
+            desc: |
+              dvar value always return a string instead of object, if you
+              need to use the object, you will need to register it to global space
+            value: '{{ .lines | splitLines }}'
+            flags: [vvv]
+
+        do:
+          - echo '{{.lines}}'
+          - echo '{{.linelist}}'
+
+      -
+        func: shell
+        dvars:
+          - name: linelist
+            value: '{{ .lines | splitLines | printobj }}'
+            flags: [vvv]
+
+        do:
+          - echo '{{.lines}}'
+          - echo '{{.linelist}}'
+
+      -
+        func: shell
+        name: regtest
+        dvars:
+          - name: linelist
+            value: '{{ .lines | splitLines | reg "linelist_object" }}'
+            flags: [vvv]
+        do:
+          - echo '{{.lines}}'
+          - echo '{{.linelist}}'
+          - echo '{{.linelist_object}}'
+
+      -
+        func: shell
+        loop: workers
+        do:
+          - echo "{{.loopindex1}} -> {{.loopitem}}"
+
+      -
+        func: shell
+        loop: linelist_object
+        do:
+          - echo "{{.loopindex1}} -> {{.loopitem}}"

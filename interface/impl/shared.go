@@ -21,18 +21,6 @@ const (
 	FUNC_CMD      = "cmd"
 )
 
-type StepRuntimeContext struct {
-	Stepname string
-	Result   *ExecResult
-	//Flags    *[]string
-}
-
-type ExecResult struct {
-	Code   int
-	Output string
-	ErrMsg string
-}
-
 type MustConditionToContinueFunc func() bool
 
 func DryRunOrExit(mark string, mustCondition MustConditionToContinueFunc, conditionDesc string) {

@@ -152,21 +152,37 @@ func (step *Step) Exec() {
 				func() {
 					if step.Loop != nil {
 						func() {
+							//loop points to a var name which is a slice
 							if reflect.TypeOf(step.Loop).Kind() == reflect.String {
-
 								loopVarName := cache.Render(step.Loop.(string), stepExecVars)
-
 								loopObj := stepExecVars.Get(loopVarName)
+								if loopObj == nil {
+									u.InvalidAndExit("Evaluating loop var and object", u.Spf("Please use a correct varname:(%s) containing a list of values", loopVarName))
+								}
 								if reflect.TypeOf(loopObj).Kind() == reflect.Slice {
-									for idx, item := range loopObj.([]interface{}) {
-										routeFuncType(&LoopItem{idx, idx + 1, item})
-										chainAction(&action)
+
+									switch loopObj.(type) {
+									case []interface{}:
+										for idx, item := range loopObj.([]interface{}) {
+											routeFuncType(&LoopItem{idx, idx + 1, item})
+											chainAction(&action)
+										}
+
+									case []string:
+										for idx, item := range loopObj.([]string) {
+											routeFuncType(&LoopItem{idx, idx + 1, item})
+											chainAction(&action)
+										}
+
+									default:
+										u.LogWarn("loop item evaluation", "Loop item type is not supported yet!")
 									}
 
 								} else {
 									u.InvalidAndExit("evaluate loop var", "loop var is not a array/list/slice")
 								}
 							} else if reflect.TypeOf(step.Loop).Kind() == reflect.Slice {
+								//loop itself is a slice
 								for idx, item := range step.Loop.([]interface{}) {
 									routeFuncType(&LoopItem{idx, idx + 1, item})
 									chainAction(&action)
@@ -215,7 +231,7 @@ func (steps *Steps) Exec() {
 		u.Ppmsgvvvv(step)
 
 		execStep := func() {
-			rtContext := StepRuntimeContext{
+			rtContext := cache.StepRuntimeContext{
 				Stepname: step.Name,
 				//Flags:    &step.Flags,
 			}
@@ -223,7 +239,7 @@ func (steps *Steps) Exec() {
 
 			step.Exec()
 
-			result := cache.StepStack.GetTop().(*StepRuntimeContext).Result
+			result := cache.StepStack.GetTop().(*cache.StepRuntimeContext).Result
 			taskname := cache.TaskStack.GetTop().(*cache.TaskRuntimeContext).Taskname
 
 			if u.Contains([]string{FUNC_SHELL, FUNC_TASK_REF}, step.Func) {
@@ -239,7 +255,7 @@ func (steps *Steps) Exec() {
 			}
 
 			func() {
-				result := cache.StepStack.GetTop().(*StepRuntimeContext).Result
+				result := cache.StepStack.GetTop().(*cache.StepRuntimeContext).Result
 
 				if result != nil && result.Code == 0 {
 					u.LogOk(".")
