@@ -12,7 +12,7 @@ docs:
 
 dvars:
   - name: usecase
-    ref: wip.yml
+    ref: c0074.yml
     flags: [to_object,]
 
 tasks:

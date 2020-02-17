@@ -50,6 +50,7 @@ func main() {
 	u.SetTaskfile(*taskfile)
 	u.Pfvvvv(" :verbose level:  %s", u.CoreConfig.Verbose)
 	u.Pfvvvv(" :instance name:  %s", *instanceName)
+
 	cache.SetInstanceName(*instanceName)
 
 	switch cmd {

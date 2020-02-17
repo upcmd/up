@@ -13,9 +13,8 @@ import (
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	"os"
-	"strings"
-
 	"os/exec"
+	"strings"
 )
 
 func runCmd(f *ShellFuncAction, cmd string) string {

@@ -14,12 +14,13 @@ type SecureSetting struct {
 }
 
 type CoreConfig struct {
-	Version  string
-	TaskDir  string
-	TaskFile string
-	FlowDir  string
-	FlowFile string
-	Verbose  string
-	Secure   *SecureSetting
+	Version      string
+	TaskDir      string
+	TaskFile     string
+	FlowDir      string
+	FlowFile     string
+	Verbose      string
+	MaxRefLayers string
+	Secure       *SecureSetting
 }
 

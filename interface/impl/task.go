@@ -14,6 +14,7 @@ import (
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -84,7 +85,10 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 
 				cache.TaskStack.Push(&rtContext)
 				u.Pvvvv("Executing task stack layer:", cache.TaskStack.GetLen())
-				if cache.TaskStack.GetLen() > 2 {
+				maxLayers, err := strconv.Atoi(u.CoreConfig.MaxRefLayers)
+				u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxRefLayers correctly")
+
+				if cache.TaskStack.GetLen() > maxLayers {
 					u.LogError("Task exec stack layer check", "Too many layers of task executions, please fix your recursive .nv-task configurations")
 					os.Exit(-1)
 				}

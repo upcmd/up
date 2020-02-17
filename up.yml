@@ -36,6 +36,9 @@ tasks:
     desc: generate logs
     task:
 
+      - func: task_ref
+        do:
+          - release_local
       -
         func: shell
         name: getcases
@@ -46,16 +49,24 @@ tasks:
       -
         func: shell
         dvars:
-          - name: caselist
-            value: '{{ print .cases | splitLines |reg}}'
+          - name: void
+            value: '{{ print .cases | splitLines |reg "caselist"}}'
             flags: [vvv]
-
         do:
           - echo $HUGO_DOC_LOG_DIR
-          # - gotest ./tests/functests/casex_test.go -v > $HUGO_DOC_LOG_DIR/
+          - rm -rf $HUGO_DOC_LOG_DIR
+          - mkdir -p $HUGO_DOC_LOG_DIR
+
+      -
+        func: shell
+        do:
           - echo "processing {{.loopitem}}"
-#        loop: '{{.caselist_object}}'
-#  reg "caselist_object"
+          - up task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests > $HUGO_DOC_LOG_DIR/{{.loopitem | replace ".yml" ""}}_v.log
+          - up task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvv > $HUGO_DOC_LOG_DIR/{{.loopitem | replace ".yml" ""}}_vvv.log
+          - up task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvvv> $HUGO_DOC_LOG_DIR/{{.loopitem | replace ".yml" ""}}_vvvvv.log
+          - up task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvvvv> $HUGO_DOC_LOG_DIR/{{.loopitem | replace ".yml" ""}}_vvvvvv.log
+        loop: caselist
+
   -
     name: testf
     desc: test the exit scenarios due to different types of validation
