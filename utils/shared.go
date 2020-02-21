@@ -9,6 +9,7 @@ package utils
 
 import (
 	"fmt"
+	"time"
 )
 
 var (
@@ -26,5 +27,18 @@ func Contains(a []string, x string) bool {
 		}
 	}
 	return false
+}
+
+func Sleep(mscnt int) {
+	PfHiColor("sleeping %d milli seconds", mscnt)
+	total := 0
+	for i := 0; i < mscnt; i += 100 {
+		Pf("%s", ".")
+		total += 100
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	time.Sleep(time.Duration(mscnt-total) * time.Millisecond)
+	P()
 }
 

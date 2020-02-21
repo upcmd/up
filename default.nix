@@ -16,13 +16,12 @@ let
 in
     pkgs.dockerTools.buildLayeredImage {
         maxLayers = 104;
-        name = "golang-runtime";
+        name = "cmgolang";
         tag = "latest";
         contents = envPkgs;
         extraCommands = ''
             mkdir ./cm
             ln -s "${pkgs.bash}/bin/bash" ./bash
-            ln -s "${pkgs.bash}/bin/bash" /bash
             ln -s "${pkgs.bash}/bin/bash" ./cm/bash
         '';
         config = ({

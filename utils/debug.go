@@ -108,6 +108,10 @@ func PpmsgvvvvhintHigh(hint string, a ...interface{}) {
 	}
 }
 
+func PfHiColor(format string, a ...interface{}) {
+	himsg_color_printf(format, a...)
+}
+
 func PpmsgvvvhintHigh(hint string, a ...interface{}) {
 	if permitted("vvv") {
 		vvvvv_color_printf("%s:", hint)

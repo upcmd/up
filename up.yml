@@ -10,8 +10,10 @@ tasks:
         desc: build the binary to build directory
         do:
           - rm -rf ./build
-          - mkdir -p ./build
-          - go build -o build/up app/up/*.go
+          - mkdir -p ./build/linux
+          - GOOS=darwin GOARCH=amd64 go build -o build/up app/up/*.go
+          - GOOS=linux GOARCH=amd64 go build -o build/linux/up app/up/*.go
+
 
   - name: release_local
     desc: release it to local path
@@ -32,13 +34,42 @@ tasks:
           - gotest ./tests/functests/casec_test.go -v
 
   -
-    name: log_gen
-    desc: generate logs
+    name: log_gen_in_dev
+    desc: demo of design pattern
     task:
-
-      - func: task_ref
+      -
+        func: task_ref
+        vars:
+          hugo_doc_log_dir: /updocs/reflogs
+          upcmd: ./build/linux/up
         do:
-          - release_local
+          - log_gen_impl
+
+  -
+    name: log_gen_in_mac
+    desc: demo of design pattern
+    task:
+      -
+        func: cmd
+        vars:
+          upcmd: ./build/up
+        dvars:
+          - name: hugo_doc_log_dir
+            value: '{{env "HUGO_DOC_LOG_DIR"}}'
+            flags: [reg]
+        do:
+          - name: print
+            cmd: 'log will be generated at: {{.hugo_doc_log_dir}}'
+
+      -
+        func: task_ref
+        do:
+          - log_gen_impl
+
+  -
+    name: log_gen_impl
+    desc: run in up docker | generate logs
+    task:
       -
         func: shell
         name: getcases
@@ -53,18 +84,18 @@ tasks:
             value: '{{ print .cases | splitLines |reg "caselist"}}'
             flags: [vvv]
         do:
-          - echo $HUGO_DOC_LOG_DIR
-          - rm -rf $HUGO_DOC_LOG_DIR
-          - mkdir -p $HUGO_DOC_LOG_DIR
+          - 'echo {{.hugo_doc_log_dir}}'
+          - 'rm -rf {{.hugo_doc_log_dir}}'
+          - 'mkdir -p {{.hugo_doc_log_dir}}'
 
       -
         func: shell
         do:
           - echo "processing {{.loopitem}}"
-          - up task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests > $HUGO_DOC_LOG_DIR/{{.loopitem | replace ".yml" ""}}_v.log
-          - up task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvv > $HUGO_DOC_LOG_DIR/{{.loopitem | replace ".yml" ""}}_vvv.log
-          - up task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvvv> $HUGO_DOC_LOG_DIR/{{.loopitem | replace ".yml" ""}}_vvvvv.log
-          - up task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvvvv> $HUGO_DOC_LOG_DIR/{{.loopitem | replace ".yml" ""}}_vvvvvv.log
+          - '{{.upcmd}} task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests > {{.hugo_doc_log_dir}}/{{.loopitem | replace ".yml" ""}}_v.log'
+          - '{{.upcmd}} task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvv > {{.hugo_doc_log_dir}}/{{.loopitem | replace ".yml" ""}}_vvv.log'
+          - '{{.upcmd}} task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvvv> {{.hugo_doc_log_dir}}/{{.loopitem | replace ".yml" ""}}_vvvvv.log'
+          - '{{.upcmd}} task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvvvv> {{.hugo_doc_log_dir}}/{{.loopitem | replace ".yml" ""}}_vvvvvv.log'
         loop: caselist
 
   -
@@ -151,4 +182,28 @@ tasks:
           - wiptest
           - testc
 
+  -
+    name: build_dev_docker_image
+    desc: run in linux | build a nix docker image
+    task:
+      -
+        func: shell
+        do:
+          - nix build
+          - cp  /nix/store/*-docker-image-cmgolang.tar.gz .
+          - rm -f result
 
+  -
+    name: load_dev_docker_image
+    desc: run in linux | build a nix docker image
+    task:
+      -
+        func: shell
+        do:
+          - ls *-docker-image-cmgolang.tar.gz
+
+      -
+        func: shell
+        do:
+          - 'docker load --input="{{.last_task_result.Output}}"'
+          - docker images |grep cmgolang

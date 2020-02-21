@@ -53,16 +53,29 @@ func (f *CmdFuncAction) Adapt() {
 }
 
 func (cmdCmd *CmdCmd) runCmd(whichtype string, f func()) {
-	//u.Dvvvv("111", cmdCmd.Cmd)
+	invalidTypeHint := func(typeGot string) {
+		u.LogWarn("type mismatch", u.Spf("cmd name: %s -> type wanted: %s, got :%s", cmdCmd.Name, whichtype, typeGot))
+	}
 	switch cmdCmd.Cmd.(type) {
 	case string:
 		if whichtype == "string" {
 			f()
+		} else {
+			invalidTypeHint("string")
+		}
+
+	case int:
+		if whichtype == "int" {
+			f()
+		} else {
+			invalidTypeHint("int")
 		}
 
 	case map[interface{}]interface{}:
 		if whichtype == "map" {
 			f()
+		} else {
+			invalidTypeHint("map")
 		}
 
 	default:
@@ -105,6 +118,12 @@ func (f *CmdFuncAction) Exec() {
 			})
 			u.Ppmsgvvvvvhint("after reg the var - global:", cache.RuntimeVarsAndDvarsMerged)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
+
+		case "sleep":
+			cmdItem.runCmd("int", func() {
+				mscnt := cmdItem.Cmd.(int)
+				u.Sleep(mscnt)
+			})
 
 		case "readfile":
 			cmdItem.runCmd("map", func() {

@@ -1,0 +1,58 @@
+goal:
+  - test a sleep delay cmd
+  - test a dynamic task ref in a loop
+
+tasks:
+  -
+    name: task
+    desc: generate logs
+    task:
+
+      -
+        func: shell
+        do:
+          - echo 'hello'
+      -
+        func: cmd
+        do:
+          - name: sleep
+            cmd: 3000
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: world
+
+      -
+        func: task_ref
+        do:
+          - '{{.loopitem}}'
+        loop: [impl1, impl2]
+
+
+  -
+    name: impl1
+    task:
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: hello
+
+      -
+        func: cmd
+        do:
+          - name: sleep
+            cmd: 4000
+
+  -
+    name: impl2
+    task:
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: world
+

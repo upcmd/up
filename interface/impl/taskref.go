@@ -46,7 +46,8 @@ func (f *TaskRefFuncAction) Adapt() {
 
 func (f *TaskRefFuncAction) Exec() {
 	u.P("executing linking tasks")
-	for idx, taskname := range f.Refs {
+	for idx, tmptaskname := range f.Refs {
+		taskname := cache.Render(tmptaskname, f.Vars)
 		u.Pfv("    taskname(%2d):\n%+v\n", idx+1, color.HiBlueString("%s", taskname))
 		runTask(f, taskname)
 	}
