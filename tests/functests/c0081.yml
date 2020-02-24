@@ -23,7 +23,7 @@ tasks:
     name: task
     task:
       -
-        func: task_ref
+        func: call
         do:
           - compose_required_object
           - render

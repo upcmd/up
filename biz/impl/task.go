@@ -41,8 +41,18 @@ func InitTasks() {
 func ListTasks() {
 
 	u.P("-task list")
+	maxlen := 0
+	for _, task := range *Tasks {
+		tasknamelen := len(task.Name)
+		if tasknamelen > maxlen {
+			maxlen = tasknamelen
+		}
+	}
+
+	format := "  %4d| %" + u.Spf("%d", maxlen) + "s: %s \n"
+
 	for idx, task := range *Tasks {
-		u.Pf("  %d %20s: %s \n", idx+1, task.Name, task.Desc)
+		u.Pf(format, idx+1, task.Name, task.Desc)
 		u.Ppmsgvvvv(task)
 	}
 	u.P("-")
@@ -85,11 +95,12 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 
 				cache.TaskStack.Push(&rtContext)
 				u.Pvvvv("Executing task stack layer:", cache.TaskStack.GetLen())
-				maxLayers, err := strconv.Atoi(u.CoreConfig.MaxRefLayers)
-				u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxRefLayers correctly")
+				maxLayers, err := strconv.Atoi(u.CoreConfig.MaxCallLayers)
+				u.Ptmpdebug("99", maxLayers)
+				u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
 
-				if cache.TaskStack.GetLen() > maxLayers {
-					u.LogError("Task exec stack layer check", "Too many layers of task executions, please fix your recursive .nv-task configurations")
+				if maxLayers != 0 && cache.TaskStack.GetLen() > maxLayers {
+					u.LogError("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
 					os.Exit(-1)
 				}
 

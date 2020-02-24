@@ -1,7 +1,0 @@
-
-tasks:
-  job5: #a task can be a sequential steps
-    - sh:
-        - echo "hello"
-        - echo "world"
-

@@ -9,7 +9,7 @@ package main
 
 import (
 	"github.com/alecthomas/kingpin"
-	"github.com/stephencheng/up/interface/impl"
+	"github.com/stephencheng/up/biz/impl"
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	"os"
@@ -18,21 +18,17 @@ import (
 var (
 	app = kingpin.New("up", "UP: The Ultimate Provisioner")
 
-	task               = app.Command("task", "run a entry task")
-	taskName           = task.Arg("taskname", "task name to run").Required().String()
-	list               = app.Command("list", "list tasks and plays")
-	listTypeName       = list.Arg("listtypename", "list [ task | flow ]").Required().String()
-	validate           = app.Command("validate", "validate tasks and plays")
-	validateTypeName   = validate.Arg("validatetypename", "list [ task | flow ]").Required().String()
-	validateObjectName = validate.Arg("validateobjectname", "taskname | flowname ]").Required().String()
-	play               = app.Command("play", "run a playbook with defined steps")
-	playFile           = play.Arg("playfile", "play step file to run").Required().String()
-	verbose            = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
-	taskdir            = app.Flag("taskdir", "task file directory").Short('d').String()
-	taskfile           = app.Flag("taskfile", "task file to load (without yml extension)").Short('t').String()
-	instanceName       = app.Flag("instance", "instance name for execution").Short('i').String()
-	configDir          = app.Flag("configdir", "config file directory to load from|default .").String()
-	configFile         = app.Flag("configfile", "config file name to load without yml extension|default config").String()
+	ngo              = app.Command("ngo", "run a entry task")
+	ngoTaskName      = ngo.Arg("taskname", "task name to run").Required().String()
+	list             = app.Command("list", "list tasks and plays")
+	validate         = app.Command("validate", "validate tasks and plays")
+	validateTaskName = validate.Arg("validatetaskname", "taskname").Required().String()
+	verbose          = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
+	taskdir          = app.Flag("taskdir", "task file directory").Short('d').String()
+	taskfile         = app.Flag("taskfile", "task file to load (without yml extension)").Short('t').String()
+	instanceName     = app.Flag("instance", "instance name for execution").Short('i').String()
+	configDir        = app.Flag("configdir", "config file directory to load from|default .").String()
+	configFile       = app.Flag("configfile", "config file name to load without yml extension|default config").String()
 )
 
 func main() {
@@ -54,32 +50,20 @@ func main() {
 	cache.SetInstanceName(*instanceName)
 
 	switch cmd {
-	case task.FullCommand():
-		if *taskName != "" {
-			u.P("-exec task:", *taskName)
+	case ngo.FullCommand():
+		if *ngoTaskName != "" {
+			u.P("-exec task:", *ngoTaskName)
 			impl.InitTasks()
-			impl.ExecTask(*taskName, nil)
+			impl.ExecTask(*ngoTaskName, nil)
 		}
 	case list.FullCommand():
-		u.P("-list", *listTypeName)
-		switch *listTypeName {
-		case "task":
-			impl.InitTasks()
-			impl.ListTasks()
-		case "flow":
-		}
+		impl.InitTasks()
+		impl.ListTasks()
 	case validate.FullCommand():
-		u.P("-validate", *validateTypeName)
-		switch *validateTypeName {
-		case "task":
-			impl.InitTasks()
-			taskname := *validateObjectName
-			u.Pf("validate task: %s\n")
-			impl.ValidateTask(taskname)
-		case "flow":
-		}
-	case play.FullCommand():
-		u.P(*playFile)
+		impl.InitTasks()
+		taskname := *validateTaskName
+		u.Pf("validate task: %s\n")
+		impl.ValidateTask(taskname)
 	}
 }
 

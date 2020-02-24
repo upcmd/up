@@ -8,7 +8,7 @@
 package functests
 
 import (
-	"github.com/stephencheng/up/interface/impl"
+	"github.com/stephencheng/up/biz/impl"
 	"github.com/stephencheng/up/model/cache"
 	"github.com/stephencheng/up/tests"
 	u "github.com/stephencheng/up/utils"

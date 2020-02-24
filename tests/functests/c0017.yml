@@ -24,8 +24,8 @@ tasks:
     desc:
     task:
       -
-        func: task_ref
-        desc: task_ref1
+        func: call
+        desc: call1
         vars:
           a: caller-ref-1a
           b: caller-ref-1b
@@ -34,8 +34,8 @@ tasks:
           - callee_task2
 
       -
-        func: task_ref
-        desc: task_ref2
+        func: call
+        desc: call2
         vars:
           a: caller-ref-2a
           b: caller-ref-2b

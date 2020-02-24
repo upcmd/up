@@ -1,6 +1,6 @@
 goal:
   - test a sleep delay cmd
-  - test a dynamic task ref in a loop
+  - test a dynamic call in a loop
 
 tasks:
   -
@@ -16,7 +16,7 @@ tasks:
         func: cmd
         do:
           - name: sleep
-            cmd: 3000
+            cmd: 2000
       -
         func: cmd
         do:
@@ -24,7 +24,7 @@ tasks:
             cmd: world
 
       -
-        func: task_ref
+        func: call
         do:
           - '{{.loopitem}}'
         loop: [impl1, impl2]
@@ -44,7 +44,7 @@ tasks:
         func: cmd
         do:
           - name: sleep
-            cmd: 4000
+            cmd: 1000
 
   -
     name: impl2

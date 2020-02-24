@@ -11,7 +11,7 @@ import (
 	"bufio"
 	"github.com/imdario/mergo"
 	"github.com/mohae/deepcopy"
-	ic "github.com/stephencheng/up/interface"
+	"github.com/stephencheng/up/biz"
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	ee "github.com/stephencheng/up/utils/error"
@@ -85,13 +85,13 @@ type LoopItem struct {
 	Item   interface{}
 }
 
-func chainAction(action *ic.Do) {
+func chainAction(action *biz.Do) {
 	(*action).Adapt()
 	(*action).Exec()
 }
 
 func (step *Step) Exec() {
-	var action ic.Do
+	var action biz.Do
 	//u.Ptmpdebug("step debug", step)
 
 	var bizErr *ee.Error = ee.New()
@@ -111,21 +111,21 @@ func (step *Step) Exec() {
 				Do:   step.Do,
 				Vars: stepExecVars,
 			}
-			action = ic.Do(&funcAction)
+			action = biz.Do(&funcAction)
 
-		case FUNC_TASK_REF:
+		case FUNC_CALL:
 			funcAction := TaskRefFuncAction{
 				Do:   step.Do,
 				Vars: stepExecVars,
 			}
-			action = ic.Do(&funcAction)
+			action = biz.Do(&funcAction)
 
 		case FUNC_CMD:
 			funcAction := CmdFuncAction{
 				Do:   step.Do,
 				Vars: stepExecVars,
 			}
-			action = ic.Do(&funcAction)
+			action = biz.Do(&funcAction)
 
 		default:
 			u.InvalidAndExit("Step dispatch", "func name is not recognised and implemented")
@@ -242,7 +242,7 @@ func (steps *Steps) Exec() {
 			result := cache.StepStack.GetTop().(*cache.StepRuntimeContext).Result
 			taskname := cache.TaskStack.GetTop().(*cache.TaskRuntimeContext).Taskname
 
-			if u.Contains([]string{FUNC_SHELL, FUNC_TASK_REF}, step.Func) {
+			if u.Contains([]string{FUNC_SHELL, FUNC_CALL}, step.Func) {
 				if step.Reg == "auto" {
 					cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
 				} else if step.Reg != "" {

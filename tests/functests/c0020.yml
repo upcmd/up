@@ -1,5 +1,5 @@
 goal:
-  - to show a design pattern using task_ref and callee task without local vars
+  - to show a design pattern using call and callee task without local vars
 
 vars:
   school: sydney grammar
@@ -9,7 +9,7 @@ tasks:
     name: task
     task:
       -
-        func: task_ref
+        func: call
         desc: call function with different vars
         vars:
           studentname: Tom
@@ -22,7 +22,7 @@ tasks:
     desc: |
       as a design pattern, this is a function task
       it's better to not to use any local vars, in this
-      way, the vars are passed in from caller task_ref so
+      way, the vars are passed in from caller call so
       that this function could be used by multiple ref tasks
     task:
       -

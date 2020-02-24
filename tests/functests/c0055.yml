@@ -1,12 +1,12 @@
 goal:
-  - test the if condition works for cmd and task_ref
+  - test the if condition works for cmd and call
 
 tasks:
   -
     name: task
     task:
 
-      - func: task_ref
+      - func: call
         do:
           - taska
         if: "false"
@@ -18,7 +18,7 @@ tasks:
             flags: [vvvv]
         if: "true"
 
-      - func: task_ref
+      - func: call
         do:
           - taska
         if: "true"

@@ -1,4 +1,4 @@
 
 version: 1.0.0
 Verbose: v
-MaxRefLayers: 3
+MaxCallLayers: 8

@@ -64,7 +64,7 @@ tasks:
   -
     name: task
     task:
-      - func: task_ref
+      - func: call
         do: task_generate_password
 
   -

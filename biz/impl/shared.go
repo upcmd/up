@@ -16,9 +16,9 @@ import (
 )
 
 const (
-	FUNC_SHELL    = "shell"
-	FUNC_TASK_REF = "task_ref"
-	FUNC_CMD      = "cmd"
+	FUNC_SHELL = "shell"
+	FUNC_CALL  = "call"
+	FUNC_CMD   = "cmd"
 )
 
 type MustConditionToContinueFunc func() bool

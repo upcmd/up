@@ -11,18 +11,18 @@ tasks:
         do:
           - rm -rf ./build
           - mkdir -p ./build/linux
-          - GOOS=darwin GOARCH=amd64 go build -o build/up app/up/*.go
+          - mkdir -p ./build/mac
+          - GOOS=darwin GOARCH=amd64 go build -o build/mac/up app/up/*.go
           - GOOS=linux GOARCH=amd64 go build -o build/linux/up app/up/*.go
-
 
   - name: release_local
     desc: release it to local path
     task:
-      - func: task_ref
+      - func: call
         do: build
 
       - func: shell
-        do: cp -f build/up /usr/local/bin/
+        do: cp -f build/mac/up /usr/local/bin/
 
   -
     name: testc
@@ -38,7 +38,7 @@ tasks:
     desc: demo of design pattern
     task:
       -
-        func: task_ref
+        func: call
         vars:
           hugo_doc_log_dir: /updocs/reflogs
           upcmd: ./build/linux/up
@@ -62,7 +62,7 @@ tasks:
             cmd: 'log will be generated at: {{.hugo_doc_log_dir}}'
 
       -
-        func: task_ref
+        func: call
         do:
           - log_gen_impl
 
@@ -175,7 +175,7 @@ tasks:
     desc: test all differnt type of tests
     task:
       -
-        func: task_ref
+        func: call
         do:
           - testx
           - testwip

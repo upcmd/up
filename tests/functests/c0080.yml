@@ -1,6 +1,6 @@
 docs:
   mddoc: |
-    extend c0079 to use composible task_ref to make tasks configuration modular
+    extend c0079 to use composible call to make tasks configuration modular
 
 vars:
   complex_data_structure_template: |
@@ -22,7 +22,7 @@ tasks:
     name: task
     task:
       -
-        func: task_ref
+        func: call
         do:
           - compose_required_object
           - render

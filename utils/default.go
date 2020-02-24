@@ -11,14 +11,14 @@ import "github.com/fatih/color"
 
 var (
 	defaults map[string]string = map[string]string{
-		"TaskDir":      ".",
-		"TaskFile":     "up",
-		"FlowDir":      ".",
-		"FlowFile":     "flow",
-		"Verbose":      "v",
-		"MaxRefLayers": "2",
-		"ConfigDir":    ".",
-		"ConfigFile":   "upconfig",
+		"TaskDir":       ".",
+		"TaskFile":      "up",
+		"FlowDir":       ".",
+		"FlowFile":      "flow",
+		"Verbose":       "v",
+		"MaxCallLayers": "256",
+		"ConfigDir":     ".",
+		"ConfigFile":    "upconfig",
 	}
 	vvvvv_color_printf  = color.Magenta
 	verror_color_printf = color.Red

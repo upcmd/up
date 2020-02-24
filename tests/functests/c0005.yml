@@ -1,8 +1,8 @@
 notes:
   goal:
-    - to ues task ref to achieve the goal of task composition
+    - to ues call to achieve the goal of task composition
   why:
-    - it is like dep but allow pre and post task using task ref
+    - it is like dep but allow pre and post task using call
 
 tasks:
   -
@@ -38,7 +38,7 @@ tasks:
     desc: this is the task and expect the final message (hello I love this world)
     task:
       -
-        func: task_ref
+        func: call
         do:
           - pre_task
       -
@@ -46,7 +46,7 @@ tasks:
         do:
           - echo " I love this "
       -
-        func: task_ref
+        func: call
         do:
           - post_task
           - 2ndtask

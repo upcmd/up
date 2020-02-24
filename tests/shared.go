@@ -8,7 +8,7 @@
 package tests
 
 import (
-	"github.com/stephencheng/up/interface/impl"
+	"github.com/stephencheng/up/biz/impl"
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	"os/exec"

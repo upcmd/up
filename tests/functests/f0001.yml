@@ -31,7 +31,7 @@ tasks:
     desc:
     task:
       -
-        func: task_ref
+        func: call
         vars:
           a: caller-ref-a
           b: caller-ref-b

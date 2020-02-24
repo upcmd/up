@@ -5,15 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-package cli_test
+package biz
 
-//import (
-//"testing"
-//	upmain "github.com/stephencheng/up/app/up"
-//)
-//
-//func TestUpMain(t *testing.T) {
-//
-//	upmain.
-//}
+type Do interface {
+	Adapt()
+	Exec()
+}
 

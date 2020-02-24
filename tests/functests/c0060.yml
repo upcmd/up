@@ -20,7 +20,7 @@ tasks:
           - echo "task step 2"
 
       -
-        func: task_ref
+        func: call
         do:
           - task_a
           - task_c
@@ -28,7 +28,7 @@ tasks:
         if: '{{eq .student_name "tom"}}'
 
       -
-        func: task_ref
+        func: call
         do:
           - task_b
         loop: "classes"
@@ -41,7 +41,7 @@ tasks:
           - echo "task step 4"
 
       -
-        func: task_ref
+        func: call
         do:
           - a_very_complicated_task
 

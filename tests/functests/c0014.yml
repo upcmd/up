@@ -1,5 +1,5 @@
 goal:
-  - to test vars applicable in task-ref exec time
+  - to test vars applicable in call exec time
   - the caller task's vars should override the local vars in the ref task(callee)
   - tested with only one embeded call but not recursive call
   - callee-task exec vars: |
@@ -53,7 +53,7 @@ tasks:
     desc:
     task:
       -
-        func: task_ref
+        func: call
         vars:
           a: caller-ref-a
           b: caller-ref-b

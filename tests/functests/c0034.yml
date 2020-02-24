@@ -1,7 +1,7 @@
 goal:
-  - dvars expand in task-ref level
+  - dvars expand in call level
   - dvars object can merge in leaf level
-  - dvar in task-ref task will override same name dvar in local level
+  - dvar in call task will override same name dvar in local level
 
 expected:
   - school object in nonprod could append new element and
@@ -80,7 +80,7 @@ tasks:
     name: task
     task:
       -
-        func: task_ref
+        func: call
         vars:
           a: local-a
           b: local-b

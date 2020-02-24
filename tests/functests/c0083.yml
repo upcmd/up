@@ -88,7 +88,7 @@ tasks:
     name: task
     task:
       -
-        func: task_ref
+        func: call
         do:
           - setup
           - compose_required_object

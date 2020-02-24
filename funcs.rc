@@ -3,7 +3,7 @@ goup(){
 }
 
 wiptest(){
-    goup task task -d ./tests/functests -t wip -i dev --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t wip -i dev --configdir=./tests/functests
 }
 
 wipfunctest(){
@@ -11,26 +11,23 @@ wipfunctest(){
 }
 
 wiptestvvvv(){
-    goup task task -d ./tests/functests -t wip -i dev -v vvvv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t wip -i dev -v vvvv --configdir=./tests/functests
 }
-
 
 wiptestvv(){
-    goup task task -d ./tests/functests -t wip -i dev -v vv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t wip -i dev -v vv --configdir=./tests/functests
 }
 
-
 wiptestvvv(){
-    goup task task -d ./tests/functests -t wip -i dev -v vvv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t wip -i dev -v vvv --configdir=./tests/functests
 }
 
 wiptestvvvvv(){
-    goup task task -d ./tests/functests -t wip -i dev -v vvvvv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t wip -i dev -v vvvvv --configdir=./tests/functests
 }
 
-
 wiptestdebug(){
-    goup task task -d ./tests/functests -t wip -i dev -v vvvvv
+    goup ngo task -d ./tests/functests -t wip -i dev -v vvvvv
 }
 
 wiptestvalidate(){
@@ -43,38 +40,35 @@ goup list task
 
 uptestx(){
 echo "syntax: uptestx c0033"
-    goup task task -d ./tests/functests -t $1 -i dev --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t $1 -i dev --configdir=./tests/functests
 }
-
 
 uptestxvvv(){
 echo "syntax: uptestx c0033"
-    goup task task -d ./tests/functests -t $1 -i dev -v vvv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t $1 -i dev -v vvv --configdir=./tests/functests
 }
-
 
 uptestxvv(){
 echo "syntax: uptestx c0033"
-    goup task task -d ./tests/functests -t $1 -i dev -v vv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t $1 -i dev -v vv --configdir=./tests/functests
 }
 
 
 
 uptestxvvvv(){
 echo "syntax: uptestx c0033"
-    goup task task -d ./tests/functests -t $1 -i dev -v vvvv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t $1 -i dev -v vvvv --configdir=./tests/functests
 }
 
 
 uptestxvvvvv(){
 echo "syntax: uptestx c0033"
-    goup task task -d ./tests/functests -t $1 -i dev -v vvvvv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t $1 -i dev -v vvvvv --configdir=./tests/functests
 }
 
 uptestf(){
-    goup task testf
+    goup ngo testf
 }
-
 
 upregression(){
   GOTEST=true gotest ./tests/functests/casec_test.go -v
