@@ -1,0 +1,41 @@
+goal:
+  - test MaxCallLayers
+  - if MaxCallLayers==0, it means unlimted layers, user is responsible for its behavior
+  - if MaxCallLayers!=0, it will quit once max layers exceeds the configured number
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: call
+        do:
+          - '{{.loopitem}}'
+        loop: [impl1, impl2]
+
+
+  -
+    name: impl1
+    task:
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: hello
+
+  -
+    name: impl2
+    task:
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: world
+
+      -
+        func: call
+        do:
+          - task
+

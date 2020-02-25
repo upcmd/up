@@ -42,6 +42,7 @@ var (
 type Scope struct {
 	Name    string
 	Ref     string
+	RefDir  string
 	Members []string
 	Vars    Cache
 	Dvars   Dvars
@@ -252,8 +253,12 @@ func (ss *Scopes) InitContextInstances() {
 			u.Dvvvvv(s)
 			os.Exit(-1)
 		}
+		refdir := u.CoreConfig.RefDir
 		if s.Ref != "" {
-			yamlvarsroot := u.YamlLoader("ref vars", u.CoreConfig.TaskDir, s.Ref)
+			if s.RefDir != "" {
+				refdir = s.RefDir
+			}
+			yamlvarsroot := u.YamlLoader("ref vars", refdir, s.Ref)
 			vars := *loadRefVars(yamlvarsroot)
 			u.Pvvvv("loading vars from:", s.Ref)
 			u.Ppmsgvvvv(vars)

@@ -24,7 +24,7 @@ var (
 	validate         = app.Command("validate", "validate tasks and plays")
 	validateTaskName = validate.Arg("validatetaskname", "taskname").Required().String()
 	verbose          = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
-	taskdir          = app.Flag("taskdir", "task file directory").Short('d').String()
+	refdir           = app.Flag("refdir", "ref yml files directory").Short('d').String()
 	taskfile         = app.Flag("taskfile", "task file to load (without yml extension)").Short('t').String()
 	instanceName     = app.Flag("instance", "instance name for execution").Short('i').String()
 	configDir        = app.Flag("configdir", "config file directory to load from|default .").String()
@@ -42,7 +42,7 @@ func main() {
 
 	u.SetVerbose(*verbose)
 
-	u.SetTaskdir(*taskdir)
+	u.SetRefdir(*refdir)
 	u.SetTaskfile(*taskfile)
 	u.Pfvvvv(" :verbose level:  %s", u.CoreConfig.Verbose)
 	u.Pfvvvv(" :instance name:  %s", *instanceName)

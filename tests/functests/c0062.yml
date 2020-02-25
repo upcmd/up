@@ -6,11 +6,11 @@ vars:
   classes: [1k,2b,3j,4s]
 
 tasksref:
-  - c0062-tasks-simple
-  - c0062-tasks-complicated
+  - c0062-tasks-simple.yml
+  - c0062-tasks-complicated.yml
 
 tasks:
 
   -
     name: task
-    ref: c0062-task-main
+    ref: c0062-task-main.yml

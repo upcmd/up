@@ -1,11 +1,12 @@
 goal:
-  - to test out vars reference in yml file
+  - refdir will override the default configured refdir
+  - it will error if the refdir does not contains the ref file
 
 scopes:
   -
     name: global
     ref: d0009-global.yml
-    refdir: ./tests/functests
+    refdir: ./tests
 
   -
     name: prod

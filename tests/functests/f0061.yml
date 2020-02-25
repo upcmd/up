@@ -1,8 +1,5 @@
 goal:
-  - show a little bit more complicated use case with chained tasks and externalised tasks
-  - show how to use condition(basics)
-  - show how to use loop(basics)
-  - for details of condition/loop, check the comphensive case of them separately
+  - it will error if the refdir overrided not correct
 
 vars:
   student_name: tom
@@ -13,7 +10,7 @@ tasks:
   -
     name: task
     ref: c0061-task-main.yml
-    refdir: ./tests/functests
+    refdir: ./tests
 
   -
     name: a_very_complicated_task

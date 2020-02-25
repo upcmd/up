@@ -97,9 +97,9 @@ func SetVerbose(cmdV string) {
 	}
 }
 
-func SetTaskdir(taskdir string) {
-	if taskdir != "" {
-		CoreConfig.TaskDir = taskdir
+func SetRefdir(refdir string) {
+	if refdir != "" {
+		CoreConfig.RefDir = refdir
 	}
 }
 

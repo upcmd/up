@@ -1,5 +1,6 @@
 goal:
-  - to test out dvars object can merge in leaf level
+  - refdir will override global configured refdir
+  - it will error if refdir for dvar is not correct
 
 expected:
   - school object in nonprod could append new element and
@@ -62,7 +63,7 @@ scopes:
 dvars:
   - name: sgp_address
     ref: d0030_school.yml
-    refdir: ./tests/functests
+    refdir: ./tests
     flags: [to_object]
 
 tasks:

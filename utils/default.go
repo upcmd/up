@@ -11,10 +11,8 @@ import "github.com/fatih/color"
 
 var (
 	defaults map[string]string = map[string]string{
-		"TaskDir":       ".",
+		"RefDir":        ".",
 		"TaskFile":      "up",
-		"FlowDir":       ".",
-		"FlowFile":      "flow",
 		"Verbose":       "v",
 		"MaxCallLayers": "256",
 		"ConfigDir":     ".",

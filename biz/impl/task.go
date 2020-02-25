@@ -24,7 +24,7 @@ var (
 )
 
 func InitTasks() {
-	TaskYmlRoot = u.YamlLoader("Task", u.CoreConfig.TaskDir, u.CoreConfig.TaskFile)
+	TaskYmlRoot = u.YamlLoader("Task", u.CoreConfig.RefDir, u.CoreConfig.TaskFile)
 
 	//TODO: refactory of the runtime init after config is loaded to a proper place
 	cache.FuncMapInit()
@@ -96,7 +96,6 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 				cache.TaskStack.Push(&rtContext)
 				u.Pvvvv("Executing task stack layer:", cache.TaskStack.GetLen())
 				maxLayers, err := strconv.Atoi(u.CoreConfig.MaxCallLayers)
-				u.Ptmpdebug("99", maxLayers)
 				u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
 
 				if maxLayers != 0 && cache.TaskStack.GetLen() > maxLayers {
@@ -126,14 +125,19 @@ func validateAndLoadTaskRef(taks *model.Tasks) {
 			invalidNames = append(invalidNames, task.Name)
 		}
 
-		//u.Ptmpdebug("99", task)
 		if task.Task != nil && task.Ref != "" {
 			u.InvalidAndExit("validate task node and ref", "task and ref can not coexist")
 		}
 
 		//load ref task
+		refdir := u.CoreConfig.RefDir
+
 		if task.Ref != "" {
-			yamlflowroot := u.YamlLoader("flow ref", u.CoreConfig.TaskDir, task.Ref)
+			if task.RefDir != "" {
+				refdir = task.RefDir
+			}
+
+			yamlflowroot := u.YamlLoader("flow ref", refdir, task.Ref)
 			flow := loadRefFlow(yamlflowroot)
 			(*taks)[idx].Task = flow
 		}
@@ -149,7 +153,7 @@ func loadRefTasks() {
 	if tasksRefList != nil {
 		for _, ref := range tasksRefList.([]interface{}) {
 			tasksYamlName := ref.(string)
-			tasksYmlRoot := u.YamlLoader(tasksYamlName, u.CoreConfig.TaskDir, tasksYamlName)
+			tasksYmlRoot := u.YamlLoader(tasksYamlName, u.CoreConfig.RefDir, tasksYamlName)
 
 			var tasks model.Tasks
 			tasksData := tasksYmlRoot.Get("tasks")

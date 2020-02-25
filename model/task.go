@@ -8,10 +8,11 @@
 package model
 
 type Task struct {
-	Task interface{} //Steps
-	Desc string
-	Name string
-	Ref  string
+	Task   interface{} //Steps
+	Desc   string
+	Name   string
+	Ref    string
+	RefDir string
 }
 
 type Tasks []Task

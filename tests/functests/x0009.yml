@@ -4,7 +4,7 @@ goal:
 scopes:
   -
     name: global
-    ref: d0009-global
+    ref: d0009-global.yml
 
   -
     name: prod
@@ -31,7 +31,7 @@ scopes:
       b: staging-b
 
   -  name: dev
-     ref: d0009-dev
+     ref: d0009-dev.yml
 
 tasks:
 

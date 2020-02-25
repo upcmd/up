@@ -31,7 +31,7 @@ tasks:
   -
     name: compose_required_object
     desc: prepare the data object for rendering
-    ref: c0081_task_compose_required_object
+    ref: c0081_task_compose_required_object.yml
 
   -
     name: render

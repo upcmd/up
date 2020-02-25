@@ -72,4 +72,4 @@ tasks:
   -
     name: a_very_complicated_task
     desc: "a_very_complicated_task"
-    ref: c0060-task-ref
+    ref: c0060-task-ref.yml

@@ -238,7 +238,7 @@ func SubStepStatus(mark string, statusCode int) {
 	if statusCode == 0 {
 		color.Green(" %s ok", mark)
 	} else {
-		color.Red(" %s failed(but ignored and continue)", mark)
+		color.Red(" %s failed(suppressed if not last step)", mark)
 	}
 }
 

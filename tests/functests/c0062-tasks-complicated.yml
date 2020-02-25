@@ -4,7 +4,7 @@ tasks:
   -
     name: a_very_complicated_task
     desc: "a_very_complicated_task"
-    ref: c0061-task-complicate
+    ref: c0061-task-complicate.yml
 
   -
     name: task_b

@@ -8,6 +8,6 @@ tasks:
 
   -
     name: task
-    ref: c0059-task-ref
+    ref: c0059-task-ref.yml
     task:
       - name:

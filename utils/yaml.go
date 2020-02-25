@@ -14,7 +14,7 @@ import (
 )
 
 func YamlLoader(id, path, filename string) *viper.Viper {
-	Pf("loading [%s]:  %s/%s.yml\n", id, path, filename)
+	Pf("loading [%s]:  %s/%s\n", id, path, filename)
 	newV := viper.New()
 	newV.AddConfigPath(path)
 	newV.SetConfigType("yaml")
@@ -24,7 +24,7 @@ func YamlLoader(id, path, filename string) *viper.Viper {
 	err := newV.ReadInConfig()
 
 	if err != nil {
-		fmt.Printf("yml file: %s/%s.yml ", path, filename)
+		fmt.Printf("yml file: %s/%s ", path, filename)
 		fmt.Println("errored:", err.Error())
 		LogError("Yaml loading error", err)
 		os.Exit(3)

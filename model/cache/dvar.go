@@ -28,6 +28,7 @@ type Dvar struct {
 	Rendered string
 	Secure   *model.SecureSetting
 	Ref      string
+	RefDir   string
 	Data     string
 }
 
@@ -43,8 +44,13 @@ func (dvars *Dvars) ValidateAndLoading() {
 			u.InvalidAndExit("validating dvar ref and value", "ref and value can not both exist at the same time")
 		}
 
+		refdir := u.CoreConfig.RefDir
 		if dvar.Ref != "" {
-			data, err := ioutil.ReadFile(path.Join(u.CoreConfig.TaskDir, dvar.Ref))
+			if dvar.RefDir != "" {
+				refdir = dvar.RefDir
+			}
+
+			data, err := ioutil.ReadFile(path.Join(refdir, dvar.Ref))
 			u.LogErrorAndExit("load dvar value from ref file", err, "please fix file loading problem")
 			(*dvars)[idx].Value = string(data)
 		}
