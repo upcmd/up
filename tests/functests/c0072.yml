@@ -36,7 +36,7 @@ tasks:
               name: correct_working_dir
               desc: the value of .intest is string but not bool so you can not simple use if .intest for condition
               value: >-
-                {{if eq .intest "true" }}{{.register_task_root}}/../..{{else}}{{.register_task_root}}{{end}}
+                {{if eq .intest "true" }}{{.register_task_root}}{{else}}{{.register_task_root}}{{end}}
 
       - func: cmd
         do:
@@ -48,7 +48,7 @@ tasks:
 
           -
             name: template
-            desc: render a template file to a file
+            desc: render a template file to a file 1
             cmd:
               src: '{{.correct_working_dir}}/tests/functests/d0072.template'
               dest: /tmp/mystory.txt
@@ -70,7 +70,7 @@ tasks:
 
           -
             name: template
-            desc: render a template file to a file
+            desc: render a template file to a file 2
             cmd:
               src: '{{.correct_working_dir}}/tests/functests/d0072.template'
               dest: '{{.save_to}}'

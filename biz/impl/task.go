@@ -14,6 +14,7 @@ import (
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -24,7 +25,14 @@ var (
 )
 
 func InitTasks() {
-	TaskYmlRoot = u.YamlLoader("Task", u.CoreConfig.RefDir, u.CoreConfig.TaskFile)
+
+	priorityLoadingTaskFile := filepath.Join(".", u.CoreConfig.TaskFile)
+	refDir := "."
+	if _, err := os.Stat(priorityLoadingTaskFile); err != nil {
+		refDir = u.CoreConfig.RefDir
+	}
+
+	TaskYmlRoot = u.YamlLoader("Task", refDir, u.CoreConfig.TaskFile)
 
 	//TODO: refactory of the runtime init after config is loaded to a proper place
 	cache.FuncMapInit()

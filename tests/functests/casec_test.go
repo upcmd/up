@@ -12,9 +12,14 @@ import (
 	"github.com/stephencheng/up/model/cache"
 	"github.com/stephencheng/up/tests"
 	u "github.com/stephencheng/up/utils"
+	"os"
 
 	"testing"
 )
+
+func init() {
+	os.Chdir("../..")
+}
 
 func TestC(t *testing.T) {
 	u.InitConfig()

@@ -3,7 +3,7 @@ goup(){
 }
 
 wiptest(){
-    goup ngo task -d ./tests/functests -t wip -i dev --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t wip.yml -i dev --configdir=./tests/functests
 }
 
 wipfunctest(){
@@ -11,27 +11,27 @@ wipfunctest(){
 }
 
 wiptestvvvv(){
-    goup ngo task -d ./tests/functests -t wip -i dev -v vvvv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t wip.yml -i dev -v vvvv --configdir=./tests/functests
 }
 
 wiptestvv(){
-    goup ngo task -d ./tests/functests -t wip -i dev -v vv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t wip.yml -i dev -v vv --configdir=./tests/functests
 }
 
 wiptestvvv(){
-    goup ngo task -d ./tests/functests -t wip -i dev -v vvv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t wip.yml -i dev -v vvv --configdir=./tests/functests
 }
 
 wiptestvvvvv(){
-    goup ngo task -d ./tests/functests -t wip -i dev -v vvvvv --configdir=./tests/functests
+    goup ngo task -d ./tests/functests -t wip.yml -i dev -v vvvvv --configdir=./tests/functests
 }
 
 wiptestdebug(){
-    goup ngo task -d ./tests/functests -t wip -i dev -v vvvvv
+    goup ngo task -d ./tests/functests -t wip.yml -i dev -v vvvvv
 }
 
 wiptestvalidate(){
-    goup validate task task -d ./tests/functests -t wip -i dev -v vvvvv
+    goup validate task task -d ./tests/functests -t wip.yml -i dev -v vvvvv
 }
 
 uplist(){

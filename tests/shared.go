@@ -9,6 +9,7 @@ package tests
 
 import (
 	"github.com/stephencheng/up/biz/impl"
+	m "github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/cache"
 	u "github.com/stephencheng/up/utils"
 	"os/exec"
@@ -54,12 +55,15 @@ func TestT(prefix string, t *testing.T) {
 	impl.ExecTask("task", nil)
 }
 
+//mock required settings
 func Setupx(filename string) {
 
 	filenameonly := path.Base(filename)
 
 	filenoext := strings.TrimSuffix(filenameonly, filepath.Ext(filenameonly))
 	u.CoreConfig.TaskFile = GetTestName(filenoext)
+	u.CoreConfig.RefDir = "./tests/functests"
+	u.CoreConfig.Secure = &m.SecureSetting{Type: "default_aes", Key: "enc_key"}
 	u.ShowCoreConfig()
 	u.ShowCoreConfigMsg()
 	u.P(" :test task file:", u.CoreConfig.TaskFile)

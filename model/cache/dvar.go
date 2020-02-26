@@ -67,10 +67,10 @@ func (dvars *Dvars) ValidateAndLoading() {
 func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 
 	dvars.ValidateAndLoading()
-	var expandedVars *Cache = New()
+	var expandedVars *Cache = NewCache()
 
 	if *contextVars == nil {
-		contextVars = New()
+		contextVars = NewCache()
 	}
 
 	var tmpVars Cache = deepcopy.Copy(*contextVars).(Cache)

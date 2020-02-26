@@ -137,7 +137,7 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 			}
 
 			if u.Contains(dvar.Flags, "prompt") {
-				//hiColor := color.New(color.FgHiWhite, color.BgBlack)
+				//hiColor := color.NewCache(color.FgHiWhite, color.BgBlack)
 				//hiColor.Printf("Enter Value For Dvar: %s\n", dvar.Name)
 				u.Ppromptvvvvv("Dvar", "This will be saved as a dvar value")
 				reader := bufio.NewReader(os.Stdin)
@@ -155,6 +155,9 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 func decryptAndRegister(securetag *model.SecureSetting, dvar *Dvar, mergeTarget *Cache) {
 	s := securetag
 
+	if s == nil {
+		u.InvalidAndExit("check secure setting", "secure setting has to be explicit in dvar secure node, or as a default setting in upconfig.yml")
+	}
 	var encryptionkey string
 	if s.KeyRef != "" {
 		data, err := ioutil.ReadFile(s.KeyRef)
@@ -287,7 +290,7 @@ func (ss *Scopes) InitContextInstances() {
 	if globalScope != nil {
 		globalvarsMergedWithDvars = GlobalVarsMergedWithDvars(globalScope)
 	} else {
-		globalvarsMergedWithDvars = New()
+		globalvarsMergedWithDvars = NewCache()
 	}
 
 	for idx, s := range *ss {

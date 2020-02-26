@@ -110,7 +110,7 @@ tasks:
               name: correct_working_dir
               desc: the value of .intest is string but not bool so you can not simple use if .intest for condition
               value: >-
-                {{if eq .intest "true" }}{{.register_render_root}}/../..{{else}}{{.register_render_root}}{{end}}
+                {{if eq .intest "true" }}{{.register_render_root}}{{else}}{{.register_render_root}}{{end}}
 
       - func: cmd
         do:

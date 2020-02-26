@@ -22,12 +22,12 @@ var (
 
 func GetCache() *Cache {
 	if cacheMap == nil {
-		cacheMap = New()
+		cacheMap = NewCache()
 	}
 	return cacheMap
 }
 
-func New() *Cache {
+func NewCache() *Cache {
 	cache := Cache{}
 	return &cache
 }
@@ -47,7 +47,7 @@ func (c *Cache) Len() int {
 }
 
 func (c *Cache) GetPrefixMatched(prefix string) *Cache {
-	valueMap := New()
+	valueMap := NewCache()
 	for k, v := range *c {
 		if strings.HasPrefix(k, prefix) {
 			varname := strings.Trim(k, prefix)
