@@ -9,7 +9,7 @@ package impl
 
 import (
 	"github.com/fatih/color"
-	"github.com/stephencheng/up/model/cache"
+	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	ee "github.com/stephencheng/up/utils/error"
 	"os"
@@ -27,7 +27,7 @@ func DryRunOrExit(mark string, mustCondition MustConditionToContinueFunc, condit
 
 	ok := mustCondition()
 
-	if cache.Dryrun {
+	if core.Dryrun {
 		color.Green("      %s -> %s", mark, "in dryrun, try to ignore")
 		if !ok {
 			color.Red("      %s -> %s", mark, "can not continue further due to critical condition not satisfied")
@@ -50,7 +50,7 @@ func DryRunAndSkip(mark string, allowedErrors []string, continueFunc ContinueFun
 		continueFunc()
 	} else if u.Contains(allowedErrors, mark) {
 		//do nothing
-		if cache.Dryrun {
+		if core.Dryrun {
 			u.Pdryrun("in dry run and skip further")
 		}
 	} else {

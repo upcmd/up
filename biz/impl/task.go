@@ -11,7 +11,7 @@ import (
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
-	"github.com/stephencheng/up/model/cache"
+	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	"os"
 	"path/filepath"
@@ -35,15 +35,15 @@ func InitTasks() {
 	TaskYmlRoot = u.YamlLoader("Task", refDir, u.CoreConfig.TaskFile)
 
 	//TODO: refactory of the runtime init after config is loaded to a proper place
-	cache.FuncMapInit()
-	loadTasks()
+	core.FuncMapInit()
 	loadScopes()
-	cache.ScopeProfiles.InitContextInstances()
+	core.ScopeProfiles.InitContextInstances()
 	loadRuntimeGlobalVars()
 	loadRuntimeDvars()
-	cache.SetRuntimeVarsMerged(cache.InstanceName)
-	cache.SetRuntimeGlobalMergedWithDvars()
+	core.SetRuntimeVarsMerged(core.InstanceName)
+	core.SetRuntimeGlobalMergedWithDvars()
 	//t.ListAllFuncs()
+	loadTasks()
 }
 
 func ListTasks() {
@@ -67,11 +67,11 @@ func ListTasks() {
 
 }
 func ValidateTask(taskname string) {
-	cache.SetDryrun()
+	core.SetDryrun()
 	ExecTask(taskname, nil)
 }
 
-func ExecTask(taskname string, callerVars *cache.Cache) {
+func ExecTask(taskname string, callerVars *core.Cache) {
 	found := false
 	for idx, task := range *Tasks {
 		if taskname == task.Name {
@@ -96,23 +96,23 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 			}()
 
 			func() {
-				rtContext := cache.TaskRuntimeContext{
+				rtContext := core.TaskRuntimeContext{
 					Taskname:   taskname,
 					CallerVars: callerVars,
 				}
 
-				cache.TaskStack.Push(&rtContext)
-				u.Pvvvv("Executing task stack layer:", cache.TaskStack.GetLen())
+				core.TaskStack.Push(&rtContext)
+				u.Pvvvv("Executing task stack layer:", core.TaskStack.GetLen())
 				maxLayers, err := strconv.Atoi(u.CoreConfig.MaxCallLayers)
 				u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
 
-				if maxLayers != 0 && cache.TaskStack.GetLen() > maxLayers {
+				if maxLayers != 0 && core.TaskStack.GetLen() > maxLayers {
 					u.LogError("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
 					os.Exit(-1)
 				}
 
 				steps.Exec()
-				cache.TaskStack.Pop()
+				core.TaskStack.Pop()
 			}()
 
 		}
@@ -127,6 +127,7 @@ func ExecTask(taskname string, callerVars *cache.Cache) {
 
 func validateAndLoadTaskRef(taks *model.Tasks) {
 	//validation
+
 	invalidNames := []string{}
 	for idx, task := range *taks {
 		if strings.Contains(task.Name, "-") {
@@ -142,7 +143,8 @@ func validateAndLoadTaskRef(taks *model.Tasks) {
 
 		if task.Ref != "" {
 			if task.RefDir != "" {
-				refdir = task.RefDir
+				rawdir := task.RefDir
+				refdir = core.Render(rawdir, core.RuntimeVarsAndDvarsMerged)
 			}
 
 			yamlflowroot := u.YamlLoader("flow ref", refdir, task.Ref)
@@ -197,26 +199,24 @@ func loadRefFlow(yamlroot *viper.Viper) *Steps {
 
 func loadScopes() {
 	scopesData := TaskYmlRoot.Get("scopes")
-	var scopes cache.Scopes
+	var scopes core.Scopes
 	err := ms.Decode(scopesData, &scopes)
-	cache.SetScopeProfiles(&scopes)
+	core.SetScopeProfiles(&scopes)
 
 	u.LogErrorAndExit("load full scopes", err, "please assess your scope configuration carefully")
-	//u.Ptmpdebug("111", scopes)
 }
 
 func loadRuntimeGlobalVars() {
 	varsData := TaskYmlRoot.Get("vars")
-	var vars cache.Cache
+	var vars core.Cache
 	err := ms.Decode(varsData, &vars)
-	//u.Ptmpdebug("111", vars)
 	u.LogError("loadRuntimeGlobalVars", err)
-	cache.SetRuntimeGlobalVars(&vars)
+	core.SetRuntimeGlobalVars(&vars)
 }
 
-func loadRuntimeDvars() *cache.Dvars {
+func loadRuntimeDvars() *core.Dvars {
 	dvarsData := TaskYmlRoot.Get("dvars")
-	var dvars cache.Dvars
+	var dvars core.Dvars
 	err := ms.Decode(dvarsData, &dvars)
 	u.LogErrorAndExit("loadRuntimeDvars",
 		err,
@@ -224,7 +224,7 @@ func loadRuntimeDvars() *cache.Dvars {
 	)
 
 	//dvars.ValidateAndLoading()
-	cache.SetRuntimeGlobalDvars(&dvars)
+	core.SetRuntimeGlobalDvars(&dvars)
 	return &dvars
 
 }

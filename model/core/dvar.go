@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-package cache
+package core
 
 import (
 	"github.com/mohae/deepcopy"
@@ -32,9 +32,10 @@ type Dvar struct {
 	Data     string
 }
 
-func (dvars *Dvars) ValidateAndLoading() {
+func (dvars *Dvars) ValidateAndLoading(contextVars *Cache) {
 	var identified bool
 	for idx, dvar := range *dvars {
+
 		if strings.Contains(dvar.Name, "-") {
 			identified = true
 			u.InvalidAndExit("validating dvar name", "dvar name can not contain '-', please use '_' instead")
@@ -47,7 +48,8 @@ func (dvars *Dvars) ValidateAndLoading() {
 		refdir := u.CoreConfig.RefDir
 		if dvar.Ref != "" {
 			if dvar.RefDir != "" {
-				refdir = dvar.RefDir
+				rawdir := dvar.RefDir
+				refdir = Render(rawdir, contextVars)
 			}
 
 			data, err := ioutil.ReadFile(path.Join(refdir, dvar.Ref))
@@ -66,7 +68,7 @@ func (dvars *Dvars) ValidateAndLoading() {
 //given a dvars with the vars context, it expands with rendered result
 func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 
-	dvars.ValidateAndLoading()
+	dvars.ValidateAndLoading(contextVars)
 	var expandedVars *Cache = NewCache()
 
 	if *contextVars == nil {
@@ -77,9 +79,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 	var tmpDvars Dvars
 	tmpDvars = deepcopy.Copy(*dvars).(Dvars)
 
-	//var datasource *Cache
 	var datasource interface{}
-	//var datasource map[string]interface{}
 
 	for idx, dvar := range tmpDvars {
 		if dvar.Expand == 0 {

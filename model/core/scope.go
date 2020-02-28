@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-package cache
+package core
 
 import (
 	"bufio"
@@ -96,9 +96,6 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 				err := yaml.Unmarshal([]byte(rawyml), obj)
 				u.LogErrorAndExit("dvar conversion to object:", err, "please validate the ymal content")
 
-				//if dvar.Expand > 1 {
-				//	u.InvalidAndExit("dvar validation", "multiple expand > 1 is not allowed when to_object is set")
-				//}
 				dvarObjName := u.Spf("%s_%s", dvar.Name, "object")
 				if dvar.Name != "void" {
 					(*mergeTarget).Put(dvarObjName, *obj)
@@ -186,7 +183,6 @@ func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
 	var mergedVars Cache
 	mergedVars = deepcopy.Copy(*RuntimeVarsMerged).(Cache)
 
-	//u.Ptmpdebug("xxx", RuntimeGlobalDvars)
 	expandedVars := RuntimeGlobalDvars.Expand("runtime global", RuntimeVarsMerged)
 
 	if RuntimeGlobalDvars != nil {
@@ -312,11 +308,8 @@ func (ss *Scopes) InitContextInstances() {
 			var groupvarsMergedWithDvars *Cache = ScopeVarsMergedWithDvars(groupScope, &groupvars)
 
 			expandedContext[s.Name] = groupvarsMergedWithDvars
-			//u.Ptmpdebug("group merged vars", s.Name, *groupvarsMergedWithDvars)
 		}
 	}
-
-	//u.Ppmsgvvvvhint("999", expandedContext)
 
 	expandedContext["global"] = globalvarsMergedWithDvars
 	ListContextInstances()

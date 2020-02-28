@@ -12,12 +12,11 @@ import (
 	"github.com/imdario/mergo"
 	"github.com/mohae/deepcopy"
 	"github.com/stephencheng/up/biz"
-	"github.com/stephencheng/up/model/cache"
+	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	ee "github.com/stephencheng/up/utils/error"
 	"os"
 
-	//"gopkg.in/yaml.v2"
 	"reflect"
 	"strconv"
 )
@@ -26,24 +25,22 @@ type Step struct {
 	Name  string
 	Do    interface{} //FuncImpl
 	Func  string
-	Vars  cache.Cache
-	Dvars cache.Dvars
+	Vars  core.Cache
+	Dvars core.Dvars
 	Desc  string
 	Reg   string
-	Flags []string //ignore_error |
+	Flags []string
 	If    string
-	//Loop  *[]interface{}
-	Loop interface{}
+	Loop  interface{}
 }
 
 type Steps []Step
 
 //this is final merged exec vars the individual step will use
 //this step will merge the vars with the caller's stack vars
-func (step *Step) GetExecVarsWithRefOverrided(funcname string) *cache.Cache {
+func (step *Step) GetExecVarsWithRefOverrided(funcname string) *core.Cache {
 	vars := step.getRuntimeExecVars(funcname)
-	callerVars := cache.TaskStack.GetTop().(*cache.TaskRuntimeContext).CallerVars
-	//u.Ptmpdebug("callerVars", callerVars)
+	callerVars := core.TaskStack.GetTop().(*core.TaskRuntimeContext).CallerVars
 
 	if callerVars != nil {
 		mergo.Merge(vars, callerVars, mergo.WithOverride)
@@ -57,10 +54,10 @@ func (step *Step) GetExecVarsWithRefOverrided(funcname string) *cache.Cache {
 merge localvars to above RuntimeVarsAndDvarsMerged to get final runtime exec vars
 the localvars is the vars in the step
 */
-func (step *Step) getRuntimeExecVars(mark string) *cache.Cache {
-	var execvars cache.Cache
+func (step *Step) getRuntimeExecVars(mark string) *core.Cache {
+	var execvars core.Cache
 
-	execvars = deepcopy.Copy(*cache.RuntimeVarsAndDvarsMerged).(cache.Cache)
+	execvars = deepcopy.Copy(*core.RuntimeVarsAndDvarsMerged).(core.Cache)
 
 	if step.Vars != nil {
 		mergo.Merge(&execvars, step.Vars, mergo.WithOverride)
@@ -70,7 +67,7 @@ func (step *Step) getRuntimeExecVars(mark string) *cache.Cache {
 		u.Dvvvvv(execvars)
 	}
 
-	localVarsMergedWithDvars := cache.VarsMergedWithDvars("local", &step.Vars, &step.Dvars, &execvars)
+	localVarsMergedWithDvars := core.VarsMergedWithDvars("local", &step.Vars, &step.Dvars, &execvars)
 
 	if localVarsMergedWithDvars.Len() > 0 {
 		mergo.Merge(&execvars, localVarsMergedWithDvars, mergo.WithOverride)
@@ -92,10 +89,9 @@ func chainAction(action *biz.Do) {
 
 func (step *Step) Exec() {
 	var action biz.Do
-	//u.Ptmpdebug("step debug", step)
 
 	var bizErr *ee.Error = ee.New()
-	var stepExecVars *cache.Cache
+	var stepExecVars *core.Cache
 	stepExecVars = step.GetExecVarsWithRefOverrided("get plain exec vars")
 
 	routeFuncType := func(loopItem *LoopItem) {
@@ -154,7 +150,7 @@ func (step *Step) Exec() {
 						func() {
 							//loop points to a var name which is a slice
 							if reflect.TypeOf(step.Loop).Kind() == reflect.String {
-								loopVarName := cache.Render(step.Loop.(string), stepExecVars)
+								loopVarName := core.Render(step.Loop.(string), stepExecVars)
 								loopObj := stepExecVars.Get(loopVarName)
 								if loopObj == nil {
 									u.InvalidAndExit("Evaluating loop var and object", u.Spf("Please use a correct varname:(%s) containing a list of values", loopVarName))
@@ -206,7 +202,7 @@ func (step *Step) Exec() {
 
 	func() {
 		if step.If != "" {
-			IfEval := cache.Render(step.If, stepExecVars)
+			IfEval := core.Render(step.If, stepExecVars)
 			goahead, err := strconv.ParseBool(IfEval)
 			u.LogErrorAndExit("evaluate condition", err, u.Spf("please fix if condition evaluation: [%s]", IfEval))
 			if goahead {
@@ -231,31 +227,31 @@ func (steps *Steps) Exec() {
 		u.Ppmsgvvvv(step)
 
 		execStep := func() {
-			rtContext := cache.StepRuntimeContext{
+			rtContext := core.StepRuntimeContext{
 				Stepname: step.Name,
 				//Flags:    &step.Flags,
 			}
-			cache.StepStack.Push(&rtContext)
+			core.StepStack.Push(&rtContext)
 
 			step.Exec()
 
-			result := cache.StepStack.GetTop().(*cache.StepRuntimeContext).Result
-			taskname := cache.TaskStack.GetTop().(*cache.TaskRuntimeContext).Taskname
+			result := core.StepStack.GetTop().(*core.StepRuntimeContext).Result
+			taskname := core.TaskStack.GetTop().(*core.TaskRuntimeContext).Taskname
 
 			if u.Contains([]string{FUNC_SHELL, FUNC_CALL}, step.Func) {
 				if step.Reg == "auto" {
-					cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
+					core.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
 				} else if step.Reg != "" {
-					cache.RuntimeVarsAndDvarsMerged.Put(u.Spf("%s", step.Reg), result.Output)
+					core.RuntimeVarsAndDvarsMerged.Put(u.Spf("%s", step.Reg), result.Output)
 				} else {
 					if step.Func == FUNC_SHELL {
-						cache.RuntimeVarsAndDvarsMerged.Put("last_task_result", result)
+						core.RuntimeVarsAndDvarsMerged.Put("last_task_result", result)
 					}
 				}
 			}
 
 			func() {
-				result := cache.StepStack.GetTop().(*cache.StepRuntimeContext).Result
+				result := core.StepStack.GetTop().(*core.StepRuntimeContext).Result
 
 				if result != nil && result.Code == 0 {
 					u.LogOk(".")
@@ -285,7 +281,7 @@ func (steps *Steps) Exec() {
 
 			}()
 
-			cache.StepStack.Pop()
+			core.StepStack.Pop()
 		}
 
 		execStep()

@@ -10,7 +10,7 @@ package impl
 import (
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
-	"github.com/stephencheng/up/model/cache"
+	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	"io/ioutil"
 	"path"
@@ -18,7 +18,7 @@ import (
 
 type CmdFuncAction struct {
 	Do   interface{}
-	Vars *cache.Cache
+	Vars *core.Cache
 	Cmds *CmdCmds
 }
 
@@ -96,14 +96,14 @@ func (f *CmdFuncAction) Exec() {
 		switch cmdItem.Name {
 		case "print":
 			cmdItem.runCmd("string", func() {
-				cmdRendered := cache.Render(cmdItem.Cmd.(string), f.Vars)
+				cmdRendered := core.Render(cmdItem.Cmd.(string), f.Vars)
 				u.Pfv("%s\n", color.HiGreenString("%s", cmdRendered))
 			})
 
 		case "printobj":
 			u.Dvvvv(cmdItem.Cmd)
 			cmdItem.runCmd("string", func() {
-				objname := cache.Render(cmdItem.Cmd.(string), f.Vars)
+				objname := core.Render(cmdItem.Cmd.(string), f.Vars)
 				//obj := cache.RuntimeVarsAndDvarsMerged.Get(objname)
 				obj := f.Vars.Get(objname)
 				u.Ppfmsg(u.Spf("object:\n %s", objname), obj)
@@ -111,12 +111,12 @@ func (f *CmdFuncAction) Exec() {
 
 		case "dereg":
 			cmdItem.runCmd("string", func() {
-				varname := cache.Render(cmdItem.Cmd.(string), f.Vars)
+				varname := core.Render(cmdItem.Cmd.(string), f.Vars)
 				u.Pfv("deregister var: %s\n", color.HiGreenString("%s", varname))
-				cache.RuntimeVarsAndDvarsMerged.Delete(varname)
+				core.RuntimeVarsAndDvarsMerged.Delete(varname)
 				f.Vars.Delete(varname)
 			})
-			u.Ppmsgvvvvvhint("after reg the var - global:", cache.RuntimeVarsAndDvarsMerged)
+			u.Ppmsgvvvvvhint("after reg the var - global:", core.RuntimeVarsAndDvarsMerged)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 
 		case "sleep":
@@ -134,13 +134,13 @@ func (f *CmdFuncAction) Exec() {
 					switch k.(string) {
 					case "reg":
 						raw = v.(string)
-						varname = cache.Render(raw, f.Vars)
+						varname = core.Render(raw, f.Vars)
 					case "filename":
 						raw = v.(string)
-						filename = cache.Render(raw, f.Vars)
+						filename = core.Render(raw, f.Vars)
 					case "dir":
 						raw = v.(string)
-						dir = cache.Render(raw, f.Vars)
+						dir = core.Render(raw, f.Vars)
 					case "localonly":
 						localonly = v.(bool)
 					}
@@ -153,13 +153,13 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					f.Vars.Put(varname, string(content))
 				} else {
-					cache.RuntimeVarsAndDvarsMerged.Put(varname, string(content))
+					core.RuntimeVarsAndDvarsMerged.Put(varname, string(content))
 					f.Vars.Put(varname, string(content))
 				}
 
 			})
 
-			u.Ppmsgvvvvvhint("after reg the var - global:", cache.RuntimeVarsAndDvarsMerged)
+			u.Ppmsgvvvvvhint("after reg the var - global:", core.RuntimeVarsAndDvarsMerged)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 
 		case "writefile":
@@ -170,13 +170,13 @@ func (f *CmdFuncAction) Exec() {
 					switch k.(string) {
 					case "content":
 						contentRaw := v.(string)
-						content = cache.Render(contentRaw, f.Vars)
+						content = core.Render(contentRaw, f.Vars)
 					case "filename":
 						raw = v.(string)
-						filename = cache.Render(raw, f.Vars)
+						filename = core.Render(raw, f.Vars)
 					case "dir":
 						raw = v.(string)
-						dir = cache.Render(raw, f.Vars)
+						dir = core.Render(raw, f.Vars)
 					}
 				}
 				filepath := path.Join(dir, filename)
@@ -192,22 +192,22 @@ func (f *CmdFuncAction) Exec() {
 					switch k.(string) {
 					case "src":
 						raw = v.(string)
-						src = cache.Render(raw, f.Vars)
+						src = core.Render(raw, f.Vars)
 					case "data":
 						raw = v.(string)
-						datakey = cache.Render(raw, f.Vars)
+						datakey = core.Render(raw, f.Vars)
 						data = f.Vars.Get(datakey)
 					case "dest":
 						raw = v.(string)
-						dest = cache.Render(raw, f.Vars)
+						dest = core.Render(raw, f.Vars)
 					}
 				}
 
 				tbuf, err := ioutil.ReadFile(src)
 				if data == nil || data == "" {
-					rendered = cache.Render(string(tbuf), f.Vars)
+					rendered = core.Render(string(tbuf), f.Vars)
 				} else {
-					rendered = cache.Render(string(tbuf), data)
+					rendered = core.Render(string(tbuf), data)
 				}
 
 				u.LogErrorAndExit("cmd template", err, "please fix file path and name issues")
@@ -225,7 +225,7 @@ func (f *CmdFuncAction) Exec() {
 					}
 					if k.(string) == "value" {
 						varvalueRaw := v.(string)
-						varvalue = cache.Render(varvalueRaw, f.Vars)
+						varvalue = core.Render(varvalueRaw, f.Vars)
 					}
 					if k.(string) == "localonly" {
 						localonly = v.(bool)
@@ -235,12 +235,12 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					f.Vars.Put(varname, varvalue)
 				} else {
-					cache.RuntimeVarsAndDvarsMerged.Put(varname, varvalue)
+					core.RuntimeVarsAndDvarsMerged.Put(varname, varvalue)
 					f.Vars.Put(varname, varvalue)
 				}
 
 			})
-			u.Ppmsgvvvvvhint("after reg the var - global:", cache.RuntimeVarsAndDvarsMerged)
+			u.Ppmsgvvvvvhint("after reg the var - global:", core.RuntimeVarsAndDvarsMerged)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 		default:
 			u.Pferror("warrning: check cmd name:(%s),%s\n", cmdItem.Name, "cmd not implemented")

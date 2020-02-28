@@ -10,7 +10,7 @@ package impl
 import (
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
-	"github.com/stephencheng/up/model/cache"
+	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 )
 
@@ -20,7 +20,7 @@ func runTask(f *TaskRefFuncAction, taskname string) {
 
 type TaskRefFuncAction struct {
 	Do   interface{}
-	Vars *cache.Cache
+	Vars *core.Cache
 	Refs []string
 }
 
@@ -47,7 +47,7 @@ func (f *TaskRefFuncAction) Adapt() {
 func (f *TaskRefFuncAction) Exec() {
 	u.P("executing linking tasks")
 	for idx, tmptaskname := range f.Refs {
-		taskname := cache.Render(tmptaskname, f.Vars)
+		taskname := core.Render(tmptaskname, f.Vars)
 		u.Pfv("    taskname(%2d):\n%+v\n", idx+1, color.HiBlueString("%s", taskname))
 		runTask(f, taskname)
 	}

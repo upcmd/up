@@ -9,7 +9,7 @@ package functests
 
 import (
 	"github.com/stephencheng/up/biz/impl"
-	"github.com/stephencheng/up/model/cache"
+	"github.com/stephencheng/up/model/core"
 	"github.com/stephencheng/up/tests"
 	u "github.com/stephencheng/up/utils"
 	"os"
@@ -25,14 +25,14 @@ func TestC(t *testing.T) {
 	u.InitConfig()
 
 	files := tests.GetUnitTestCollection()
-	cache.SetInstanceName("dev")
+	core.SetInstanceName("dev")
 	for _, x := range files {
 		u.P("testing:", x)
 		tests.Setupx(x)
 		impl.InitTasks()
 		impl.ListTasks()
 		impl.ExecTask("task", nil)
-		cache.Unset()
+		core.Unset()
 	}
 }
 

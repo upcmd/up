@@ -1,5 +1,6 @@
 goal:
   - to test out vars reference in yml file
+  - refdir in scope itme can not be dynamic value as the scope is very fundamental
 
 scopes:
   -

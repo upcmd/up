@@ -10,7 +10,7 @@ package main
 import (
 	"github.com/alecthomas/kingpin"
 	"github.com/stephencheng/up/biz/impl"
-	"github.com/stephencheng/up/model/cache"
+	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	"os"
 )
@@ -47,7 +47,7 @@ func main() {
 	u.Pfvvvv(" :verbose level:  %s", u.CoreConfig.Verbose)
 	u.Pfvvvv(" :instance name:  %s", *instanceName)
 
-	cache.SetInstanceName(*instanceName)
+	core.SetInstanceName(*instanceName)
 
 	switch cmd {
 	case ngo.FullCommand():

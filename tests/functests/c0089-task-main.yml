@@ -1,0 +1,6 @@
+flow:
+  -
+    func: shell
+    do:
+      - echo "task step 1"
+      - echo "task step 2"

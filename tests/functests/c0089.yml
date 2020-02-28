@@ -1,0 +1,12 @@
+goal:
+  - add dynamic refdir support for task ref
+
+vars:
+  dynadir: ./tests/functests
+
+tasks:
+
+  -
+    name: task
+    ref: c0089-task-main.yml
+    refdir: '{{.dynadir}}'

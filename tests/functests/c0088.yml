@@ -1,0 +1,34 @@
+goal:
+  - to test out dvars object can be loaded from a dynamic ref dir
+
+vars:
+  student:
+    name: Tom
+    gender: Male
+    address:
+      suburb:
+        name: sydney
+        postcode: 2000
+        CBD: yes
+      school: Sydney Grammar
+
+
+tasks:
+
+  -
+    name: task
+    desc: use dynamic dir instead of static ref dir
+    task:
+      -
+        func: shell
+        vars:
+          dynadir: ./tests/functests
+        dvars:
+          - name: sgp_address_dyna_dir
+            ref: d0030_school.yml
+            refdir: '{{.dynadir}}'
+            flags: [to_object, vvvv]
+
+        do:
+          - echo """1.address -> \n{{.sgp_address_dyna_dir}}"""
+          - echo """1.address object-> \n{{.sgp_address_dyna_dir_object}}"""

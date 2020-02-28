@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-package cache
+package core
 
 import (
 	"bytes"
@@ -17,9 +17,6 @@ import (
 	"strings"
 	"time"
 
-	//"path/filepath"
-	//"runtime"
-	//"strings"
 	"github.com/leekchan/gtf"
 	"text/template"
 )
@@ -58,7 +55,6 @@ func FuncMapInit() {
 			return t.Format("2006-01-02T15:04:05+11:00")
 		},
 		"printobj": func(obj interface{}) string {
-			//u.Ppfmsg(u.Spf("object:\n %s", objname), obj)
 			u.Ppmsg(obj)
 			return u.Sppmsg(obj)
 		},

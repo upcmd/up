@@ -10,7 +10,7 @@ package impl
 import (
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
-	"github.com/stephencheng/up/model/cache"
+	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	"os"
 	"os/exec"
@@ -29,13 +29,13 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 		}
 	}()
 
-	if cache.Dryrun {
+	if core.Dryrun {
 		u.Pdryrun("in dryrun mode and skipping the actual commands")
 		return "dryrun result"
 	} else {
 
 		cmdOutput, err := cmdExec.CombinedOutput()
-		var result cache.ExecResult
+		var result core.ExecResult
 		if err != nil {
 			if exitError, ok := err.(*exec.ExitError); ok {
 				result.Code = exitError.ExitCode()
@@ -56,9 +56,9 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 
 type ShellFuncAction struct {
 	Do     interface{}
-	Vars   *cache.Cache
+	Vars   *core.Cache
 	Cmds   []string
-	Result cache.ExecResult
+	Result core.ExecResult
 }
 
 //adapt the abstract step.Do to concrete ShellFuncAction Cmds
@@ -86,7 +86,7 @@ func (f *ShellFuncAction) Exec() {
 	for idx, tcmd := range f.Cmds {
 		u.Pfv("cmd(%2d):\n", idx+1)
 		u.Pvv(tcmd)
-		cmd := cache.Render(tcmd, f.Vars)
+		cmd := core.Render(tcmd, f.Vars)
 		u.Pfvvvv(" \\_ %+v\n", color.HiBlueString("%s", cmd))
 		runCmd(f, cmd)
 		u.Pfv("%s\n", color.HiGreenString("%s", f.Result.Output))
@@ -97,6 +97,6 @@ func (f *ShellFuncAction) Exec() {
 		u.Dvvvvv(f.Result)
 	}
 
-	cache.StepStack.GetTop().(*cache.StepRuntimeContext).Result = &f.Result
+	core.StepStack.GetTop().(*core.StepRuntimeContext).Result = &f.Result
 }
 
