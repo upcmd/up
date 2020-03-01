@@ -52,7 +52,10 @@ func (dvars *Dvars) ValidateAndLoading(contextVars *Cache) {
 				refdir = Render(rawdir, contextVars)
 			}
 
-			data, err := ioutil.ReadFile(path.Join(refdir, dvar.Ref))
+			rawref := dvar.Ref
+			ref := Render(rawref, contextVars)
+
+			data, err := ioutil.ReadFile(path.Join(refdir, ref))
 			u.LogErrorAndExit("load dvar value from ref file", err, "please fix file loading problem")
 			(*dvars)[idx].Value = string(data)
 		}

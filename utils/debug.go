@@ -108,6 +108,13 @@ func PpmsgvvvvhintHigh(hint string, a ...interface{}) {
 	}
 }
 
+func PpmsgvvvvvhintHigh(hint string, a ...interface{}) {
+	if permitted("vvvvv") {
+		vvvvv_color_printf("%s:", hint)
+		himsg_color_printf("%s\n", spewMsgState.Sdump(a...))
+	}
+}
+
 func PfHiColor(format string, a ...interface{}) {
 	himsg_color_printf(format, a...)
 }

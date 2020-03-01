@@ -1,0 +1,52 @@
+goal:
+  - show call func can be use to segregate a var scope due to its nature
+  - |
+    because all called tasks inerit the vars/dvars from calling func, so
+    if you want to have a bound scope of vars/dvars, you can define the
+    vars/dvars in calling func and they will be availabe in all funcs in
+    called funcs within the task
+  - |
+    this example shows that defined vars layer1_aaa, layer1_bbb are available
+    in both funcss of task layer2
+  - |
+    it is powerful to wrap up reusable code into a task which sharing the same
+    set of vars/dvars
+
+tasks:
+
+  - name: task
+    task:
+
+      - func: call
+        vars:
+          layer1_aaa: layer1_aaa
+          layer1_bbb: layer1_bbb
+
+        do:
+          - layer2
+        loop:
+          - layer1-tom
+          - layer1-peter
+          - layer1-james
+
+  - name: layer2
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'hello {{.loopitem}}'
+
+          -
+            name: print
+            cmd: 'hello layer1_aaa: {{.layer1_aaa}}'
+
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'hello {{.loopitem}}'
+
+          -
+            name: print
+            cmd: 'hello layer1_bbb: {{.layer1_bbb}}'

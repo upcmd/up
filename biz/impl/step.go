@@ -100,6 +100,7 @@ func (step *Step) Exec() {
 			stepExecVars.Put("loopindex", loopItem.Index)
 			stepExecVars.Put("loopindex1", loopItem.Index1)
 		}
+		//u.PpmsgvvvvvhintHigh("step exec vars:", stepExecVars)
 
 		switch step.Func {
 		case FUNC_SHELL:

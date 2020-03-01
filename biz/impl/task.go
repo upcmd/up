@@ -147,7 +147,10 @@ func validateAndLoadTaskRef(taks *model.Tasks) {
 				refdir = core.Render(rawdir, core.RuntimeVarsAndDvarsMerged)
 			}
 
-			yamlflowroot := u.YamlLoader("flow ref", refdir, task.Ref)
+			rawref := task.Ref
+			ref := core.Render(rawref, core.RuntimeVarsAndDvarsMerged)
+
+			yamlflowroot := u.YamlLoader("flow ref", refdir, ref)
 			flow := loadRefFlow(yamlflowroot)
 			(*taks)[idx].Task = flow
 		}

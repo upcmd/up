@@ -1,0 +1,23 @@
+goal:
+  - add feature of dynamic call routing
+
+tasks:
+
+  - name: task
+    task:
+
+      - func: call
+        vars:
+          person:
+            name: tom
+            age: 23
+        do:
+          - '{{.person.name}}_action'
+
+  - name: tom_action
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'hello {{.person.name}}'

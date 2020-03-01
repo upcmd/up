@@ -1,0 +1,25 @@
+goal:
+  - add feature of dynamic call routing
+  - show a little dynamic using if
+
+tasks:
+
+  - name: task
+    task:
+
+      - func: call
+        vars:
+          person:
+            name: tom
+            age: 23
+        do:
+          - '{{.person.name}}_action'
+        if: '{{gt .person.age 20}}'
+
+  - name: tom_action
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'hello {{.person.name}}'

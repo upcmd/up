@@ -45,10 +45,10 @@ func (f *TaskRefFuncAction) Adapt() {
 }
 
 func (f *TaskRefFuncAction) Exec() {
-	u.P("executing linking tasks")
+	u.P("calling task:")
 	for idx, tmptaskname := range f.Refs {
 		taskname := core.Render(tmptaskname, f.Vars)
-		u.Pfv("    taskname(%2d):\n%+v\n", idx+1, color.HiBlueString("%s", taskname))
+		u.Pfv("    taskname(%2d):\n%+v\n", idx+1, color.HiBlueString("        \\_%s", taskname))
 		runTask(f, taskname)
 	}
 }

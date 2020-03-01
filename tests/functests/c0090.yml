@@ -1,0 +1,60 @@
+goal:
+  - make loop item and index parsablele in dvar
+  - loopitem and index will never be availab in dvar expansion phase as designed
+
+tasks:
+  -
+    name: task
+    task:
+
+      - func: call
+        vars:
+          taskvar: taskvar
+        do:
+          - task_callee2
+        loop:
+          - tom
+          - peter
+          - james
+
+  -
+    name: task_callee1
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'hello {{.loopitem}}'
+  -
+    name: task_callee2
+    task:
+      - func: cmd
+        dvars:
+          - name: person
+            desc: |
+              loopitem is not availab yet when dvar is expanded
+              due to the design that caller's var will override
+              the callee's var, the loopitem should not be availabe
+              in dvar and this is not a bug
+            value: '{{.loopitem}}'
+            flags: [vvvv]
+          - name: greet
+            value: 'hello'
+            flags: [vvvv]
+        do:
+          -
+            name: print
+            desc: as explained, this should be <no value>
+            cmd: 'callee2: {{.person}}'
+          -
+            name: print
+            desc: |
+              this will be the loopitem from parent caller's
+              var space and this is design
+            cmd: 'callee2: {{.loopitem}}'
+          -
+            name: print
+            cmd: 'callee2: {{.greet}}'
+          -
+            name: print
+            cmd: 'taskvar: {{.taskvar}}'

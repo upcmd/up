@@ -1,0 +1,59 @@
+goal:
+  - |
+    demo 3 layers loop to show the loopitem in each layer
+    is from parent
+  - the callee will inherit all vars/dvars from caller chain through to the root caller
+
+tasks:
+
+  - name: task
+    task:
+
+      - func: call
+        vars:
+          layer1_aaa: layer1_aaa
+          layer1_bbb: layer1_bbb
+
+        do:
+          - layer2
+        loop:
+          - layer1-tom
+          - layer1-peter
+          - layer1-james
+
+  - name: layer2
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'hello {{.loopitem}}'
+
+          -
+            name: print
+            cmd: 'hello layer1_aaa: {{.layer1_aaa}}'
+
+      - func: call
+        vars:
+          layer2_aaa: layer2_aaa
+          layer2_bbb: layer2_bbb
+        do:
+          - layer3
+        loop:
+          - layer2-tom
+          - layer2-peter
+          - layer2-james
+
+  - name: layer3
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'hello {{.loopitem}}'
+          -
+            name: print
+            cmd: 'hello layer1_aaa: {{.layer1_aaa}}'
+          -
+            name: print
+            cmd: 'hello layer2_aaa: {{.layer2_aaa}}'
