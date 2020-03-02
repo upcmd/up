@@ -224,7 +224,7 @@ func (steps *Steps) Exec() {
 	for idx, step := range *steps {
 		u.Pf("step(%3d):\n", idx+1)
 		//u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Sppmsg(step))
-		u.LogDesc("step", step.Desc)
+		u.LogDesc("step", step.Name, step.Desc)
 		u.Ppmsgvvvv(step)
 
 		execStep := func() {

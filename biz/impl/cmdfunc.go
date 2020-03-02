@@ -12,6 +12,7 @@ import (
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path"
 )
@@ -92,7 +93,7 @@ func (f *CmdFuncAction) Exec() {
 		u.Pfv("cmd cmdItem(%2d): %s (%s)\n", idx+1, cmdItem.Name, cmdItem.Desc)
 		u.Pfvv("%s\n", color.MagentaString("%s", cmdItem.Cmd))
 
-		u.LogDesc("substep", cmdItem.Desc)
+		u.LogDesc("substep", cmdItem.Name, cmdItem.Desc)
 		switch cmdItem.Name {
 		case "print":
 			cmdItem.runCmd("string", func() {
@@ -237,6 +238,43 @@ func (f *CmdFuncAction) Exec() {
 				} else {
 					core.RuntimeVarsAndDvarsMerged.Put(varname, varvalue)
 					f.Vars.Put(varname, varvalue)
+				}
+
+			})
+			u.Ppmsgvvvvvhint("after reg the var - global:", core.RuntimeVarsAndDvarsMerged)
+			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
+		case "to_object":
+			//src: a var name to get the yml content from
+			//reg: a registered name to cache the variable
+			//localonly: if set, then the variable will not be saved to global space
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+				var src, reg string
+				var localonly bool
+				for k, v := range cmd {
+					if k.(string) == "src" {
+						srcRaw := v.(string)
+						src = core.Render(srcRaw, f.Vars)
+					}
+					if k.(string) == "reg" {
+						regRaw := v.(string)
+						reg = core.Render(regRaw, f.Vars)
+					}
+					if k.(string) == "localonly" {
+						localonly = v.(bool)
+					}
+				}
+
+				srcyml := f.Vars.Get(src).(string)
+				obj := new(interface{})
+				err := yaml.Unmarshal([]byte(srcyml), obj)
+				u.LogErrorAndExit("cmd to_object:", err, "please validate the ymal content")
+
+				if localonly {
+					(*f.Vars).Put(reg, *obj)
+				} else {
+					core.RuntimeVarsAndDvarsMerged.Put(src, reg)
+					(*f.Vars).Put(reg, *obj)
 				}
 
 			})

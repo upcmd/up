@@ -227,17 +227,17 @@ func LogOk(mark string) {
 	color.HiGreen("%s ok", mark)
 }
 
-func LogDesc(descType string, desc string) {
+func LogDesc(descType string, name string, desc string) {
 	if desc == "" {
 		desc = "unamed"
 	}
 	switch descType {
 	case "task":
-		color.HiBlue("==Task: [ %s ]", desc)
+		color.HiBlue("==Task: [ %s: %s ]", name, desc)
 	case "step":
-		color.HiBlue("--Step: [ %s ]", desc)
+		color.HiBlue("--Step: [ %s: %s ]", name, desc)
 	case "substep":
-		color.HiBlue("~~SubStep: [ %s ]", desc)
+		color.HiBlue("~~SubStep: [ %s: %s ]", name, desc)
 	}
 }
 

@@ -76,7 +76,7 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 	for idx, task := range *Tasks {
 		if taskname == task.Name {
 			u.Pfvvvv("  located task-> %d [%s]: \n", idx+1, task.Name)
-			u.LogDesc("task", task.Desc)
+			u.LogDesc("task", taskname, task.Desc)
 			found = true
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)

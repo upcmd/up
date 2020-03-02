@@ -92,6 +92,7 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 
 			if u.Contains(dvar.Flags, "to_object") {
 				rawyml := dvar.Rendered
+
 				obj := new(interface{})
 				err := yaml.Unmarshal([]byte(rawyml), obj)
 				u.LogErrorAndExit("dvar conversion to object:", err, "please validate the ymal content")

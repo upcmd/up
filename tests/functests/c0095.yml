@@ -1,0 +1,41 @@
+goal:
+  - add a cmd to convert yml to object
+  - |
+    to_object in dvar is limited and can not inherit
+    the loopitem unless you register the loopitem to another var
+  - it does not need load to implment load from file, use readfile instead
+
+tasks:
+
+  - name: task
+    task:
+
+      - func: cmd
+        vars:
+          person_yml: |
+            person:
+              name: tom
+              age: 23
+          name_to_convert: person_yml
+          name_to_reg: person_dyna_object
+
+        do:
+          - name: to_object
+            cmd:
+              src: person_yml
+              reg: person_object
+
+          - name: printobj
+            cmd: person_object
+
+          - name: print
+            cmd: 'my name is: {{.person_object.person.name}}'
+
+          - name: to_object
+            cmd:
+              src: '{{.name_to_convert}}'
+              reg: '{{.name_to_reg}}'
+
+          - name: printobj
+            cmd: '{{.name_to_reg}}'
+
