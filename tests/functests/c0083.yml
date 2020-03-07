@@ -213,12 +213,12 @@ tasks:
             cmd:
               content: "{{.doc_rendered}}"
               filename: spike_doc.md
-              dir: '{{env "SPIKE_DOC_PATH"}}/'
+#              dir: '{{env "SPIKE_DOC_PATH"}}/'
+              dir: /tmp
 
           -
             name: readfile
             cmd:
-              content: "{{.doc_rendered}}"
               filename: spike_doc.md
               dir: /tmp
               reg: loaded_doc

@@ -29,6 +29,19 @@ func Contains(a []string, x string) bool {
 	return false
 }
 
+func StrIn(s string, aStrList ...string) int {
+	for idx, x := range aStrList {
+		if x == s {
+			return idx
+		}
+	}
+	return -1
+}
+
+func CharIsNum(s string) int {
+	return StrIn(s, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+}
+
 func Sleep(mscnt int) {
 	PfHiColor("sleeping %d milli seconds", mscnt)
 	total := 0

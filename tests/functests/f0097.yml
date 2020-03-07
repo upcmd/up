@@ -1,0 +1,17 @@
+goal:
+  - var name validation that var name can not start with number
+
+tasks:
+
+  - name: task
+    task:
+
+      - func: cmd
+        vars:
+          name_to_reg: person_dyna_object
+          2ndperson: jason
+
+        do:
+          - name: print
+            cmd: 'my name is: tom'
+

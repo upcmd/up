@@ -1,0 +1,48 @@
+goal:
+  - add featuer to template cmd to support sub element
+
+vars:
+  school_details_object:
+    school:
+      name: "sydney grammar",
+      address: "1 fox road, sydney, nsw 2000"
+    principals:
+      - "peter"
+      - "tom"
+      - "jane"
+    ranking: "No 5"
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        vars:
+          school_name: sydney grammar
+          school_address: 1 fox road, sydney, nsw 2000
+          schoo_principals:
+            - peter
+            - tom
+            - jane
+          schoo_ranking: No 5
+        do:
+          - name: template
+            desc: render the template file using above dynamic variable from defined var
+            cmd:
+              src: './tests/functests/d0079.template'
+              dest: /tmp/myschool.txt
+              data: ".school_details_object.school"
+
+      - func: cmd
+        do:
+          - name: readfile
+            desc: read content of a file and register it to a var
+            cmd:
+              filename: myschool.txt
+              dir: /tmp
+              reg: my_school
+
+          - 
+            name: print
+            cmd: "{{.my_school}}"

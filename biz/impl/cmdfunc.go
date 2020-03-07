@@ -249,9 +249,13 @@ func (f *CmdFuncAction) Exec() {
 			//localonly: if set, then the variable will not be saved to global space
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
-				var src, reg string
+				var key, src, reg string
 				var localonly bool
 				for k, v := range cmd {
+					if k.(string) == "key" {
+						keyRaw := v.(string)
+						key = core.Render(keyRaw, f.Vars)
+					}
 					if k.(string) == "src" {
 						srcRaw := v.(string)
 						src = core.Render(srcRaw, f.Vars)
@@ -265,7 +269,24 @@ func (f *CmdFuncAction) Exec() {
 					}
 				}
 
-				srcyml := f.Vars.Get(src).(string)
+				srcyml := func() string {
+					if src != "" && key != "" {
+						u.InvalidAndExit("locate yml string", "you can only use either key or src, but not both")
+					}
+					if src != "" {
+						return src
+					}
+					if key != "" {
+						t := f.Vars.Get(key)
+						if t != nil {
+							return t.(string)
+						} else {
+							u.InvalidAndExit("locate yml string", "please use a valid addressable key to locate a yml document")
+							return ""
+						}
+					}
+					return ""
+				}()
 				obj := new(interface{})
 				err := yaml.Unmarshal([]byte(srcyml), obj)
 				u.LogErrorAndExit("cmd to_object:", err, "please validate the ymal content")

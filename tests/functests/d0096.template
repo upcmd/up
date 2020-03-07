@@ -1,0 +1,3 @@
+
+My school name is: {{.name}}, it is located
+at {{.address}}

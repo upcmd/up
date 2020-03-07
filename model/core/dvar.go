@@ -40,6 +40,10 @@ func (dvars *Dvars) ValidateAndLoading(contextVars *Cache) {
 			identified = true
 			u.InvalidAndExit("validating dvar name", "dvar name can not contain '-', please use '_' instead")
 		}
+		if u.CharIsNum(dvar.Name[0:1]) != -1 {
+			identified = true
+			u.InvalidAndExit("validating dvar name", "dvar name can not start with number")
+		}
 
 		if dvar.Ref != "" && dvar.Value != "" {
 			u.InvalidAndExit("validating dvar ref and value", "ref and value can not both exist at the same time")

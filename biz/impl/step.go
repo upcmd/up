@@ -87,6 +87,24 @@ func chainAction(action *biz.Do) {
 	(*action).Exec()
 }
 
+func validation(vars *core.Cache) {
+	identified := false
+
+	for k, _ := range *vars {
+		if u.CharIsNum(k[0:1]) != -1 {
+			identified = true
+			u.InvalidAndExit("validating var name", u.Spf("var name (%s) can not start with number", k))
+		}
+
+	}
+
+	if identified {
+		u.LogError("vars validation", "please fix all validation before continue")
+		os.Exit(-1)
+	}
+
+}
+
 func (step *Step) Exec() {
 	var action biz.Do
 
@@ -94,6 +112,7 @@ func (step *Step) Exec() {
 	var stepExecVars *core.Cache
 	stepExecVars = step.GetExecVarsWithRefOverrided("get plain exec vars")
 
+	validation(stepExecVars)
 	routeFuncType := func(loopItem *LoopItem) {
 		if loopItem != nil {
 			stepExecVars.Put("loopitem", loopItem.Item)

@@ -18,11 +18,14 @@ tasks:
               age: 23
           name_to_convert: person_yml
           name_to_reg: person_dyna_object
+          person: jason
 
         do:
           - name: to_object
+            desc: |
+              the key is pointing to a var name and use its content as yml content
             cmd:
-              src: person_yml
+              key: person_yml
               reg: person_object
 
           - name: printobj
@@ -33,7 +36,20 @@ tasks:
 
           - name: to_object
             cmd:
-              src: '{{.name_to_convert}}'
+              key: '{{.name_to_convert}}'
+              reg: '{{.name_to_reg}}'
+
+          - name: printobj
+            cmd: '{{.name_to_reg}}'
+
+          - name: to_object
+            desc:
+              use src content directly
+            cmd:
+              src: |
+                person:
+                  name: {{.person}}
+                  age: 53
               reg: '{{.name_to_reg}}'
 
           - name: printobj
