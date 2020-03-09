@@ -19,7 +19,7 @@ tasks:
         dvars:
           - name: student_info
             value: 'my name is:{{.name}} and I am in {{.school}}'
-            data: student
+            datakey: student
             flags: [vvv]
         do:
           - name: print
@@ -29,7 +29,7 @@ tasks:
         dvars:
           - name: student_info
             value: 'my name is:{{.name}} and I am in {{.school}}'
-            data: '{{.datapointer}}'
+            datakey: '{{.datapointer}}'
             flags: [vvv]
         do:
           - name: print

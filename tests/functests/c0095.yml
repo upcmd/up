@@ -25,7 +25,7 @@ tasks:
             desc: |
               the key is pointing to a var name and use its content as yml content
             cmd:
-              key: person_yml
+              fromkey: person_yml
               reg: person_object
 
           - name: printobj
@@ -36,7 +36,7 @@ tasks:
 
           - name: to_object
             cmd:
-              key: '{{.name_to_convert}}'
+              fromkey: '{{.name_to_convert}}'
               reg: '{{.name_to_reg}}'
 
           - name: printobj

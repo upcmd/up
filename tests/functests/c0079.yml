@@ -121,7 +121,7 @@ tasks:
             cmd:
               src: '{{.correct_working_dir}}/tests/functests/d0079.template'
               dest: /tmp/myschool.txt
-              data: "school_details_object"
+              datakey: "school_details_object"
 
       - func: cmd
         do:

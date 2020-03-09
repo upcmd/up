@@ -203,7 +203,7 @@ tasks:
         dvars:
           - name: doc_rendered
             value: '{{.doc_template}}'
-            data: doc_meta_yml_object
+            datakey: doc_meta_yml_object
         do:
 #          -
 #            name: print

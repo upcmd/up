@@ -187,17 +187,30 @@ func (f *CmdFuncAction) Exec() {
 		case "template":
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
-				var src, dest, raw, datakey, rendered string
+				var src, dest, raw, datakey, datapath, rendered string
 				var data interface{}
 				for k, v := range cmd {
 					switch k.(string) {
 					case "src":
 						raw = v.(string)
 						src = core.Render(raw, f.Vars)
-					case "data":
+					case "datakey":
 						raw = v.(string)
 						datakey = core.Render(raw, f.Vars)
 						data = f.Vars.Get(datakey)
+					case "datapath":
+						raw = v.(string)
+						//dataref: eg a.b.c
+						datapath = core.Render(raw, f.Vars)
+						//datatemplate: {{.a.b.c}}
+						//datatemplate := u.Spf("{{.%s}}", dataref)
+						//data = core.Render(datatemplate, f.Vars)
+
+						//data = f.Vars.Get("root")
+
+						//d, _ := yaml.Marshal(&data)
+						data = core.GetSubObject(f.Vars, datapath, false)
+						u.Ppmsgvvvhint("sub object:", data)
 					case "dest":
 						raw = v.(string)
 						dest = core.Render(raw, f.Vars)
@@ -249,12 +262,12 @@ func (f *CmdFuncAction) Exec() {
 			//localonly: if set, then the variable will not be saved to global space
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
-				var key, src, reg string
+				var fromkey, src, reg string
 				var localonly bool
 				for k, v := range cmd {
-					if k.(string) == "key" {
+					if k.(string) == "fromkey" {
 						keyRaw := v.(string)
-						key = core.Render(keyRaw, f.Vars)
+						fromkey = core.Render(keyRaw, f.Vars)
 					}
 					if k.(string) == "src" {
 						srcRaw := v.(string)
@@ -270,18 +283,18 @@ func (f *CmdFuncAction) Exec() {
 				}
 
 				srcyml := func() string {
-					if src != "" && key != "" {
+					if src != "" && fromkey != "" {
 						u.InvalidAndExit("locate yml string", "you can only use either key or src, but not both")
 					}
 					if src != "" {
 						return src
 					}
-					if key != "" {
-						t := f.Vars.Get(key)
+					if fromkey != "" {
+						t := f.Vars.Get(fromkey)
 						if t != nil {
 							return t.(string)
 						} else {
-							u.InvalidAndExit("locate yml string", "please use a valid addressable key to locate a yml document")
+							u.InvalidAndExit("locate yml string", "please use a valid addressable varkey to locate a yml document")
 							return ""
 						}
 					}

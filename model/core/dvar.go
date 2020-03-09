@@ -29,7 +29,7 @@ type Dvar struct {
 	Secure   *model.SecureSetting
 	Ref      string
 	RefDir   string
-	Data     string
+	DataKey  string
 }
 
 func (dvars *Dvars) ValidateAndLoading(contextVars *Cache) {
@@ -89,6 +89,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 	var datasource interface{}
 
 	for idx, dvar := range tmpDvars {
+		dvarRaw := tmpDvars[idx].Value
 		if dvar.Expand == 0 {
 			tmpDvars[idx].Expand = 1
 		}
@@ -100,10 +101,10 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 		var rval string
 
 		//the rendering using the data is the post rendering process
-		if dvar.Data != "" {
-			datakey := Render(dvar.Data, tmpVars)
+		if dvar.DataKey != "" {
+			datakey := Render(dvar.DataKey, tmpVars)
 			datasource = tmpVars.Get(datakey)
-			rval = Render(tmpDvars[idx].Value, datasource)
+			rval = Render(dvarRaw, datasource)
 		} else {
 			rval = tmpDvars[idx].Value
 		}
