@@ -1,0 +1,37 @@
+goal:
+  - showcase the dvar to render value using sub element of an var rather the global var name space
+  - extension to c0082 and c0098
+
+vars:
+  student:
+    name: Tom
+    gender: Male
+    school: Sydney Grammar
+  nsw:
+    sydney:
+      sgschool:
+        student:
+          name: Grace
+          gender: Female
+          school: MLC
+  aaa: aaa
+  datapointer: student
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        desc: use datatemplate as datasource
+        dvars:
+          - name: student_info
+            value: 'my name is:{{.name}} and I am in {{.school}}'
+            datatemplate: |
+              name: {{.nsw.sydney.sgschool.student.name}}
+              gender: {{.nsw.sydney.sgschool.student.gender}}
+              school: {{.nsw.sydney.sgschool.student.school}}
+            flags: [vvv]
+        do:
+          - name: print
+            cmd: '{{.student_info}}'

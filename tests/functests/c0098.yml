@@ -1,6 +1,6 @@
 goal:
-  - showcase the dvar to render value using data field as
-    source rather the global var name space
+  - showcase the dvar to render value using sub element of an var rather the global var name space
+  - extension to c0082
 
 vars:
   student:
@@ -23,20 +23,11 @@ tasks:
     task:
       -
         func: cmd
+        desc: use sub element of an var as context to render values
         dvars:
           - name: student_info
             value: 'my name is:{{.name}} and I am in {{.school}}'
-            datakey: student
-            flags: [vvv]
-        do:
-          - name: print
-            cmd: '{{.student_info}}'
-      -
-        func: cmd
-        dvars:
-          - name: student_info
-            value: 'my name is:{{.name}} and I am in {{.school}}'
-            datakey: '{{.datapointer}}'
+            datapath: nsw.sydney.sgschool.student
             flags: [vvv]
         do:
           - name: print

@@ -20,16 +20,18 @@ import (
 type Dvars []Dvar
 
 type Dvar struct {
-	Name     string
-	Value    string
-	Desc     string
-	Expand   int
-	Flags    []string //supported: vvvv, to_object,envvar,
-	Rendered string
-	Secure   *model.SecureSetting
-	Ref      string
-	RefDir   string
-	DataKey  string
+	Name         string
+	Value        string
+	Desc         string
+	Expand       int
+	Flags        []string //supported: vvvv, to_object,envvar,
+	Rendered     string
+	Secure       *model.SecureSetting
+	Ref          string
+	RefDir       string
+	DataKey      string
+	DataPath     string
+	DataTemplate string
 }
 
 func (dvars *Dvars) ValidateAndLoading(contextVars *Cache) {
@@ -100,10 +102,30 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 
 		var rval string
 
-		//the rendering using the data is the post rendering process
+		if dvar.DataKey != "" && dvar.DataPath != "" && dvar.DataTemplate != "" {
+			u.InvalidAndExit("validating datasource", "datakey, datapath and datatemplate can not coexist at the same time")
+		}
+
+		//the rendering using the datakey is the post rendering process
 		if dvar.DataKey != "" {
 			datakey := Render(dvar.DataKey, tmpVars)
 			datasource = tmpVars.Get(datakey)
+			rval = Render(dvarRaw, datasource)
+		} else {
+			rval = tmpDvars[idx].Value
+		}
+
+		if dvar.DataPath != "" {
+			datapath := Render(dvar.DataPath, tmpVars)
+			datasource = GetSubObjectFromCache(&tmpVars, datapath, false)
+			rval = Render(dvarRaw, datasource)
+		} else {
+			rval = tmpDvars[idx].Value
+		}
+
+		if dvar.DataTemplate != "" {
+			datatemplate := Render(dvar.DataTemplate, tmpVars)
+			datasource = YamlToObj(datatemplate)
 			rval = Render(dvarRaw, datasource)
 		} else {
 			rval = tmpDvars[idx].Value

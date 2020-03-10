@@ -200,16 +200,8 @@ func (f *CmdFuncAction) Exec() {
 						data = f.Vars.Get(datakey)
 					case "datapath":
 						raw = v.(string)
-						//dataref: eg a.b.c
 						datapath = core.Render(raw, f.Vars)
-						//datatemplate: {{.a.b.c}}
-						//datatemplate := u.Spf("{{.%s}}", dataref)
-						//data = core.Render(datatemplate, f.Vars)
-
-						//data = f.Vars.Get("root")
-
-						//d, _ := yaml.Marshal(&data)
-						data = core.GetSubObject(f.Vars, datapath, false)
+						data = core.GetSubObjectFromCache(f.Vars, datapath, false)
 						u.Ppmsgvvvhint("sub object:", data)
 					case "dest":
 						raw = v.(string)

@@ -24,5 +24,15 @@ var (
 	himsg_color_printf  = color.HiWhite
 	msg_color_sprintf   = color.YellowString
 	dryrun_color_print  = color.Cyan
+
+	Yq_read_hint = `
+path format:
+1. 'a.b.c'
+2. 'a.*.c'
+3. 'a.**.c'
+4. 'a.(child.subchild==co*).c'
+5. 'a.array[0].blah'
+6. 'a.array[*].blah'
+`
 )
 

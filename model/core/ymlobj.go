@@ -32,12 +32,12 @@ obj is a cache item
 path format: a.b.c(name=fr*).value
 prefix will be used to get the obj, rest will be used as yq path
 */
-func GetSubObject(cache *Cache, path string, collect bool) interface{} {
+func GetSubObjectFromCache(cache *Cache, path string, collect bool) interface{} {
 	//obj -> yml -> yq to get node in yml -> obj
 	elist := strings.Split(path, ".")
 	func() {
 		if elist[0] == "" {
-			u.InvalidAndExit("yml path validation", "path format is not correct, use format: a.b.c(name=fr*).value")
+			u.InvalidAndExit("yml path validation", u.Spf("path format is not correct, use format like:\n %s", u.Yq_read_hint))
 		}
 	}()
 	yqpath := strings.Join(elist[1:], ".")
@@ -50,6 +50,13 @@ func GetSubObject(cache *Cache, path string, collect bool) interface{} {
 	yqresult, err := yq.UpReadYmlStr(ymlstr, yqpath, u.CoreConfig.Verbose, collect)
 	u.LogErrorAndContinue("parse sub element in yml", err, u.Spf("please ensure yml query path: %s", yqpath))
 	obj = YamlToObj(yqresult)
+	return obj
+}
+
+func GetSubObjectFromYml(ymlstr string, path string, collect bool) interface{} {
+	yqresult, err := yq.UpReadYmlStr(ymlstr, path, u.CoreConfig.Verbose, collect)
+	u.LogErrorAndContinue("parse sub element in yml", err, u.Spf("please ensure yml query path: %s", path))
+	obj := YamlToObj(yqresult)
 	return obj
 }
 
