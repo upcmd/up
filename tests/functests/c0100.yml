@@ -1,0 +1,290 @@
+goal:
+  - add query demo
+  - ymlkey to ref to a var name pointing to a yml string
+  - path is the path refer to yml element, ref to the usage example
+  - reg is the varname register to
+  - |
+    localonly indicate it is registered to local func var scope only
+    otherwise it will be in global scope
+  - collect is to indicate whether result will be put into array using yml format
+  - ymlonly will register a query result in yml string instead
+
+vars:
+  query_name: jason
+  student:
+    name: Tom
+    gender: Male
+    school: Sydney Grammar
+  nsw:
+    sydney:
+      - sg:
+          student:
+            name: Grace
+            gender: Female
+            school: MLC
+      - kings:
+          student:
+            name: Emily
+            gender: Female
+            school: KINGS
+    chatswood:
+      - chatswood_high:
+          student:
+            name: Jason
+            gender: Mail
+            school: Public High School
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        vars:
+          ymlstr: |
+            student:
+              name: jason
+              gender: Male
+              school: The Kings
+        do:
+          - name: query
+            desc: query using ref var ymlstr and query a registered var by default in global
+            cmd:
+              ymlkey: ymlstr
+              path: student.school
+              reg: school_name
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.school_name}}'
+
+#--------------------------------------------------------------------
+
+      -
+        func: cmd
+        vars:
+          ymlstr: |
+            student: |
+              name: jason
+              gender: Male
+              school: The Kings
+        do:
+          - name: query
+            desc: query using ref var ymlstr and query a registered var by default in global
+            cmd:
+              ymlkey: ymlstr
+              path: student
+              reg: student_info
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.student_info}}'
+
+#--------------------------------------------------------------------
+      -
+        func: cmd
+        vars:
+          ymlstr: |
+            student:
+              name: jason
+              gender: Male
+              school: The Kings
+        do:
+          - name: query
+            desc: query and query a registered var in local
+            cmd:
+              ymlkey: ymlstr
+              path: student.school
+              reg: local_school_name
+              localonly: true
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.local_school_name}}'
+#--------------------------------------------------------------------
+
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query from cached vars only
+            cmd:
+              path: nsw.sydney.sg.student.school
+              reg: data_school_name
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.data_school_name}}'
+#--------------------------------------------------------------------
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query from cached vars and put result into a list/array
+            cmd:
+              path: nsw.sydney.**.student.school
+              reg: school_name_list
+              collect: true
+          - name: printobj
+            cmd: '{{.school_name_list}}'
+          - name: print
+            cmd: '{{.school_name_list}}'
+#--------------------------------------------------------------------
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query a sub node
+            cmd:
+              path: nsw.sydney
+              reg: city
+              collect: true
+          - name: printobj
+            cmd: '{{.city}}'
+          - name: print
+            cmd: '{{.city}}'
+#--------------------------------------------------------------------
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query a selected indexed node from a array
+            cmd:
+              path: nsw.sydney.[1]
+              reg: city1
+          - name: printobj
+            cmd: '{{.city1}}'
+          - name: print
+            cmd: '{{.city1}}'
+#--------------------------------------------------------------------
+
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query all nodes from an array
+            cmd:
+              path: nsw.sydney.[*]
+              reg: cityall
+          - name: printobj
+            cmd: '{{.cityall}}'
+          - name: print
+            cmd: '{{.cityall}}'
+#--------------------------------------------------------------------
+#TO TEST
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query result matching the criteria
+            cmd:
+              path: nsw.sydney.[*].*(name==Emily)
+              reg: studentx
+          - name: printobj
+            cmd: '{{.studentx}}'
+          - name: print
+            cmd: '{{.studentx}}'
+
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query result matching the criteria
+            cmd:
+              path: nsw.sydney.[1].*(name==Emily)
+              reg: studenty
+          - name: printobj
+            cmd: '{{.studenty}}'
+
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query result matching the criteria
+            cmd:
+              path: nsw.sydney.**(name==Emily)
+              reg: studentz
+          - name: printobj
+            cmd: '{{.studentz}}'
+
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query result matching the criteria
+            cmd:
+              path: nsw.sydney.[*].kings(name==Emily)
+              reg: studentm
+          - name: printobj
+            cmd: '{{.studentm}}'
+
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query result matching the criteria
+            cmd:
+              path: nsw.sydney.[*].*(name==Grace)
+              reg: studentn
+          - name: printobj
+            cmd: '{{.studentn}}'
+
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query result matching the criteria
+            cmd:
+              path: nsw.chatswood.[*]
+              reg: studento
+          - name: printobj
+            cmd: '{{.studento}}'
+
+#--------------------------------------------------------------------
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query and register result as a yml string instead of object
+            cmd:
+              path: nsw.
+              reg: city2
+              ymlonly: true
+          - name: printobj
+            cmd: '{{.city2}}'
+          - name: print
+            cmd: '{{.city2}}'
+#--------------------------------------------------------------------
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query result from yml file using refdir
+            cmd:
+              ymlfile: d0100.yml
+              refdir: ./tests/functests
+              path: nsw.
+              reg: city2
+              ymlonly: true
+          - name: print
+            cmd: '{{.city2}}'
+
+#--------------------------------------------------------------------
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query result from yml file using implicit global refdir
+            cmd:
+              ymlfile: d0100.yml
+              path: nsw.
+              reg: city2
+              ymlonly: true
+          - name: print
+            cmd: '{{.city2}}'

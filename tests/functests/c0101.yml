@@ -1,0 +1,24 @@
+goal:
+  - add pause cmd
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: hello
+
+      -
+        func: cmd
+        do:
+          - name: pause
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: world
+

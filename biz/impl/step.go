@@ -8,7 +8,6 @@
 package impl
 
 import (
-	"bufio"
 	"github.com/imdario/mergo"
 	"github.com/mohae/deepcopy"
 	"github.com/stephencheng/up/biz"
@@ -222,6 +221,7 @@ func (step *Step) Exec() {
 
 	func() {
 		if step.If != "" {
+
 			IfEval := core.Render(step.If, stepExecVars)
 			goahead, err := strconv.ParseBool(IfEval)
 			u.LogErrorAndExit("evaluate condition", err, u.Spf("please fix if condition evaluation: [%s]", IfEval))
@@ -283,20 +283,7 @@ func (steps *Steps) Exec() {
 					}
 				}
 				if u.Contains(step.Flags, "pause") {
-					u.Ppromptvvvvv("pause action to continue", " q: quit\n c: continue")
-					reader := bufio.NewReader(os.Stdin)
-					keyinput, _ := reader.ReadString('\n')
-
-					switch keyinput {
-					case "q\n":
-						u.GraceExit("puase action", "client choce to stop continuing the execution")
-					case "c\n":
-						//contine
-					default:
-						//continue
-
-					}
-
+					pause(&step.Vars)
 				}
 
 			}()

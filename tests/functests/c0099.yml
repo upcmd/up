@@ -14,8 +14,6 @@ vars:
           name: Grace
           gender: Female
           school: MLC
-  aaa: aaa
-  datapointer: student
 
 tasks:
   -
@@ -31,6 +29,23 @@ tasks:
               name: {{.nsw.sydney.sgschool.student.name}}
               gender: {{.nsw.sydney.sgschool.student.gender}}
               school: {{.nsw.sydney.sgschool.student.school}}
+            flags: [vvv]
+        do:
+          - name: print
+            cmd: '{{.student_info}}'
+
+      -
+        func: cmd
+        desc: use datatemplate as datasource
+        dvars:
+          - name: student_info
+            value: 'my name is:{{.student.name}} and I am in {{.school.name}}'
+            datatemplate: |
+              student:
+                name: {{.nsw.sydney.sgschool.student.name}}
+                gender: {{.nsw.sydney.sgschool.student.gender}}
+              school:
+                name: {{.nsw.sydney.sgschool.student.school}}
             flags: [vvv]
         do:
           - name: print

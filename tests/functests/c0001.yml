@@ -1,14 +1,14 @@
 doc_meta: |
   folder: quick-start
-  title: first task hello world
-  head: show a hello world type of UP task
+  title: First task - hello world
+  head: Show a hello world type of UP task
   head_content: |-
     Welcome to this first quick start guide of up cmd
 
   sections:
     - title: Intro
       content: |
-        A UP task files is composed of tasks, a task is composed of a sequential steps, a step is function call implementation of provided functions, for example, shell
+        A UP task file is composed of tasks, a task is composed of a sequential steps, a step is function call implementation of function, for example, shell
 
     - title: What's ignore_error
       content: |
@@ -17,7 +17,7 @@ doc_meta: |
       refs:
         - title: main task file
           type: yml
-          link: {{.doc_dir}}/c0081.yml
+          link: '{{.ref_dir}}/c0001.yml'
 
     - title: What's like when you run the task
       content: |
@@ -26,7 +26,7 @@ doc_meta: |
       refs:
         - title: logfile
           type: txt
-          link: {{.doc_dir}}/c0083.log
+          link: '{{.log_dir}}/c0001_v.log'
 
   related:
     refs:

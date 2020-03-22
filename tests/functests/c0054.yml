@@ -130,3 +130,21 @@ tasks:
           {{and (ge .age 18) (eq .sex "male") }}
           {{- end -}}
 
+      -
+        func: cmd
+        desc: |
+          show that complicated arg needs to be quoted using ()
+          otherwise it will cause gt to be confused
+        vars:
+          doc: hello
+        do:
+          - name: print
+            cmd: '{{ gt (.doc|len) 1 }}'
+      -
+        func: cmd
+        vars:
+          doc: hello
+        do:
+          - name: print
+            cmd: '{{ gt (.doc|len) 1 }}'
+        if: '{{gt (.doc|len) 0}}

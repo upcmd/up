@@ -1,0 +1,19 @@
+nsw:
+  sydney:
+    - sg:
+        student:
+          name: Grace
+          gender: Female
+          school: MLC
+    - kings:
+        student:
+          name: Emily
+          gender: Female
+          school: KINGS
+  chatswood:
+    - chatswood_high:
+        student:
+          name: Jason
+          gender: Mail
+          school: Public High School
+

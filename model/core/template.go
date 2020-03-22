@@ -70,7 +70,7 @@ func FuncMapInit() {
 		"filecontent": func(filepath string) string {
 			content, err := ioutil.ReadFile(filepath)
 			if err != nil {
-				u.LogWarn("template readfile", "please fix file path and name issues")
+				u.LogWarn("filecontent readfile", u.Spf("please fix file path: %s", filepath))
 			}
 			return string(content)
 		},

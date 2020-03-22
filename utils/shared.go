@@ -9,6 +9,7 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -53,5 +54,13 @@ func Sleep(mscnt int) {
 
 	time.Sleep(time.Duration(mscnt-total) * time.Millisecond)
 	P()
+}
+
+func PrintContentWithLineNuber(content string) string {
+	withLineNuber := ""
+	for idx, line := range strings.Split(content, "\n") {
+		withLineNuber += fmt.Sprintf("%5d:%s\n", idx+1, line)
+	}
+	return withLineNuber
 }
 

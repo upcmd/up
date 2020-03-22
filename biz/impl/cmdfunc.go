@@ -87,11 +87,12 @@ func (cmdCmd *CmdCmd) runCmd(whichtype string, f func()) {
 
 func (f *CmdFuncAction) Exec() {
 
-	//u.P("executing cmd commands")
 	for idx, cmdItem := range *f.Cmds {
 		//u.Pfv("cmd cmdItem(%2d): %s (%s)\n%s\n", idx+1, cmdItem.Name, cmdItem.Desc, color.HiBlueString("%s", cmdItem.Cmd))
 		u.Pfv("cmd cmdItem(%2d): %s (%s)\n", idx+1, cmdItem.Name, cmdItem.Desc)
-		u.Pfvv("%s\n", color.MagentaString("%s", cmdItem.Cmd))
+		if cmdItem.Cmd != nil {
+			u.Pfvv("%s\n", color.MagentaString("%s", cmdItem.Cmd))
+		}
 
 		u.LogDesc("substep", cmdItem.Name, cmdItem.Desc)
 		switch cmdItem.Name {
@@ -105,7 +106,6 @@ func (f *CmdFuncAction) Exec() {
 			u.Dvvvv(cmdItem.Cmd)
 			cmdItem.runCmd("string", func() {
 				objname := core.Render(cmdItem.Cmd.(string), f.Vars)
-				//obj := cache.RuntimeVarsAndDvarsMerged.Get(objname)
 				obj := f.Vars.Get(objname)
 				u.Ppfmsg(u.Spf("object:\n %s", objname), obj)
 			})
@@ -125,6 +125,12 @@ func (f *CmdFuncAction) Exec() {
 				mscnt := cmdItem.Cmd.(int)
 				u.Sleep(mscnt)
 			})
+
+		case "pause":
+			pause(f.Vars)
+
+		case "exit":
+			u.GraceExit("exit", "client choose to exit")
 
 		case "readfile":
 			cmdItem.runCmd("map", func() {
@@ -202,7 +208,7 @@ func (f *CmdFuncAction) Exec() {
 						raw = v.(string)
 						datapath = core.Render(raw, f.Vars)
 						data = core.GetSubObjectFromCache(f.Vars, datapath, false)
-						u.Ppmsgvvvhint("sub object:", data)
+						u.Ppmsgvvvvv("sub object:", data)
 					case "dest":
 						raw = v.(string)
 						dest = core.Render(raw, f.Vars)
@@ -218,6 +224,79 @@ func (f *CmdFuncAction) Exec() {
 
 				u.LogErrorAndExit("cmd template", err, "please fix file path and name issues")
 				ioutil.WriteFile(dest, []byte(rendered), 0644)
+			})
+
+		case "query":
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+				var raw, reg, ymlkey, ymlfile, yqpath string
+				var collect, localonly, ymlonly bool
+				refdir := u.CoreConfig.RefDir
+				var data interface{}
+				for k, v := range cmd {
+					switch k.(string) {
+					case "ymlkey":
+						raw = v.(string)
+						ymlkey = core.Render(raw, f.Vars)
+					case "ymlfile":
+						raw = v.(string)
+						ymlfile = core.Render(raw, f.Vars)
+					case "refdir":
+						raw = v.(string)
+						refdir = core.Render(raw, f.Vars)
+					case "reg":
+						raw = v.(string)
+						reg = core.Render(raw, f.Vars)
+					case "path":
+						//yqpath used as:
+						//1. a yqpath ref in yml content
+						//2. a yqpath ref in cached object
+						raw = v.(string)
+						yqpath = core.Render(raw, f.Vars)
+					case "localonly":
+						localonly = v.(bool)
+					case "ymlonly":
+						ymlonly = v.(bool)
+					case "collect":
+						collect = v.(bool)
+					}
+				}
+
+				if yqpath == "" || reg == "" {
+					u.InvalidAndExit("query cmd mandatory attribute validation", "path and reg are all mandatory and required")
+				}
+
+				if ymlkey != "" {
+					ymlstr := f.Vars.Get(ymlkey).(string)
+					if ymlonly {
+						data = core.GetSubYmlFromYml(ymlstr, yqpath, collect)
+					} else {
+						data = core.GetSubObjectFromYml(ymlstr, yqpath, collect)
+					}
+				} else if ymlfile != "" {
+					filepath := path.Join(refdir, ymlfile)
+					if ymlonly {
+						data = core.GetSubYmlFromFile(filepath, yqpath, collect)
+					} else {
+						data = core.GetSubObjectFromFile(filepath, yqpath, collect)
+					}
+				} else if yqpath != "" {
+					//means to retrieve from cache
+					if ymlonly {
+						data = core.GetSubYmlFromCache(f.Vars, yqpath, collect)
+					} else {
+						data = core.GetSubObjectFromCache(f.Vars, yqpath, collect)
+					}
+				}
+
+				u.Ppmsgvvvvvhint("data object:", data)
+				if localonly {
+					f.Vars.Put(reg, data)
+				} else {
+					core.RuntimeVarsAndDvarsMerged.Put(reg, data)
+					f.Vars.Put(reg, data)
+				}
+
 			})
 
 		case "reg":

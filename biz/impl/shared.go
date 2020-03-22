@@ -8,6 +8,7 @@
 package impl
 
 import (
+	"bufio"
 	"github.com/fatih/color"
 	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
@@ -57,6 +58,27 @@ func DryRunAndSkip(mark string, allowedErrors []string, continueFunc ContinueFun
 		if mustCondition != nil {
 			DryRunOrExit("mark", mustCondition, "trying to continue")
 		}
+	}
+}
+
+func pause(execvars *core.Cache) {
+	hint := `
+enter: continue 
+    q: quit
+    i: inspect
+`
+	u.Ppromptvvvvv("pause action to continue", hint)
+	reader := bufio.NewReader(os.Stdin)
+	keyinput, _ := reader.ReadString('\n')
+
+	switch keyinput {
+	case "q\n":
+		u.GraceExit("puase action", "client choose to stop continuing the execution")
+	case "i\n":
+		u.Ppfmsg("exec vars:", *execvars)
+		pause(execvars)
+	default:
+		//continue
 	}
 }
 

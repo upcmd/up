@@ -2,6 +2,16 @@ version: 1.0.0
 
 tasks:
   -
+    name: deps
+    desc: update key deps
+    task:
+      -
+        func: shell
+        do:
+          - go list -m -versions github.com/stephencheng/yq/v3
+          - go get github.com/stephencheng/yq/v3
+
+  -
     name: build
     desc: build binary
     task:
