@@ -20,7 +20,6 @@ func YamlLoader(id, path, filename string) *viper.Viper {
 	newV.SetConfigType("yaml")
 	newV.SetConfigName(filename)
 
-	//fmt.Println(path, filename)
 	err := newV.ReadInConfig()
 
 	if err != nil {

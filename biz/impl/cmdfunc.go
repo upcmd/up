@@ -12,6 +12,7 @@ import (
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
+	yq "github.com/stephencheng/yq/v3/cmd"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path"
@@ -295,6 +296,118 @@ func (f *CmdFuncAction) Exec() {
 				} else {
 					core.RuntimeVarsAndDvarsMerged.Put(reg, data)
 					f.Vars.Put(reg, data)
+				}
+
+			})
+
+		case "yml_delete":
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+				var raw, ymlfile, yqpath, reg string
+
+				refdir := u.CoreConfig.RefDir
+				verbose := u.CoreConfig.Verbose
+				var inplace, localonly bool
+				for k, v := range cmd {
+					switch k.(string) {
+					case "ymlfile":
+						raw = v.(string)
+						ymlfile = core.Render(raw, f.Vars)
+					case "refdir":
+						raw = v.(string)
+						refdir = core.Render(raw, f.Vars)
+					case "path":
+						raw = v.(string)
+						yqpath = core.Render(raw, f.Vars)
+					case "verbose":
+						verbose = v.(string)
+					case "inplace":
+						inplace = v.(bool)
+					case "reg":
+						raw = v.(string)
+						reg = core.Render(raw, f.Vars)
+					case "localonly":
+						localonly = v.(bool)
+					}
+				}
+
+				if yqpath == "" || ymlfile == "" {
+					u.InvalidAndExit("mandatory attribute validation", "ymlfile and path are mandatory and required")
+				}
+
+				if inplace == true && reg != "" {
+					u.InvalidAndExit("yml_delete criteria validation", "inplace and reg are mutual exclusive")
+				}
+
+				modified, err := yq.UpDeletePathFromFile(path.Join(refdir, ymlfile), yqpath, inplace, verbose)
+				u.LogErrorAndContinue("delete sub element in yml", err, u.Spf("please ensure correct yml query path: %s", yqpath))
+				u.Ppmsgvvvvvhint("yml modified:", modified)
+
+				if inplace != true && reg != "" {
+					if localonly {
+						f.Vars.Put(reg, modified)
+					} else {
+						core.RuntimeVarsAndDvarsMerged.Put(reg, modified)
+						f.Vars.Put(reg, modified)
+					}
+				}
+			})
+
+		case "yml_write":
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+				var raw, yqpath, ymlstr, reg, value, nodevalue, modified string
+				var err error
+
+				verbose := u.CoreConfig.Verbose
+				var localonly bool
+				for k, v := range cmd {
+					switch k.(string) {
+					case "ymlstr":
+						raw = v.(string)
+						ymlstr = core.Render(raw, f.Vars)
+					case "value":
+						raw = v.(string)
+						value = core.Render(raw, f.Vars)
+					case "nodevalue":
+						raw = v.(string)
+						nodevalue = core.Render(raw, f.Vars)
+					case "path":
+						raw = v.(string)
+						yqpath = core.Render(raw, f.Vars)
+					case "verbose":
+						verbose = v.(string)
+					case "reg":
+						raw = v.(string)
+						reg = core.Render(raw, f.Vars)
+					case "localonly":
+						localonly = v.(bool)
+					}
+				}
+
+				if ymlstr == "" || yqpath == "" || reg == "" {
+					u.InvalidAndExit("mandatory attribute validation", "ymlstr, path and reg are required")
+				}
+
+				if value != "" && nodevalue != "" {
+					u.InvalidAndExit("value validation", "value and nodevalue are mutual exclusive")
+				}
+
+				if value != "" {
+					modified, err = yq.UpWriteNodeFromStrForSimpleValue(ymlstr, yqpath, value, verbose)
+				} else if nodevalue != "" {
+					modified, err = yq.UpWriteNodeFromStrForComplexValueFromYmlStr(ymlstr, yqpath, nodevalue, verbose)
+				}
+
+				u.LogErrorAndContinue("write node in yml", err, u.Spf("please ensure correct yml query path: %s", yqpath))
+
+				u.Ppmsgvvvvvhint("yml modified:", modified)
+
+				if localonly {
+					f.Vars.Put(reg, modified)
+				} else {
+					core.RuntimeVarsAndDvarsMerged.Put(reg, modified)
+					f.Vars.Put(reg, modified)
 				}
 
 			})

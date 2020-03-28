@@ -1,0 +1,66 @@
+goal:
+  - add feature to delete a node from yaml file
+  - inplace and reg/localonly are mutual exclusive
+  - refdir is optional, if empty then default to global configured
+
+
+vars:
+  mock_yml: |
+    tom:
+      sex: male
+      age: 23
+    jason:
+      sex: male
+      age: 35
+    emily:
+      sex: female
+      age: 32
+
+tasks:
+  -
+    name: task
+    task:
+      - func: shell
+        do:
+          - 'echo "{{.mock_yml}}" > /tmp/mock_yml.yml'
+
+      -
+        func: cmd
+        desc: inplace modification
+        do:
+          - name: yml_delete
+            cmd:
+              ymlfile: mock_yml.yml
+              refdir: /tmp
+              path: jason.sex
+              inplace: true
+              verbose: v
+
+          - name: readfile
+            desc: check new file content
+            cmd:
+              filename: mock_yml.yml
+              dir: /tmp
+              reg: new_yml
+
+          - name: print
+            desc: show the modified yml content read from file
+            cmd: '{{.new_yml}}'
+
+      -
+        func: cmd
+        desc: modify in memory and register to cache
+        do:
+          - name: yml_delete
+            cmd:
+              ymlfile: mock_yml.yml
+              refdir: /tmp
+              path: jason.sex
+              verbose: vvvv
+              reg: modified_yml
+              localonly: true
+
+          - name: print
+            desc: show the modified yml content registered
+            cmd: '{{.modified_yml}}'
+

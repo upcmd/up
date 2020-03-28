@@ -4,6 +4,9 @@ notes:
   why:
     - it is like dep but allow pre and post task using call
 
+vars:
+  extra_task_name: post_task
+
 tasks:
   -
     name: pre_task
@@ -39,14 +42,20 @@ tasks:
     task:
       -
         func: call
-        do:
-          - pre_task
+        do: pre_task
       -
         func: shell
         do:
           - echo " I love this "
       -
         func: call
+        desc: use a dynamic var to refer to a task name
         do:
-          - post_task
+          - '{{.extra_task_name}}'
           - 2ndtask
+
+      -
+        func: call
+        do:
+          - pre_task: pre
+            name: yes

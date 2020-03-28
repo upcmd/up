@@ -16,7 +16,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.6.2
 	github.com/stephencheng/go-spew v1.2.0
-	github.com/stephencheng/yq/v3 v3.2.7
+	github.com/stephencheng/yq/v3 v3.3.1
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect

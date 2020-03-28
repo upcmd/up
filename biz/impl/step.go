@@ -90,6 +90,9 @@ func validation(vars *core.Cache) {
 	identified := false
 
 	for k, _ := range *vars {
+		if k == "" {
+			u.InvalidAndExit("validating var name", "var name can not be empty")
+		}
 		if u.CharIsNum(k[0:1]) != -1 {
 			identified = true
 			u.InvalidAndExit("validating var name", u.Spf("var name (%s) can not start with number", k))
@@ -142,8 +145,12 @@ func (step *Step) Exec() {
 			}
 			action = biz.Do(&funcAction)
 
+		case "":
+			u.InvalidAndExit("Step dispatch", "func name is empty and not defined")
+			bizErr.Mark = "func name not implemented"
+
 		default:
-			u.InvalidAndExit("Step dispatch", "func name is not recognised and implemented")
+			u.InvalidAndExit("Step dispatch", u.Spf("func name(%s) is not recognised and implemented", step.Func))
 			bizErr.Mark = "func name not implemented"
 		}
 	}

@@ -1,0 +1,42 @@
+goal:
+  - add feature to modify a node value of a yml string
+
+vars:
+  tom: |
+    tom:
+      sex: male
+      age: 23
+  emily: |
+    emily:
+      sex: female
+      age: 32
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        desc: inplace modification
+        do:
+          - name: yml_write
+            cmd:
+              ymlstr: '{{.tom}}'
+              path: tom.sex
+              value: female
+              verbose: v
+              reg: tomyml
+
+          - name: print
+            cmd: '{{.tomyml }}'
+
+          - name: yml_write
+            cmd:
+              ymlstr: '{{.tomyml}}'
+              path: tom.wife
+              nodevalue: '{{.emily}}'
+              verbose: vvvv
+              reg: tomyml
+
+          - name: print
+            cmd: '{{.tomyml }}'

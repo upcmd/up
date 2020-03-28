@@ -1,5 +1,8 @@
 version: 1.0.0
 
+vars:
+  ver_yq: v3.3.1
+
 tasks:
   -
     name: deps
@@ -9,8 +12,7 @@ tasks:
         func: shell
         do:
           - go list -m -versions github.com/stephencheng/yq/v3
-          - go get github.com/stephencheng/yq/v3
-
+          - 'go get github.com/stephencheng/yq/v3@{{.ver_yq}}'
   -
     name: build
     desc: build binary

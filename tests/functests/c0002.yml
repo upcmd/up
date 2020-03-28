@@ -1,3 +1,38 @@
+doc_meta: |
+  folder: quick-start
+  title: First task - hello world
+  head: Show a hello world type of UP task
+  head_content: |-
+    Welcome to this first quick start guide of up cmd
+
+  sections:
+    - title: Intro
+      content: |
+        A UP task file is composed of tasks, a task is composed of a sequential steps, a step is function call implementation of function, for example, shell
+
+    - title: What's ignore_error
+      content: |
+        ignore_error is a annotated feature using flags to indicate that if that step fails, it simply ignore the status and continue the execution
+
+      refs:
+        - title: main task file
+          type: yml
+          link: '{{.ref_dir}}/c0001.yml'
+
+    - title: What's like when you run the task
+      content: |
+        * Firstly, it will try to create the folder if it does not exist
+        add reference link
+      refs:
+        - title: logfile
+          type: txt
+          link: '{{.log_dir}}/c0001_v.log'
+
+  related:
+    refs:
+      - title: main task file
+        link: main.html
+
 notes:
   goal:
     - to test using a simpler mode of data structure for tasks using array

@@ -36,7 +36,7 @@ func (f *TaskRefFuncAction) Adapt() {
 
 	case []interface{}:
 		err := ms.Decode(f.Do, &tasknames)
-		u.LogError("call func adapter", err)
+		u.LogErrorAndExit("call func adapter", err, "please ref to a task name only")
 
 	default:
 		u.LogWarn("call func", "Not implemented or void for no action!")
