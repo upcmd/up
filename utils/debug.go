@@ -169,6 +169,11 @@ func Ptmpdebug(mark string, a ...interface{}) {
 	hiColor.Printf("------%s start-----\n%s\n------%s end-----\n\n", mark, spewMsgState.Sdump(a...), mark)
 }
 
+func Ptrace(mark, info string) {
+	hiColor := color.New(color.FgHiWhite, color.BgHiBlue)
+	hiColor.Printf("%s%s\n", mark, info)
+}
+
 func Pfvvvv(format string, a ...interface{}) {
 	if permitted("vvvv") {
 		vvvvv_color_printf(format, a...)

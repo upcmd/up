@@ -15,6 +15,7 @@ import (
 )
 
 func runTask(f *TaskRefFuncAction, taskname string) {
+	u.PpmsgvvvvvhintHigh(u.Spf("caller's vars to task (%s):", taskname), f.Vars)
 	ExecTask(taskname, f.Vars)
 }
 

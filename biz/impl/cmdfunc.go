@@ -103,6 +103,12 @@ func (f *CmdFuncAction) Exec() {
 				u.Pfv("%s\n", color.HiGreenString("%s", cmdRendered))
 			})
 
+		case "trace":
+			cmdItem.runCmd("string", func() {
+				cmdRendered := core.Render(cmdItem.Cmd.(string), f.Vars)
+				u.Ptrace("Trace:", cmdRendered)
+			})
+
 		case "printobj":
 			u.Dvvvv(cmdItem.Cmd)
 			cmdItem.runCmd("string", func() {

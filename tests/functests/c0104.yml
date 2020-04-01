@@ -1,25 +1,31 @@
 doc_meta: |
   folder: quick-start
-  weight: 18
-  title: manage dependencies
+  title: call func (power up)
   head: |
-    Use call to func to chain dependencies
-
-    We are used to the way the dependencies are managed in build tasks, such as in Makefile, we list the pre tasks to be executed prior to the named task
-
-    In UP, we simply use call instead
-
-    It is designed this way for composibility and flexibility so that task and steps are consumable and reusable.
+    The callee task is reprented using a var name make it dynamic in execution time
 
   sections:
     - title: Demo
       log: yes
+
+    - title: How it works?
+      content: the task call pointing to a var name extra_task_name is routed to post_task task
+
+    - title: Prerequisites
+      content: Understanding of basics of vars
+      refs:
+        - title: vars basics
+          link: ../vars/c0012.yml
+
 
 notes:
   goal:
     - to ues call to achieve the goal of task composition
   why:
     - it is like dep but allow pre and post task using call
+
+vars:
+  extra_task_name: post_task
 
 tasks:
   -
@@ -55,14 +61,12 @@ tasks:
     desc: this is the task and expect the final message (hello I love this world)
     task:
       -
-        func: call
-        do: pre_task
-      -
         func: shell
         do:
           - echo " I love this "
       -
         func: call
+        desc: use a dynamic var to refer to a task name
         do:
-          - post_task
+          - '{{.extra_task_name}}'
           - 2ndtask

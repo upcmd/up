@@ -1,3 +1,13 @@
+doc_meta: |
+  folder: quick-start
+  weight: 14
+  title: Yaml literal
+  head: A example to show using yaml string literal to execute multiple line of shell script
+
+  sections:
+    - title: Demo
+      log: yes
+
 notes:
   goal:
     - to test the shell function can handle do but without using array
@@ -6,7 +16,7 @@ tasks:
   -
     name: task
     desc: this is task1
-    task: #this comment will not be treated as desc of the task, removing # will invalid the yml
+    task:
       -
         func: shell
         desc: do step1 in shell func

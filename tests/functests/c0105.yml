@@ -1,0 +1,59 @@
+goal:
+  - to test the var scope and its aviablity
+
+vars:
+  tom: this is tom
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        vars:
+          jerry: this is jerry
+        do:
+          - name: print
+            cmd: '{{.tom}}'
+          - name: print
+            cmd: '{{.jerry}}'
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.jerry}}'
+
+          - name: reg
+            cmd:
+              name: hitom
+              desc: by default hitom is registered in to global context
+              value: 'hello, {{.tom}}'
+
+          - name: print
+            cmd: '{{.hitom}}'
+
+
+      -
+        func: cmd
+        do:
+          - name: print
+            desc: by default hitom is accessible from global context, that's why it is accessiable cross func
+            cmd: '{{.hitom}}'
+
+          - name: reg
+            cmd:
+              name: hijerry
+              desc: hijerry is registered to local scope only
+              value: 'hello, jerry'
+              localonly: true
+
+          - name: print
+            desc: expecting to see its value since it is still in same func scope
+            cmd: '{{.hijerry}}'
+      -
+        func: cmd
+        do:
+          - name: print
+            desc: by default hitom is accessible from global context, that's why it is accessiable cross func
+            cmd: '{{.hijerry}}'

@@ -99,6 +99,7 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 				rtContext := core.TaskRuntimeContext{
 					Taskname:   taskname,
 					CallerVars: callerVars,
+					TaskVars:   core.NewCache(),
 				}
 
 				core.TaskStack.Push(&rtContext)

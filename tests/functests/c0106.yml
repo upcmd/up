@@ -1,0 +1,78 @@
+goal:
+  - to test the registered global var should be availabe in global context
+
+vars:
+  tom: this is tom
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: call
+        do: sub1
+
+      -
+        func: cmd
+        desc: check if hitom is available in global context
+        do:
+          - name: print
+            cmd: '{{.hitom}}'
+
+      -
+        func: call
+        do: sub2
+
+      -
+        func: cmd
+        desc: check if hitom is available in global context
+        do:
+          - name: print
+            cmd: '{{.hitom}}'
+
+  -
+    name: sub1
+    task:
+      -
+        func: cmd
+        do:
+
+          - name: reg
+            cmd:
+              name: hitom
+              desc: by default hitom is registered in to global context
+              value: 'hello, {{.tom}}'
+              localonly: true
+
+          - name: print
+            cmd: '{{.hitom}}'
+
+      -
+        func: cmd
+        do:
+          - name: print
+            desc: by default hitom is accessible from global context, that's why it is accessiable cross func
+            cmd: '{{.hitom}}'
+
+  -
+    name: sub2
+    task:
+      -
+        func: cmd
+        do:
+
+          - name: reg
+            cmd:
+              name: hitom
+              desc: by default hitom is registered in to global context
+              value: 'hello, {{.tom}}'
+
+          - name: print
+            cmd: '{{.hitom}}'
+
+      -
+        func: cmd
+        do:
+          - name: print
+            desc: by default hitom is accessible from global context, that's why it is accessiable cross func
+            cmd: '{{.hitom}}'

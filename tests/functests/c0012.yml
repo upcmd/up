@@ -1,5 +1,42 @@
-goal:
-  - to test vars without scope will still work
+doc_meta: |
+  folder: vars
+  weight: 32
+  title: vars in func
+  head: |
+    The vars definition block in a func(shell in this case) make the vars' scope to be local scope to the func, the var defined in the local scope is only available in all the execution steps in that func
+
+    It is similar to func or method in most of programming languages, the vars defined in local scope in func are only avaiable in local scope   callee task is reprented using a var name make it dynamic in execution time
+
+  sections:
+    - title: Demo
+      log: yes
+
+    - title: What to observe
+      content: |
+        do check the verbosed log in vvv level, you will see that studentname exist only in local var scope, which are the final exec vars
+        ```
+        -------runtime global final merged with dvars-------
+
+        {
+          "a": "runtime-a",
+          "e": "runtime-e",
+          "k": "runtime-k"
+        }
+
+        overall final exec vars:
+
+          (*core.Cache)({
+        "a": "runtime-a",
+        "e": "runtime-e",
+        "k": "runtime-k",
+        "studentname": "Tom"
+        })
+
+        ```
+
+notes:
+  goal:
+    - to test vars without scope will still work
 
 vars:
   a: runtime-a

@@ -1,38 +1,21 @@
 doc_meta: |
   folder: quick-start
   title: First task - hello world
-  head: Show a hello world type of UP task
-  head_content: |-
-    Welcome to this first quick start guide of up cmd
+  weight: 10
+  head: |
+    Welcome to this first quick start guide of up cmd, this shows a hello world type of UP task
 
   sections:
     - title: Intro
       content: |
         A UP task file is composed of tasks, a task is composed of a sequential steps, a step is function call implementation of function, for example, shell
 
-      refs:
-        - title: main task file
-          type: yml
-          link: '{{.ref_dir}}/c0001.yml'
+    - title: Demo
+      log: yes
 
-    - title: What's like when you run the task
-      refs:
-        - title: logfile
-          type: txt
-          link: '{{.log_dir}}/c0001_v.log'
-
-    - title: Internal notes
-      content: |
-        * goal: to test using a simpler model of data structure for tasks using array
-        * why: array will allow you to put more attribute so that you can put desc
-
-  related:
-    log: yes
-    refs:
-      - title: log
-        link: ../c0002/
-      - title: ref test
-        link: /cases/c0002/
+notes:
+  goal: to test using a simpler model of data structure for tasks using array
+  why: array will allow you to put more attribute so that you can put desc
 
 tasks:
   -

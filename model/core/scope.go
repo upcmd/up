@@ -142,6 +142,11 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 				dvarInputValue, _ := reader.ReadString('\n')
 				(*mergeTarget).Put(dvar.Name, dvarInputValue)
 			}
+
+			if u.Contains(dvar.Flags, "taskscope") {
+				TaskRuntime().TaskVars.Put(dvar.Name, dvar.Rendered)
+			}
+
 		}
 
 		if dvar.Secure != nil {

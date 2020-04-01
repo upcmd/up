@@ -1,12 +1,23 @@
+doc_meta: |
+  folder: quick-start
+  weight: 16
+  title: Use array
+  head: |
+    Mix of yaml literal and single line of shell script
+
+  sections:
+    - title: Demo
+      log: yes
+
 notes:
   goal:
-    - to test the shell function can handle multiline scripts
+    - to test the shell function can handle multiline scripts in array
 
 tasks:
   -
     name: task
     desc: this is task1
-    task: #this comment will not be treated as desc of the task, removing # will invalid the yml
+    task:
       -
         func: shell
         desc: do step1 in shell func
@@ -14,3 +25,5 @@ tasks:
           - |
              echo "hello"
              echo "world"
+          -  echo "how are you"
+

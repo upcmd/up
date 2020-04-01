@@ -1,49 +1,32 @@
 doc_meta: |
   folder: quick-start
-  title: First task - hello world
-  head: Show a hello world type of UP task
-  head_content: |-
-    Welcome to this first quick start guide of up cmd
+  weight: 12
+  title: Multiple Steps
+  head: A task could be a sequential steps of implementation of a func. You can chaine a series of steps in a task
 
   sections:
-    - title: Intro
+    - title: Brief of shell func
       content: |
-        A UP task file is composed of tasks, a task is composed of a sequential steps, a step is function call implementation of function, for example, shell
+        A shell func is a func implementation, in which you could add one or multiple line of shell scripts to be executed
 
-    - title: What's ignore_error
+        We will call the step in the array of steps shell func as sub step to just avoid confusion, each func implementation in a task is called a step
+
+    - title: ignore_error flag
       content: |
-        ignore_error is a annotated feature using flags to indicate that if that step fails, it simply ignore the status and continue the execution
+        A flag in flag list attaching to a func dictates some behavior, in such a way it provides additional feature to the execution, workflow etc
 
-      refs:
-        - title: main task file
-          type: yml
-          link: '{{.ref_dir}}/c0001.yml'
+        Normally a successful shell execution returns exit code 0, ignore_error is to allow the executio to contiue to next or end without a return code of 0
 
-    - title: What's like when you run the task
-      content: |
-        * Firstly, it will try to create the folder if it does not exist
-        add reference link
-      refs:
-        - title: logfile
-          type: txt
-          link: '{{.log_dir}}/c0001_v.log'
+        In this demo, it reports the sub step has failed with its own return code, but it continue to complete all execution
 
-  related:
-    refs:
-      - title: main task file
-        link: main.html
-
-notes:
-  goal:
-    - to test using a simpler mode of data structure for tasks using array
-  why:
-    - array will allow you to put more attribute so that you can put desc
+    - title: Demo
+      log: yes
 
 tasks:
   -
     name: task
     desc: this is task
-    task: #this comment will not be treated as desc of the task, removing # will invalid the yml
+    task:
       -
         func: shell
         desc: do step1 in shell func
@@ -58,4 +41,5 @@ tasks:
           - ignore_error
         do:
           - echo "hello"
-          - echo "world"|grep non-exist
+          - echo "I got exception"|grep non-exist
+          - echo "world"

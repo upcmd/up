@@ -1,0 +1,62 @@
+goal:
+  - to fix a bug in callee task which var has been updated but not reflected
+  - introduce trace to set a colorful trace marker to easily locate problem in verbose log
+  - demo that the vars in callee task has its own stack
+
+vars:
+  tom: this is tom in global
+  jerry: this is jerry in global
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: call
+        do: sub_loop
+
+      -
+        func: cmd
+        desc: check value of tom
+        do:
+          - name: print
+            cmd: 'in main task print3: {{.tom}}'
+
+  -
+    name: sub_loop
+    task:
+      -
+        func: cmd
+        desc: check value of tom 1
+        vars:
+          john: john in sub_loop func1
+        do:
+          - name: reg
+            cmd:
+              name: tom
+              desc: by default hitom is registered in to global context
+              value: 'tom created in sub_loop'
+
+          - name: print
+            cmd: 'in sub_loop print1: {{.tom}}'
+
+      -
+        func: cmd
+        do:
+          - name: trace
+            cmd: debug tom's value==>
+
+      -
+        func: cmd
+        desc: check value of tom 2
+        vars:
+          john: john in sub_loop func2
+        do:
+          - name: print
+            cmd: 'in sub_loop print2: {{.tom}}'
+
+      -
+        func: cmd
+        do:
+          - name: trace
+            cmd: <==debug tom's value

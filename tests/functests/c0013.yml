@@ -1,5 +1,25 @@
-goal:
-  - to test empty vars in func will pass
+doc_meta: |
+  folder: vars
+  weight: 30
+  title: Use variables
+  head: |
+    You can define variables in your UP global context, which means the vars element is a root element of the yml file
+
+    In your func implementation(it is a shell in this case), you can reference this var using golang template syntax
+
+  sections:
+    - title: Demo
+      log: yes
+
+    - title: How it works?
+      content: hello {{.a}} will print out the actual value 'runtime-a'
+
+    - title: Prerequisites
+      content: Understanding of basics usage of golang template
+
+notes:
+  goal:
+    - to test empty vars in func will pass
 
 vars:
   a: runtime-a
@@ -16,3 +36,4 @@ tasks:
         desc: to test display env vars from shell context
         do:
           - echo "hello, world"
+          - echo 'hello {{.a}}'

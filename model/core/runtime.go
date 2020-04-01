@@ -33,6 +33,7 @@ func SetDryrun() {
 type TaskRuntimeContext struct {
 	Taskname   string
 	CallerVars *Cache
+	TaskVars   *Cache
 }
 
 type StepRuntimeContext struct {
@@ -44,5 +45,9 @@ type ExecResult struct {
 	Code   int
 	Output string
 	ErrMsg string
+}
+
+func TaskRuntime() *TaskRuntimeContext {
+	return TaskStack.GetTop().(*TaskRuntimeContext)
 }
 

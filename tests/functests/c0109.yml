@@ -1,0 +1,61 @@
+goal:
+  - to test out the task vars dealing in sub task is all correct and expected
+
+vars:
+  tom: this is tom
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        dvars:
+          - name: jerry
+            value: this is jerry in task scope
+            flags:
+              - taskscope
+        do:
+          - name: print
+            desc: this should print out the dvar value of jerry
+            cmd: '{{.jerry}}'
+
+      -
+        func: call
+        do:
+          - subtask1
+
+  -
+    name: subtask1
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            desc: this should print out the dvar value of jerry as it is declared jerry is in taskscope
+            cmd: '{{.jerry}}'
+          - name: trace
+            cmd: ===>
+
+      -
+        func: cmd
+        vars:
+          jerry: jerry is overrided in local scope
+        do:
+          - name: print
+            desc: var jerry in task scope is overrided by local var jerry
+            cmd: '{{.jerry}}'
+          - name: trace
+            cmd: <===
+
+          - name: trace
+            cmd: --->
+
+      -
+        func: cmd
+        do:
+          - name: print
+            desc: this should print out the jerry defined in caller's task var scope
+            cmd: '{{.jerry}}'
+          - name: trace
+            cmd: <---

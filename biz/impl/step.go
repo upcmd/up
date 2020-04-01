@@ -39,24 +39,35 @@ type Steps []Step
 //this step will merge the vars with the caller's stack vars
 func (step *Step) GetExecVarsWithRefOverrided(funcname string) *core.Cache {
 	vars := step.getRuntimeExecVars(funcname)
-	callerVars := core.TaskStack.GetTop().(*core.TaskRuntimeContext).CallerVars
+	callerVarsDerived := core.TaskRuntime().CallerVars
 
-	if callerVars != nil {
-		mergo.Merge(vars, callerVars, mergo.WithOverride)
+	u.PpmsgvvvvvhintHigh("runtime vars:", vars)
+	u.PpmsgvvvvvhintHigh("derived caller vars:", callerVarsDerived)
+
+	if callerVarsDerived != nil {
+		callerVars := deepcopy.Copy(*callerVarsDerived).(core.Cache)
+		mergo.Merge(&callerVars, vars, mergo.WithOverride)
+		u.Ppmsgvvvhint("overall final exec vars:", callerVars)
+		return &callerVars
+	} else {
+		u.Ppmsgvvvhint("overall final exec vars:", vars)
+		return vars
 	}
 
-	u.Ppmsgvvvhint("overall final exec vars:", vars)
-	return vars
 }
 
 /*
 merge localvars to above RuntimeVarsAndDvarsMerged to get final runtime exec vars
 the localvars is the vars in the step
+merge taskvars before final merge of localvars
 */
 func (step *Step) getRuntimeExecVars(mark string) *core.Cache {
 	var execvars core.Cache
 
 	execvars = deepcopy.Copy(*core.RuntimeVarsAndDvarsMerged).(core.Cache)
+
+	taskVars := core.TaskRuntime().TaskVars
+	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
 
 	if step.Vars != nil {
 		mergo.Merge(&execvars, step.Vars, mergo.WithOverride)
