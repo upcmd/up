@@ -1,5 +1,5 @@
 goal:
-  - to test multiple ref-task executions should pass
+  - to test multiple call func task executions should pass
 
 vars:
   a: runtime-a

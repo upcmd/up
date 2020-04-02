@@ -1,0 +1,32 @@
+
+notes:
+  - to test out that that the caller's var will override callees' local var
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: call
+        vars:
+          tom: my name is tom
+        do:
+          - subtask1
+
+  -
+    name: subtask1
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.tom}}'
+
+      -
+        func: cmd
+        vars:
+          tom: 'hi i am tom'
+        do:
+          - name: print
+            cmd: '{{.tom}}'

@@ -220,7 +220,8 @@ func VarsMergedWithDvars(mark string, baseVars *Cache, dvars *Dvars, contextMerg
 
 	if dvars != nil {
 		expandedVars := dvars.Expand(mark, contextMergedVars)
-		mergo.Merge(&mergedVars, *expandedVars, mergo.WithOverride)
+		//mergo.Merge(&mergedVars, *expandedVars, mergo.WithOverride)
+		mergo.Merge(&mergedVars, expandedVars, mergo.WithOverride)
 	}
 
 	u.Pfvvvvv("scope[%s] merged: %s", mark, u.Sppmsg(mergedVars))
@@ -228,7 +229,6 @@ func VarsMergedWithDvars(mark string, baseVars *Cache, dvars *Dvars, contextMerg
 	procDvars(dvars, &mergedVars)
 
 	return &mergedVars
-
 }
 
 func loadRefVars(yamlroot *viper.Viper) *Cache {

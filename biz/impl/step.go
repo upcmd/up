@@ -35,27 +35,6 @@ type Step struct {
 
 type Steps []Step
 
-//this is final merged exec vars the individual step will use
-//this step will merge the vars with the caller's stack vars
-func (step *Step) GetExecVarsWithRefOverrided(funcname string) *core.Cache {
-	vars := step.getRuntimeExecVars(funcname)
-	callerVarsDerived := core.TaskRuntime().CallerVars
-
-	u.PpmsgvvvvvhintHigh("runtime vars:", vars)
-	u.PpmsgvvvvvhintHigh("derived caller vars:", callerVarsDerived)
-
-	if callerVarsDerived != nil {
-		callerVars := deepcopy.Copy(*callerVarsDerived).(core.Cache)
-		mergo.Merge(&callerVars, vars, mergo.WithOverride)
-		u.Ppmsgvvvhint("overall final exec vars:", callerVars)
-		return &callerVars
-	} else {
-		u.Ppmsgvvvhint("overall final exec vars:", vars)
-		return vars
-	}
-
-}
-
 /*
 merge localvars to above RuntimeVarsAndDvarsMerged to get final runtime exec vars
 the localvars is the vars in the step
@@ -77,13 +56,36 @@ func (step *Step) getRuntimeExecVars(mark string) *core.Cache {
 		u.Dvvvvv(execvars)
 	}
 
-	localVarsMergedWithDvars := core.VarsMergedWithDvars("local", &step.Vars, &step.Dvars, &execvars)
+	//execvars > callervars > stepvars > dvars
+	callerVarsDerived := core.TaskRuntime().CallerVars
+	var callerVars core.Cache
+	u.PpmsgvvvvvhintHigh("derived caller vars:", callerVarsDerived)
+	execMergedWthCallerContextVars := func() *core.Cache {
+		//this is to ensure required vars from caller to be in the context
+		if callerVarsDerived != nil {
+			callerVars = deepcopy.Copy(*callerVarsDerived).(core.Cache)
+			mergo.Merge(&execvars, &callerVars, mergo.WithOverride)
+		}
+		return &execvars
+	}()
+
+	localVarsMergedWithDvars := core.VarsMergedWithDvars("local", &step.Vars, &step.Dvars, execMergedWthCallerContextVars)
 
 	if localVarsMergedWithDvars.Len() > 0 {
 		mergo.Merge(&execvars, localVarsMergedWithDvars, mergo.WithOverride)
 	}
 
-	return &execvars
+	//caller's vars should always override callee' vars
+	localMergedWthCallerVars := func() *core.Cache {
+		if callerVarsDerived != nil {
+			mergo.Merge(&execvars, &callerVars, mergo.WithOverride)
+		}
+		return &execvars
+	}()
+
+	u.Ppmsgvvvhint("overall final exec vars:", localMergedWthCallerVars)
+
+	return localMergedWthCallerVars
 }
 
 type LoopItem struct {
@@ -123,7 +125,8 @@ func (step *Step) Exec() {
 
 	var bizErr *ee.Error = ee.New()
 	var stepExecVars *core.Cache
-	stepExecVars = step.GetExecVarsWithRefOverrided("get plain exec vars")
+	//stepExecVars = step.GetExecVarsWithRefOverrided("get plain exec vars")
+	stepExecVars = step.getRuntimeExecVars("get plain exec vars")
 
 	validation(stepExecVars)
 	routeFuncType := func(loopItem *LoopItem) {

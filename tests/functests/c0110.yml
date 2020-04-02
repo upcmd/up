@@ -1,0 +1,44 @@
+
+notes:
+  - to test out the internal var loopitem could be used in dvar reference
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: call
+        do:
+          - subtask1
+        loop:
+          - tom
+          - jerry
+          - emily
+
+  -
+    name: subtask1
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+
+      -
+        func: cmd
+        vars:
+          person: '{{.loopitem}}'
+        do:
+          - name: print
+            cmd: '{{.person}}'
+
+      -
+        func: cmd
+        dvars:
+          - name: theone
+            value: '{{.loopitem}}'
+        do:
+          - name: print
+            cmd: '{{.theone}}'
+

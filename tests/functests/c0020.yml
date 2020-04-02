@@ -1,5 +1,8 @@
-goal:
-  - to show a design pattern using call and callee task without local vars
+
+notes:
+  goal:
+    - to show a design pattern using call and callee task without local vars
+    - the caller's varss should always take priority than the the callee's vars, if callee has already got same local vars defined, they will be overrided and used as default values
 
 vars:
   school: sydney grammar
