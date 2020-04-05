@@ -97,9 +97,15 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 
 			func() {
 				rtContext := core.TaskRuntimeContext{
-					Taskname:   taskname,
-					CallerVars: callerVars,
-					TaskVars:   core.NewCache(),
+					Taskname: taskname,
+					TaskVars: core.NewCache(),
+				}
+
+				taskLayerCnt := core.TaskStack.GetLen()
+				if taskLayerCnt > 0 {
+					rtContext.ExecbaseVars = callerVars
+				} else {
+					rtContext.ExecbaseVars = core.RuntimeVarsAndDvarsMerged
 				}
 
 				core.TaskStack.Push(&rtContext)
@@ -126,11 +132,11 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 
 }
 
-func validateAndLoadTaskRef(taks *model.Tasks) {
+func validateAndLoadTaskRef(tasks *model.Tasks) {
 	//validation
 
 	invalidNames := []string{}
-	for idx, task := range *taks {
+	for idx, task := range *tasks {
 		if strings.Contains(task.Name, "-") {
 			invalidNames = append(invalidNames, task.Name)
 		}
@@ -153,7 +159,7 @@ func validateAndLoadTaskRef(taks *model.Tasks) {
 
 			yamlflowroot := u.YamlLoader("flow ref", refdir, ref)
 			flow := loadRefFlow(yamlflowroot)
-			(*taks)[idx].Task = flow
+			(*tasks)[idx].Task = flow
 		}
 	}
 

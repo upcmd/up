@@ -121,10 +121,10 @@ func (f *CmdFuncAction) Exec() {
 			cmdItem.runCmd("string", func() {
 				varname := core.Render(cmdItem.Cmd.(string), f.Vars)
 				u.Pfv("deregister var: %s\n", color.HiGreenString("%s", varname))
-				core.RuntimeVarsAndDvarsMerged.Delete(varname)
+				core.TaskRuntime().ExecbaseVars.Delete(varname)
 				f.Vars.Delete(varname)
 			})
-			u.Ppmsgvvvvvhint("after reg the var - global:", core.RuntimeVarsAndDvarsMerged)
+			u.Ppmsgvvvvvhint("after reg the var - contextual global:", core.TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 
 		case "sleep":
@@ -167,13 +167,13 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					f.Vars.Put(varname, string(content))
 				} else {
-					core.RuntimeVarsAndDvarsMerged.Put(varname, string(content))
+					core.TaskRuntime().ExecbaseVars.Put(varname, string(content))
 					f.Vars.Put(varname, string(content))
 				}
 
 			})
 
-			u.Ppmsgvvvvvhint("after reg the var - global:", core.RuntimeVarsAndDvarsMerged)
+			u.Ppmsgvvvvvhint("after reg the var - contextual global:", core.TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 
 		case "writefile":
@@ -300,7 +300,7 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					f.Vars.Put(reg, data)
 				} else {
-					core.RuntimeVarsAndDvarsMerged.Put(reg, data)
+					core.TaskRuntime().ExecbaseVars.Put(reg, data)
 					f.Vars.Put(reg, data)
 				}
 
@@ -353,7 +353,7 @@ func (f *CmdFuncAction) Exec() {
 					if localonly {
 						f.Vars.Put(reg, modified)
 					} else {
-						core.RuntimeVarsAndDvarsMerged.Put(reg, modified)
+						core.TaskRuntime().ExecbaseVars.Put(reg, modified)
 						f.Vars.Put(reg, modified)
 					}
 				}
@@ -412,7 +412,7 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					f.Vars.Put(reg, modified)
 				} else {
-					core.RuntimeVarsAndDvarsMerged.Put(reg, modified)
+					core.TaskRuntime().ExecbaseVars.Put(reg, modified)
 					f.Vars.Put(reg, modified)
 				}
 
@@ -439,13 +439,13 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					f.Vars.Put(varname, varvalue)
 				} else {
-					core.RuntimeVarsAndDvarsMerged.Put(varname, varvalue)
+					core.TaskRuntime().ExecbaseVars.Put(varname, varvalue)
 					f.Vars.Put(varname, varvalue)
 				}
-
 			})
-			u.Ppmsgvvvvvhint("after reg the var - global:", core.RuntimeVarsAndDvarsMerged)
+			u.Ppmsgvvvvvhint("after reg the var - contextual global:", core.TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
+
 		case "to_object":
 			//src: a var name to get the yml content from
 			//reg: a registered name to cache the variable
@@ -497,12 +497,12 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					(*f.Vars).Put(reg, *obj)
 				} else {
-					core.RuntimeVarsAndDvarsMerged.Put(src, reg)
+					core.TaskRuntime().ExecbaseVars.Put(src, reg)
 					(*f.Vars).Put(reg, *obj)
 				}
 
 			})
-			u.Ppmsgvvvvvhint("after reg the var - global:", core.RuntimeVarsAndDvarsMerged)
+			u.Ppmsgvvvvvhint("after reg the var - contextual global:", core.TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 		default:
 			u.Pferror("warrning: check cmd name:(%s),%s\n", cmdItem.Name, "cmd not implemented")

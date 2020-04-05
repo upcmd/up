@@ -102,13 +102,14 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 					(*mergeTarget).Put(dvarObjName, *obj)
 				}
 
-				if u.Contains(dvar.Flags, "reg") {
-					if dvar.Name != "void" {
-						RuntimeVarsAndDvarsMerged.Put(dvarObjName, *obj)
-					} else {
-						u.LogWarn("?reg a void", "you can't register a object with void name, use a proper name instead or split to multiple steps")
+				if TaskStack.GetLen() > 0 {
+					if u.Contains(dvar.Flags, "reg") {
+						if dvar.Name != "void" {
+							TaskRuntime().ExecbaseVars.Put(dvarObjName, *obj)
+						} else {
+							u.LogWarn("?reg a void", "you can't register a object with void name, use a proper name instead or split to multiple steps")
+						}
 					}
-
 				}
 
 				if u.Contains(dvar.Flags, "vvvv") {
@@ -124,9 +125,11 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 				(*mergeTarget).Put(envvarName, dvar.Rendered)
 			}
 
-			if u.Contains(dvar.Flags, "reg") {
-				if dvar.Name != "void" {
-					RuntimeVarsAndDvarsMerged.Put(dvar.Name, dvar.Rendered)
+			if TaskStack.GetLen() > 0 {
+				if u.Contains(dvar.Flags, "reg") {
+					if dvar.Name != "void" {
+						TaskRuntime().ExecbaseVars.Put(dvar.Name, dvar.Rendered)
+					}
 				}
 			}
 
@@ -197,7 +200,6 @@ func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
 
 	RuntimeVarsAndDvarsMerged = &mergedVars
 	u.Ppmsgvvvvhint("-------runtime global final merged with dvars-------", mergedVars)
-
 	procDvars(RuntimeGlobalDvars, RuntimeVarsAndDvarsMerged)
 
 	return RuntimeVarsAndDvarsMerged

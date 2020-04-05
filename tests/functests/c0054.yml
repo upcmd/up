@@ -147,4 +147,4 @@ tasks:
         do:
           - name: print
             cmd: '{{ gt (.doc|len) 1 }}'
-        if: '{{gt (.doc|len) 0}}
+        if: '{{gt (.doc|len) 0}}'

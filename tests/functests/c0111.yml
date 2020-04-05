@@ -2,14 +2,20 @@
 notes:
   - to test out that that the caller's var will override callees' local var
 
+
+vars:
+  global_a: aaa
+  global_b: bbb
+
 tasks:
   -
     name: task
     task:
-
       -
         func: call
         vars:
+          local_a: aaa
+          local_b: bbb
           tom: my name is tom
         do:
           - subtask1

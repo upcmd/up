@@ -1,0 +1,65 @@
+
+notes:
+  - need a new design of caller vars passing down to callee
+  - the reg only regs the var to the protected stack vars, which is based from caller's vars
+  - in callee task, for vars, including taskscope vars, reg
+    vars or dvar, support a option to return the var value
+    to be registered and merged to caller's vars
+  - the callee task should not have any direct access to RuntimeVarsAndDvarsMerged
+  - func in callee should use caller's vars as base only, the reg cmd regs to caller's vars
+
+vars:
+  global_a: aaa
+  global_b: bbb
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: call
+        vars:
+          local_a: aaa
+          local_b: bbb
+          tom: my name is tom
+        do:
+          - subtask1
+
+  -
+    name: subtask1
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.tom}}'
+
+      -
+        func: cmd
+        vars:
+          tom: 'hi i am tom'
+        do:
+          - name: print
+            cmd: '{{.tom}}'
+
+      -
+        func: call
+        do:
+          - subtask2
+
+  -
+    name: subtask2
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.tom}}'
+
+      -
+        func: cmd
+        vars:
+          tom: 'hi i am tom'
+        do:
+          - name: print
+            cmd: '{{.tom}}'

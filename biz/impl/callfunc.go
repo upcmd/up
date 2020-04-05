@@ -14,19 +14,19 @@ import (
 	u "github.com/stephencheng/up/utils"
 )
 
-func runTask(f *TaskRefFuncAction, taskname string) {
+func runTask(f *CallFuncAction, taskname string) {
 	u.PpmsgvvvvvhintHigh(u.Spf("caller's vars to task (%s):", taskname), f.Vars)
 	ExecTask(taskname, f.Vars)
 }
 
-type TaskRefFuncAction struct {
+type CallFuncAction struct {
 	Do   interface{}
 	Vars *core.Cache
 	Refs []string
 }
 
 //adapt the abstract step.Do to concrete ShellFuncAction Cmds
-func (f *TaskRefFuncAction) Adapt() {
+func (f *CallFuncAction) Adapt() {
 	var taskname string
 	var tasknames []string
 
@@ -45,7 +45,7 @@ func (f *TaskRefFuncAction) Adapt() {
 	f.Refs = tasknames
 }
 
-func (f *TaskRefFuncAction) Exec() {
+func (f *CallFuncAction) Exec() {
 	u.P("calling task:")
 	for idx, tmptaskname := range f.Refs {
 		taskname := core.Render(tmptaskname, f.Vars)

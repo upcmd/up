@@ -1,0 +1,20 @@
+goal:
+  - to test and show sprig funcs usage and examples
+  - showcase the fail template func
+
+
+dvars:
+
+  - name: sprig_flow_fail
+    value: '{{ fail "Please accept the end user license agreement" }}'
+    flags: [vvvv,]
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: shell
+        do:
+          - echo "check the value of other dvar using vvvv flag print out"

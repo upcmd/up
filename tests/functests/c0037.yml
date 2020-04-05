@@ -104,10 +104,6 @@ dvars:
     value: '{{ nospace "hello w o r l d" }}'
     flags: [vvvv,]
 
-  - name: sprig_flow_fail
-    value: '{{ fail "Please accept the end user license agreement" }}'
-    flags: [vvvv,]
-
   - name: sprig_encrypt_AES
     value: '{{ encryptAES "secretkey" "plaintext" }}'
     flags: [vvvv,]
@@ -239,6 +235,33 @@ dvars:
     desc: checkout other dic/map funcs here http://masterminds.github.io/sprig/dicts.html
     flags: [vvvv,]
 
+  - name: add1
+    value: '{{ add1 "100" }}'
+    flags: [vvvv,]
+
+  - name: add
+    value: '{{ add "100" "23" }}'
+    flags: [vvvv,]
+
+  - name: convert_and_add1
+    value: '{{ atoi "010" | add1 }}'
+    flags: [vvvv,]
+
+  - name: convert_and_add1_2
+    value: '{{ atoi "0010" | add1 }}'
+    flags: [vvvv,]
+
+  - name: sprig_substring2
+    value: '{{ substr 1 5 "c0011" }}'
+    flags: [vvvv,]
+
+  - name: sprig_word_count
+    value: '{{ wordcount "c0011 asdf hello" }}'
+    flags: [vvv,]
+
+  - name: sprig_muliply
+    value: '{{ mul 4 5 3 }}'
+    flags: [vvv,]
 
 tasks:
   -

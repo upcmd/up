@@ -43,7 +43,7 @@ merge taskvars before final merge of localvars
 func (step *Step) getRuntimeExecVars(mark string) *core.Cache {
 	var execvars core.Cache
 
-	execvars = deepcopy.Copy(*core.RuntimeVarsAndDvarsMerged).(core.Cache)
+	execvars = deepcopy.Copy(*core.TaskRuntime().ExecbaseVars).(core.Cache)
 
 	taskVars := core.TaskRuntime().TaskVars
 	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
@@ -56,36 +56,17 @@ func (step *Step) getRuntimeExecVars(mark string) *core.Cache {
 		u.Dvvvvv(execvars)
 	}
 
-	//execvars > callervars > stepvars > dvars
-	callerVarsDerived := core.TaskRuntime().CallerVars
-	var callerVars core.Cache
-	u.PpmsgvvvvvhintHigh("derived caller vars:", callerVarsDerived)
-	execMergedWthCallerContextVars := func() *core.Cache {
-		//this is to ensure required vars from caller to be in the context
-		if callerVarsDerived != nil {
-			callerVars = deepcopy.Copy(*callerVarsDerived).(core.Cache)
-			mergo.Merge(&execvars, &callerVars, mergo.WithOverride)
-		}
-		return &execvars
-	}()
+	//so far the execvars includes: scope vars + scope dvars + global runtime vars + task vars
+	localVarsMergedWithDvars := core.VarsMergedWithDvars("local", &step.Vars, &step.Dvars, &execvars)
 
-	localVarsMergedWithDvars := core.VarsMergedWithDvars("local", &step.Vars, &step.Dvars, execMergedWthCallerContextVars)
-
+	//so far the localVarsMergedWithDvars includes: the local vars + dvars rendered using execvars
 	if localVarsMergedWithDvars.Len() > 0 {
 		mergo.Merge(&execvars, localVarsMergedWithDvars, mergo.WithOverride)
 	}
 
-	//caller's vars should always override callee' vars
-	localMergedWthCallerVars := func() *core.Cache {
-		if callerVarsDerived != nil {
-			mergo.Merge(&execvars, &callerVars, mergo.WithOverride)
-		}
-		return &execvars
-	}()
+	u.Ppmsgvvvhint("overall final exec vars:", execvars)
 
-	u.Ppmsgvvvhint("overall final exec vars:", localMergedWthCallerVars)
-
-	return localMergedWthCallerVars
+	return &execvars
 }
 
 type LoopItem struct {
@@ -125,7 +106,6 @@ func (step *Step) Exec() {
 
 	var bizErr *ee.Error = ee.New()
 	var stepExecVars *core.Cache
-	//stepExecVars = step.GetExecVarsWithRefOverrided("get plain exec vars")
 	stepExecVars = step.getRuntimeExecVars("get plain exec vars")
 
 	validation(stepExecVars)
@@ -135,7 +115,6 @@ func (step *Step) Exec() {
 			stepExecVars.Put("loopindex", loopItem.Index)
 			stepExecVars.Put("loopindex1", loopItem.Index1)
 		}
-		//u.PpmsgvvvvvhintHigh("step exec vars:", stepExecVars)
 
 		switch step.Func {
 		case FUNC_SHELL:
@@ -146,7 +125,7 @@ func (step *Step) Exec() {
 			action = biz.Do(&funcAction)
 
 		case FUNC_CALL:
-			funcAction := TaskRefFuncAction{
+			funcAction := CallFuncAction{
 				Do:   step.Do,
 				Vars: stepExecVars,
 			}
@@ -274,6 +253,7 @@ func (steps *Steps) Exec() {
 			}
 			core.StepStack.Push(&rtContext)
 
+			//TODO: consider move task vars merging to here
 			step.Exec()
 
 			result := core.StepStack.GetTop().(*core.StepRuntimeContext).Result
@@ -281,12 +261,12 @@ func (steps *Steps) Exec() {
 
 			if u.Contains([]string{FUNC_SHELL, FUNC_CALL}, step.Func) {
 				if step.Reg == "auto" {
-					core.RuntimeVarsAndDvarsMerged.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
+					core.TaskRuntime().ExecbaseVars.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
 				} else if step.Reg != "" {
-					core.RuntimeVarsAndDvarsMerged.Put(u.Spf("%s", step.Reg), result.Output)
+					core.TaskRuntime().ExecbaseVars.Put(u.Spf("%s", step.Reg), result.Output)
 				} else {
 					if step.Func == FUNC_SHELL {
-						core.RuntimeVarsAndDvarsMerged.Put("last_task_result", result)
+						core.TaskRuntime().ExecbaseVars.Put("last_task_result", result)
 					}
 				}
 			}

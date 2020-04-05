@@ -60,11 +60,11 @@ func FuncMapInit() {
 		},
 		//reg do not return any value, so do not expect the dvar value will be something other than empty
 		"reg": func(varname string, object interface{}) string {
-			RuntimeVarsAndDvarsMerged.Put(varname, object)
+			TaskRuntime().ExecbaseVars.Put(varname, object)
 			return ""
 		},
 		"dereg": func(varname string) string {
-			RuntimeVarsAndDvarsMerged.Delete(varname)
+			TaskRuntime().ExecbaseVars.Delete(varname)
 			return ""
 		},
 		"filecontent": func(filepath string) string {
