@@ -241,15 +241,14 @@ func (step *Step) Exec() {
 func (steps *Steps) Exec() {
 
 	for idx, step := range *steps {
-		u.Pf("step(%3d):\n", idx+1)
-		//u.Pfvvvv("  step(%3d): %s\n", idx+1, u.Sppmsg(step))
-		u.LogDesc("step", step.Name, step.Desc)
+
+		taskLayerCnt := core.TaskStack.GetLen()
+		u.LogDesc("step", idx+1, taskLayerCnt, step.Name, step.Desc)
 		u.Ppmsgvvvv(step)
 
 		execStep := func() {
 			rtContext := core.StepRuntimeContext{
 				Stepname: step.Name,
-				//Flags:    &step.Flags,
 			}
 			core.StepStack.Push(&rtContext)
 

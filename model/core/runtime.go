@@ -31,9 +31,11 @@ func SetDryrun() {
 }
 
 type TaskRuntimeContext struct {
-	Taskname     string
-	ExecbaseVars *Cache
-	TaskVars     *Cache
+	Taskname        string
+	TasknameLayered string
+	ExecbaseVars    *Cache
+	TaskVars        *Cache
+	ReturnVars      *Cache
 }
 
 type StepRuntimeContext struct {

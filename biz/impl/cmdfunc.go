@@ -58,7 +58,7 @@ func (cmdCmd *CmdCmd) runCmd(whichtype string, f func()) {
 	invalidTypeHint := func(typeGot string) {
 		u.LogWarn("type mismatch", u.Spf("cmd name: %s -> type wanted: %s, got :%s", cmdCmd.Name, whichtype, typeGot))
 	}
-	switch cmdCmd.Cmd.(type) {
+	switch t := cmdCmd.Cmd.(type) {
 	case string:
 		if whichtype == "string" {
 			f()
@@ -80,8 +80,15 @@ func (cmdCmd *CmdCmd) runCmd(whichtype string, f func()) {
 			invalidTypeHint("map")
 		}
 
+	case []interface{}:
+		if whichtype == "array" {
+			f()
+		} else {
+			invalidTypeHint("array")
+		}
+
 	default:
-		u.LogWarn("cmd", "Not implemented or void for no action!")
+		u.LogWarn("cmd", u.Spf("Not implemented type(%T) or void for no action!", t))
 	}
 
 }
@@ -89,13 +96,12 @@ func (cmdCmd *CmdCmd) runCmd(whichtype string, f func()) {
 func (f *CmdFuncAction) Exec() {
 
 	for idx, cmdItem := range *f.Cmds {
-		//u.Pfv("cmd cmdItem(%2d): %s (%s)\n%s\n", idx+1, cmdItem.Name, cmdItem.Desc, color.HiBlueString("%s", cmdItem.Cmd))
-		u.Pfv("cmd cmdItem(%2d): %s (%s)\n", idx+1, cmdItem.Name, cmdItem.Desc)
 		if cmdItem.Cmd != nil {
-			u.Pfvv("%s\n", color.MagentaString("%s", cmdItem.Cmd))
+			u.Pfvvvvv("%s\n", color.MagentaString("%s", cmdItem.Cmd))
 		}
 
-		u.LogDesc("substep", cmdItem.Name, cmdItem.Desc)
+		taskLayerCnt := core.TaskStack.GetLen()
+		u.LogDesc("substep", idx+1, taskLayerCnt, cmdItem.Name, cmdItem.Desc)
 		switch cmdItem.Name {
 		case "print":
 			cmdItem.runCmd("string", func() {
@@ -445,6 +451,29 @@ func (f *CmdFuncAction) Exec() {
 			})
 			u.Ppmsgvvvvvhint("after reg the var - contextual global:", core.TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
+
+		case "return":
+			cmdItem.runCmd("array", func() {
+				retNames := cmdItem.Cmd.([]interface{})
+				var retName string
+
+				if core.TaskRuntime().ReturnVars == nil {
+					core.TaskRuntime().ReturnVars = core.NewCache()
+				}
+
+				for _, v := range retNames {
+					rawName := v.(string)
+					retName = core.Render(rawName, f.Vars)
+					ret := f.Vars.Get(retName)
+					if ret != nil {
+						core.TaskRuntime().ReturnVars.Put(retName, f.Vars.Get(retName))
+					} else {
+						u.LogWarn("return validation", u.Spf("The referencing var name: (%s) not exist", retName))
+					}
+				}
+
+			})
+			u.Ppmsgvvvvvhint("contextual return vars:", core.TaskRuntime().ReturnVars)
 
 		case "to_object":
 			//src: a var name to get the yml content from

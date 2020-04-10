@@ -13,6 +13,7 @@ import (
 	"github.com/stephencheng/go-spew/spew"
 	"os"
 	"runtime"
+	"strings"
 )
 
 var (
@@ -45,7 +46,7 @@ func Pvvvv(a ...interface{}) {
 
 func Pvvv(a ...interface{}) {
 	if permitted("vvv") {
-		vvvvv_color_printf("%s\n", fmt.Sprintln(a...))
+		vvvvv_color_printf("%s", fmt.Sprintln(a...))
 	}
 }
 
@@ -83,13 +84,13 @@ func Pdryrun(a ...interface{}) {
 
 func Ppmsgvvvv(a ...interface{}) {
 	if permitted("vvvv") {
-		msg_color_printf("%s\n", spewMsgState.Sdump(a...))
+		msg_color_printf("%s", spewMsgState.Sdump(a...))
 	}
 }
 
 func Ppmsgvvv(a ...interface{}) {
 	if permitted("vvv") {
-		msg_color_printf("%s\n", spewMsgState.Sdump(a...))
+		msg_color_printf("%s", spewMsgState.Sdump(a...))
 	}
 }
 
@@ -232,17 +233,18 @@ func LogOk(mark string) {
 	color.HiGreen("%s ok", mark)
 }
 
-func LogDesc(descType string, name string, desc string) {
+func LogDesc(descType string, contextIdx1 int, taskLayerCnt int, name string, desc string) {
 	if desc == "" {
-		desc = "unamed"
+		desc = ""
 	}
+
 	switch descType {
 	case "task":
-		color.HiBlue("==Task: [ %s: %s ]", name, desc)
+		color.HiBlue("%sTask%d: [%s: %s ]", strings.Repeat("=", taskLayerCnt), contextIdx1, name, desc)
 	case "step":
-		color.HiBlue("--Step: [ %s: %s ]", name, desc)
+		color.HiBlue("%sStep%d: [%s: %s ]", strings.Repeat("-", taskLayerCnt), contextIdx1, name, desc)
 	case "substep":
-		color.HiBlue("~~SubStep: [ %s: %s ]", name, desc)
+		color.HiBlue("%sSubStep%d: [%s: %s ]", strings.Repeat("~", taskLayerCnt), contextIdx1, name, desc)
 	}
 }
 

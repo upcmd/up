@@ -1,0 +1,63 @@
+goal:
+  - add new feature of return from callee task
+  - |
+    application could be use as auto returned vars to parent var scope,
+    or use as a callerable task module to do a callback data injection
+    for other client caller tasks
+  - notice the difference between c0107 and this case
+
+vars:
+  tom: this is tom in global
+  jerry: this is jerry in global
+
+tasks:
+  -
+    name: task
+    desc: main entry
+    task:
+      -
+        func: call
+        desc: call subtask and exam the return value in following steps
+        do: subtask
+
+      -
+        func: cmd
+        desc: check value of tom
+        do:
+          - name: print
+            cmd: 'in main task print3: {{.tom}}'
+
+  -
+    name: subtask
+    desc: subtask to test reg and return
+    task:
+      -
+        func: cmd
+        desc: check value of tom after it is registered in current task stack
+        vars:
+          john: john in sub_loop func1
+        do:
+          - name: reg
+            desc: by default hitom is registered in to global context
+            cmd:
+              name: tom
+              value: 'tom created in sub_loop'
+
+          - name: print
+            cmd: 'in sub_loop print1: {{.tom}}'
+
+      -
+        func: cmd
+        desc: check value of tom and it should be available in current stack
+        vars:
+          john: john in sub_loop func2
+        do:
+          - name: print
+            cmd: 'in sub_loop print2: {{.tom}}'
+
+          - name: return
+            desc: it should return and merge tom to parent's vars scope and it should report warning as jason does not exist
+            cmd:
+              - tom
+              - jason
+

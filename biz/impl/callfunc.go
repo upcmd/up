@@ -8,7 +8,6 @@
 package impl
 
 import (
-	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
@@ -46,10 +45,8 @@ func (f *CallFuncAction) Adapt() {
 }
 
 func (f *CallFuncAction) Exec() {
-	u.P("calling task:")
-	for idx, tmptaskname := range f.Refs {
+	for _, tmptaskname := range f.Refs {
 		taskname := core.Render(tmptaskname, f.Vars)
-		u.Pfv("    taskname(%2d):\n%+v\n", idx+1, color.HiBlueString("        \\_%s", taskname))
 		runTask(f, taskname)
 	}
 }

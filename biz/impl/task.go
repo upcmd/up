@@ -8,6 +8,7 @@
 package impl
 
 import (
+	"github.com/imdario/mergo"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
@@ -76,7 +77,16 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 	for idx, task := range *Tasks {
 		if taskname == task.Name {
 			u.Pfvvvv("  located task-> %d [%s]: \n", idx+1, task.Name)
-			u.LogDesc("task", taskname, task.Desc)
+
+			var ctxCallerTaskname string
+			if core.TaskStack.GetLen() > 0 {
+				ctxCallerTaskname = core.TaskRuntime().TasknameLayered
+			} else {
+				ctxCallerTaskname = taskname
+			}
+
+			taskLayerCnt := core.TaskStack.GetLen()
+			u.LogDesc("task", idx+1, taskLayerCnt, u.Spf("%s ==> %s", ctxCallerTaskname, taskname), task.Desc)
 			found = true
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
@@ -104,8 +114,10 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 				taskLayerCnt := core.TaskStack.GetLen()
 				if taskLayerCnt > 0 {
 					rtContext.ExecbaseVars = callerVars
+					rtContext.TasknameLayered = u.Spf("%s/%s", core.TaskRuntime().TasknameLayered, taskname)
 				} else {
 					rtContext.ExecbaseVars = core.RuntimeVarsAndDvarsMerged
+					rtContext.TasknameLayered = taskname
 				}
 
 				core.TaskStack.Push(&rtContext)
@@ -119,7 +131,14 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 				}
 
 				steps.Exec()
+
+				returnVars := core.TaskRuntime().ReturnVars
 				core.TaskStack.Pop()
+				if core.TaskStack.GetLen() > 0 && returnVars != nil {
+					mergo.Merge(core.TaskRuntime().ExecbaseVars, returnVars, mergo.WithOverride)
+				} else if core.TaskStack.GetLen() == 0 && returnVars != nil {
+					mergo.Merge(core.RuntimeVarsAndDvarsMerged, returnVars, mergo.WithOverride)
+				}
 			}()
 
 		}
