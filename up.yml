@@ -47,7 +47,7 @@ tasks:
 
   -
     name: log_gen_in_dev
-    desc: demo of design pattern
+    desc: generate all logs for the docs
     task:
       -
         func: call
@@ -59,7 +59,7 @@ tasks:
 
   -
     name: log_gen_in_mac
-    desc: demo of design pattern
+    desc: generate all logs for the docs
     task:
       -
         func: cmd

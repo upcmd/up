@@ -17,7 +17,7 @@ require (
 	github.com/spf13/viper v1.6.2
 	github.com/stephencheng/go-spew v1.2.0
 	github.com/stephencheng/yq/v3 v3.3.1
-	github.com/stretchr/testify v1.4.0
+	github.com/xlab/treeprint v1.0.0
 	golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/yaml.v2 v2.2.8

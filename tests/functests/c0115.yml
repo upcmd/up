@@ -1,7 +1,7 @@
 goal:
   - demo a workflow using return in different cases
   - the location of return cmd used could result in different result in parent vars scope
-  - this proves the design of local 
+  - this proves the design of local
 
 vars:
   tom: this is tom in global
@@ -14,6 +14,7 @@ tasks:
     task:
       -
         func: call
+        name: main task
         desc: call subtask and exam the return value in following steps
         do: subtask1
 
@@ -40,7 +41,7 @@ tasks:
           - name: reg
             desc: by default hitom is registered in to global context
             cmd:
-              name: tom
+              n ame: tom
               value: 'tom created in subtask1'
 
           - name: print
@@ -58,7 +59,9 @@ tasks:
       -
         func: call
         desc: call subtask and exam the return value in following steps
-        do: subtask2
+        do:
+          - subtask2
+          - subtask3
 
       -
         func: cmd
@@ -106,3 +109,13 @@ tasks:
             cmd:
               - tom
 
+  -
+    name: subtask3
+    desc: subtask3
+    task:
+      -
+        func: cmd
+        desc: dummy
+        do:
+          - name: print
+            cmd: 'dummy to help build inspect task'

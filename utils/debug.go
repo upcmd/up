@@ -242,7 +242,11 @@ func LogDesc(descType string, contextIdx1 int, taskLayerCnt int, name string, de
 	case "task":
 		color.HiBlue("%sTask%d: [%s: %s ]", strings.Repeat("=", taskLayerCnt), contextIdx1, name, desc)
 	case "step":
-		color.HiBlue("%sStep%d: [%s: %s ]", strings.Repeat("-", taskLayerCnt), contextIdx1, name, desc)
+		if name == "" && desc == "" {
+			color.HiBlue("%sStep%d:", strings.Repeat("-", taskLayerCnt), contextIdx1)
+		} else {
+			color.HiBlue("%sStep%d: [%s: %s ]", strings.Repeat("-", taskLayerCnt), contextIdx1, name, desc)
+		}
 	case "substep":
 		color.HiBlue("%sSubStep%d: [%s: %s ]", strings.Repeat("~", taskLayerCnt), contextIdx1, name, desc)
 	}

@@ -21,6 +21,7 @@ var (
 	ngo              = app.Command("ngo", "run a entry task")
 	ngoTaskName      = ngo.Arg("taskname", "task name to run").Required().String()
 	list             = app.Command("list", "list tasks and plays")
+	listName         = list.Arg("taskname", "task name to inspect").String()
 	validate         = app.Command("validate", "validate tasks and plays")
 	validateTaskName = validate.Arg("validatetaskname", "taskname").Required().String()
 	verbose          = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
@@ -58,7 +59,12 @@ func main() {
 		}
 	case list.FullCommand():
 		impl.InitTasks()
-		impl.ListTasks()
+		if *listName != "" {
+			impl.ListTask(*listName)
+		} else {
+			impl.ListTasks()
+		}
+
 	case validate.FullCommand():
 		impl.InitTasks()
 		taskname := *validateTaskName

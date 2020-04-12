@@ -8,12 +8,14 @@
 package impl
 
 import (
+	"github.com/fatih/color"
 	"github.com/imdario/mergo"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
+	"github.com/xlab/treeprint"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -67,6 +69,109 @@ func ListTasks() {
 	u.P("-")
 
 }
+
+func ListTask2(taskname string) {
+
+	u.Pf("\n-inspect task: (%s) summary-", taskname)
+	tree := treeprint.New()
+	for _, task := range *Tasks {
+		if task.Name == taskname {
+			desc := strings.Split(task.Desc, "\n")[0]
+			u.Pf("\n%s %s", color.BlueString("%s", task.Name), desc)
+			var steps Steps
+			err := ms.Decode(task.Task, &steps)
+			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
+
+			for _, step := range steps {
+				desc := strings.Split(step.Desc, "\n")[0]
+				if step.Func == FUNC_CALL {
+					tree.AddNode(u.Spf("%s: %s %s %s", step.Name, desc, color.HiGreenString("%s", "->"), color.GreenString("%s", step.Do)))
+				} else {
+					tree.AddNode(u.Spf("%s: %s", step.Name, desc))
+				}
+			}
+		}
+	}
+	u.P(tree.String())
+}
+
+func ListTask(taskname string) {
+	var tree = treeprint.New()
+	u.P("\ninspect task:")
+	for _, task := range *Tasks {
+		if task.Name == taskname {
+			desc := strings.Split(task.Desc, "\n")[0]
+			u.Pf("%s: %s", color.BlueString("%s", task.Name), desc)
+			var steps Steps
+			err := ms.Decode(task.Task, &steps)
+			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
+
+			for _, step := range steps {
+				desc := strings.Split(step.Desc, "\n")[0]
+				if step.Func == FUNC_CALL {
+					branch := tree.AddMetaBranch(step.Name, desc)
+					var callee string
+					switch t := step.Do.(type) {
+					case string:
+						callee = step.Do.(string)
+						InspectTask(callee, branch)
+						//branch.AddBranch("aa")
+					case []interface{}:
+						calleeTasknames := step.Do.([]interface{})
+						for _, x := range calleeTasknames {
+							callee = x.(string)
+							InspectTask(callee, branch)
+							//branch.AddBranch("bb")
+						}
+					default:
+						u.Pf("type: %T", t)
+					}
+
+				} else {
+					tree.AddNode(u.Spf("%s: %s", step.Name, desc))
+				}
+			}
+		}
+	}
+	u.P(tree.String())
+}
+func InspectTask(taskname string, branch treeprint.Tree) {
+	for _, task := range *Tasks {
+		if task.Name == taskname {
+			desc := strings.Split(task.Desc, "\n")[0]
+			br := branch.AddMetaBranch(color.BlueString("%s", task.Name), desc)
+			var steps Steps
+			err := ms.Decode(task.Task, &steps)
+			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
+
+			for _, step := range steps {
+				desc := strings.Split(step.Desc, "\n")[0]
+				if step.Func == FUNC_CALL {
+					var callee string
+					switch t := step.Do.(type) {
+					case string:
+						callee = step.Do.(string)
+						InspectTask(callee, br)
+						//br.AddBranch("aaaa")
+					case []interface{}:
+						calleeTasknames := step.Do.([]interface{})
+						for _, x := range calleeTasknames {
+							callee = x.(string)
+							InspectTask(callee, br)
+						}
+						//br.AddBranch("bbbb")
+					default:
+						u.Pf("type: %T", t)
+					}
+				} else {
+					br.AddNode(u.Spf("%s: %s", step.Name, desc))
+				}
+			}
+		}
+	}
+
+}
+
 func ValidateTask(taskname string) {
 	core.SetDryrun()
 	ExecTask(taskname, nil)
