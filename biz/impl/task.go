@@ -98,6 +98,7 @@ func ListTask2(taskname string) {
 func ListTask(taskname string) {
 	var tree = treeprint.New()
 	u.P("\ninspect task:")
+	level := 0
 	for _, task := range *Tasks {
 		if task.Name == taskname {
 			desc := strings.Split(task.Desc, "\n")[0]
@@ -114,14 +115,25 @@ func ListTask(taskname string) {
 					switch t := step.Do.(type) {
 					case string:
 						callee = step.Do.(string)
-						InspectTask(callee, branch)
+						if !InspectTask(callee, branch, &level) {
+							break
+						}
+						level -= 1
 						//branch.AddBranch("aa")
 					case []interface{}:
 						calleeTasknames := step.Do.([]interface{})
+						breakFlag := false
 						for _, x := range calleeTasknames {
 							callee = x.(string)
-							InspectTask(callee, branch)
+							if !InspectTask(callee, branch, &level) {
+								breakFlag = true
+								break
+							}
+							level -= 1
 							//branch.AddBranch("bb")
+						}
+						if breakFlag {
+							break
 						}
 					default:
 						u.Pf("type: %T", t)
@@ -135,7 +147,13 @@ func ListTask(taskname string) {
 	}
 	u.P(tree.String())
 }
-func InspectTask(taskname string, branch treeprint.Tree) {
+func InspectTask(taskname string, branch treeprint.Tree, level *int) bool {
+	*level += 1
+	maxLayers, _ := strconv.Atoi(u.CoreConfig.MaxCallLayers)
+	if *level > maxLayers {
+		u.LogWarn("evaluate max task stack layer", "please setup max MaxCallLayers correctly, or fix recursive cycle calls")
+		return false
+	}
 	for _, task := range *Tasks {
 		if task.Name == taskname {
 			desc := strings.Split(task.Desc, "\n")[0]
@@ -151,13 +169,13 @@ func InspectTask(taskname string, branch treeprint.Tree) {
 					switch t := step.Do.(type) {
 					case string:
 						callee = step.Do.(string)
-						InspectTask(callee, br)
+						InspectTask(callee, br, level)
 						//br.AddBranch("aaaa")
 					case []interface{}:
 						calleeTasknames := step.Do.([]interface{})
 						for _, x := range calleeTasknames {
 							callee = x.(string)
-							InspectTask(callee, br)
+							InspectTask(callee, br, level)
 						}
 						//br.AddBranch("bbbb")
 					default:
@@ -169,7 +187,7 @@ func InspectTask(taskname string, branch treeprint.Tree) {
 			}
 		}
 	}
-
+	return true
 }
 
 func ValidateTask(taskname string) {

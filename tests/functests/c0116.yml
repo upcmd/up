@@ -1,0 +1,105 @@
+goal:
+  - add feature to show task tree
+  - test task inspect
+  - goup list task -d ./tests/functests -t c0116.yml -i dev --configdir=./tests/functests
+
+tasks:
+  -
+    name: task
+    desc: main entry
+    task:
+      -
+        func: cmd
+        name: step1
+        desc: check value of tom after it is registered in current task stack
+        do:
+          - name: print
+            cmd: 'in subtask1 print1: {{.tom}}'
+
+      -
+        func: call
+        name: step2
+        desc: call subtask and exam the return value in following steps
+        do: subtask1
+
+      -
+        func: cmd
+        desc: |
+          check value of tom
+          in this case tom's value should come from subtask1
+          tom's expected value:  tom created in subtask1
+        do:
+          - name: print
+            cmd: 'in main task print3: {{.tom}}'
+
+  -
+    name: subtask1
+    desc: subtask to test reg and return
+    task:
+      -
+        func: cmd
+        desc: check value of tom after it is registered in current task stack
+        do:
+          - name: print
+            cmd: 'in subtask1 print1: {{.tom}}'
+
+      -
+        func: cmd
+        desc: check value of tom and it should be available in current stack
+        vars:
+          john: john in sub_loop func2
+        do:
+          - name: print
+            cmd: 'in subtask1 print21: {{.tom}}'
+
+      -
+        func: call
+        desc: call subtask and exam the return value in following steps
+        do: subtask2
+
+      -
+        func: cmd
+        desc: check value of tom and it should be available in current stack
+        vars:
+          john: john in sub_loop func2
+        do:
+          - name: print
+            cmd: 'in subtask1 print22: {{.tom}}'
+
+          - name: return
+            cmd:
+              - tom
+
+
+  -
+    name: subtask2
+    desc: subtask to test reg and return
+    task:
+      -
+        func: cmd
+        desc: check value of tom after it is registered in current task stack
+        vars:
+          john: john in sub_loop func1
+        do:
+          - name: reg
+            desc: by default hitom is registered in to global context
+            cmd:
+              name: tom
+              value: 'tom2 created in subtask2'
+
+          - name: print
+            cmd: 'in subtask2 print1: {{.tom}}'
+
+      -
+        func: cmd
+        desc: check value of tom and it should be available in current stack
+        vars:
+          john: john in sub_loop func2
+        do:
+          - name: print
+            cmd: 'in subtask2 print2: {{.tom}}'
+
+          - name: return
+            cmd:
+              - tom
+
