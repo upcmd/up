@@ -42,9 +42,9 @@ func Setup(prefix string, t *testing.T) {
 	u.CoreConfig.TaskFile = GetTestName(u.Spfv("%s%s", prefix, t.Name()))
 	u.ShowCoreConfig()
 
-	u.P(" :test task file:", u.CoreConfig.TaskFile)
-	u.P(" :release version:", u.CoreConfig.Version)
-	u.P(" :verbose level:", u.CoreConfig.Verbose)
+	u.Pln(" :test task file:", u.CoreConfig.TaskFile)
+	u.Pln(" :release version:", u.CoreConfig.Version)
+	u.Pln(" :verbose level:", u.CoreConfig.Verbose)
 }
 
 func TestT(prefix string, t *testing.T) {
@@ -66,9 +66,9 @@ func Setupx(filename string) {
 	u.CoreConfig.Secure = &m.SecureSetting{Type: "default_aes", Key: "enc_key"}
 	u.ShowCoreConfig()
 	u.ShowCoreConfigMsg()
-	u.P(" :test task file:", u.CoreConfig.TaskFile)
-	u.P(" :release version:", u.CoreConfig.Version)
-	u.P(" :verbose level:", u.CoreConfig.Verbose)
+	u.Pln(" :test task file:", u.CoreConfig.TaskFile)
+	u.Pln(" :release version:", u.CoreConfig.Version)
+	u.Pln(" :verbose level:", u.CoreConfig.Verbose)
 
 }
 
@@ -80,7 +80,7 @@ func GetUnitTestCollection() []string {
 	u.LogError("list func test cases", err)
 
 	for _, f := range files {
-		u.P(f)
+		u.Pln(f)
 	}
 
 	return files

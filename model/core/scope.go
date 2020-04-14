@@ -358,7 +358,7 @@ This has chained dvar expansion through global to group then to instance level
 and finally merge with global var, except the global dvars
 */
 func SetRuntimeVarsMerged(runtimeid string) *Cache {
-	u.P("instance id:", runtimeid)
+	u.Pln("instance id:", runtimeid)
 	var runtimevars Cache
 	runtimevars = deepcopy.Copy(*expandedContext["global"]).(Cache)
 

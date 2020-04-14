@@ -1,0 +1,53 @@
+goal:
+  - use conditional loop
+
+vars:
+  items:
+    - item1
+    - item2
+    - item3
+  loopkey: items
+
+tasks:
+  -
+    name: task
+    desc: main entry
+    task:
+      -
+        func: cmd
+        vars:
+          person: tom
+        name: step1
+        desc: demo loop will not be executed if false
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+        loop:
+          - item1
+          - item2
+          - item3
+        if: '{{eq .person "tom hanks"}}'
+
+      -
+        func: cmd
+        vars:
+          person: tom
+        name: step1
+        desc: demo use if condition is true
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+        loop:
+          - item1
+          - item2
+          - item3
+        if: '{{eq .person "tom  "}}'
+
+      -
+        func: cmd
+        name: step1
+        desc: demo use dynamic key to ref to a loop item from var
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+        loop: '{{.loopkey}}'

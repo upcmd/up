@@ -27,10 +27,9 @@ func TestC(t *testing.T) {
 	files := tests.GetUnitTestCollection()
 	core.SetInstanceName("dev")
 	for _, x := range files {
-		u.P("testing:", x)
+		u.Pln("testing:", x)
 		tests.Setupx(x)
 		impl.InitTasks()
-		impl.ListTasks()
 		impl.ExecTask("task", nil)
 		core.Unset()
 	}

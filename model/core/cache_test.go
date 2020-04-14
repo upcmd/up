@@ -20,7 +20,7 @@ type TestObj struct {
 
 func TestCache(t *testing.T) {
 	u.SetMockConfig()
-	u.P("start testing")
+	u.Pln("start testing")
 
 	c := GetCache()
 	c.Put("1key", "key1_value")
@@ -34,10 +34,10 @@ func TestCache(t *testing.T) {
 
 	u.Pf("%+v -> %+v\n", ok, v1)
 	c.Update("1key", "key1_value_with_update")
-	u.P(c.Get("1key"))
+	u.Pln(c.Get("1key"))
 	c.Obsolete("2key")
 	c.List()
-	u.P("-2key deleted")
+	u.Pln("-2key deleted")
 	c.Delete("2key")
 	c.List()
 

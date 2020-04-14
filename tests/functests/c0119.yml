@@ -1,0 +1,98 @@
+goal:
+  - introduce until key word to exit loop
+  - deom 3 loop cases
+
+tasks:
+  -
+    name: task
+    desc: main entry
+    task:
+      -
+        func: cmd
+        name: step1
+        desc: demo it will loop until loopitem = item3
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+        loop:
+          - item1
+          - item2
+          - item3
+          - item4
+        until: '{{ eq .loopitem "item3" }}'
+
+      -
+        func: cmd
+        name: step2
+        do:
+          - name: print
+            cmd: hello
+
+      -
+        func: call
+        name: step3
+        do: subtask
+        loop:
+          - proc 1
+          - proc 2
+          - proc 3
+          - proc 4
+        until: '{{ eq .loopitem "proc 3" }}'
+
+      -
+        func: call
+        name: step4
+        do: subtask
+        loop:
+          - proc 1
+          - proc 2
+          - proc 3
+          - proc 4
+        until: '{{ eq .loopindex 3 }}'
+
+      -
+        func: call
+        name: step5
+        desc: it will stop loop at proc 4
+        vars:
+          person: jason
+        do: subtask2
+        loop:
+          - proc 1
+          - proc 2
+          - proc 3
+          - proc 4
+          - proc 5
+          - proc 6
+        until: '{{ eq .person "tom" }}'
+
+  -
+    name: subtask
+    desc: subtask to test reg and return
+    task:
+      -
+        func: cmd
+        name: step1
+        desc: the loopitem here is inherited from caller
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+
+  -
+    name: subtask2
+    task:
+      -
+        func: cmd
+        do:
+          - name: reg
+            cmd:
+              name: person
+              value: tom
+        if: '{{ eq .loopindex 3 }}'
+
+      -
+        func: cmd
+        name: step2
+        do:
+          - name: print
+            cmd: 'person: {{.person}}'

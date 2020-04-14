@@ -442,6 +442,9 @@ func (f *CmdFuncAction) Exec() {
 					}
 				}
 
+				if varname == "" {
+					u.InvalidAndExit("validate varname", "the reg varname must not be empty")
+				}
 				if localonly {
 					f.Vars.Put(varname, varvalue)
 				} else {

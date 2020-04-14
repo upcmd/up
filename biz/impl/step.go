@@ -31,6 +31,7 @@ type Step struct {
 	Flags []string
 	If    string
 	Loop  interface{}
+	Until string
 }
 
 type Steps []Step
@@ -65,7 +66,6 @@ func (step *Step) getRuntimeExecVars(mark string) *core.Cache {
 	}
 
 	u.Ppmsgvvvhint("overall final exec vars:", execvars)
-
 	return &execvars
 }
 
@@ -91,7 +91,6 @@ func validation(vars *core.Cache) {
 			identified = true
 			u.InvalidAndExit("validating var name", u.Spf("var name (%s) can not start with number", k))
 		}
-
 	}
 
 	if identified {
@@ -166,6 +165,7 @@ func (step *Step) Exec() {
 			ContinueFunc(
 				func() {
 					if step.Loop != nil {
+						rawUtil := step.Until
 						func() {
 							//loop points to a var name which is a slice
 							if reflect.TypeOf(step.Loop).Kind() == reflect.String {
@@ -175,24 +175,46 @@ func (step *Step) Exec() {
 									u.InvalidAndExit("Evaluating loop var and object", u.Spf("Please use a correct varname:(%s) containing a list of values", loopVarName))
 								}
 								if reflect.TypeOf(loopObj).Kind() == reflect.Slice {
-
 									switch loopObj.(type) {
 									case []interface{}:
 										for idx, item := range loopObj.([]interface{}) {
 											routeFuncType(&LoopItem{idx, idx + 1, item})
-											chainAction(&action)
+											if rawUtil != "" {
+												untilEval := core.Render(rawUtil, stepExecVars)
+												toBreak, err := strconv.ParseBool(untilEval)
+												u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
+												if toBreak {
+													u.Pvvvv("loop util conditional break")
+													break
+												} else {
+													chainAction(&action)
+												}
+											} else {
+												chainAction(&action)
+											}
 										}
 
 									case []string:
 										for idx, item := range loopObj.([]string) {
 											routeFuncType(&LoopItem{idx, idx + 1, item})
-											chainAction(&action)
+											if rawUtil != "" {
+												untilEval := core.Render(rawUtil, stepExecVars)
+												toBreak, err := strconv.ParseBool(untilEval)
+												u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
+												if toBreak {
+													u.Pvvvv("loop util conditional break")
+													break
+												} else {
+													chainAction(&action)
+												}
+											} else {
+												chainAction(&action)
+											}
 										}
 
 									default:
 										u.LogWarn("loop item evaluation", "Loop item type is not supported yet!")
 									}
-
 								} else {
 									u.InvalidAndExit("evaluate loop var", "loop var is not a array/list/slice")
 								}
@@ -200,9 +222,20 @@ func (step *Step) Exec() {
 								//loop itself is a slice
 								for idx, item := range step.Loop.([]interface{}) {
 									routeFuncType(&LoopItem{idx, idx + 1, item})
-									chainAction(&action)
+									if rawUtil != "" {
+										untilEval := core.Render(rawUtil, stepExecVars)
+										toBreak, err := strconv.ParseBool(untilEval)
+										u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
+										if toBreak {
+											u.Pvvvv("loop util conditional break")
+											break
+										} else {
+											chainAction(&action)
+										}
+									} else {
+										chainAction(&action)
+									}
 								}
-
 							} else {
 								u.InvalidAndExit("evaluate loop items", "please either use a list or a template evaluation which could result in a value of a list")
 							}
@@ -211,7 +244,6 @@ func (step *Step) Exec() {
 					} else {
 						routeFuncType(nil)
 						chainAction(&action)
-
 					}
 
 				}),
@@ -221,7 +253,6 @@ func (step *Step) Exec() {
 
 	func() {
 		if step.If != "" {
-
 			IfEval := core.Render(step.If, stepExecVars)
 			goahead, err := strconv.ParseBool(IfEval)
 			u.LogErrorAndExit("evaluate condition", err, u.Spf("please fix if condition evaluation: [%s]", IfEval))

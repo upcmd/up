@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	P   = fmt.Println
+	P   = fmt.Print
+	Pln = fmt.Println
 	Pf  = fmt.Printf
 	Sp  = fmt.Sprint
 	Spf = fmt.Sprintf
@@ -53,7 +54,7 @@ func Sleep(mscnt int) {
 	}
 
 	time.Sleep(time.Duration(mscnt-total) * time.Millisecond)
-	P()
+	Pln()
 }
 
 func PrintContentWithLineNuber(content string) string {

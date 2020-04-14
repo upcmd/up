@@ -1,7 +1,6 @@
 doc_meta: |
   folder: quick-start
   title: First task - hello world
-  weight: 10
   head: |
     Welcome to this first quick start guide of up cmd, this shows a hello world type of UP task
 
@@ -21,7 +20,7 @@ tasks:
   -
     name: task
     desc: say hello world in shell
-    task: #this comment will not be treated as desc of the task, removing # will invalid the yml
+    task:
       -
         func: shell
         desc: do step1 in shell func

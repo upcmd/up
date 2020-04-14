@@ -63,8 +63,6 @@ tasks:
     task:
       -
         func: cmd
-        vars:
-          upcmd: ./build/up
         dvars:
           - name: hugo_doc_log_dir
             value: '{{env "HUGO_DOC_LOG_DIR"}}'
@@ -75,6 +73,8 @@ tasks:
 
       -
         func: call
+        vars:
+          upcmd: ./build/mac/up
         do:
           - log_gen_impl
 
@@ -101,14 +101,38 @@ tasks:
           - 'mkdir -p {{.hugo_doc_log_dir}}'
 
       -
-        func: shell
-        do:
-          - echo "processing {{.loopitem}}"
-          - '{{.upcmd}} task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests > {{.hugo_doc_log_dir}}/{{.loopitem | replace ".yml" ""}}_v.log'
-          - '{{.upcmd}} task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvv > {{.hugo_doc_log_dir}}/{{.loopitem | replace ".yml" ""}}_vvv.log'
-          - '{{.upcmd}} task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvvv> {{.hugo_doc_log_dir}}/{{.loopitem | replace ".yml" ""}}_vvvvv.log'
-          - '{{.upcmd}} task task -d ./tests/functests -t {{.loopitem | replace ".yml" ""}} -i dev --configdir=./tests/functests -v vvvvv> {{.hugo_doc_log_dir}}/{{.loopitem | replace ".yml" ""}}_vvvvvv.log'
+        func: call
+        do: process_level
         loop: caselist
+
+  -
+    name: process_level
+    desc: process different verbose level
+    task:
+      -
+        func: shell
+        dvars:
+          - name: parentLoopItem
+            value: '{{.loopitem}}'
+          - name: shcmd
+            value: '{{.upcmd}} ngo task -d ./tests/functests -t {{.parentLoopItem | replace ".yml" ""}} -i dev --configdir=./tests/functests '
+            flags:
+              - vvv
+          - name: shoutput
+            value: '> {{.hugo_doc_log_dir}}/{{.parentLoopItem | replace ".yml" ""}}'
+            flags:
+              - vvv
+        do:
+          - 'echo """{{.shcmd}} -v {{.loopitem}} {{.shoutput}}_{{.loopitem}}.log"""'
+          - '{{.shcmd}} -v {{.loopitem}} {{.shoutput}}_{{.loopitem}}.log'
+        loop:
+          - v
+          - vv
+          - vvv
+          - vvvv
+          - vvvvv
+          - vvvvvv
+          - vvvvvvv
 
   -
     name: testf

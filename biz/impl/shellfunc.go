@@ -82,7 +82,7 @@ func (f *ShellFuncAction) Adapt() {
 }
 
 func (f *ShellFuncAction) Exec() {
-	//u.P("executing shell commands")
+	//u.Pln("executing shell commands")
 	for idx, tcmd := range f.Cmds {
 		u.Pfv("cmd(%2d):\n", idx+1)
 		u.Pvv(tcmd)

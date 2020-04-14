@@ -51,7 +51,7 @@ func InitTasks() {
 
 func ListTasks() {
 
-	u.P("-task list")
+	u.Pln("-task list")
 	maxlen := 0
 	for _, task := range *Tasks {
 		tasknamelen := len(task.Name)
@@ -59,45 +59,24 @@ func ListTasks() {
 			maxlen = tasknamelen
 		}
 	}
-
 	format := "  %4d| %" + u.Spf("%d", maxlen) + "s: %s \n"
-
 	for idx, task := range *Tasks {
 		u.Pf(format, idx+1, task.Name, task.Desc)
 		u.Ppmsgvvvv(task)
 	}
-	u.P("-")
-
+	u.Pln("-\n")
 }
 
-func ListTask2(taskname string) {
-
-	u.Pf("\n-inspect task: (%s) summary-", taskname)
-	tree := treeprint.New()
+func ListAllTasks() {
+	u.Pln("-inspect all tasks:")
 	for _, task := range *Tasks {
-		if task.Name == taskname {
-			desc := strings.Split(task.Desc, "\n")[0]
-			u.Pf("\n%s %s", color.BlueString("%s", task.Name), desc)
-			var steps Steps
-			err := ms.Decode(task.Task, &steps)
-			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
-
-			for _, step := range steps {
-				desc := strings.Split(step.Desc, "\n")[0]
-				if step.Func == FUNC_CALL {
-					tree.AddNode(u.Spf("%s: %s %s %s", step.Name, desc, color.HiGreenString("%s", "->"), color.GreenString("%s", step.Do)))
-				} else {
-					tree.AddNode(u.Spf("%s: %s", step.Name, desc))
-				}
-			}
-		}
+		ListTask(task.Name)
 	}
-	u.P(tree.String())
 }
 
 func ListTask(taskname string) {
 	var tree = treeprint.New()
-	u.P("\ninspect task:")
+	//u.Pln("\ninspect task:")
 	level := 0
 	for _, task := range *Tasks {
 		if task.Name == taskname {
@@ -145,8 +124,9 @@ func ListTask(taskname string) {
 			}
 		}
 	}
-	u.P(tree.String())
+	u.Pln(tree.String())
 }
+
 func InspectTask(taskname string, branch treeprint.Tree, level *int) bool {
 	*level += 1
 	maxLayers, _ := strconv.Atoi(u.CoreConfig.MaxCallLayers)
@@ -271,7 +251,6 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 		u.Pferror("Task %s is not defined!", taskname)
 		ListTasks()
 	}
-
 }
 
 func validateAndLoadTaskRef(tasks *model.Tasks) {

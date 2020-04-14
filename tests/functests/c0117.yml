@@ -1,0 +1,65 @@
+goal:
+  - demo how to do double layered loop
+  - use call func to achieve that
+
+tasks:
+  -
+    name: task
+    desc: main entry
+    task:
+      -
+        func: call
+        name: step2
+        desc: call subtask and exam the return value in following steps
+        do: subtask
+        loop:
+          - proc 1
+          - proc 2
+          - proc 3
+
+  -
+    name: subtask
+    desc: subtask to test reg and return
+    task:
+
+      -
+        func: cmd
+        name: step1
+        desc: the loopitem here is inherited from caller
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+
+#      -
+#        func: cmd
+#        do:
+#          - name: exit
+
+      -
+        func: cmd
+        name: step2
+        desc: the loopitem here is the local defined loopitem
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+        loop:
+          - item1
+          - item2
+          - item3
+
+      -
+        func: cmd
+        name: step3
+        desc: |
+          demo use both loopitem in same context
+          the dvar parentLoopItem will map the value of parent loopitem
+        dvars:
+          - name: parentLoopItem
+            value: '{{.loopitem}}'
+        do:
+          - name: print
+            cmd: 'parent loop: {{.parentLoopItem}}, child loop: {{.loopitem}}'
+        loop:
+          - item1
+          - item2
+          - item3

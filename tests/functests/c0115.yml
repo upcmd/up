@@ -41,7 +41,7 @@ tasks:
           - name: reg
             desc: by default hitom is registered in to global context
             cmd:
-              n ame: tom
+              name: tom
               value: 'tom created in subtask1'
 
           - name: print

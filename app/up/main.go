@@ -53,13 +53,15 @@ func main() {
 	switch cmd {
 	case ngo.FullCommand():
 		if *ngoTaskName != "" {
-			u.P("-exec task:", *ngoTaskName)
+			u.Pln("-exec task:", *ngoTaskName)
 			impl.InitTasks()
 			impl.ExecTask(*ngoTaskName, nil)
 		}
 	case list.FullCommand():
 		impl.InitTasks()
-		if *listName != "" {
+		if *listName == "=" {
+			impl.ListAllTasks()
+		} else if *listName != "" {
 			impl.ListTask(*listName)
 		} else {
 			impl.ListTasks()
