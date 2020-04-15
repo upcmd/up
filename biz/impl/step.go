@@ -322,7 +322,12 @@ func (steps *Steps) Exec() {
 			core.StepStack.Pop()
 		}
 
-		execStep()
+		if !core.TaskBreak {
+			execStep()
+		} else {
+			core.TaskBreak = false
+			break
+		}
 
 	}
 

@@ -1,0 +1,76 @@
+goal:
+  - demo advanced break usage in callee task
+
+tasks:
+  -
+    name: task
+    desc: main entry
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: step1
+      -
+        func: call
+        do: subtask
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: step2
+
+      -
+        func: call
+        do: subtask2
+
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: step3
+
+  -
+    name: subtask
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: sub task step1
+
+      -
+        func: cmd
+        do:
+          - name: break
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: sub task step2
+
+  -
+    name: subtask2
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: sub task step1
+
+      -
+        func: cmd
+        vars:
+          person: tom
+        do:
+          - name: break
+        if: '{{eq .person "tom"}}'
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: sub task step2

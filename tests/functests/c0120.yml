@@ -1,0 +1,22 @@
+goal:
+  - introduce break cmd
+
+tasks:
+  -
+    name: task
+    desc: main entry
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: step1
+      -
+        func: cmd
+        do:
+          - name: break
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: step2

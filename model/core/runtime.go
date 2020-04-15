@@ -16,6 +16,7 @@ var (
 	Dryrun       bool
 	TaskStack    = stack.New("task")
 	StepStack    = stack.New("step")
+	TaskBreak    bool
 )
 
 func SetInstanceName(id string) {

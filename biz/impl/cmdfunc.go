@@ -145,6 +145,9 @@ func (f *CmdFuncAction) Exec() {
 		case "exit":
 			u.GraceExit("exit", "client choose to exit")
 
+		case "break":
+			core.TaskBreak = true
+
 		case "readfile":
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
