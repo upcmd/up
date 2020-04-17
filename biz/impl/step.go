@@ -254,10 +254,14 @@ func (step *Step) Exec() {
 	func() {
 		if step.If != "" {
 			IfEval := core.Render(step.If, stepExecVars)
-			goahead, err := strconv.ParseBool(IfEval)
-			u.LogErrorAndExit("evaluate condition", err, u.Spf("please fix if condition evaluation: [%s]", IfEval))
-			if goahead {
-				dryRunOrContinue()
+			if IfEval != "<no value>" {
+				goahead, err := strconv.ParseBool(IfEval)
+				u.LogErrorAndExit("evaluate condition", err, u.Spf("please fix if condition evaluation: [%s]", IfEval))
+				if goahead {
+					dryRunOrContinue()
+				} else {
+					u.Pvvvv("condition failed, skip executing step", step.Name)
+				}
 			} else {
 				u.Pvvvv("condition failed, skip executing step", step.Name)
 			}

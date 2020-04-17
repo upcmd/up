@@ -90,5 +90,6 @@ inspect_task_example(){
 #  goup list task -d ./tests/functests -t c0115.yml -i dev --configdir=./tests/functests
 #  goup list subtask1 -d ./tests/functests -t c0115.yml -i dev --configdir=./tests/functests
 #  goup list build -d ./tests/functests -t f0116.yml -i dev --configdir=./tests/functests
+#  goup list task -d ./tests/functests -t c0116.yml -i dev --configdir=./tests/functests
   goup list task -d ./tests/functests -t wip.yml -i dev --configdir=./tests/functests
 }

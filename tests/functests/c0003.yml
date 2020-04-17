@@ -1,6 +1,5 @@
 doc_meta: |
   folder: quick-start
-  weight: 14
   title: Yaml literal
   head: A example to show using yaml string literal to execute multiple line of shell script
 

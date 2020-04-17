@@ -1,6 +1,7 @@
 doc_meta: |
   folder: quick-start
   title: call func (power up)
+  weight: 152
   head: |
     The callee task is reprented using a var name make it dynamic in execution time
 
@@ -15,8 +16,7 @@ doc_meta: |
       content: Understanding of basics of vars
       refs:
         - title: vars basics
-          link: ../vars/c0012.yml
-
+          link: ../../vars/c0012
 
 notes:
   goal:

@@ -1,0 +1,62 @@
+goal:
+  - demo how to reference to a non exist element
+  - or how to evaluate an element
+  - add support if the element does not exist, then if condition should be false by default
+  - use query cmd to query within yml string, then use the registered var in if evaluation
+
+vars:
+  student:
+    name: tom
+    sex: male
+
+  ymldoc: |
+    student:
+      name: tom
+      sex: male
+
+tasks:
+  -
+    name: task
+    desc: main entry
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.student.name}}'
+
+          - name: print
+            cmd: '{{.student.age}}'
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: hello tom
+        if: '{{eq .student.name "tom"}}'
+
+      -
+        func: cmd
+        desc: add support if the element does not exist, then if condition should be false by default
+        do:
+          - name: print
+            cmd: you will not see this message
+        if: '{{.student.age}}'
+
+      -
+        func: cmd
+        name: query
+        cmd:
+          ymlkey: ymldoc
+          path: student.age.
+          ymlonly: true
+          reg: studentage
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: you will not see this message
+        if: '{{.studentage}}'
+
+

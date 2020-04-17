@@ -1,9 +1,8 @@
 doc_meta: |
   folder: quick-start
-  weight: 18
   title: manage dependencies
   head: |
-    Use call to func to chain dependencies
+    Use call func to chain dependencies
 
     We are used to the way the dependencies are managed in build tasks, such as in Makefile, we list the pre tasks to be executed prior to the named task
 

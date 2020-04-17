@@ -1,6 +1,5 @@
 doc_meta: |
   folder: quick-start
-  weight: 16
   title: Use array
   head: |
     Mix of yaml literal and single line of shell script

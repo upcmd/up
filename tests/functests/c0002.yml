@@ -1,6 +1,5 @@
 doc_meta: |
   folder: quick-start
-  weight: 12
   title: Multiple Steps
   head: A task could be a sequential steps of implementation of a func. You can chaine a series of steps in a task
 

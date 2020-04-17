@@ -70,7 +70,6 @@ tasks:
             cmd:
               - tom
 
-
   -
     name: subtask2
     desc: subtask to test reg and return

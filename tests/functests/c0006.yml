@@ -1,9 +1,24 @@
-goal:
-  - to test out using env vars
-  - result:
-      - it takes env var properly
-      - the ":" is offending, please try to avoid using it
-      - or use it in text litera
+doc_meta: |
+  folder: quick-start
+  title: use env var
+  head: |
+    To consume the environment vars in shell func, simply use $varname as reference
+
+  sections:
+    - title: Demo
+      log: yes
+
+    - title: note
+      content: |
+        the ":" is offending, please try to avoid using it or use it in text litera
+
+notes:
+  goal:
+    - to test out using env vars
+    - result:
+        - it takes env var properly
+        - the ":" is offending, please try to avoid using it
+        - or use it in text litera
 
 tasks:
 

@@ -1,0 +1,41 @@
+goal:
+  - demo how to reference to a non exist element
+  - or how to evaluate an element
+  - add support if the element does not exist, then if condition should be false by default
+
+vars:
+  student:
+    name: tom
+    sex: male
+
+tasks:
+  -
+    name: task
+    desc: main entry
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.student.name}}'
+
+          - name: print
+            cmd: '{{.student.age}}'
+
+#          - name: print
+#            cmd: '{{.student.age | len}}'
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: hello tom
+        if: '{{eq .student.name "tom"}}'
+
+      -
+        func: cmd
+        desc: add support if the element does not exist, then if condition should be false by default
+        do:
+          - name: print
+            cmd: you will not see this message
+        if: '{{.student.age}}'

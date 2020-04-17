@@ -89,7 +89,13 @@ func ListTask(taskname string) {
 			for _, step := range steps {
 				desc := strings.Split(step.Desc, "\n")[0]
 				if step.Func == FUNC_CALL {
-					branch := tree.AddMetaBranch(step.Name, desc)
+					branch := tree.AddMetaBranch(func() string {
+						if step.Loop != "" {
+							return step.Name + color.HiYellowString("%s", " /loop..")
+						} else {
+							return step.Name
+						}
+					}(), desc)
 					var callee string
 					switch t := step.Do.(type) {
 					case string:
@@ -109,7 +115,6 @@ func ListTask(taskname string) {
 								break
 							}
 							level -= 1
-							//branch.AddBranch("bb")
 						}
 						if breakFlag {
 							break
@@ -148,16 +153,31 @@ func InspectTask(taskname string, branch treeprint.Tree, level *int) bool {
 					var callee string
 					switch t := step.Do.(type) {
 					case string:
+
+						brnode := br.AddMetaBranch(func() string {
+							if step.Loop != nil {
+								return step.Name + color.HiYellowString("%s", " /loop..")
+							} else {
+								return step.Name
+							}
+						}(), desc)
+
 						callee = step.Do.(string)
-						InspectTask(callee, br, level)
-						//br.AddBranch("aaaa")
+						InspectTask(callee, brnode, level)
 					case []interface{}:
 						calleeTasknames := step.Do.([]interface{})
 						for _, x := range calleeTasknames {
+							brnode := br.AddMetaBranch(func() string {
+								if step.Loop != "" {
+									return step.Name + color.HiYellowString("%s", " /loop..")
+								} else {
+									return step.Name
+								}
+							}(), desc)
+
 							callee = x.(string)
-							InspectTask(callee, br, level)
+							InspectTask(callee, brnode, level)
 						}
-						//br.AddBranch("bbbb")
 					default:
 						u.Pf("type: %T", t)
 					}
