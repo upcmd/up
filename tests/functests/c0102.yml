@@ -58,7 +58,7 @@ tasks:
               path: jason.sex
               verbose: vvvv
               reg: modified_yml
-              localonly: true
+            flags: [localonly]
 
           - name: print
             desc: show the modified yml content registered

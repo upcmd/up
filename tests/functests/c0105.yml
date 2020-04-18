@@ -46,7 +46,7 @@ tasks:
               name: hijerry
               desc: hijerry is registered to local scope only
               value: 'hello, jerry'
-              localonly: true
+            flags: [localonly]
 
           - name: print
             desc: expecting to see its value since it is still in same func scope

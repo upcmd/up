@@ -42,7 +42,7 @@ tasks:
               name: hitom
               desc: by default hitom is registered in to global context
               value: 'hello, {{.tom}}'
-              localonly: true
+            flags: [localonly]
 
           - name: print
             cmd: '{{.hitom}}'

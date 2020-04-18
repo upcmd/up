@@ -129,8 +129,8 @@ tasks:
             cmd:
               ymlkey: caseyml
               path: doc_meta.
-              ymlonly: true
               reg: docyml
+            flags: [ymlonly]
 
       -
         func: call

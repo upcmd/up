@@ -1,28 +1,44 @@
-TODO:
+doc_meta: |
+  folder: cmd-func
+  title: reg and dereg
+  head: |
+    reg and dereg cmd is used to register a variable or remove a variable
 
-goal:
-  - out parameter saves the cmd result to local func scope only, it is just like local var
-  - reg will automatically register it to global vars map
-  - the out won't gurantee the output of the cmd execution will be meaningful, it depends on how/what you do
+  sections:
+    - title: reg cmd spec
+      content: |
+        reg will automatically register it to global runtime vars map
+        ```
+         -  name: reg
+            desc: description
+            cmd:
+              name: this is varname it will register to
+              value: this is the value, or dvar to be assigned to the varname
+            flags:
+              - localonly
 
-specs:
-  - reg:
-      cmd:
-        name: this is varname it will register to
-        value: this is the value, or dvar to be assigned to the varname
-        localonly: |
-          indicating if this var only availbe in the local scope within one func call
-          by default, it register the var to global scope
+        ```
 
-  - dereg:
-      name: this is varname it will be removed from both local and global vars map
+    - title: dereg cmd spec
+      content: |
+        reg will automatically register it to global runtime vars map
+        ```
+          -
+            name: dereg
+            desc: demo of dereg command
+            cmd: this_will_be_the_var_name_to_be_removed
+        ```
 
-design:
-  - the out takes a name of var and use it to save the result
-  - |
-      compare to the template pipeline reg/dereg command
-      the difference of these two command here reg and dereg the vars immediately
-        in the current func step, rather than the next func step
+    - title: localonly flag
+      content: |
+        Indicating if this var only availbe in the local scope within one func call by default, it register the var to global scope
+
+    - title: note
+      content: |
+        Compare to the template pipeline reg/dereg command, the difference of these two command here reg and dereg the vars immediately in the current func step, rather than the next func step. Check it out the demo step
+
+    - title: Demo
+      log: yes
 
 vars:
   student:
@@ -55,23 +71,47 @@ tasks:
             desc: demo of reg command
             cmd:
               name: greet
-              value: "from local dvars, {{.school}}"
+              value: "from local dvars, {{.school}}. registered to global runtime"
+
+          -
+            name: print
+            desc: |
+              show above reg var greet and it is available immediately in current func
+              unlike the reg in template, it is available in the next step func execution
+            cmd: "hello, {{.greet}}"
 
           -
             name: reg
             desc: |
-              demo of reg command of a local var in cmd func call
-              the greetlocal will not be availe in next func call
+              demo greetlocal is registered to local var only
+              it is accessible in current func, but not next one
             cmd:
               name: greetlocal
-              value: "hello, {{.student.school}}"
-              localonly: true
+              value: "hello, {{.student.school}}. registered to local func only"
+            flags:
+              - localonly
 
-      - func: shell
+          -
+            name: print
+            desc: |
+              this show display a correct rendered value
+            cmd: "hello, {{.greetlocal}}"
+
+
+      - func: cmd
         desc: the greetlocal will not be availe in this func call
         do:
-          - echo "hello 2"
+          -
+            name: print
+            desc: |
+              this will show the registered global runtime var
+            cmd: "hello, {{.greetlocal}}"
 
+          -
+            name: print
+            desc: |
+              this will show <no value> for greetlocal, as it is not registered to global
+            cmd: "hello, {{.greet}}"
 
       - func: cmd
         do:
@@ -81,6 +121,8 @@ tasks:
             cmd: greet
 
       - func: shell
-        desc: you will see that greet var is removed from global var map
+        desc: |
+          you will see that greet var is removed from global var map
+          you will see <no value> here
         do:
-          - echo "hello 3"
+          - echo "hello {{.greet}}"

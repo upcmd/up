@@ -100,7 +100,7 @@ tasks:
               ymlkey: ymlstr
               path: student.school
               reg: local_school_name
-              localonly: true
+            flags: [localonly]
       -
         func: cmd
         do:
@@ -130,7 +130,7 @@ tasks:
             cmd:
               path: nsw.sydney.**.student.school
               reg: school_name_list
-              collect: true
+            flags: [collect]
           - name: printobj
             cmd: '{{.school_name_list}}'
           - name: print
@@ -144,7 +144,7 @@ tasks:
             cmd:
               path: nsw.sydney
               reg: city
-              collect: true
+            flags: [collect]
           - name: printobj
             cmd: '{{.city}}'
           - name: print
@@ -255,7 +255,8 @@ tasks:
             cmd:
               path: nsw.
               reg: city2
-              ymlonly: true
+            flags: [ymlonly]
+
           - name: printobj
             cmd: '{{.city2}}'
           - name: print
@@ -271,7 +272,8 @@ tasks:
               refdir: ./tests/functests
               path: nsw.
               reg: city2
-              ymlonly: true
+            flags: [ymlonly]
+
           - name: print
             cmd: '{{.city2}}'
 
@@ -285,6 +287,8 @@ tasks:
               ymlfile: d0100.yml
               path: nsw.
               reg: city2
-              ymlonly: true
+            flags: [ymlonly]
+
+
           - name: print
             cmd: '{{.city2}}'

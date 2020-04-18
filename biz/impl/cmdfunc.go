@@ -25,9 +25,10 @@ type CmdFuncAction struct {
 }
 
 type CmdCmd struct {
-	Name string
-	Desc string
-	Cmd  interface{}
+	Name  string
+	Desc  string
+	Cmd   interface{}
+	Flags []string
 }
 
 type GeneralCmd struct {
@@ -102,6 +103,13 @@ func (f *CmdFuncAction) Exec() {
 
 		taskLayerCnt := core.TaskStack.GetLen()
 		u.LogDesc("substep", idx+1, taskLayerCnt, cmdItem.Name, cmdItem.Desc)
+
+		doFlag := func(flag string, doFlagFunc func()) {
+			if cmdItem.Flags != nil && u.Contains(cmdItem.Flags, flag) {
+				doFlagFunc()
+			}
+		}
+
 		switch cmdItem.Name {
 		case "print":
 			cmdItem.runCmd("string", func() {
@@ -164,10 +172,13 @@ func (f *CmdFuncAction) Exec() {
 					case "dir":
 						raw = v.(string)
 						dir = core.Render(raw, f.Vars)
-					case "localonly":
-						localonly = v.(bool)
 					}
 				}
+
+				doFlag("localonly", func() {
+					localonly = true
+				})
+
 				filepath := path.Join(dir, filename)
 
 				content, err := ioutil.ReadFile(filepath)
@@ -269,14 +280,18 @@ func (f *CmdFuncAction) Exec() {
 						//2. a yqpath ref in cached object
 						raw = v.(string)
 						yqpath = core.Render(raw, f.Vars)
-					case "localonly":
-						localonly = v.(bool)
-					case "ymlonly":
-						ymlonly = v.(bool)
-					case "collect":
-						collect = v.(bool)
 					}
 				}
+
+				doFlag("localonly", func() {
+					localonly = true
+				})
+				doFlag("ymlonly", func() {
+					ymlonly = true
+				})
+				doFlag("collect", func() {
+					collect = true
+				})
 
 				if yqpath == "" || reg == "" {
 					u.InvalidAndExit("query cmd mandatory attribute validation", "path and reg are all mandatory and required")
@@ -341,10 +356,12 @@ func (f *CmdFuncAction) Exec() {
 					case "reg":
 						raw = v.(string)
 						reg = core.Render(raw, f.Vars)
-					case "localonly":
-						localonly = v.(bool)
 					}
 				}
+
+				doFlag("localonly", func() {
+					localonly = true
+				})
 
 				if yqpath == "" || ymlfile == "" {
 					u.InvalidAndExit("mandatory attribute validation", "ymlfile and path are mandatory and required")
@@ -395,10 +412,11 @@ func (f *CmdFuncAction) Exec() {
 					case "reg":
 						raw = v.(string)
 						reg = core.Render(raw, f.Vars)
-					case "localonly":
-						localonly = v.(bool)
 					}
 				}
+				doFlag("localonly", func() {
+					localonly = true
+				})
 
 				if ymlstr == "" || yqpath == "" || reg == "" {
 					u.InvalidAndExit("mandatory attribute validation", "ymlstr, path and reg are required")
@@ -440,10 +458,11 @@ func (f *CmdFuncAction) Exec() {
 						varvalueRaw := v.(string)
 						varvalue = core.Render(varvalueRaw, f.Vars)
 					}
-					if k.(string) == "localonly" {
-						localonly = v.(bool)
-					}
 				}
+
+				doFlag("localonly", func() {
+					localonly = true
+				})
 
 				if varname == "" {
 					u.InvalidAndExit("validate varname", "the reg varname must not be empty")
@@ -454,6 +473,7 @@ func (f *CmdFuncAction) Exec() {
 					core.TaskRuntime().ExecbaseVars.Put(varname, varvalue)
 					f.Vars.Put(varname, varvalue)
 				}
+
 			})
 			u.Ppmsgvvvvvhint("after reg the var - contextual global:", core.TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
@@ -502,10 +522,10 @@ func (f *CmdFuncAction) Exec() {
 						regRaw := v.(string)
 						reg = core.Render(regRaw, f.Vars)
 					}
-					if k.(string) == "localonly" {
-						localonly = v.(bool)
-					}
 				}
+				doFlag("localonly", func() {
+					localonly = true
+				})
 
 				srcyml := func() string {
 					if src != "" && fromkey != "" {

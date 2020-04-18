@@ -13,8 +13,7 @@ doc_meta: |
       log: yes
 
 notes:
-  goal:
-    - add cmd support for cmd func
+  goal: add cmd support for cmd func
 
 vars:
   student:
@@ -45,8 +44,3 @@ tasks:
             cmd:  |
               hello, {{.student.school}}
               hello, {{.student.school}}
-
-  -
-      - func: shell
-        do:
-          - echo "hello 2"
