@@ -1,5 +1,40 @@
-goal:
-  - to test using different yaml syntax
+doc_meta: |
+  folder: quick-start
+  title: syntax variation
+  head: |
+    Demo a few different ways for yml array
+
+  sections:
+    - title: Raw yaml
+      content: |
+        ```
+        -
+          name: task
+          task:
+            -
+              func: shell
+              do: [echo "hello", echo "world"]
+
+            -
+              func: shell
+              do: [
+                echo "hello",
+                echo "world"
+              ]
+
+            -
+              func: shell
+              do: [
+                echo "hello",
+                echo "world"]
+          ```
+    - title: Demo
+      log: yes
+
+
+notes:
+  goal:
+    - to test using different yaml syntax
 
 tasks:
 

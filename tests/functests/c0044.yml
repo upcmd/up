@@ -1,28 +1,39 @@
+doc_meta: |
+  folder: env-vars
+  title: basics
+  head: |
+    This showcases:
+      * how to use env var in your shell execution
 
-goal:
-  - showcase cmd in a formal way
+  sections:
+    - title: Demo
+      log: yes
+
+dvars:
+  - name: homedir
+    value: '{{ env "HOME"}}'
+    flags: [vvvv,]
+
+  - name: yourhome
+    value: '{{ expandenv "Your path is set to $HOME" }} '
+    flags: [vvvv,]
 
 tasks:
-
   -
     name: task
-    desc: test the exit scenarios due to different types of validation
     task:
       -
-        func: shell
-        desc: step1
-        do:
-          - echo hanks
-
-      -
         func: cmd
-        dvars:
-          - name: reg_hello
-            value: |
-              {{.last_task_result.Output |reg "hellomsg" }}
+        do:
+          - name: print
+            cmd: '{{.homedir}}'
+          - name: print
+            cmd: '{{.yourhome}}'
 
       -
         func: shell
         do:
-          - echo "{{.reg_hello}}"
-          - echo "{{.hellomsg}}"
+          - echo """my home is at {{.homedir}}"""
+          - echo """my home is at $HOME"""
+          - echo """{{.yourhome}}"""
+

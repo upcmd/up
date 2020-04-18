@@ -1,3 +1,47 @@
+doc_meta: |
+  folder: flow-controll
+  title: loop
+  weight: 1400
+  head: |
+    Showcase use loop in UP cmd cli
+
+  sections:
+    - title: How to use the loop? The simple way
+      content: |
+        To put it in simple way, you can loop a list of values simply attaching to loop in func call
+
+        ```
+        - func: shell
+          do:
+            - echo "hello {{.loopitem}}"
+          loop:
+            - tom
+            - peter
+            - james
+
+        - func: shell
+          do:
+            - echo "name {{.loopitem.name}}"
+            - echo "age {{.loopitem.age}}"
+          loop:
+            - name: tom
+              age: 11
+            - name: peter
+              age: 45
+            - name: james
+              age: 23
+        ```
+
+    - title: Advanced usage
+      content: |
+        * You can use a name reference for the loop elememnt, the reference is a var/dvar, then it is up to you to load it dynamically, or externalizing the value from file
+        * You can also use a dynamic value referencing to a var/dvar, this gives you the ability to controll the workflow dynamically
+
+        Pleas refer to the usage of .countries
+
+    - title: Demo
+      log: yes
+
 goal:
   - add loop support
 
@@ -39,6 +83,18 @@ tasks:
           - tom
           - peter
           - james
+
+      - func: shell
+        do:
+          - echo "name {{.loopitem.name}}"
+          - echo "age {{.loopitem.age}}"
+        loop:
+          - name: tom
+            age: 11
+          - name: peter
+            age: 45
+          - name: james
+            age: 23
 
       - func: shell
         do:

@@ -1,15 +1,28 @@
-goal:
-  - to test out dvars rendering in scope
-  - it loads global vars first, then render dvars and merge it with vars in global scope
-  - it then merge nonprod vars to global as runtimevars, then
-  - render dvars based on runtimevars, then
-  - continue same idea down to individual runtime intance vars/dvars process
+doc_meta: |
+  folder: dvars
+  title: complex case
+  head: |
+    Demo a little more complex case with object merging in scope and externalizing settings to file
 
-expected:
-  1-6: all rendered with value
-  7-8: |
-    prod is not within the instance(dev)'s group, so it is correct
-    that school_prod is not a living var hence no value
+  sections:
+
+    - title: d0030_school.yml reference
+      filelookup: d0030_school.yml
+
+    - title: Test result
+      content: |
+        prod is not within the instance(dev)'s group, so it is correct
+        that school_prod is can not be rendered a value
+
+    - title: Demo
+      log: yes
+
+notes:
+  expected:
+    1-6: all rendered with value
+    7-8: |
+      prod is not within the instance(dev)'s group, so it is correct
+      that school_prod is not a living var hence no value
 
 scopes:
   -
@@ -80,7 +93,7 @@ tasks:
         func: shell
         do:
           - echo """1.school_global -> {{.school_global}}"""
-          - echo """2.school_global object -> {{.school_global_object.address.suburb.name}}"""
+            - echo """2.school_global object -> {{.school_global_object.address.suburb.name}}"""
           - echo """3.school_nonprod -> {{.school_nonprod}}"""
           - echo """4.school_nonprod object -> {{.school_nonprod_object.address.suburb.name}}"""
           - echo """5.sgp address -> {{.sgp_address}}"""

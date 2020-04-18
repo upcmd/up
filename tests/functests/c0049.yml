@@ -1,6 +1,39 @@
+doc_meta: |
+  folder: env-vars
+  title: env vars in scopes
+  head: |
+    This showcases:
+      * The env var using dvar will be just like other dvar working in scopes
 
-goal:
-  - test the shell env var behaves the save that it could override in scopes
+    This makes the environment variables' management very elegant and tidy. Not only you could use dvar to manage dynamic properties, but also you could manage environment variable the same way and a set of env vars could be put into a profile for an environment context. This is important nowadays for CD/CI and integration automation with build tools as envionrment variables are normally the client facing to these tools, such as GoCD, Jenkins, Gitlab CI etc.
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - test the shell env var behaves the save that it could override in scopes
+
+  results: |
+    executing shell commands
+    cmd( 1):
+    env |grep STUDENT_NAME
+    STUDENT_NAME=Tom Hanks
+    cmd( 2):
+    env |grep STUDENT_AGE
+    STUDENT_AGE=18
+    step(  2):
+    executing shell commands
+    cmd( 1):
+    env |grep STUDENT_NAME
+    STUDENT_NAME=James Bond
+    cmd( 2):
+    env |grep STUDENT_AGE
+    STUDENT_AGE=18
+    cmd( 3):
+    env |grep SCHOOL
+    SCHOOL=James Rules
 
 scopes:
   - name: global
@@ -17,7 +50,6 @@ dvars:
   - name: STUDENT_AGE
     value: "18"
     flags: [envvar]
-
 
 tasks:
 
@@ -41,23 +73,3 @@ tasks:
           - env |grep STUDENT_NAME
           - env |grep STUDENT_AGE
           - env |grep SCHOOL
-
-results: |
-  executing shell commands
-  cmd( 1):
-  env |grep STUDENT_NAME
-  STUDENT_NAME=Tom Hanks
-  cmd( 2):
-  env |grep STUDENT_AGE
-  STUDENT_AGE=18
-  step(  2):
-  executing shell commands
-  cmd( 1):
-  env |grep STUDENT_NAME
-  STUDENT_NAME=James Bond
-  cmd( 2):
-  env |grep STUDENT_AGE
-  STUDENT_AGE=18
-  cmd( 3):
-  env |grep SCHOOL
-  SCHOOL=James Rules

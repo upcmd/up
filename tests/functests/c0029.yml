@@ -1,14 +1,26 @@
-goal:
-  - to test out dvars rendering in scope
-  - it loads global vars first, then render dvars and merge it with vars in global scope
-  - it then merge nonprod vars to global as runtimevars, then
-  - render dvars based on runtimevars, then
-  - continue same idea down to individual runtime intance vars/dvars process
+doc_meta: |
+  folder: dvars
+  title: dvars in scopes
+  head: |
+    Similarly to the process that vars loading sequence, dvars in scopes follow the same sequence to be loaded from global group, then group, then instance id, then runtime global, then local scope in func
 
-expected:
-  cmd1: da -> global-a
-  cmd2: dab -> global-a-and-global-b
-  cmd3: non-prod-a
+  sections:
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to test out dvars rendering in scope
+    - it loads global vars first, then render dvars and merge it with vars in global scope
+    - it then merge nonprod vars to global as runtimevars, then
+    - render dvars based on runtimevars, then
+    - continue same idea down to individual runtime intance vars/dvars process
+
+  expected:
+    cmd1: da -> global-a
+    cmd2: dab -> global-a-and-global-b
+    cmd3: non-prod-a
 
 scopes:
   -

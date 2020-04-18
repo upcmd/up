@@ -1,11 +1,32 @@
-goal:
-  - to show dynamic vars
-  - dynamic vars suppport customisable level of expanding
-  - default expand level is 1
-  - use array so that sequence is known and reduce complexity and mess
-  - |
-    dvar name should not contiain - as it will conflict
-    with golang template var naming
+doc_meta: |
+  folder: dvars
+  title: dvars intro
+  head: |
+    dvar stands for dynamic var. As suggested by the naming, dvar is like a calculated variable during runtime, we call this behavior as expansion. A dvar's value is expressed using golang template, it could be the case that a expanded result contains another template variable, so that you will need to expand it again.
+
+    By default the expand level is 1, but you can custmise it to be multiple depending on your own needs
+
+    We use array to configure a entry of dvar item, the sequence matters as the value of dvar will be evaluated sequentially, the later one will need to reference to the evaluated value of another dvar
+
+    A validation rule is that the name of a dvar should should not contiain "-" as it will conflict with golang template var naming
+
+  sections:
+    - title: Note
+      content: |
+        Please take note the demo cases that use multiple expansion, it is dynamic on dynamic and it is usful in certain cases. Please read the self explanation of the description in dvar config
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to show dynamic vars
+    - dynamic vars suppport customizable level of expanding
+    - default expand level is 1
+    - use array so that sequence is known and reduce complexity and mess
+    - |
+      dvar name should not contiain - as it will conflict
+      with golang template var naming
 
 vars:
   student: Tom

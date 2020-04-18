@@ -1,5 +1,16 @@
-goal:
-  - to show using the problem that it requires further var expanding to get real value
+doc_meta: |
+  folder: vars
+  title: var rendering
+  head: |
+    The vars defined in UP cli command are like constants defined by user, the var contains reference to other vars is just like a definition or declaration of a variable which is not substituded fully to its completed form yet, it is a anchor to be used and expanded in runtime, which will be detailed in the advanced topic in chapter of dvar
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to show the problem that it requires further var expanding to get real value
 
 tasks:
 

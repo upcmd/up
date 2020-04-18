@@ -1,34 +1,45 @@
-goal:
-  - dvars expand in instance level
-  - dvars object can merge in leaf level
-  - dvar in dev will override same name dvar in nonprod level
+doc_meta: |
+  folder: dvars
+  title: local scope merge
+  head: |
+    Demo dvars merge in local scope in execution time
 
-expected:
-  - school object in nonprod could append new element and
-  - also override same name element
+  sections:
+    - title: Demo
+      log: yes
 
-result_log: |
-    executing shell commands
-    cmd( 1):
-      echo """1.school -> {{.school}}"""
-    1.school -> address:
-      state: NSW
-      city: sydney
-      suburb:
-        name: sydney
-        postcode: 2000
-        CBD: LOCAL
-      school: Sydney Grammar
-    principal: Mr Right
-    cmd( 2):
-      echo """2.school object CBD -> {{.school_object.address.suburb.CBD}}"""
-      2.school object CBD -> LOCAL
-    cmd( 3):
-      echo """3.school object-> {{.school_object.address.school}}"""
-      3.school object-> Sydney Grammar
-    cmd( 4):
-      echo """4.school object-> {{.school_object.principal}}"""
-      4.school object-> Mr Right
+notes:
+  goal:
+    - dvars expand in instance level
+    - dvars object can merge in leaf level
+    - dvar in dev will override same name dvar in nonprod level
+
+  expected:
+    - school object in nonprod could append new element and
+    - also override same name element
+
+  result_log: |
+      executing shell commands
+      cmd( 1):
+        echo """1.school -> {{.school}}"""
+      1.school -> address:
+        state: NSW
+        city: sydney
+        suburb:
+          name: sydney
+          postcode: 2000
+          CBD: LOCAL
+        school: Sydney Grammar
+      principal: Mr Right
+      cmd( 2):
+        echo """2.school object CBD -> {{.school_object.address.suburb.CBD}}"""
+        2.school object CBD -> LOCAL
+      cmd( 3):
+        echo """3.school object-> {{.school_object.address.school}}"""
+        3.school object-> Sydney Grammar
+      cmd( 4):
+        echo """4.school object-> {{.school_object.principal}}"""
+        4.school object-> Mr Right
 
 scopes:
   -

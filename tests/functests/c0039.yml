@@ -1,11 +1,85 @@
-goal:
-  - showcase template usage of "with"
-  - showcase template block
-  - showcase template definition
-  - showcase dynamic template using expand so that you can compose multiple templates
+doc_meta: |
+  folder: template
+  title: advanced usage
+  head: |
+    Demo usecases of builtin with, block, definition
 
-bug:
-  - due to the viper's lower case all var keys, please use lower case as reference
+    Also demo the dynamic templating using expand so that you can compose multiple templates
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - showcase template usage of "with"
+    - showcase template block
+    - showcase template definition
+    - showcase dynamic template using expand so that you can compose multiple templates
+
+  bug:
+    - due to the viper's lower case all var keys, please use lower case as reference
+
+  output: |
+    dvar> usage_of_with:
+    "  student name: Tom\n  school name: Sydney Grammar\n  Male\n  "
+
+    dvar> usage_of_with_else:
+    "  i am somebody  "
+
+    dvar> template_def_plain:
+    "\n\n\nONE TWO\"\n"
+
+    dvar> template_def_consume:
+    "\nshow example of how you can define reusable template\nand how you can pass in the parameters\n\n\n\n\nstudent:\n  name: ONE: Tom\n  gender: TWO: Male\n"
+
+    dvar> template_def_consume_dynamic:
+    "\n\n\n\nstudent:\n  name: ONE: Tom\n  gender: TWO: Male\n\n"
+
+    dvar> template_use_block:
+    "\n\nstudent:\n  name: ONE: Tom\ngender: TWO: Male\n\n"
+
+      executing shell commands
+    cmd( 1):
+      echo "value\n {{.usage_of_with}}"
+      value
+    student name: Tom
+    school name: Sydney Grammar
+      Male
+    cmd( 2):
+      echo "{{.usage_of_template}}"
+      <no value>
+    cmd( 3):
+      echo "{{.template_def_consume}}"
+      show example of how you can define reusable template
+      and how you can pass in the parameters
+
+    student:
+      name: ONE: Tom
+      gender: TWO: Male
+    cmd( 4):
+      echo "{{.template_def_consume_dynamic_t1}}"
+      {{define T1}}ONE: {{.}}{{end}}
+    cmd( 5):
+      echo "{{.template_def_consume_dynamic_t2}}"
+      {{define T2}}TWO: {{.}}{{end}}
+    cmd( 6):
+      echo "{{.template_def_consume_dynamic_t3}}"
+      {{define T3}}student:
+    name: {{template T1 .name}}
+    gender: {{template T2 .gender}}{{end}}
+      {{template T3 .student}}
+    cmd( 7):
+      echo "{{.template_def_consume_dynamic}}"
+    student:
+      name: ONE: Tom
+      gender: TWO: Male
+    cmd( 8):
+      echo "{{.template_use_block}}"
+    student:
+      name: ONE: Tom
+    gender: TWO: Male
+
 
 vars:
   ns: prod
@@ -100,7 +174,6 @@ dvars:
       {{template "T3" .student}}
     flags: [vvvv,]
 
-
 #  NOTE: this will not work, as the value itself serve as plain text as template rather than
 #  dynamic rendering, so this reusable definition of template should go to vars section
 #-------------------------------------------------------
@@ -131,7 +204,6 @@ dvars:
     flags: [vvvv,]
     expand: 3
 
-
   - name: template_use_block
     desc: |
       A block is shorthand for defining a template
@@ -152,7 +224,6 @@ dvars:
       {{end}}
     flags: [vvvv,]
 
-
 tasks:
   -
     name: task
@@ -168,65 +239,3 @@ tasks:
           - echo "{{.template_def_consume_dynamic_t3}}"
           - echo "{{.template_def_consume_dynamic}}"
           - echo "{{.template_use_block}}"
-
-
-output: |
-  dvar> usage_of_with:
-  "  student name: Tom\n  school name: Sydney Grammar\n  Male\n  "
-
-  dvar> usage_of_with_else:
-  "  i am somebody  "
-
-  dvar> template_def_plain:
-  "\n\n\nONE TWO\"\n"
-
-  dvar> template_def_consume:
-  "\nshow example of how you can define reusable template\nand how you can pass in the parameters\n\n\n\n\nstudent:\n  name: ONE: Tom\n  gender: TWO: Male\n"
-
-  dvar> template_def_consume_dynamic:
-  "\n\n\n\nstudent:\n  name: ONE: Tom\n  gender: TWO: Male\n\n"
-
-  dvar> template_use_block:
-  "\n\nstudent:\n  name: ONE: Tom\ngender: TWO: Male\n\n"
-
-    executing shell commands
-  cmd( 1):
-    echo "value\n {{.usage_of_with}}"
-    value
-  student name: Tom
-  school name: Sydney Grammar
-    Male
-  cmd( 2):
-    echo "{{.usage_of_template}}"
-    <no value>
-  cmd( 3):
-    echo "{{.template_def_consume}}"
-    show example of how you can define reusable template
-    and how you can pass in the parameters
-
-  student:
-    name: ONE: Tom
-    gender: TWO: Male
-  cmd( 4):
-    echo "{{.template_def_consume_dynamic_t1}}"
-    {{define T1}}ONE: {{.}}{{end}}
-  cmd( 5):
-    echo "{{.template_def_consume_dynamic_t2}}"
-    {{define T2}}TWO: {{.}}{{end}}
-  cmd( 6):
-    echo "{{.template_def_consume_dynamic_t3}}"
-    {{define T3}}student:
-  name: {{template T1 .name}}
-  gender: {{template T2 .gender}}{{end}}
-    {{template T3 .student}}
-  cmd( 7):
-    echo "{{.template_def_consume_dynamic}}"
-  student:
-    name: ONE: Tom
-    gender: TWO: Male
-  cmd( 8):
-    echo "{{.template_use_block}}"
-  student:
-    name: ONE: Tom
-  gender: TWO: Male
-

@@ -1,5 +1,22 @@
-goal:
-  - load dvar value from a file
+doc_meta: |
+  folder: dvars
+  title: externalize settings
+  head: |
+    You can load dvars from a file. The configuration file will look much cleaner if you externalize the dvars settings
+
+  sections:
+
+    - title: d0028_smart_guy.yml reference
+      filelookup: d0028_smart_guy.yml
+    - title: d0028_school.yml reference
+      filelookup: d0028_school.yml
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - load dvar value from a file
 
 vars:
   student:

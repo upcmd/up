@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-func runCmd(f *ShellFuncAction, cmd string) string {
+func runCmd(f *ShellFuncAction, cmd string) {
 	cmdExec := exec.Command("/bin/sh", "-c", cmd)
 
 	func() {
@@ -29,13 +29,15 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 		}
 	}()
 
+	var result core.ExecResult
+
 	if core.Dryrun {
 		u.Pdryrun("in dryrun mode and skipping the actual commands")
-		return "dryrun result"
+		result.Code = 0
+		result.Output = strings.TrimSpace("dryrun result")
 	} else {
 
 		cmdOutput, err := cmdExec.CombinedOutput()
-		var result core.ExecResult
 		if err != nil {
 			if exitError, ok := err.(*exec.ExitError); ok {
 				result.Code = exitError.ExitCode()
@@ -46,11 +48,8 @@ func runCmd(f *ShellFuncAction, cmd string) string {
 			result.Output = strings.TrimSpace(string(cmdOutput))
 		}
 
-		u.SubStepStatus("..", result.Code)
-
 		f.Result = result
 		u.LogError("exec error:", err)
-		return string(cmdOutput)
 	}
 }
 
@@ -94,6 +93,7 @@ func (f *ShellFuncAction) Exec() {
 			u.Pfv("      %s\n", color.RedString("%s", f.Result.ErrMsg))
 		}
 
+		u.SubStepStatus("..", f.Result.Code)
 		u.Dvvvvv(f.Result)
 	}
 

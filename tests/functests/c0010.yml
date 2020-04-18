@@ -1,44 +1,84 @@
-goal:
-  - to test complex object and leaf nodes can be merged
-  - expected dev vars: |
-      (cache.Cache) (len=4) {
-       (string) (len=1) "a": (string) (len=5) "dev-a",
-       (string) (len=1) "b": (string) (len=10) "non-prod-b",
-       (string) (len=1) "c": (map[interface {}]interface {}) (len=7) {
-        (string) (len=2) "c1": (string) (len=6) "dev-c1",
-        (string) (len=2) "c2": (string) (len=6) "dev-c2",
-        (string) (len=2) "c3": (map[interface {}]interface {}) (len=3) {
-         (string) (len=3) "c31": (string) (len=10) "global-c31",
-         (string) (len=3) "c32": (string) (len=11) "nonprod-c32",
-         (string) (len=3) "c33": (string) (len=7) "dev-c33"
-        },
-        (string) (len=2) "c4": (string) (len=10) "nonprod-c4",
-        (string) (len=2) "c5": (string) (len=10) "nonprod-c5",
-        (string) (len=2) "c6": (string) (len=6) "dev-c6",
-        (string) (len=2) "c7": (string) (len=6) "dev-c7"
-       },
-       (string) (len=1) "d": (string) (len=8) "global-d"
-      }
-  - vars: |
-      current instance[ dev ] runtime vars:
-      {
-        "c": {
-          "c4": "nonprod-c4",
-          "c5": "nonprod-c5",
-          "c1": "dev-c1",
-          "c2": "dev-c2",
-          "c3": {
-            "c32": "nonprod-c32",
-            "c33": "dev-c33",
-            "c31": "global-c31"
+doc_meta: |
+  folder: scope
+  title: leave merge
+  head: |
+    Demo a comlex merge with leave elements
+
+    In most of caes, it is enough to just use simple plain string as a var. However we offten need to use object in our project. The configuration of the object evolves in scope and also during the runtime
+
+    This demo shows that the vars could be merged in leave level of an object tree. For example, the elements for the object in group vars can override the leave level elements from global scope, then individual scope, eg dev vars override/merge with the nonprod grouop vars, then local vars in func will overrides all above
+
+  sections:
+    - title: Expected merge result
+      content: |
+        ```
+        overall final exec vars:
+
+        (*core.Cache)({
+          "a": "dev-a",
+          "b": "non-prod-b",
+          "c": {
+            "c6": "dev-c6",
+            "c7": "dev-c7",
+            "c1": "dev-c1",
+            "c2": "dev-c2",
+            "c3": {
+              "c31": "global-c31",
+              "c32": "nonprod-c32",
+              "c33": "dev-c33"
+            },
+            "c4": "nonprod-c4",
+            "c5": "nonprod-c5"
           },
-          "c6": "dev-c6",
-          "c7": "dev-c7"
-        },
-        "d": "global-d",
-        "a": "dev-a",
-        "b": "non-prod-b"
-      }
+          "d": "global-d"
+        })
+        ```
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to test complex object and leaf nodes can be merged
+    - expected dev vars: |
+        (cache.Cache) (len=4) {
+         (string) (len=1) "a": (string) (len=5) "dev-a",
+         (string) (len=1) "b": (string) (len=10) "non-prod-b",
+         (string) (len=1) "c": (map[interface {}]interface {}) (len=7) {
+          (string) (len=2) "c1": (string) (len=6) "dev-c1",
+          (string) (len=2) "c2": (string) (len=6) "dev-c2",
+          (string) (len=2) "c3": (map[interface {}]interface {}) (len=3) {
+           (string) (len=3) "c31": (string) (len=10) "global-c31",
+           (string) (len=3) "c32": (string) (len=11) "nonprod-c32",
+           (string) (len=3) "c33": (string) (len=7) "dev-c33"
+          },
+          (string) (len=2) "c4": (string) (len=10) "nonprod-c4",
+          (string) (len=2) "c5": (string) (len=10) "nonprod-c5",
+          (string) (len=2) "c6": (string) (len=6) "dev-c6",
+          (string) (len=2) "c7": (string) (len=6) "dev-c7"
+         },
+         (string) (len=1) "d": (string) (len=8) "global-d"
+        }
+    - vars: |
+        current instance[ dev ] runtime vars:
+        {
+          "c": {
+            "c4": "nonprod-c4",
+            "c5": "nonprod-c5",
+            "c1": "dev-c1",
+            "c2": "dev-c2",
+            "c3": {
+              "c32": "nonprod-c32",
+              "c33": "dev-c33",
+              "c31": "global-c31"
+            },
+            "c6": "dev-c6",
+            "c7": "dev-c7"
+          },
+          "d": "global-d",
+          "a": "dev-a",
+          "b": "non-prod-b"
+        }
 
 scopes:
   -

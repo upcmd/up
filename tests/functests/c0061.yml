@@ -1,8 +1,31 @@
-goal:
-  - show a little bit more complicated use case with chained tasks and externalised tasks
-  - show how to use condition(basics)
-  - show how to use loop(basics)
-  - for details of condition/loop, check the comphensive case of them separately
+doc_meta: |
+  folder: organization
+  title: use case 2
+  head: |
+    Showcase gradually the lengthy configuration evolve to simpler skeleton by using ref element to externalized task/flow. Please also checkout the changes of: use case 1
+
+  sections:
+    - title: Externalized the task definition
+      filelookup: c0061-task-main.yml
+
+    - title: Externalized the task definition
+      filelookup: c0061-task-complicate.yml
+
+    - title: flow element
+      content: |
+        Introduce the flow element to notate a task reference
+
+        With ref element in main tasks file, this will make the entry point much cleaner and the main skeleton design stand out
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - show a little bit more complicated use case with chained tasks and externalised tasks
+    - show how to use condition(basics)
+    - show how to use loop(basics)
+    - for details of condition/loop, check the comphensive case of them separately
 
 vars:
   student_name: tom
@@ -18,7 +41,7 @@ tasks:
   -
     name: a_very_complicated_task
     desc: "a_very_complicated_task"
-    ref: c0061-task-complicate
+    ref: c0061-task-complicate.yml
 
   -
     name: task_a

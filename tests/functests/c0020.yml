@@ -1,3 +1,22 @@
+doc_meta: |
+  folder: call-func
+  title: call func as interface
+  head: |
+    This demos a design pattern using call and callee task without local vars
+
+    The caller's varss should always take priority than the the callee's vars, if callee has already got same local vars defined, they will be overrided and used as default values
+
+  sections:
+    - title: Applications
+      content: |
+        The possible application of this pattern is to  call different implmentation task depending on certain condition, For example,
+
+        1. you could conditionally deploy an application to AWS, Azure or K8s depending on criteria
+
+        2. you could provistion backend storage solution using EBS, EFS
+
+    - title: Demo
+      log: yes
 
 notes:
   goal:

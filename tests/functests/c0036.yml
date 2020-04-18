@@ -1,8 +1,27 @@
-goal:
-  - to test and show that the local var is jailed in local space only
-  - test usage of buitin golang template funcs
-  - slice is not working as expected yet
-  - add auto logging flag vvvv to display value of dvar value
+doc_meta: |
+  folder: template
+  title: builtin funcs
+  head: |
+    Demo dvars merge in local scope in execution time
+
+  sections:
+    - title: flag verbose level
+      content: |
+        if you put a flag like vvv together with dvar definition, you will see the evaluated result will be printed in that verbose level for you to debug or trace problem
+
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: default golang template reference
+        link: https://golang.org/pkg/text/template/
+
+notes:
+  goal:
+    - test usage of buitin golang template funcs
+    - slice is not working as expected yet
+    - add auto logging flag vvvv to display value of dvar value
 
 
 vars:

@@ -1,5 +1,22 @@
-goal:
-  - test the if condition works for cmd and call
+doc_meta: |
+  folder: flow-controll
+  title: if condition advanced
+  head: |
+    Showcase you can use if condition for cmd func and call func too
+
+  sections:
+    - title: What's good about it when you use if with call func?
+      content: |
+        The call func actually is very powerfully to create a execution branch with its own stack. So if you use a if condition to call another task, it actually separate the implementation with your own main flow.
+
+        Also with multiple if, it is similar to convert the workflow to if/if else, or switch/case etc. Or with embeded if in callee, you could create branched flows so this enrichs the workflow management in very simple way compare to other tools
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - test the if condition works for cmd and call
 
 tasks:
   -

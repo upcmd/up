@@ -1,17 +1,31 @@
+doc_meta: |
+  folder: design-patterns
+  title: basic cli skeleton
+  head: |
+    This showcases:
+      * A typical cli application with user input
+      * It taskes 2 envionrment vars and use default value if they are empty
+      * Prepare the dynamic script(data) to be executed
+      * Use a shell func to execute the final prepared script
 
-goal:
-  - showcase the bare minimal entry point is just a named task only
-  - showcase how to gracefully manage the env vars
-  - continue of c0046
+  sections:
+    - title: Demo
+      log: yes
 
-storys:
-  - a cli script requires 2 input from env vars
-  - it should take the env var from current bash/shell environment
-  - the env vars:
-      student_name: |
-        if it can not find it, it fails fast and execution stops
-        ref to f0045 for the failed case
-      student_age: if it can not find it, defaul it to 18
+notes:
+  goal:
+    - showcase the bare minimal entry point is just a named task only
+    - showcase how to gracefully manage the env vars
+    - continue of c0046
+
+  storys:
+    - a cli script requires 2 input from env vars
+    - it should take the env var from current bash/shell environment
+    - the env vars:
+        student_name: |
+          if it can not find it, it fails fast and execution stops
+          ref to f0045 for the failed case
+        student_age: if it can not find it, defaul it to 18
 
 scopes:
 

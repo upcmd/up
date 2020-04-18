@@ -1,35 +1,95 @@
-goal:
-  - to test and show sprig funcs usage and examples
-  - ref to the doc link for more examples
-  - showcase encrpt and decrypt using dynamic var
-  - showcase dict/map/slice/b64/envexpand and more
+doc_meta: |
+  folder: template
+  title: sprig funcs
+  head: |
+    Demo usecases of sprig golang template functions
+
+  sections:
+    - title: Showcase deal with data types
+      content: Please refer to usage relating to dict/map/slice/b64
+
+    - title: env variables
+      content: |
+        ```
+        - name: sprig_os_env
+          value: '{{ env "HOME"}}'
+          flags: [vvvv,]
+
+        - name: sprig_os_env_expand
+          value: '{{ expandenv "Your path is set to $PATH" }} '
+          flags: [vvvv,]
+        ```
+
+        * env func get the value of HOME
+        * expandenv func is to expand and subsitude the value in runtime
+
+    - title: showcase encrpt and decrypt using dynamic var
+      content: |
+        Please notice the usage of encrypt and decrypt examples:
+        ```
+        - name: sprig_encrypt_AES
+          value: '{{ encryptAES "secretkey" "plaintext" }}'
+          flags: [vvvv,]
+
+        - name: sprig_decrypt_AES
+          value: '{{ print .sprig_encrypt_AES |decryptAES "secretkey" }}'
+          flags: [vvvv,]
+
+        - name: sprig_AES_key
+          value: '{{ printf "%s-%s" .pod_name .ns }}'
+          flags: [vvvv,]
+
+        - name: sprig_encrypt_AES_using_key_var
+          value: '{{ encryptAES .sprig_AES_key "plaintext" }}'
+          flags: [vvvv,]
+
+        - name: sprig_decrypt_AES_using_key_var
+          value: '{{ print .sprig_encrypt_AES_using_key_var |decryptAES .sprig_AES_key }}'
+          flags: [vvvv,]
+        ```
+
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: sprig reference
+        link: http://masterminds.github.io/sprig/
+
 
 notes:
-  - |
-    Pipeline is a unique Go templating feature, which
-    allows to declare expressions that can be executed
-    in a manner similar to shell pipeline. Formally, a
-    pipeline is a chained sequence of commands separated
-    by | symbol. A command can be a simple value or a
-    function call. The result of each command is passed
-    as the last argument to the following command. The
-    output of the final command in the pipeline is the
-    value of the whole pipeline.
+  doc:
+    - |
+      Pipeline is a unique Go templating feature, which
+      allows to declare expressions that can be executed
+      in a manner similar to shell pipeline. Formally, a
+      pipeline is a chained sequence of commands separated
+      by | symbol. A command can be a simple value or a
+      function call. The result of each command is passed
+      as the last argument to the following command. The
+      output of the final command in the pipeline is the
+      value of the whole pipeline.
 
-    A command is allowed to return one or two values,
-    the second of which must be of error type. If command
-    returns two values and the second value evaluates to
-    non-nil, execution terminates and the error is
-    returned to the caller of Execute.
+      A command is allowed to return one or two values,
+      the second of which must be of error type. If command
+      returns two values and the second value evaluates to
+      non-nil, execution terminates and the error is
+      returned to the caller of Execute.
 
-  - |
-    It means that you can't always use a func as pipe if
-    the result can not be served as last argument, then you
-    will have to use assignment and code
+    - |
+      It means that you can't always use a func as pipe if
+      the result can not be served as last argument, then you
+      will have to use assignment and code
 
-refs:
-  skip: lower, title, untitle
-  doc: http://masterminds.github.io/sprig/
+  refs:
+    skip: lower, title, untitle
+    doc: http://masterminds.github.io/sprig/
+
+  goal:
+    - to test and show sprig funcs usage and examples
+    - ref to the doc link for more examples
+    - showcase encrpt and decrypt using dynamic var
+    - showcase dict/map/slice/b64/envexpand and more
 
 vars:
   ns: prod
@@ -198,16 +258,16 @@ dvars:
     value: '{{ .sprig_b64enc |b64dec }} '
     flags: [vvvv,]
 
-  - name: sprig_os_env
-    value: '{{ env "HOME"}}'
-    flags: [vvvv,]
-
   - name: random_hello
     value: '{{ hello }}'
     flags: [vvvv,]
 
   - name: random_hello_plain
     value: '{{ "hi, tom"}}'
+    flags: [vvvv,]
+
+  - name: sprig_os_env
+    value: '{{ env "HOME"}}'
     flags: [vvvv,]
 
   - name: sprig_os_env_expand

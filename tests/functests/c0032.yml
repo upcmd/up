@@ -1,11 +1,30 @@
-goal:
-  - dvars expand in instance level
-  - dvars object can merge in leaf level
-  - dvar in dev will override same name dvar in nonprod level
+doc_meta: |
+  folder: dvars
+  title: instance level merge
+  head: |
+    Demo dvars leave level merge in scope and instance level
 
-expected:
-  - school object in nonprod could append new element and
-  - also override same name element
+  sections:
+
+    - title: Note
+      content: |
+        * dvars expand in instance level
+        * dvars object can merge in leaf level
+        * dvar in dev will override same name dvar in nonprod level
+        * school object in nonprod could append new element and also override same name element
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - dvars expand in instance level
+    - dvars object can merge in leaf level
+    - dvar in dev will override same name dvar in nonprod level
+
+  expected:
+    - school object in nonprod could append new element and
+    - also override same name element
 
 scopes:
   -

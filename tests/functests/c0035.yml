@@ -1,5 +1,18 @@
-goal:
-  - to test and show that the local var is jailed in local space only
+doc_meta: |
+  folder: vars
+  title: local vars
+  head: |
+    Showcase that the local var is jailed in local space only
+
+    The below case shows that the var a is available in step1 but not in step2
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to test and show that the local var is jailed in local space only
 
 tasks:
 
@@ -9,7 +22,7 @@ tasks:
     task:
       -
         func: shell
-        name: getcases
+        name: step1
         vars:
           a: aaa
           b: bbb
@@ -18,5 +31,6 @@ tasks:
 
       -
         func: shell
+        name: step2
         do:
           - echo "{{.a}}"

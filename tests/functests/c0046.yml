@@ -1,21 +1,32 @@
+doc_meta: |
+  folder: env-vars
+  title: environment vars
+  head: |
+    This showcases:
+      * How to use env variables and provide a default value if it is empty
+      * An minimal entry task could be just a name
 
-goal:
-  - showcase the bare minimal entry point is just a named task only
-  - showcase how to gracefully manage the env vars
+  sections:
+    - title: Demo
+      log: yes
 
-storys:
-  - a cli script requires 2 input from env vars
-  - |
-    it also requires 2 config vars in a profile
-    based config for different execution context/env,
-    eg dev/st/prod
-  - it should take the env var from current bash/shell environment
-  - the env vars:
-      student_name: |
-        if it can not find it, it fails fast and execution stops
-        ref to f0045 for the failed case
-      student_age: if it can not find it, defaul it to 18
+notes:
+  goal:
+    - showcase the bare minimal entry point is just a named task only
+    - showcase how to gracefully manage the env vars
 
+  storys:
+    - a cli script requires 2 input from env vars
+    - |
+      it also requires 2 config vars in a profile
+      based config for different execution context/env,
+      eg dev/st/prod
+    - it should take the env var from current bash/shell environment
+    - the env vars:
+        student_name: |
+          if it can not find it, it fails fast and execution stops
+          ref to f0045 for the failed case
+        student_age: if it can not find it, defaul it to 18
 
 scopes:
 

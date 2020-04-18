@@ -1,5 +1,16 @@
-goal:
-  - add feature of template func to register a var into global var map
+doc_meta: |
+  folder: shell-func
+  title: check result
+  head: |
+    Demo the feature that you could use .last_result.Code and .last_result.Output as condition to orchestrate your workflow
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - add feature of template func to register a var into global var map
 
 tasks:
 
@@ -19,7 +30,8 @@ tasks:
         desc: step2
         do:
           - echo tom
-          - echo "{{.last_task_result.Output}}"
+          - echo "{{.last_result.Code}}"
+          - echo "{{.last_result.Output}}"
           - echo hanks
 
       -
@@ -28,10 +40,10 @@ tasks:
         dvars:
           - name: greet
             value: |
-              hello: {{.last_task_result.Output}}
+              hello: {{.last_result.Output}}
         do:
           - echo tom
-          - echo "{{.last_task_result.Output}}"
+          - echo "{{.last_result.Output}}"
           - echo hanks
           - echo "{{.greet}}"
 

@@ -1,7 +1,20 @@
-goal:
-  - to show that you can use empty do list
-  - introduce a new funcname cmd to do var/dvar conversion
-  - in cmd, you can also do reg/dereg var in dvar evaluation
+doc_meta: |
+  folder: design-patterns
+  title: workflow skeleton
+  head: |
+    When you are developing your workflow and try to achieve it step by step, you do not need to put the detailed and trivals programming code precisely in one go. You could lay the basic building blocks by puting main task, the callee(dependant) tasks for implementation there. You don't have to put detailed step and concrete implmentation, as shown in this demo, you can leave the do element empty.
+
+    In fact, for certain steps, their jobs are probably just to do data transformation
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to show that you can use empty do list
+    - introduce a new funcname cmd to do var/dvar conversion
+    - in cmd, you can also do reg/dereg var in dvar evaluation
 
 tasks:
 

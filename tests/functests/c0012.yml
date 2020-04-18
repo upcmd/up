@@ -1,42 +1,24 @@
 doc_meta: |
   folder: vars
-  weight: 32
-  title: vars in func
+  title: Use variables
   head: |
-    The vars definition block in a func(shell in this case) make the vars' scope to be local scope to the func, the var defined in the local scope is only available in all the execution steps in that func
+    You can define variables in your UP global context, which means the vars element is a root element of the yml file
 
-    It is similar to func or method in most of programming languages, the vars defined in local scope in func are only avaiable in local scope   callee task is reprented using a var name make it dynamic in execution time
+    In your func implementation(it is a shell in this case), you can reference this var using golang template syntax
 
   sections:
     - title: Demo
       log: yes
 
-    - title: What to observe
-      content: |
-        do check the verbosed log in vvv level, you will see that studentname exist only in local var scope, which are the final exec vars
-        ```
-        -------runtime global final merged with dvars-------
+    - title: How it works?
+      content: hello {{.a}} will print out the actual value 'runtime-a'
 
-        {
-          "a": "runtime-a",
-          "e": "runtime-e",
-          "k": "runtime-k"
-        }
-
-        overall final exec vars:
-
-          (*core.Cache)({
-        "a": "runtime-a",
-        "e": "runtime-e",
-        "k": "runtime-k",
-        "studentname": "Tom"
-        })
-
-        ```
+    - title: Prerequisites
+      content: Understanding of basics usage of golang template
 
 notes:
   goal:
-    - to test vars without scope will still work
+    - to test empty vars in func will pass
 
 vars:
   a: runtime-a
@@ -51,8 +33,6 @@ tasks:
       -
         func: shell
         desc: to test display env vars from shell context
-        vars:
-          studentname: Tom
         do:
           - echo "hello, world"
-
+          - echo 'hello {{.a}}'

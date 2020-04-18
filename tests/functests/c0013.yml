@@ -1,30 +1,74 @@
 doc_meta: |
   folder: vars
-  weight: 30
-  title: Use variables
+  title: vars in func
   head: |
-    You can define variables in your UP global context, which means the vars element is a root element of the yml file
+    The vars definition block in a func(shell in this case) make the vars' scope to be local scope to the func, the var defined in the local scope is only available in all the execution steps in that func
 
-    In your func implementation(it is a shell in this case), you can reference this var using golang template syntax
+    It is similar to func or method in most of programming languages, the vars defined in local scope in func are only avaiable in local scope   callee task is reprented using a var name make it dynamic in execution time
 
   sections:
+    - title: Glabal vars
+      content: |
+        The global vasrs are the one defined externally to the tasks definition, eg:
+        ```
+        vars:
+          a: runtime-a
+          e: runtime-e
+          k: runtime-k
+          studentname: Jason
+        ```
+
+    - title: Local vars
+      content: |
+        The local vasrs are the one defined within the func definition, eg:
+        ```
+        vars:
+          studentname: Tom
+          school: SG
+        ```
+
+    - title: Auto merge
+      content: |
+        During the runtime of step1, it will merge the vars with the same name, the local vars take priority. In this demo, the var studentname will be Tom instead of Jason
+
+
     - title: Demo
       log: yes
 
-    - title: How it works?
-      content: hello {{.a}} will print out the actual value 'runtime-a'
+    - title: What to observe in log file
+      content: |
+        do check the verbosed log in vvv level, you will see that studentname exist only in local var scope, which are the final exec vars
+        ```
+        -------runtime global final merged with dvars-------
 
-    - title: Prerequisites
-      content: Understanding of basics usage of golang template
+        {
+          "k": "runtime-k",
+          "studentname": "Jason",
+          "a": "runtime-a",
+          "e": "runtime-e"
+        }
+
+        overall final exec vars:
+
+        {
+          "a": "runtime-a",
+          "e": "runtime-e",
+          "school": "SG",
+          "k": "runtime-k",
+          "studentname": "Tom"
+        }
+
+        ```
 
 notes:
   goal:
-    - to test empty vars in func will pass
+    - to test vars without scope will still work
 
 vars:
   a: runtime-a
   e: runtime-e
   k: runtime-k
+  studentname: Jason
 
 tasks:
 
@@ -33,7 +77,11 @@ tasks:
     task:
       -
         func: shell
+        name: step1
         desc: to test display env vars from shell context
+        vars:
+          studentname: Tom
+          school: SG
         do:
           - echo "hello, world"
-          - echo 'hello {{.a}}'
+          - echo "hello {{.studentname}}"

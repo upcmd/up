@@ -1,15 +1,44 @@
-goal:
-  - show an example to deal with secure var and how to encrypt and decrypt
+doc_meta: |
+  folder: security
+  title: builtin en/decryption
+  head: |
+    UP cmd cli has got builtin security solution by making use of the template func
 
-design:
-  - in real case, you can use bank_password_encrypted to get the encrypted value
-  - |
-    save the encrypted value as a password dvar,
-    eg 'bank_password' and this could be safely
-    commited into code repo
-  - use secure/type field to describe the encrypt/decrypt type
-  - use secure/key to link to a varname containing value of the encryption key
-  - optionall you can you secure/keyref to point to key file
+    This demos a very generic solution how to deal with a bank application deployment when it comes to prod and nonprod envs.
+
+    Note that you could split this process up to a few distributed parts:
+      * A reference file to store encryption key, using keyref
+      * You could dynamically manage pointing to nonprod/prod key during deployment time for decryption
+      * You could automate the step to encrypt the password and use the encryption value in dvar, or
+      * You could externalize the dvar values to a file and then encrypt the whole dvar file, dynamically decrypt it during runtime
+
+    The solution is flexible and you are not bound to third party tool, binary for your implementation and it is seamlessly integrated with your own workflow
+
+  sections:
+    - title: Notes
+      content: |
+        * in real case, you can use bank_password_encrypted to get the encrypted value
+        * save the encrypted value as a password dvar, eg 'bank_password' and this could be safely commited into code repo
+        * use secure/type field to describe the encrypt/decrypt type
+        * use secure/key to link to a varname containing value of the encryption key
+        * optionall you can you secure/keyref to point to key file
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - show an example to deal with secure var and how to encrypt and decrypt
+
+  design:
+    - in real case, you can use bank_password_encrypted to get the encrypted value
+    - |
+      save the encrypted value as a password dvar,
+      eg 'bank_password' and this could be safely
+      commited into code repo
+    - use secure/type field to describe the encrypt/decrypt type
+    - use secure/key to link to a varname containing value of the encryption key
+    - optionall you can you secure/keyref to point to key file
 
 vars:
   bank_acct: 1234-5678
@@ -30,7 +59,6 @@ scopes:
       #you can dynamically get it from ENV Var
       #or you can use secure api call to a backend
       enc_key: my_prod_enc_key
-
 
 dvars:
   - name: bank_password_encrypted

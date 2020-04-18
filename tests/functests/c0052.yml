@@ -1,10 +1,20 @@
-goal:
-  - workflow status management
-  - configurable to stop on fail
-  - configurable to ignore and continue
+doc_meta: |
+  folder: shell-func
+  title: ignore error
+  head: |
+    Showcase you can use ignore_error flag to ignore the failed step and continue
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - workflow status management
+    - configurable to stop on fail
+    - configurable to ignore and continue
 
 tasks:
-
   -
     name: task
     task:

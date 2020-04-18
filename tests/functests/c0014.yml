@@ -1,33 +1,57 @@
-goal:
-  - to test vars applicable in call exec time
-  - the caller task's vars should override the local vars in the ref task(callee)
-  - tested with only one embeded call but not recursive call
-  - callee-task exec vars: |
-      {
-        "a": "callee-a",
-        "e": "runtime-e",
-        "b": "callee-b",
-        "c": "callee-c",
-        "k": "runtime-k"
-      }
+doc_meta: |
+  folder: vars
+  title: variables in callee
+  head: |
+    A task is a implmentation of certain job, it uses a list of defined vars for its implmentation
 
-  - caller-task exec vars: |
-      (*cache.Cache)({
-      "k": "runtime-k",
-      "a": "caller-ref-a",
-      "e": "runtime-e",
-      "b": "caller-ref-b"
-      })
+    A caller step invoke(call) a callee task is exactly comparable to a function/method call in many programming languages, caller pass in the vars from within its own vars scope and overrides the local vars defined in callee task
 
-  - result expected: |
-      caller vars will override callee's
-      (*cache.Cache)({
-      "b": "caller-ref-b",
-      "c": "callee-c",
-      "k": "runtime-k",
-      "a": "caller-ref-a",
-      "e": "runtime-e"
-      })
+  sections:
+    - title: But why it overrides?
+      content: |
+        It is a design pattern to separate the intention and implementation, so actually the call func will serve like a interface just like it is in programming languages
+
+    - title: Demo
+      log: yes
+
+    - title: What are to observe?
+      content: |
+        ```
+        - callee-task exec vars: |
+            {
+              "a": "callee-a",
+              "e": "runtime-e",
+              "b": "callee-b",
+              "c": "callee-c",
+              "k": "runtime-k"
+            }
+
+        - caller-task exec vars: |
+            (*cache.Cache)({
+            "k": "runtime-k",
+            "a": "caller-ref-a",
+            "e": "runtime-e",
+            "b": "caller-ref-b"
+            })
+
+        - result expected: |
+            caller vars will override callee's
+            (*cache.Cache)({
+            "b": "caller-ref-b",
+            "c": "callee-c",
+            "k": "runtime-k",
+            "a": "caller-ref-a",
+            "e": "runtime-e"
+            })
+
+        ```
+
+
+notes:
+  goal:
+    - to test vars applicable in call exec time
+    - the caller task's vars should override the local vars in the ref task(callee)
+    - tested with only one embeded call but not recursive call
 
 vars:
   a: runtime-a
@@ -47,6 +71,15 @@ tasks:
           c: callee-c
         do:
           - echo "exec ref-task"
+          - |
+            echo """
+            vars:
+            a: {{.a}}
+            b: {{.b}}
+            c: {{.c}}
+            e: {{.e}}
+            k: {{.k}}
+            """
 
   -
     name: task
@@ -59,4 +92,3 @@ tasks:
           b: caller-ref-b
         do:
           - callee_task
-

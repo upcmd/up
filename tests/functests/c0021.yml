@@ -1,5 +1,18 @@
-goal:
-  - to show using template
+doc_meta: |
+  folder: vars
+  title: use golang template
+  head: |
+    Demo to show using template
+
+    Please note that you can not reference to a sub element if it is in string literal, such as example of .info.school
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to show using template
 
 tasks:
 
@@ -21,10 +34,10 @@ tasks:
             student's gender: {{.gender}}
              school's name: {{.school}}"""
           - |
-            {{$info := .}}
-            echo """my student: {{$info.student}}
-            student's gender: {{$info.gender}}
-             school's name: {{$info.school}}"""
+            {{$details := .}}
+            echo """my student: {{$details.student}}
+            student's gender: {{$details.gender}}
+             school's name: {{$details.school}}"""
           - |
             {{$a := .student}}
             {{$b := .gender}}
@@ -32,3 +45,9 @@ tasks:
             echo """my student: {{$a}}
             student's gender: {{$b}}
              school's name: {{$c}}"""
+          - |
+            echo """my school: {{.info.school}}"""
+          - |
+            echo """my student: {{.info}}"""
+        flags:
+          - ignore_error

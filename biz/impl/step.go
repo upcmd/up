@@ -37,36 +37,47 @@ type Step struct {
 type Steps []Step
 
 /*
-merge localvars to above RuntimeVarsAndDvarsMerged to get final runtime exec vars
-the localvars is the vars in the step
-merge taskvars before final merge of localvars
+ExecbaseVars is the the scope containing passed in caller vars
+local vars will be merged depending if it is a callee task
+merge taskvars before final merge as task vars will be the calculated result of current stack
 */
 func (step *Step) getRuntimeExecVars(mark string) *core.Cache {
 	var execvars core.Cache
+	var resultVars *core.Cache
 
 	execvars = deepcopy.Copy(*core.TaskRuntime().ExecbaseVars).(core.Cache)
 
+	//u.Ptmpdebug("11", execvars)
 	taskVars := core.TaskRuntime().TaskVars
 	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
+	//u.Ptmpdebug("33", execvars)
+	//u.Ptmpdebug("44", step.Vars)
 
-	if step.Vars != nil {
-		mergo.Merge(&execvars, step.Vars, mergo.WithOverride)
-
-		u.Pfvvvv("current exec runtime[%s] vars:", mark)
-		u.Ppmsgvvvv(execvars)
-		u.Dvvvvv(execvars)
+	if IsCalled() {
+		//u.Ptmpdebug("if", "if")
+		if step.Vars != nil {
+			mergo.Merge(&step.Vars, &execvars, mergo.WithOverride)
+			resultVars = &step.Vars
+		} else {
+			resultVars = &execvars
+		}
+	} else {
+		//u.Ptmpdebug("else", "else")
+		mergo.Merge(&execvars, &step.Vars, mergo.WithOverride)
+		resultVars = &execvars
 	}
+
+	u.Pfvvvv("current exec runtime[%s] vars:", mark)
+	u.Ppmsgvvvv(resultVars)
+	//u.Ptmpdebug("55", resultVars)
 
 	//so far the execvars includes: scope vars + scope dvars + global runtime vars + task vars
-	localVarsMergedWithDvars := core.VarsMergedWithDvars("local", &step.Vars, &step.Dvars, &execvars)
+	resultVars = core.VarsMergedWithDvars("local", resultVars, &step.Dvars, resultVars)
 
-	//so far the localVarsMergedWithDvars includes: the local vars + dvars rendered using execvars
-	if localVarsMergedWithDvars.Len() > 0 {
-		mergo.Merge(&execvars, localVarsMergedWithDvars, mergo.WithOverride)
-	}
-
-	u.Ppmsgvvvhint("overall final exec vars:", execvars)
-	return &execvars
+	//so far the resultVars includes: the local vars + dvars rendered using execvars
+	u.Ppmsgvvvhint("overall final exec vars:", resultVars)
+	//u.Ptmpdebug("99", resultVars)
+	return resultVars
 }
 
 type LoopItem struct {
@@ -108,6 +119,11 @@ func (step *Step) Exec() {
 	stepExecVars = step.getRuntimeExecVars("get plain exec vars")
 
 	validation(stepExecVars)
+
+	if step.Flags != nil && u.Contains(step.Flags, "pause") {
+		pause(stepExecVars)
+	}
+
 	routeFuncType := func(loopItem *LoopItem) {
 		if loopItem != nil {
 			stepExecVars.Put("loopitem", loopItem.Item)
@@ -300,7 +316,7 @@ func (steps *Steps) Exec() {
 					core.TaskRuntime().ExecbaseVars.Put(u.Spf("%s", step.Reg), result.Output)
 				} else {
 					if step.Func == FUNC_SHELL {
-						core.TaskRuntime().ExecbaseVars.Put("last_task_result", result)
+						core.TaskRuntime().ExecbaseVars.Put("last_result", result)
 					}
 				}
 			}
@@ -317,9 +333,6 @@ func (steps *Steps) Exec() {
 						u.InvalidAndExit("Failed And Not Ignored!", "You may want to continue and ignore the error")
 					}
 				}
-				if u.Contains(step.Flags, "pause") {
-					pause(&step.Vars)
-				}
 
 			}()
 
@@ -327,6 +340,7 @@ func (steps *Steps) Exec() {
 		}
 
 		if !core.TaskBreak {
+
 			execStep()
 		} else {
 			core.TaskBreak = false

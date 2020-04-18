@@ -1,9 +1,24 @@
-goal:
-  - to test out dvars object can merge in leaf level
+doc_meta: |
+  folder: dvars
+  title: leave level merge
+  head: |
+    Demo dvars leave level merge in scope
 
-expected:
-  - school object in nonprod could append new element and
-  - also override same name element
+  sections:
+
+    - title: d0030_school.yml reference
+      filelookup: d0030_school.yml
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to test out dvars object can merge in leaf level
+
+  expected:
+    - school object in nonprod could append new element and
+    - also override same name element
 
 scopes:
   -

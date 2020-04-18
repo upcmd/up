@@ -1,6 +1,54 @@
-goal:
-  - to test out vars reference in yml file
-  - refdir in scope itme can not be dynamic value as the scope is very fundamental
+doc_meta: |
+  folder: scope
+  title: externalize settings
+  head: |
+    This demos how to externalize the lengthy vars configuration to a reference file, load it during the runtime
+
+  sections:
+    - title: Why
+      content: |
+        It is ok to just put the a few vars configuration entries together in paralelle with tasks in one yml file. With project growing, we offten need to make the code tidy, clean and modulized. In our case, it refers to yml configurations. It will significantlly reduce the line of codes before you could have a quick glimpse of skeleton of the tasks
+
+        In this demo, we show that the global vars all go to the referece yml file in refdir. The refdir could be a global configurable settting apply to all
+
+    - title: Application
+      content: |
+        You could configure the group relationship in scope element and offload the details to separate files
+
+        For example: You could use follow directory structure to manage your vars:
+
+        ```
+        scope:\
+            global.yml          -> store all global vars
+            prod:\              -> prod group
+              dr:\
+                dr.yml
+              prod:\
+                prod.yml
+                db.yml
+            nonprod:\           -> nonprod group
+              dev:\
+                dev.yml         -> dev settings
+              st:\
+                st.yml
+              staging:\
+                staging.yml
+              db.yml            -> common db setttings for all nonprod group
+          ```
+
+    - title: d0009-global.yml reference
+      filelookup: d0009-global.yml
+
+    - title: d0009-dev.yml reference
+      filelookup: d0009-dev.yml
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to test out vars reference in yml file
+    - refdir in scope itme can not be dynamic value as the scope is very fundamental
 
 scopes:
   -

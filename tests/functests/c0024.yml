@@ -1,5 +1,16 @@
-goal:
-  - to show complex object using dynamic var
+doc_meta: |
+  folder: dvars
+  title: complext object
+  head: |
+    Showcase a dvar's value could reference to a object's sub element
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to show complex object using dynamic var
 
 vars:
   student:

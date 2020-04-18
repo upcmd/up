@@ -1,3 +1,18 @@
+doc_meta: |
+  folder: flow-controll
+  title: if condition
+  head: |
+    Showcase using if condition
+
+  sections:
+    - title: Supported true/false values
+      content: |
+        * true: ["1", "t", "T", "TRUE", "true", "True"]
+        * false: ["0", "f", "F", "FALSE", "false", "False"]
+
+    - title: Demo
+      log: yes
+
 goal:
   - add condition support
 
@@ -49,14 +64,14 @@ tasks:
       - func: shell
         dvars:
           - name: last_task_succeeded
-            value: "{{eq .last_task_result.Code 0}}"
+            value: "{{eq .last_result.Code 0}}"
             flags: [vvvv]
         do:
           - echo "check last step"
-          - echo "{{.last_task_result|toJson}}"
-          - echo "{{.last_task_result|toPrettyJson}}"
-          - echo "{{eq .last_task_result.Code 0}}"
-        if: "{{eq .last_task_result.Code 0}}"
+          - echo "{{.last_result|toJson}}"
+          - echo "{{.last_result|toPrettyJson}}"
+          - echo "{{eq .last_result.Code 0}}"
+        if: "{{eq .last_result.Code 0}}"
 
       - func: shell
         flags:
@@ -68,9 +83,9 @@ tasks:
       - func: shell
         do:
           - echo "check last step"
-          - echo "{{.last_task_result|toJson}}"
-          - echo "{{.last_task_result|toPrettyJson}}"
-        if: "{{eq .last_task_result.Code 0}}"
+          - echo "{{.last_result|toJson}}"
+          - echo "{{.last_result|toPrettyJson}}"
+        if: "{{eq .last_result.Code 0}}"
 
       - func: shell
         vars:

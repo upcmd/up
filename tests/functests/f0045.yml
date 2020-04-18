@@ -1,10 +1,23 @@
+doc_meta: |
+  folder: env-vars
+  title: client validation
+  head: |
+    This showcases:
+      * Fail fast if a env var is not in the current shell session
 
-goal:
-  - show that if required ENV var is empty and it will fail if this is empty
+    It is always better to provide this type of validation so that it fail fast to ensure all the initial required data are gathered.
 
-storys:
-  - the env vars:
-      student_name: if it can not find it, it fails fast and execution stops
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - show that if required ENV var is empty and it will fail if this is empty
+
+  storys:
+    - the env vars:
+        student_name: if it can not find it, it fails fast and execution stops
 
 scopes:
 

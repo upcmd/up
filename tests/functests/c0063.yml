@@ -1,5 +1,34 @@
-goal:
-  - add pause
+doc_meta: |
+  folder: flow-controll
+  title: use pause
+  head: |
+    Showcase you can use pause during the execution of the task steps
+
+  sections:
+    - title: Pause and inspect for debugging
+      content: |
+        It is good that we can have an option to pause the workflow and inspect the runtime values to understand what is not working. You will be prompted with option to continue, to quit or inspect the runtime vars
+
+        Note that pause support generic step rather than just shell func, it works for cmd func too in this demo
+
+        ```
+        Enter Value For pause action to continue:
+
+        enter: continue
+            q: quit
+            i: inspect
+        ```
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - add pause
+    - add pause support to generic step rather than just shell func
+
+vars:
+  a: global-var-a
 
 tasks:
 
@@ -7,10 +36,21 @@ tasks:
     name: task
     task:
       - func: shell
+        vars:
+          b: runtime-var-b
         do:
-          - echo "hello 1"
+          - echo "hello"
+          - echo "hello {{.a}}"
+        flags: [pause]
+
+      - func: cmd
+        vars:
+          b: runtime-var-b
+        do:
+          - name: print
+            cmd: "hello {{.a}}"
         flags: [pause]
 
       - func: shell
         do:
-          - echo "hello2"
+          - echo "next step"

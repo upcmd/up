@@ -1,8 +1,23 @@
-goal:
-  - demo how to reference to a non exist element
-  - or how to evaluate an element
-  - add support if the element does not exist, then if condition should be false by default
-  - use query cmd to query within yml string, then use the registered var in if evaluation
+doc_meta: |
+  folder: flow-controll
+  title: indirect reference
+  head: |
+    Showcase using if condition in the case of non-exist value, you will probably need to use query cmd to query element from yml string then use if condition in the next step
+
+  sections:
+    - title: Note
+      content: |
+        For this case, if you need to reference to a dynamic value from a yml doc rather than var object, you can use query and register it, then refernce to that registered var value for if condition
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - demo how to reference to a non exist element
+    - or how to evaluate an element
+    - add support if the element does not exist, then if condition should be false by default
+    - use query cmd to query within yml string, then use the registered var in if evaluation
 
 vars:
   student:

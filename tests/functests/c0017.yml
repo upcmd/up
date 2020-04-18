@@ -1,5 +1,24 @@
-goal:
-  - to test multiple call func task executions should pass
+doc_meta: |
+  folder: call-func
+  title: assemble worlflow
+  head: |
+    You can use call func to assemble a sequential workflow
+
+    This demo shows that you can adjust the seqence of the callee tasks
+
+    The result of concret implementation of callee_task1/2 will be different depending on the input vars from the caller
+
+  sections:
+    - title: Note
+      content: |
+        Please take a look of the log to see what are the contextual vars in runtime are
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to test multiple call func task executions should pass
 
 vars:
   a: runtime-a
@@ -7,6 +26,7 @@ vars:
   k: runtime-k
 
 tasks:
+
   -
     name: callee_task1
     task:
@@ -18,6 +38,15 @@ tasks:
           c: callee-c
         do:
           - echo "exec ref-task1"
+          - |
+            echo """
+            vars:
+            a: {{.a}}
+            b: {{.b}}
+            c: {{.c}}
+            e: {{.e}}
+            k: {{.k}}
+            """
 
   -
     name: task
@@ -54,3 +83,12 @@ tasks:
           c: callee-c
         do:
           - echo "exec ref-task2"
+          - |
+            echo """
+            vars:
+            a: {{.a}}
+            b: {{.b}}
+            c: {{.c}}
+            e: {{.e}}
+            k: {{.k}}
+            """

@@ -1,19 +1,32 @@
-goal:
-  - to show complex object using dynamic var
+doc_meta: |
+  folder: dvars
+  title: convert dvar
+  head: |
+    A dvar value is normally a string, which could be a formated yml content, then be converted to an object. This demo shows that you can use a flag: to_object to notate this dvar will be transformed to an object and registered to global runtime
 
-design:
-  - to make it simple, the dvar value is always a string
-  - |
-    the string could be a formated yaml, so that you can
-    convert it to yaml then a object
-  - register the object into that scope's vars list
-  - consider a modified name of -> a_smart_guy_object to reference to
+  sections:
+    - title: Rules
+      content: |
+        * you can reference to plain dvar with the string|untemplated value
+        * you can reference to hiera structure of a object once it is converted
+        * the new name of the dvar object will be: dvar_object
 
-expect:
-  - you can reference to plain dvar with the string|untemplated value
-  - you can reference to hiera structure of a object in static vars
-  - you can reference to a dynamic converted dvar with new name -> a_smart_guy_object
-  - fail if expand > 1 and to_object both exist
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to show complex object using dynamic var
+
+  design:
+    - register the object into that scope's vars list
+    - consider a modified name of -> a_smart_guy_object to reference to
+
+  expect:
+    - you can reference to plain dvar with the string|untemplated value
+    - you can reference to hiera structure of a object in static vars
+    - you can reference to a dynamic converted dvar with new name -> a_smart_guy_object
+    - fail if expand > 1 and to_object both exist
 
 vars:
   student:
@@ -59,3 +72,8 @@ tasks:
           - echo """this guy is in =>{{.a_smart_guy_object.school}} school"""
           - echo """school address object {{.school_address_object.suburb.name}}"""
           - echo """school address object -> {{.school_address_object.address.suburb.name}}"""
+
+      -
+        func: shell
+        do:
+          - echo hello

@@ -75,10 +75,28 @@ enter: continue
 	case "q\n":
 		u.GraceExit("puase action", "client choose to stop continuing the execution")
 	case "i\n":
-		u.Ppfmsg("exec vars:", *execvars)
+		u.Ppfmsg("runtime exec vars:", *execvars)
 		pause(execvars)
 	default:
 		//continue
 	}
+}
+
+func IsCalled() (called bool) {
+	if core.TaskStack.GetLen() > 1 {
+		called = true
+	} else {
+		called = false
+	}
+	return
+}
+
+func IsAtRootTaskLevel() (called bool) {
+	if core.TaskStack.GetLen() == 0 {
+		called = true
+	} else {
+		called = false
+	}
+	return
 }
 

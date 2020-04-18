@@ -1,6 +1,18 @@
+doc_meta: |
+  folder: env-vars
+  title: declare env var
+  head: |
+    This showcases:
+      * Use dvar to manage an environment variable in that shell func session
+      * Use flag to notate the named dvar will be a env var
 
-goal:
-  - test the shell env vars context and manage env vars in each session
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - test the shell env vars context and manage env vars in each session
 
 tasks:
 

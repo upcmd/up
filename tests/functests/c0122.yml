@@ -1,7 +1,22 @@
-goal:
-  - demo how to reference to a non exist element
-  - or how to evaluate an element
-  - add support if the element does not exist, then if condition should be false by default
+doc_meta: |
+  folder: flow-controll
+  title: non-exist value if
+  head: |
+    Showcase using if condition in the case of non-exist value
+
+  sections:
+    - title: Supported true/false values
+      content: |
+        If a reference to a variable or sub elment does not exist, it will be false by default
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - demo how to reference to a non exist element
+    - or how to evaluate an element
+    - add support if the element does not exist, then if condition should be false by default
 
 vars:
   student:

@@ -1,7 +1,20 @@
-goal:
-  - to show dynamic vars usage
-  - you can use plain value in dvar, nothing preventing you doing so
-  - remember dvar value normally already evaluated so be careful with expand level
+doc_meta: |
+  folder: dvars
+  title: dynamics on dynamics
+  head: |
+    Showcase you can use multiple expansions to dynamically render a dvar
+
+    Please note you can use plain raw value for dvar value, however it is better to manage the string constant as a configuration entry as a var item
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to show dynamic vars usage
+    - you can use plain value in dvar, nothing preventing you doing so
+    - remember dvar value normally already evaluated so be careful with expand level
 
 vars:
   school: Sydney Grammar
@@ -46,7 +59,6 @@ dvars:
     desc: |
       you can't expect to use expand level 2 to get value z, as there is no need
       to do so because y should be already rendered
-
 
 tasks:
 

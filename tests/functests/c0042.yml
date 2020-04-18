@@ -1,5 +1,24 @@
-goal:
-  - add feature to use .last_task_result to have a quick shortcut access to last task result
+doc_meta: |
+  folder: template
+  title: reg/dereg/void
+  head: |
+    You can use template func reg to register a value to global runtime or dereg to remove it from runtime
+
+  sections:
+    - title: Important note
+      content: |
+        Please note that the reg will register the value into global runtime, however this value will be only availble in the next func call
+
+        Actually if you use a dvar value to register a value, the dvar actually does not do its core job to render value, so to make your runtime vars list clean, it better to use void as the dvar name, it will not create a new var and put into global runtime
+
+        You can always use void as the name of a dvar, so that the dvar is used more like action method to do things rather than rendering value
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - add feature to use .last_result to have a quick shortcut access to last task result
 
 tasks:
 
@@ -23,7 +42,7 @@ tasks:
         dvars:
           - name: reg_hello
             value: |
-              hello: {{.last_task_result.Output |reg "hellomsg" }}
+              hello: {{.last_result.Output |reg "hellomsg" }}
         do:
           - echo "{{.hellomsg}}"
 
@@ -45,3 +64,21 @@ tasks:
           now the hellomsg should be <no value>
         do:
           - echo "{{.hellomsg}}"
+
+      -
+        func: shell
+        dvars:
+          - name: void
+            desc: |
+              now this var name will not be shown in local automatically
+              or in global if you register it as it the reg template func
+              is more like a action and return sensible value
+            value: 'hello: {{ print "something" |reg "iamvoid" }}'
+            flags: [vvv]
+        do:
+          - echo '{{.iamvoid}}'
+
+      -
+        func: shell
+        do:
+          - echo '{{.iamvoid}}'

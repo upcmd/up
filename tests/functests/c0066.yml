@@ -1,3 +1,5 @@
+TODO:
+
 goal:
   - out parameter saves the cmd result to local func scope only, it is just like local var
   - reg will automatically register it to global vars map

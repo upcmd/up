@@ -1,5 +1,20 @@
-goal:
-  - add cmd support for cmd func
+doc_meta: |
+  folder: cmd-func
+  title: print message
+  head: |
+    cmd func is a core func to wrap up some actions, for example, query yml string/object, register/deregister a var, exit the task, template etc. It focus on core functionalities implementation provided by UP cmd cli internals
+
+  sections:
+    - title: print cmd
+      content: |
+        The print cmd simply print out the message, either it is a raw message, or a templated message referencing to vars. This is normally used for tracing and debugging
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - add cmd support for cmd func
 
 vars:
   student:
@@ -26,9 +41,12 @@ tasks:
             name: print
             cmd: "hello, {{.student.school}}"
 
-          -
-            cmd: "hello, {{.student.school}}"
+          - name: print
+            cmd:  |
+              hello, {{.student.school}}
+              hello, {{.student.school}}
 
+  -
       - func: shell
         do:
-          - echo "hello2"
+          - echo "hello 2"

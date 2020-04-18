@@ -1,3 +1,22 @@
+doc_meta: |
+  folder: organization
+  title: ref task
+  head: |
+    Showcase how to make the UP cmd cli configuration tidy, clean and more organized
+
+  sections:
+    - title: Externalize the task definition
+      filelookup: c0059-task-ref.yml
+
+    - title: flow element
+      content: |
+        Introduce the flow element to notate a task reference
+
+        With ref element in main tasks file, this will make the entry point much cleaner and the main skeleton design stand out
+
+    - title: Demo
+      log: yes
+
 goal:
   - introduce steps ref to externalise steps to yaml file
 

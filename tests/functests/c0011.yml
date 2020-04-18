@@ -1,39 +1,50 @@
-goal:
-  - test runtime vars could be merged properly
-  - test local vars could be merged properly
+doc_meta: |
+  folder: scope
+  title: runtime merge
+  head: |
+    Demo the runtime global vars and local vars in func can be merged too
 
-testresult: |
+  sections:
+    - title: Demo
+      log: yes
 
-  current exec runtime vars:
+notes:
+  goal:
+    - test runtime vars could be merged properly
+    - test local vars could be merged properly
 
-    {
-      "a": "runtime-a",
-      "b": "non-prod-b",
-      "c": "dev-c",
-      "e": "local-e",
-      "k": "runtime-k",
-      "m": "local-m",
-      "d": "global-d"
-    }
+  testresult: |
 
-    executing shell commands
-  cmd( 1):
-    echo "test out the var scopes only"
-    test out the var scopes only
+    current exec runtime vars:
 
-  exec result:
-    code:0
-  error:
-    1001
-    (*cache.Cache)(0xc0000101f8)({
-  "a": "runtime-a",
-  "b": "non-prod-b",
-  "c": "dev-c",
-  "e": "local-e",
-  "k": "runtime-k",
-  "m": "local-m",
-  "d": "global-d"
-  })
+      {
+        "a": "runtime-a",
+        "b": "non-prod-b",
+        "c": "dev-c",
+        "e": "local-e",
+        "k": "runtime-k",
+        "m": "local-m",
+        "d": "global-d"
+      }
+
+      executing shell commands
+    cmd( 1):
+      echo "test out the var scopes only"
+      test out the var scopes only
+
+    exec result:
+      code:0
+    error:
+      1001
+      (*cache.Cache)(0xc0000101f8)({
+    "a": "runtime-a",
+    "b": "non-prod-b",
+    "c": "dev-c",
+    "e": "local-e",
+    "k": "runtime-k",
+    "m": "local-m",
+    "d": "global-d"
+    })
 
 scopes:
   -

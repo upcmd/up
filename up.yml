@@ -72,11 +72,30 @@ tasks:
             cmd: 'log will be generated at: {{.hugo_doc_log_dir}}'
 
       -
+        func: shell
+        do:
+          - 'echo {{.hugo_doc_log_dir}}'
+          - 'rm -rf {{.hugo_doc_log_dir}}'
+          - 'mkdir -p {{.hugo_doc_log_dir}}'
+
+      -
         func: call
         vars:
           upcmd: ./build/mac/up
         do:
-          - log_gen_impl
+          - release_local
+          - log_gen_main
+
+  -
+    name: log_gen_main
+    desc: main entry to process different type of cases
+    task:
+      -
+        func: call
+        do: log_gen_impl
+        loop:
+          - c????
+          - f????
 
   -
     name: log_gen_impl
@@ -86,19 +105,21 @@ tasks:
         func: shell
         name: getcases
         do:
-          - cd ./tests/functests; ls c????.yml
+          - cd ./tests/functests; ls {{.loopitem}}.yml
         reg: cases
 
       -
-        func: shell
+        func: cmd
         dvars:
           - name: void
             value: '{{ print .cases | splitLines |reg "caselist"}}'
             flags: [vvv]
+
+      -
+        func: cmd
         do:
-          - 'echo {{.hugo_doc_log_dir}}'
-          - 'rm -rf {{.hugo_doc_log_dir}}'
-          - 'mkdir -p {{.hugo_doc_log_dir}}'
+          - name: print
+            cmd: 'caselist {{.caselist}}'
 
       -
         func: call
@@ -133,6 +154,8 @@ tasks:
           - vvvvv
           - vvvvvv
           - vvvvvvv
+        flags:
+          - ignore_error
 
   -
     name: testf
@@ -241,5 +264,5 @@ tasks:
       -
         func: shell
         do:
-          - 'docker load --input="{{.last_task_result.Output}}"'
+          - 'docker load --input="{{.last_result.Output}}"'
           - docker images |grep cmgolang

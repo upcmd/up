@@ -234,13 +234,12 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 					TaskVars: core.NewCache(),
 				}
 
-				taskLayerCnt := core.TaskStack.GetLen()
-				if taskLayerCnt > 0 {
-					rtContext.ExecbaseVars = callerVars
-					rtContext.TasknameLayered = u.Spf("%s/%s", core.TaskRuntime().TasknameLayered, taskname)
-				} else {
+				if IsAtRootTaskLevel() {
 					rtContext.ExecbaseVars = core.RuntimeVarsAndDvarsMerged
 					rtContext.TasknameLayered = taskname
+				} else {
+					rtContext.ExecbaseVars = callerVars
+					rtContext.TasknameLayered = u.Spf("%s/%s", core.TaskRuntime().TasknameLayered, taskname)
 				}
 
 				core.TaskStack.Push(&rtContext)

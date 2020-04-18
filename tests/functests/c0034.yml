@@ -1,39 +1,59 @@
-goal:
-  - dvars expand in call level
-  - dvars object can merge in leaf level
-  - dvar in call task will override same name dvar in local level
 
-expected:
-  - school object in nonprod could append new element and
-  - also override same name element
+TODO:
+  - not clear if dvar in calleed should be overriden as well??
+  - need a review on this later on
 
-result_log: |
-  cmd( 1):
-    echo """1.school -> {{.school}}"""
-  1.school -> address:
-    state: NSW
-    city: sydney
-    suburb:
-      name: sydney
-      postcode: 2000
-      CBD: LOCAL
-    school: Sydney Grammar
-  principal: Mr Right
-  cmd( 2):
-    echo """2.school object CBD -> {{.school_object.address.suburb.CBD}}"""
-    2.school object CBD -> LOCAL
-  cmd( 3):
-    echo """3.school object-> {{.school_object.address.school}}"""
-    3.school object-> Sydney Grammar
-  cmd( 4):
-    echo """4.school object-> {{.school_object.principal}}"""
-    4.school object-> Mr Right
-  cmd( 5):
-    echo """5.a {{.a}}"""
-    5.a local-a
-  cmd( 6):
-    echo """6.b {{.b}}"""
-    6.b local-b
+doc_meta: |
+  folder: dvars
+  title: dvars in call
+  head: |
+    Demo dvars merge in local scope in execution time
+
+  sections:
+    - title: Note
+      content: |
+        * school object in callee
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - dvars expand in call level
+    - dvars object can merge in leaf level
+    - dvar in call task will override same name dvar in local level
+
+  expected:
+    - school object in nonprod could append new element and
+    - also override same name element
+
+  result_log: |
+    cmd( 1):
+      echo """1.school -> {{.school}}"""
+    1.school -> address:
+      state: NSW
+      city: sydney
+      suburb:
+        name: sydney
+        postcode: 2000
+        CBD: LOCAL
+      school: Sydney Grammar
+    principal: Mr Right
+    cmd( 2):
+      echo """2.school object CBD -> {{.school_object.address.suburb.CBD}}"""
+      2.school object CBD -> LOCAL
+    cmd( 3):
+      echo """3.school object-> {{.school_object.address.school}}"""
+      3.school object-> Sydney Grammar
+    cmd( 4):
+      echo """4.school object-> {{.school_object.principal}}"""
+      4.school object-> Mr Right
+    cmd( 5):
+      echo """5.a {{.a}}"""
+      5.a local-a
+    cmd( 6):
+      echo """6.b {{.b}}"""
+      6.b local-b
 
 scopes:
   -
@@ -99,7 +119,7 @@ tasks:
             flags: [to_object]
 
         do:
-          - show-school-details
+          - show_school_details
 
   -
     name: show_school_details
@@ -132,3 +152,4 @@ tasks:
           - echo """4.school object-> {{.school_object.principal}}"""
           - echo """5.a {{.a}}"""
           - echo """6.b {{.b}}"""
+          - echo """7.school object-> {{.school_object|printobj}}"""

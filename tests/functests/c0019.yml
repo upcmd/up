@@ -1,8 +1,26 @@
-goal:
-  - to test out using vars using template
+doc_meta: |
+  folder: vars
+  title: use vars
+  head: |
+    Demo basic usage of vars in shell func
+
+    You can wrap the var name following golang template syntax to reference a var, eg .varname
+
+    Alternativelly, you can reference to a sub element of a object, eg sg.address to refer to the address of object of sg
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to test out using vars using template
 
 vars:
   school: sydney grammar
+  sg:
+    name: sydney grammar
+    address: Sydney, NSW 2000
 
 tasks:
   -
@@ -10,7 +28,6 @@ tasks:
     task:
       -
         func: shell
-        desc: to test display env vars from shell context
         vars:
           studentname: Tom
         do:
@@ -18,4 +35,5 @@ tasks:
           - echo "gender -> male"
           - echo "school -> {{.school}}"
           - echo "nonexist -> {{.notexist}}"
+          - echo "SG details -> {{.sg.name}}/{{.sg.address}}"
 

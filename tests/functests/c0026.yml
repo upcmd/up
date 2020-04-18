@@ -1,11 +1,27 @@
-goal:
-  - to test register a var/dvar into vars
-  - once registered, the later step can consume the registered vars
+doc_meta: |
+  folder: shell-func
+  title: register result
+  head: |
+    Showcase you can use reg in shell func to register the result to global runtime
 
-design:
-  - if reg=auto, use the step.name as var name
-  - otherwise use the defined name as var name
-  - use name scope, eg register_taskname_stepname|(choosed name) as pattern
+  sections:
+    - title: Rules
+      content: |
+        * if reg=auto, it will use naming pattern: register_taskname_stepname
+        * otherwise use the defined name as var name
+
+    - title: Demo
+      log: yes
+
+
+notes:
+  goal:
+    - to test register a var/dvar into vars
+    - once registered, the later step can consume the registered vars
+
+  design:
+    - if reg=auto, use the register_taskname_stepname as var name
+    - otherwise use the defined name as var name
 
 tasks:
 
@@ -28,6 +44,6 @@ tasks:
       -
         func: shell
         do:
-          - echo "hello,{{.register_task_woohooyaa}}"
           - echo "{{.register_task_sayhello}}"
+          - echo "{{.woohooyaa}}"
 

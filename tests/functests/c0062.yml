@@ -1,5 +1,29 @@
-goal:
-  - add feature to externalise task file into separate yaml file
+doc_meta: |
+  folder: organization
+  title: use tasksref
+  head: |
+    Showcase gradually the lengthy configuration evolve to simpler skeleton by using ref element to externalized task/flow
+
+  sections:
+    - title: Externalize the task definition
+      filelookup: c0062-task-main.yml
+
+    - title: Externalize the task definition
+      filelookup: c0062-tasks-simple.yml
+
+    - title: Externalize the task definition
+      filelookup: c0062-tasks-complicated.yml
+
+    - title: tasksref element
+      content: |
+        Introduce tasksref to manage a list of tasks, in such a way it offloads the less concerned tasks to different locations. You could manage your tasks in flexible way with your own preference, such as classify them into different names of folders
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - add feature to externalise task file into separate yaml file
 
 vars:
   student_name: tom

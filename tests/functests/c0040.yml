@@ -1,5 +1,16 @@
-goal:
-  - showcase the loop using template
+doc_meta: |
+  folder: template
+  title: use loop
+  head: |
+    Showcase the loop using template
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - showcase the loop using template
 
 tasks:
 
@@ -19,9 +30,9 @@ tasks:
         desc: a real showcase of how to loop using template
         do:
           - |
-            {{ range $idx, $file := .register_testf_cases | splitLines -}}
+            {{ range $idx, $file := .cases | splitLines -}}
             {{$casename :=  $file | replace ".yml" ""}}
             echo "==========failure case test {{$idx |add1}}==============="
-            go run app/up/*.go task task -d ./tests/functests -t {{$casename}} -i dev -v vvvv
+            echo "processing {{$casename}} .."
             {{end}}
 

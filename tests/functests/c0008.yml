@@ -1,8 +1,183 @@
-goal:
-  - to test out vars in scope
-  - vars should be merged in its own scope
-  - scope 1/2/3/4 are only for solution references
-  - plain string value for this case
+doc_meta: |
+  folder: scope
+  title: vars intro
+  head: |
+    Scope is concept of named context encapsulation. For example, for a software development, you will probably have development env, namely dev; system test env, namely st; staging env etc, all group to a non-prod group. Then prod env and disaster recovery env, grouped into prod group
+
+    Also you could have a global defined scope for common vars for all groups to inherit their vars to be the default from if not defined in that scope
+
+    So put it in simple example, if you have nonprod and prod group defined, then your runtime instance id (eg dev) belonging to a nonprod id will automatically inherit all vars definition from top to down, from vars defintion in global group, to nonprod group, then dev, then global runtime, during func execution runtime, they will merge with the local vars
+
+  sections:
+    - title: How to run
+      content: |
+        run shell command:  up ngo task -d ./tests/functests -t c0008.yml -i dev -v vvv --configdir=./tests/functests
+
+    - title: Instance id
+      content: |
+        An execution of UP cli cmd can take an instance id for execution, in this demo, it is dev as example, if you do not use any instance id, by default, your execution will inherit from global group, then global runtime, then local vars
+
+    - title: Demo
+      log: yes
+
+    - title: Demo result
+      content: |
+        This demo will have an expected result of
+        ```
+        overall final exec vars:
+
+        (*core.Cache)({
+          "a": "dev-a",
+          "b": "non-prod-b",
+          "c": "dev-c",
+          "d": "global-d"
+        })
+        ```
+
+notes:
+  goal:
+    - to test out vars in scope
+    - vars should be merged in its own scope
+    - scope 1/2/3/4 are only for solution references in spike
+    - plain string value for this case
+
+  scopes4:
+    -
+      name: global
+      vars:
+        a: global-a
+        b: global-b
+        c: global-c
+        d: global-d
+
+    -
+      name: nonprod
+      vars:
+        a: non-prod-a
+        b: non-prod-b
+        c: non-prod-c
+
+    -
+      name: prod
+      vars:
+        a: prod-group-a
+        c: prod-group-c
+
+    -
+      name: staging
+      group: nonprod
+      vars:
+        a: staging-a
+        b: staging-b
+
+    - name: dev
+      group: nonprod
+      vars:
+        a: dev-a
+        c: dev-c
+
+    - name: prod
+      group: prod
+      vars:
+        a: prod-a
+        c: prod-c
+
+  scope3:
+    -
+      name: global
+      vars:
+        a: global-a
+        b: global-b
+        c: global-c
+        d: global-d
+    -
+      name: nonprod
+      members:
+        - dev
+        - st
+        - staging
+      vars:
+        a: non-prod-a
+        b: non-prod-b
+        c: non-prod-c
+
+    -
+      name: prod
+      members: [dr,prod]
+      vars:
+        a: prod-a
+        c: prod-c
+
+    -
+      name: staging
+      vars:
+        a: staging-a
+        b: staging-b
+
+    -  name: dev
+       vars:
+         a: dev-a
+         c: dev-c
+
+  scope2:
+    vars:
+      a: global-a
+      b: global-b
+      c: global-c
+      d: global-d
+    nonprod:
+      members:
+        - dev
+        - st
+        - staging
+      vars:
+        a: non-prod-a
+        b: non-prod-b
+        c: non-prod-c
+    prod:
+      members: [dr,prod]
+      vars:
+        a: prod-a
+        c: prod-c
+    each:
+      staging:
+        vars:
+          a: staging-a
+          b: staging-b
+      dev:
+        vars:
+          a: dev-a
+          c: dev-c
+
+  scope1:
+    vars:
+      a: global-a
+      b: global-b
+      c: global-c
+      d: global-d
+    nonprod:
+      members:
+        - dev
+        - st
+        - staging
+      vars:
+        a: non-prod-a
+        b: non-prod-b
+        c: non-prod-c
+    prod:
+      members: [dr,prod]
+      vars:
+        a: prod-a
+        c: prod-c
+    each:
+      staging:
+        vars:
+          a: staging-a
+          b: staging-b
+      dev:
+        vars:
+          a: dev-a
+          c: dev-c
 
 scopes:
   -
@@ -40,144 +215,6 @@ scopes:
      vars:
        a: dev-a
        c: dev-c
-
-scopes4:
-  -
-    name: global
-    vars:
-      a: global-a
-      b: global-b
-      c: global-c
-      d: global-d
-
-  -
-    name: nonprod
-    vars:
-      a: non-prod-a
-      b: non-prod-b
-      c: non-prod-c
-
-  -
-    name: prod
-    vars:
-      a: prod-group-a
-      c: prod-group-c
-
-  -
-    name: staging
-    group: nonprod
-    vars:
-      a: staging-a
-      b: staging-b
-
-  - name: dev
-    group: nonprod
-    vars:
-       a: dev-a
-       c: dev-c
-
-  - name: prod
-    group: prod
-    vars:
-      a: prod-a
-      c: prod-c
-
-scope3:
-  -
-    name: global
-    vars:
-      a: global-a
-      b: global-b
-      c: global-c
-      d: global-d
-  -
-    name: nonprod
-    members:
-      - dev
-      - st
-      - staging
-    vars:
-      a: non-prod-a
-      b: non-prod-b
-      c: non-prod-c
-
-  -
-    name: prod
-    members: [dr,prod]
-    vars:
-      a: prod-a
-      c: prod-c
-
-  -
-    name: staging
-    vars:
-      a: staging-a
-      b: staging-b
-
-  -  name: dev
-     vars:
-       a: dev-a
-       c: dev-c
-
-scope2:
-  vars:
-    a: global-a
-    b: global-b
-    c: global-c
-    d: global-d
-  nonprod:
-    members:
-      - dev
-      - st
-      - staging
-    vars:
-      a: non-prod-a
-      b: non-prod-b
-      c: non-prod-c
-  prod:
-    members: [dr,prod]
-    vars:
-      a: prod-a
-      c: prod-c
-  each:
-    staging:
-      vars:
-        a: staging-a
-        b: staging-b
-    dev:
-      vars:
-        a: dev-a
-        c: dev-c
-
-scope1:
-  vars:
-    a: global-a
-    b: global-b
-    c: global-c
-    d: global-d
-  nonprod:
-    members:
-      - dev
-      - st
-      - staging
-    vars:
-      a: non-prod-a
-      b: non-prod-b
-      c: non-prod-c
-  prod:
-    members: [dr,prod]
-    vars:
-      a: prod-a
-      c: prod-c
-  each:
-    staging:
-      vars:
-        a: staging-a
-        b: staging-b
-    dev:
-      vars:
-        a: dev-a
-        c: dev-c
 
 tasks:
 
