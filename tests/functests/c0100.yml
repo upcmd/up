@@ -257,10 +257,16 @@ tasks:
               reg: city2
             flags: [ymlonly]
 
+          - name: trace
+            cmd: ====>
           - name: printobj
             cmd: '{{.city2}}'
           - name: print
             cmd: '{{.city2}}'
+          - name: print
+            cmd: '{{.city2|len}}'
+          - name: trace
+            cmd: <====
 #--------------------------------------------------------------------
       -
         func: cmd

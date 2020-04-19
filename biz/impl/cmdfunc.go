@@ -298,7 +298,11 @@ func (f *CmdFuncAction) Exec() {
 				}
 
 				if ymlkey != "" {
-					ymlstr := f.Vars.Get(ymlkey).(string)
+					tmpymlstr := f.Vars.Get(ymlkey)
+					if tmpymlstr == nil {
+						u.InvalidAndExit("data validation", "ymlkey does not exist, please fix it")
+					}
+					ymlstr := tmpymlstr.(string)
 					if ymlonly {
 						data = core.GetSubYmlFromYml(ymlstr, yqpath, collect)
 					} else {
@@ -320,7 +324,6 @@ func (f *CmdFuncAction) Exec() {
 					}
 				}
 
-				u.Ppmsgvvvvvhint("data object:", data)
 				if localonly {
 					f.Vars.Put(reg, data)
 				} else {

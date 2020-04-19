@@ -21,6 +21,9 @@ func ObjToYaml(obj interface{}) string {
 }
 
 func YamlToObj(srcyml string) interface{} {
+	if srcyml == "" {
+		return ""
+	}
 	obj := new(interface{})
 	err := yaml.Unmarshal([]byte(srcyml), obj)
 	u.LogErrorAndContinue("yml to object:", err, u.Spf("please validate the ymal content\n---\n%s\n---\n", u.PrintContentWithLineNuber(srcyml)))
