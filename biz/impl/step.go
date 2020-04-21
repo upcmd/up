@@ -9,6 +9,7 @@ package impl
 
 import (
 	"github.com/imdario/mergo"
+	ms "github.com/mitchellh/mapstructure"
 	"github.com/mohae/deepcopy"
 	"github.com/stephencheng/up/biz"
 	"github.com/stephencheng/up/model/core"
@@ -21,17 +22,19 @@ import (
 )
 
 type Step struct {
-	Name  string
-	Do    interface{} //FuncImpl
-	Func  string
-	Vars  core.Cache
-	Dvars core.Dvars
-	Desc  string
-	Reg   string
-	Flags []string
-	If    string
-	Loop  interface{}
-	Until string
+	Name   string
+	Do     interface{} //FuncImpl
+	Func   string
+	Vars   core.Cache
+	Dvars  core.Dvars
+	Desc   string
+	Reg    string
+	Flags  []string
+	If     string
+	Else   interface{}
+	Loop   interface{}
+	Until  string
+	RefDir string
 }
 
 type Steps []Step
@@ -141,6 +144,13 @@ func (step *Step) Exec() {
 
 		case FUNC_CALL:
 			funcAction := CallFuncAction{
+				Do:   step.Do,
+				Vars: stepExecVars,
+			}
+			action = biz.Do(&funcAction)
+
+		case FUNC_BLOCK:
+			funcAction := BlockFuncAction{
 				Do:   step.Do,
 				Vars: stepExecVars,
 			}
@@ -276,16 +286,45 @@ func (step *Step) Exec() {
 				if goahead {
 					dryRunOrContinue()
 				} else {
-					u.Pvvvv("condition failed, skip executing step", step.Name)
+					if step.Else != nil && step.Else != "" {
+						doElse(step.Else, stepExecVars)
+					} else {
+						u.Pvvv("condition failed, skip executing step", step.Name)
+					}
 				}
 			} else {
-				u.Pvvvv("condition failed, skip executing step", step.Name)
+				u.Pvvv("condition failed, skip executing step", step.Name)
 			}
 		} else {
 			dryRunOrContinue()
 		}
 
 	}()
+
+}
+
+func doElse(elseCalls interface{}, execVars *core.Cache) {
+	var taskname string
+	var tasknames []string
+
+	switch elseCalls.(type) {
+	case string:
+		taskname = elseCalls.(string)
+		tasknames = append(tasknames, taskname)
+
+	case []interface{}:
+		err := ms.Decode(elseCalls, &tasknames)
+		u.LogErrorAndExit("call func alias: else", err, "please ref to a task name only")
+
+	default:
+		u.LogWarn("else ..", "Not implemented or void for no action!")
+	}
+
+	for _, tmptaskname := range tasknames {
+		taskname := core.Render(tmptaskname, execVars)
+		u.PpmsgvvvvvhintHigh(u.Spf("else caller vars to task (%s):", taskname), execVars)
+		ExecTask(taskname, execVars)
+	}
 
 }
 

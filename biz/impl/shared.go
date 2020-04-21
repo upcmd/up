@@ -19,6 +19,7 @@ import (
 const (
 	FUNC_SHELL = "shell"
 	FUNC_CALL  = "call"
+	FUNC_BLOCK = "block"
 	FUNC_CMD   = "cmd"
 )
 

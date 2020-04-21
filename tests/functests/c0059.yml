@@ -5,7 +5,7 @@ doc_meta: |
     Showcase how to make the UP cmd cli configuration tidy, clean and more organized
 
   sections:
-    - title: Externalize the task definition
+    - title: Externalized the task definition - c0059-task-ref.yml
       filelookup: c0059-task-ref.yml
 
     - title: flow element

@@ -241,6 +241,7 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 					rtContext.ExecbaseVars = callerVars
 					rtContext.TasknameLayered = u.Spf("%s/%s", core.TaskRuntime().TasknameLayered, taskname)
 				}
+				rtContext.ExecbaseVars.Put(core.UP_RUNTIME_LAYER_NUMBER, core.TaskStack.GetLen())
 
 				core.TaskStack.Push(&rtContext)
 				u.Pvvvv("Executing task stack layer:", core.TaskStack.GetLen())

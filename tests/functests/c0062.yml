@@ -5,13 +5,13 @@ doc_meta: |
     Showcase gradually the lengthy configuration evolve to simpler skeleton by using ref element to externalized task/flow
 
   sections:
-    - title: Externalize the task definition
+    - title: Externalized the task definition - c0062-tasks-main.yml
       filelookup: c0062-task-main.yml
 
-    - title: Externalize the task definition
+    - title: Externalized the task definition - c0062-tasks-simple.yml
       filelookup: c0062-tasks-simple.yml
 
-    - title: Externalize the task definition
+    - title: Externalized the task definition - c0062-tasks-complicated.yml
       filelookup: c0062-tasks-complicated.yml
 
     - title: tasksref element

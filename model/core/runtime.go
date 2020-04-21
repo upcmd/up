@@ -19,6 +19,10 @@ var (
 	TaskBreak    bool
 )
 
+const (
+	UP_RUNTIME_LAYER_NUMBER = "up_runtime_layer_number"
+)
+
 func SetInstanceName(id string) {
 	if id != "" {
 		InstanceName = id

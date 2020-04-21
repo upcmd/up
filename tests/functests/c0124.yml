@@ -1,0 +1,94 @@
+
+notes:
+  goal:
+    - not included into doco
+    - bug fix
+    - if there is no ymlonly, it will cause a non possible detection of nil pointer problem
+    - fixed with telling if input of content yml string to be empty or not in YmlToObj
+
+vars:
+  query_name: jason
+  student:
+    name: Tom
+    gender: Male
+    school: Sydney Grammar
+  ymldoco: |
+    nsw:
+      sydney:
+        - sg:
+            student:
+              name: Grace
+              gender: Female
+              school: MLC
+        - kings:
+            student:
+              name: Emily
+              gender: Female
+              school: KINGS
+      chatswood:
+        - chatswood_high:
+            student:
+              name: Jason
+              gender: Mail
+              school: Public High School
+
+  nsw:
+    sydney:
+      - sg:
+          student:
+            name: Grace
+            gender: Female
+            school: MLC
+      - kings:
+          student:
+            name: Emily
+            gender: Female
+            school: KINGS
+    chatswood:
+      - chatswood_high:
+          student:
+            name: Jason
+            gender: Mail
+            school: Public High School
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: query and register result as a yml string instead of object
+            cmd:
+              path: nsw.
+              reg: city2
+            flags: [ymlonly]
+
+          - name: printobj
+            cmd: 'city2'
+          - name: print
+            cmd: '{{.city2}}'
+          - name: print
+            cmd: '{{.city2|len}}'
+
+          - name: trace
+            cmd: ====>
+          - name: query
+            desc: query a non-exist element
+            cmd:
+              ymlkey: ymldoco
+              path: nt.
+              reg: city3
+#            flags: [ymlonly]
+
+          - name: trace
+            cmd: <====
+
+          - name: printobj
+            cmd: 'city3'
+          - name: print
+            cmd: '{{.city3}}'
+          - name: print
+            cmd: '{{.city3|len}}'

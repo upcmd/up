@@ -5,7 +5,7 @@ doc_meta: |
     Showcase gradually the lengthy configuration evolve to simpler skeleton by using ref element to externalized task/flow. Please also checkout the changes of: use case 2
 
   sections:
-    - title: Externalize the task definition
+    - title: Externalized the task definition - c0060-task-ref.yml
       filelookup: c0060-task-ref.yml
 
     - title: Flow element

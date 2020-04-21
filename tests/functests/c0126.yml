@@ -1,0 +1,48 @@
+notes:
+  goal:
+    - try to see if it possible to make a flow controll of else logic
+    - intro the 1st solution doing if else
+
+vars:
+  goahead: False
+#  goahead: True
+
+tasks:
+
+  - name: task
+    task:
+
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: |
+              true/false value of goahead:
+              {{.goahead}}
+              {{not .goahead}}
+
+      - func: call
+        do:
+          - goahead
+        if: '{{.goahead}}'
+
+      - func: call
+        do:
+          - else
+        if: '{{not .goahead}}'
+
+  - name: goahead
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'go ahead .......'
+
+  - name: else
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'do something else .......'

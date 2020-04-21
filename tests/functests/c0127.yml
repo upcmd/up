@@ -1,0 +1,79 @@
+notes:
+  goal:
+    - intro the 2nd solution doing else
+    - add feature of else element
+
+vars:
+  goahead: False
+#  goahead: True
+
+tasks:
+
+  - name: task
+    task:
+
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: |
+              true/false value of goahead:
+              {{.goahead}}
+              {{not .goahead}}
+
+      - func: call
+        desc: show example the route goes to call goelse for the condition of not if condition succeeds
+        do:
+          - goahead
+        if: '{{.goahead}}'
+        else: goelse
+
+      - func: call
+        desc: show example the else coud route to call a list of tasks
+        do:
+          - goahead
+        if: '{{.goahead}}'
+        else:
+          - goelse
+          - goelse
+          - goelse2
+          - goelse2
+
+      - func: call
+        desc: show it is same that you could assemble a list of tasks for if true condition
+        vars:
+          goahead: True
+        do:
+          - goahead
+          - goahead
+          - goahead
+        if: '{{.goahead}}'
+        else:
+          - goelse
+          - goelse
+          - goelse2
+          - goelse2
+
+  - name: goahead
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'go ahead .......'
+
+  - name: goelse
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'do something else .......'
+
+  - name: goelse2
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'do something else2 .......'

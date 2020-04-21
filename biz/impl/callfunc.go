@@ -19,9 +19,9 @@ func runTask(f *CallFuncAction, taskname string) {
 }
 
 type CallFuncAction struct {
-	Do   interface{}
-	Vars *core.Cache
-	Refs []string
+	Do        interface{}
+	Vars      *core.Cache
+	Tasknames []string
 }
 
 //adapt the abstract step.Do to concrete ShellFuncAction Cmds
@@ -41,11 +41,11 @@ func (f *CallFuncAction) Adapt() {
 	default:
 		u.LogWarn("call func", "Not implemented or void for no action!")
 	}
-	f.Refs = tasknames
+	f.Tasknames = tasknames
 }
 
 func (f *CallFuncAction) Exec() {
-	for _, tmptaskname := range f.Refs {
+	for _, tmptaskname := range f.Tasknames {
 		taskname := core.Render(tmptaskname, f.Vars)
 		runTask(f, taskname)
 	}
