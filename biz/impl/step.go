@@ -16,9 +16,9 @@ import (
 	u "github.com/stephencheng/up/utils"
 	ee "github.com/stephencheng/up/utils/error"
 	"os"
-
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 type Step struct {
@@ -50,11 +50,11 @@ func (step *Step) getRuntimeExecVars(mark string) *core.Cache {
 
 	execvars = deepcopy.Copy(*core.TaskRuntime().ExecbaseVars).(core.Cache)
 
-	//u.Ptmpdebug("11", execvars)
+	u.Ptmpdebug("11", execvars)
 	taskVars := core.TaskRuntime().TaskVars
 	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
-	//u.Ptmpdebug("33", execvars)
-	//u.Ptmpdebug("44", step.Vars)
+	u.Ptmpdebug("33", execvars)
+	u.Ptmpdebug("44", step.Vars)
 
 	if IsCalled() {
 		//u.Ptmpdebug("if", "if")
@@ -120,7 +120,7 @@ func (step *Step) Exec() {
 	var bizErr *ee.Error = ee.New()
 	var stepExecVars *core.Cache
 	stepExecVars = step.getRuntimeExecVars("get plain exec vars")
-
+	u.Ptmpdebug("99", stepExecVars)
 	validation(stepExecVars)
 
 	if step.Flags != nil && u.Contains(step.Flags, "pause") {
@@ -306,24 +306,36 @@ func (step *Step) Exec() {
 func doElse(elseCalls interface{}, execVars *core.Cache) {
 	var taskname string
 	var tasknames []string
+	var flow Steps
 
+	u.Ptmpdebug("haha", "else .....")
 	switch elseCalls.(type) {
 	case string:
 		taskname = elseCalls.(string)
 		tasknames = append(tasknames, taskname)
 
 	case []interface{}:
-		err := ms.Decode(elseCalls, &tasknames)
-		u.LogErrorAndExit("call func alias: else", err, "please ref to a task name only")
+		elseStr := u.Spf("%s", elseCalls)
+		u.Ptmpdebug("kak", elseStr)
+		if strings.Index(elseStr, "map") != -1 && strings.Index(elseStr, "func:") != -1 {
+			err := ms.Decode(elseCalls, &flow)
+			u.LogErrorAndExit("load steps in else", err, "steps has configuration problem, please fix it")
+			BlockFlowRun(&flow, execVars)
+		} else {
+			err := ms.Decode(elseCalls, &tasknames)
+			u.LogErrorAndExit("call func alias: else", err, "please ref to a task name only")
+		}
 
 	default:
 		u.LogWarn("else ..", "Not implemented or void for no action!")
 	}
 
-	for _, tmptaskname := range tasknames {
-		taskname := core.Render(tmptaskname, execVars)
-		u.PpmsgvvvvvhintHigh(u.Spf("else caller vars to task (%s):", taskname), execVars)
-		ExecTask(taskname, execVars)
+	if len(tasknames) > 0 {
+		for _, tmptaskname := range tasknames {
+			taskname := core.Render(tmptaskname, execVars)
+			u.PpmsgvvvvvhintHigh(u.Spf("else caller vars to task (%s):", taskname), execVars)
+			ExecTask(taskname, execVars)
+		}
 	}
 
 }
@@ -348,6 +360,7 @@ func (steps *Steps) Exec() {
 			result := core.StepStack.GetTop().(*core.StepRuntimeContext).Result
 			taskname := core.TaskStack.GetTop().(*core.TaskRuntimeContext).Taskname
 
+			//TODO: add support for block
 			if u.Contains([]string{FUNC_SHELL, FUNC_CALL}, step.Func) {
 				if step.Reg == "auto" {
 					core.TaskRuntime().ExecbaseVars.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
@@ -379,7 +392,6 @@ func (steps *Steps) Exec() {
 		}
 
 		if !core.TaskBreak {
-
 			execStep()
 		} else {
 			core.TaskBreak = false

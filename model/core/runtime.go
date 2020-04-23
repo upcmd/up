@@ -16,6 +16,7 @@ var (
 	Dryrun       bool
 	TaskStack    = stack.New("task")
 	StepStack    = stack.New("step")
+	BlockStack   = stack.New("block")
 	TaskBreak    bool
 )
 
@@ -46,6 +47,10 @@ type TaskRuntimeContext struct {
 type StepRuntimeContext struct {
 	Stepname string
 	Result   *ExecResult
+}
+
+type BlockRuntimeContext struct {
+	BlockBaseVars *Cache
 }
 
 type ExecResult struct {

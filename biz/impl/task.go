@@ -377,6 +377,5 @@ func loadRuntimeDvars() *core.Dvars {
 	//dvars.ValidateAndLoading()
 	core.SetRuntimeGlobalDvars(&dvars)
 	return &dvars
-
 }
 
