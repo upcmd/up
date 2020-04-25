@@ -18,12 +18,31 @@ var (
 		"ConfigDir":     ".",
 		"ConfigFile":    "upconfig",
 	}
-	vvvvv_color_printf  = color.Magenta
+	vvvv_color_printf   = color.Magenta
 	verror_color_printf = color.Red
 	msg_color_printf    = color.Yellow
 	himsg_color_printf  = color.HiWhite
 	msg_color_sprintf   = color.YellowString
 	dryrun_color_print  = color.Cyan
+
+	DEFAULT_CONFIG = `
+version: 1.0.0
+Verbose: v
+MaxCallLayers: 8
+`
+
+	DEFAULT_UP_TASK_YML = `
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: shell
+        desc: main job
+        do:
+          - echo "hello world"
+`
 
 	Yq_read_hint = `
 path format:

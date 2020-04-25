@@ -50,11 +50,11 @@ func (step *Step) getRuntimeExecVars(mark string) *core.Cache {
 
 	execvars = deepcopy.Copy(*core.TaskRuntime().ExecbaseVars).(core.Cache)
 
-	u.Ptmpdebug("11", execvars)
+	//u.Ptmpdebug("11", execvars)
 	taskVars := core.TaskRuntime().TaskVars
 	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
-	u.Ptmpdebug("33", execvars)
-	u.Ptmpdebug("44", step.Vars)
+	//u.Ptmpdebug("33", execvars)
+	//u.Ptmpdebug("44", step.Vars)
 
 	if IsCalled() {
 		//u.Ptmpdebug("if", "if")
@@ -120,7 +120,7 @@ func (step *Step) Exec() {
 	var bizErr *ee.Error = ee.New()
 	var stepExecVars *core.Cache
 	stepExecVars = step.getRuntimeExecVars("get plain exec vars")
-	u.Ptmpdebug("99", stepExecVars)
+	//u.Ptmpdebug("99", stepExecVars)
 	validation(stepExecVars)
 
 	if step.Flags != nil && u.Contains(step.Flags, "pause") {
@@ -366,11 +366,11 @@ func (steps *Steps) Exec() {
 					core.TaskRuntime().ExecbaseVars.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
 				} else if step.Reg != "" {
 					core.TaskRuntime().ExecbaseVars.Put(u.Spf("%s", step.Reg), result.Output)
-				} else {
-					if step.Func == FUNC_SHELL {
-						core.TaskRuntime().ExecbaseVars.Put("last_result", result)
-					}
 				}
+				if step.Func == FUNC_SHELL {
+					core.TaskRuntime().ExecbaseVars.Put("last_result", result)
+				}
+
 			}
 
 			func() {
@@ -383,6 +383,10 @@ func (steps *Steps) Exec() {
 				if !u.Contains(step.Flags, "ignore_error") {
 					if result != nil && result.Code != 0 {
 						u.InvalidAndExit("Failed And Not Ignored!", "You may want to continue and ignore the error")
+					}
+				} else {
+					if result != nil && result.Code != 0 {
+						u.LogWarn("HightLight:", "Error ignored!!!")
 					}
 				}
 

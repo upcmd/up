@@ -1,3 +1,15 @@
+doc_meta: |
+  folder: flow-controll
+  title: else in hard way
+  head: |
+    Try to implement the else logic using if condition
+
+    It works but it is not dry
+
+  sections:
+    - title: Demo
+      log: yes
+
 notes:
   goal:
     - try to see if it possible to make a flow controll of else logic

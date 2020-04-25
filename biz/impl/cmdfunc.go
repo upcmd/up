@@ -16,6 +16,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path"
+	"strconv"
 )
 
 type CmdFuncAction struct {
@@ -155,6 +156,50 @@ func (f *CmdFuncAction) Exec() {
 
 		case "break":
 			core.TaskBreak = true
+
+		case "assert":
+			cmdItem.runCmd("array", func() {
+				conditions := cmdItem.Cmd.([]interface{})
+				var condition string
+
+				var failed bool
+				for idx, v := range conditions {
+					raw := v.(string)
+					condition = core.Render(raw, f.Vars)
+					succeeded, err := strconv.ParseBool(condition)
+					if !succeeded {
+						color.Red("%2d ASSERT FAILED: [%s]", idx+1, raw)
+						failed = true
+						u.LogError("Reason:", err)
+					} else {
+						color.Green("%2d ASSERT OK:     [%s]", idx+1, raw)
+					}
+				}
+
+				if failed {
+					doFlag("failfast", func() {
+						u.InvalidAndExit("Assert Failed", "Failfast and STOPS here!!!")
+					})
+				}
+
+			})
+
+		case "inspect":
+			cmdItem.runCmd("array", func() {
+				whats := cmdItem.Cmd.([]interface{})
+
+				for idx, v := range whats {
+					what := v.(string)
+					u.Pf("%2d: inspect[%s]", idx+1, v)
+					switch what {
+					case "exec_base_vars":
+						u.Ppmsg(*core.TaskRuntime().ExecbaseVars)
+					case "exec_vars":
+						u.Ppmsg(f.Vars)
+					}
+
+				}
+			})
 
 		case "readfile":
 			cmdItem.runCmd("map", func() {

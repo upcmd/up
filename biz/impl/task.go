@@ -16,7 +16,9 @@ import (
 	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	"github.com/xlab/treeprint"
+	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -26,6 +28,22 @@ var (
 	TaskYmlRoot *viper.Viper
 	Tasks       *model.Tasks
 )
+
+//func InitDefaultTaskYml() {
+//	//filepath = path.Join(".", "up.yml")
+//	//ioutil.WriteFile(filepath, []byte(u.DEFAULT_UP_TASK_YML), 0644)
+//}
+//func InitDefaultConfig() {
+//	filepath := path.Join(".", "upconfig.yml")
+//	ioutil.WriteFile(filepath, []byte(u.DEFAULT_CONFIG), 0644)
+//}
+
+func InitDefaultSkeleton() {
+	filepath := path.Join(".", "upconfig.yml")
+	ioutil.WriteFile(filepath, []byte(u.DEFAULT_CONFIG), 0644)
+	filepath = path.Join(".", "up.yml")
+	ioutil.WriteFile(filepath, []byte(u.DEFAULT_UP_TASK_YML), 0644)
+}
 
 func InitTasks() {
 
@@ -241,7 +259,7 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 					rtContext.ExecbaseVars = callerVars
 					rtContext.TasknameLayered = u.Spf("%s/%s", core.TaskRuntime().TasknameLayered, taskname)
 				}
-				rtContext.ExecbaseVars.Put(core.UP_RUNTIME_LAYER_NUMBER, core.TaskStack.GetLen())
+				rtContext.ExecbaseVars.Put(core.UP_RUNTIME_TASK_LAYER_NUMBER, core.TaskStack.GetLen())
 
 				core.TaskStack.Push(&rtContext)
 				u.Pvvvv("Executing task stack layer:", core.TaskStack.GetLen())

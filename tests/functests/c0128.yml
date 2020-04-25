@@ -1,0 +1,54 @@
+doc_meta: |
+  folder: block-func
+  title: use block
+  head: |
+    Block func is introduced for an alternative coding style to mainly deal with internal business. Call func mainly serves to offer interoperability and sharing and exchanging code with different projects/teams, block func in the oposite, it allows your code to share the same vars stack as long as your func is in one of the leave level in tree of a block
+
+  sections:
+    - title: Vars inherit from block func vars and auto merge
+      content: |
+        Please notice that the values printed out in print cmd in the flow of steps in block func, the vars: a, b, da, db will inherit the values defined in vars in block func
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - add feature to support block code style
+
+vars:
+  a: global_aaa
+  b: global_bbb
+  c: global_ccc
+
+tasks:
+  - name: task
+    task:
+
+      - func: block
+        desc: show example the route goes to call goelse for the condition of not if condition succeeds
+        vars:
+          a: local_aaa
+          b: local_bbb
+        dvars:
+          - name: da
+            value: local_da
+          - name: db
+            value: local_db
+        do:
+          - func: shell
+            do:
+              - echo "shell step1"
+              - echo "shell step2"
+
+          - func: cmd
+            do:
+              -
+                name: print
+                cmd: |
+                  cmd print step
+                  up_runtime_task_layer_number: {{.up_runtime_task_layer_number}}
+                  a: {{.a}}
+                  b: {{.b}}
+                  da: {{.da}}
+                  db: {{.db}}

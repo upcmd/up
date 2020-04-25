@@ -40,37 +40,37 @@ func permitted(v string) bool {
 
 func Pvvvv(a ...interface{}) {
 	if permitted("vvvv") {
-		vvvvv_color_printf("%s\n", fmt.Sprintln(a...))
+		vvvv_color_printf("%s\n", fmt.Sprintln(a...))
 	}
 }
 
 func Pvvv(a ...interface{}) {
 	if permitted("vvv") {
-		vvvvv_color_printf("%s", fmt.Sprintln(a...))
+		vvvv_color_printf("%s", fmt.Sprintln(a...))
 	}
 }
 
 func Pvv(a ...interface{}) {
 	if permitted("vv") {
-		vvvvv_color_printf("%s\n", fmt.Sprintln(a...))
+		vvvv_color_printf("%s\n", fmt.Sprintln(a...))
 	}
 }
 
 func Pvvvvv(a ...interface{}) {
 	if permitted("vvvvv") {
-		vvvvv_color_printf("%s", fmt.Sprint(a...))
+		vvvv_color_printf("%s", fmt.Sprint(a...))
 	}
 }
 
 func Dvvvvv(a ...interface{}) {
 	if permitted("vvvvv") {
-		vvvvv_color_printf("%s\n", spew.Sdump(a...))
+		vvvv_color_printf("%s\n", spew.Sdump(a...))
 	}
 }
 
 func Dvvvv(a ...interface{}) {
 	if permitted("vvvv") {
-		vvvvv_color_printf("%s\n", spew.Sdump(a...))
+		vvvv_color_printf("%s\n", spew.Sdump(a...))
 	}
 }
 
@@ -104,14 +104,14 @@ func Ppfmsg(mark string, a ...interface{}) {
 
 func PpmsgvvvvhintHigh(hint string, a ...interface{}) {
 	if permitted("vvvv") {
-		vvvvv_color_printf("%s:", hint)
+		vvvv_color_printf("%s:", hint)
 		himsg_color_printf("%s\n", spewMsgState.Sdump(a...))
 	}
 }
 
 func PpmsgvvvvvhintHigh(hint string, a ...interface{}) {
 	if permitted("vvvvv") {
-		vvvvv_color_printf("%s:", hint)
+		vvvv_color_printf("%s:", hint)
 		himsg_color_printf("%s\n", spewMsgState.Sdump(a...))
 	}
 }
@@ -122,7 +122,7 @@ func PfHiColor(format string, a ...interface{}) {
 
 func PpmsgvvvhintHigh(hint string, a ...interface{}) {
 	if permitted("vvv") {
-		vvvvv_color_printf("%s:", hint)
+		vvvv_color_printf("%s:", hint)
 		himsg_color_printf("%s\n", spewMsgState.Sdump(a...))
 	}
 }
@@ -177,13 +177,13 @@ func Ptrace(mark, info string) {
 
 func Pfvvvv(format string, a ...interface{}) {
 	if permitted("vvvv") {
-		vvvvv_color_printf(format, a...)
+		vvvv_color_printf(format, a...)
 	}
 }
 
 func Pfvvvvv(format string, a ...interface{}) {
 	if permitted("vvvvv") {
-		vvvvv_color_printf(format, a...)
+		vvvv_color_printf(format, a...)
 	}
 }
 
@@ -221,12 +221,6 @@ func Pferror(format string, a ...interface{}) {
 
 func Spfv(format string, a ...interface{}) string {
 	return fmt.Sprintf(format, a...)
-}
-
-func LogError(mark string, err interface{}) {
-	if err != nil {
-		color.Red("      %s -> %s", mark, err)
-	}
 }
 
 func LogOk(mark string) {
@@ -270,6 +264,12 @@ func LogErrorAndExit(mark string, err interface{}, hint string) {
 		hiColor := color.New(color.FgHiCyan, color.BgRed)
 		hiColor.Printf("ERROR: %s\n", hint)
 		os.Exit(-1)
+	}
+}
+
+func LogError(mark string, err interface{}) {
+	if err != nil {
+		color.Red("      %s -> %s", mark, err)
 	}
 }
 

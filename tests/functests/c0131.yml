@@ -1,0 +1,70 @@
+doc_meta: |
+  folder: flow-controll
+  title: else with a flow
+  head: |
+    Showcase that you could use a flow of a serial of steps in else branch。 In this case, you don not have to route the logic to a external task
+
+  sections:
+    - title: Demo
+      log: yes
+
+vars:
+  goahead: False
+#  goahead: True
+
+tasks:
+
+  - name: task
+    task:
+
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: |
+              true/false value of goahead:
+              {{.goahead}}
+              {{not .goahead}}
+
+      - func: call
+        desc: show use a flow in else
+        do:
+          - goahead
+        if: '{{.goahead}}'
+        else:
+          - func: cmd
+            do:
+              -
+                name: print
+                cmd: 'do something else step1 .......'
+          - func: shell
+            do:
+              - echo do something else step2 .......
+          - func: cmd
+            do:
+              -
+                name: print
+                cmd: 'do something else step3 .......'
+
+          - func: call
+            desc: show it is same that you could assemble a list of tasks for if true condition
+            vars:
+              goahead: True
+            do:
+              - goelse
+
+  - name: goahead
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'go ahead .......'
+
+  - name: goelse
+    task:
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: 'do something else .......'

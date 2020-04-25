@@ -1,0 +1,93 @@
+doc_meta: |
+  folder: block-func
+  title: embeded block
+  head: |
+    This demo shows that block func could be embeded in multiple layers
+
+  sections:
+    - title: block could be embeded to be multiple layers
+      content: |
+        Please notice that the values printed out in different funcs in different layer, they will inherit and override the vars from parent block func level
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - test override and merge in block func
+
+vars:
+  a: global_aaa
+  b: global_bbb
+  c: global_ccc
+
+tasks:
+  - name: task
+    task:
+
+      - func: block
+        desc: show example the route goes to call goelse for the condition of not if condition succeeds
+        vars:
+          a: local_aaa
+          b: local_bbb
+        dvars:
+          - name: da
+            value: local_da
+          - name: db
+            value: local_db
+        do:
+          - func: shell
+            do:
+              - echo "shell step1"
+              - echo "shell step2"
+
+          - func: cmd
+            vars:
+              a: block_layer1_aaa
+            do:
+              -
+                name: print
+                cmd: |
+                  layer 1
+                  up_runtime_task_layer_number: {{.up_runtime_task_layer_number}}
+                  a: {{.a}}
+                  b: {{.b}}
+                  c: {{.c}}
+                  da: {{.da}}
+                  db: {{.db}}
+
+          - func: shell
+            do:
+              - echo "shell step3"
+              - echo "shell step4"
+
+          - func: block
+            desc: test embeded 2nd layer of block
+            vars:
+              a: local_block_layer2_aaa
+              b: local_block_layer2_bbb
+            dvars:
+              - name: da
+                value: local_da_layer2
+              - name: db
+                value: local_db_layer2
+            do:
+              - func: cmd
+                vars:
+                  a: block_layer2_aaa
+                do:
+                  -
+                    name: print
+                    cmd: |
+                      layer 2
+                      up_runtime_task_layer_number: {{.up_runtime_task_layer_number}}
+                      a: {{.a}}
+                      b: {{.b}}
+                      c: {{.c}}
+                      da: {{.da}}
+                      db: {{.db}}
+
+          - func: shell
+            do:
+              - echo "shell step5"
+              - echo "shell step6"

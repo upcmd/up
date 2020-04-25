@@ -21,7 +21,7 @@ var (
 )
 
 const (
-	UP_RUNTIME_LAYER_NUMBER = "up_runtime_layer_number"
+	UP_RUNTIME_TASK_LAYER_NUMBER = "up_runtime_task_layer_number"
 )
 
 func SetInstanceName(id string) {

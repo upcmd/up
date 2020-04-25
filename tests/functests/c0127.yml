@@ -1,3 +1,13 @@
+doc_meta: |
+  folder: flow-controll
+  title: else branch
+  head: |
+    Introduce the else element, with an array of tasks for detailed implementations
+
+  sections:
+    - title: Demo
+      log: yes
+
 notes:
   goal:
     - intro the 2nd solution doing else

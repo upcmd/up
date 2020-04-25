@@ -1,6 +1,16 @@
+doc_meta: |
+  folder: flow-controll
+  title: use block
+  head: |
+    Introduce a internal var: up_runtime_task_layer_number. It is used for a force exit or an conditional break. The typical usecase would be a business logic to attempt to maximize the possibility ub a recurisve maner in code execution to probe. For example, web page scraping and a implementation of web spider etc.
+
+  sections:
+    - title: Demo
+      log: yes
+
 notes:
   goal:
-    - add feature to add a internal runtime var up_runtime_layer_number
+    - add feature to add a internal runtime var up_runtime_task_layer_number
     - it is useful for client to decide to quit or customise controll flow
 
 tasks:
@@ -18,7 +28,7 @@ tasks:
         do:
           -
             name: print
-            cmd: 'UP_RUNTIME_LAYER_NUMBER: {{.up_runtime_layer_number}}'
+            cmd: 'up_runtime_task_layer_number: {{.up_runtime_task_layer_number}}'
 
       - func: call
         do:
@@ -29,8 +39,8 @@ tasks:
       - func: cmd
         do:
           -
-            name: exit
-        if: '{{eq  .up_runtime_layer_number 4}}'
+            name: exit #or break
+        if: '{{eq  .up_runtime_task_layer_number 4}}'
 
       - func: call
         do:

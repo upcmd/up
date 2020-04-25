@@ -19,7 +19,8 @@ var (
 	app = kingpin.New("up", "UP: The Ultimate Provisioner")
 
 	ngo              = app.Command("ngo", "run a entry task")
-	ngoTaskName      = ngo.Arg("taskname", "task name to run").Required().String()
+	ngoTaskName      = ngo.Arg("taskname", "task name to run").Default("Main").String()
+	initDefault      = app.Command("init", "create a default skeleton for a quick start")
 	list             = app.Command("list", "list tasks and plays")
 	listName         = list.Arg("taskname", "task name to inspect").String()
 	validate         = app.Command("validate", "validate tasks and plays")
@@ -33,31 +34,39 @@ var (
 )
 
 func main() {
-
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
-	u.SetConfigYamlDir(*configDir)
-	u.SetConfigYamlFile(*configFile)
-	u.InitConfig()
-	u.ShowCoreConfig()
-	u.Pfvvvv(" :release version:  %s", u.CoreConfig.Version)
 
-	u.SetVerbose(*verbose)
+	initArgs := func() {
+		u.SetConfigYamlDir(*configDir)
+		u.SetConfigYamlFile(*configFile)
+		u.InitConfig()
+		u.ShowCoreConfig()
+		u.Pfvvvv(" :release version:  %s", u.CoreConfig.Version)
 
-	u.SetRefdir(*refdir)
-	u.SetTaskfile(*taskfile)
-	u.Pfvvvv(" :verbose level:  %s", u.CoreConfig.Verbose)
-	u.Pfvvvv(" :instance name:  %s", *instanceName)
+		u.SetVerbose(*verbose)
 
-	core.SetInstanceName(*instanceName)
+		u.SetRefdir(*refdir)
+		u.SetTaskfile(*taskfile)
+		u.Pfvvvv(" :verbose level:  %s", u.CoreConfig.Verbose)
+		u.Pfvvvv(" :instance name:  %s", *instanceName)
+		core.SetInstanceName(*instanceName)
+	}
 
 	switch cmd {
+	case initDefault.FullCommand():
+		u.Pln("-init default skeleton and configuration")
+		impl.InitDefaultSkeleton()
+
 	case ngo.FullCommand():
+		initArgs()
 		if *ngoTaskName != "" {
 			u.Pln("-exec task:", *ngoTaskName)
 			impl.InitTasks()
 			impl.ExecTask(*ngoTaskName, nil)
 		}
+
 	case list.FullCommand():
+		initArgs()
 		impl.InitTasks()
 		if *listName == "=" {
 			impl.ListAllTasks()
@@ -68,6 +77,7 @@ func main() {
 		}
 
 	case validate.FullCommand():
+		initArgs()
 		impl.InitTasks()
 		taskname := *validateTaskName
 		u.Pf("validate task: %s\n")

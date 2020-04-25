@@ -1,0 +1,67 @@
+doc_meta: |
+  folder: test-debug
+  title: assert and inspect
+  head: |
+    Demo you can use assert and inspect
+
+  sections:
+    - title: assert
+      content: |
+        It will go through a list of criteria and show the evaluation result
+
+    - title: inspect
+      content: |
+        It allows you to inspect below:
+
+        1. exec_vars: The runtime execution vars for current func
+        2. exec_base_vars: it is the base vars which its func inherit from as base
+
+    - title: Demo
+      log: yes
+
+
+notes:
+  goal:
+    - add assert for testing
+    - add inspect for debugging
+
+vars:
+  a: global_aaa
+  b: global_bbb
+  c: global_ccc
+
+tasks:
+  - name: task
+    task:
+
+      - func: block
+        vars:
+          a: local_aaa
+          b: local_bbb
+        dvars:
+          - name: da
+            value: local_da
+          - name: db
+            value: local_db
+        do:
+          - func: cmd
+            vars:
+              a: block_layer2_aaa
+            do:
+              -
+                name: assert
+                cmd:
+                  - '{{eq .a "aaa"}}'
+                  - '{{eq .a "block_layer2_aaa"}}'
+
+              -
+                name: assert
+                cmd:
+                  - '{{eq .a "aaa"}}'
+
+              -
+                name: inspect
+                cmd:
+                  - exec_vars
+                  - exec_base_vars
+
