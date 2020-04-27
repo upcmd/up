@@ -1,0 +1,73 @@
+doc_meta: |
+  folder: block-func
+  title: testcase1 for block
+  head: |
+    A testcase to show multiple layers of call to invoke a block code
+
+  sections:
+    - title: Demo
+      log: yes
+
+vars:
+  a: global_aaa
+  b: global_bbb
+  c: global_ccc
+
+tasks:
+  - name: task
+    task:
+      - func: call
+        vars:
+          a: local_aaa
+          b: local_bbb
+        dvars:
+          - name: da
+            value: local_da
+          - name: db
+            value: local_db
+        do:
+          - callee_task1
+
+  - name: callee_task2
+    task:
+      - func: block
+        vars:
+          a: callee_aaa_callee_task2
+        dvars:
+          - name: db
+            value: callee_db_callee_task2
+        do:
+          - func: cmd
+            do:
+              -
+                name: print
+                cmd: |
+                  a: {{.a}}
+                  b: {{.b}}
+                  c: {{.c}}
+                  da: {{.da}}
+                  db: {{.db}}
+
+              -
+                name: assert
+                cmd:
+                  - '{{eq .a "local_aaa" }}'
+                  - '{{eq .b "local_bbb" }}'
+                  - '{{eq .c "global_ccc" }}'
+                  - '{{eq .da "local_da_callee_task1" }}'
+                  - '{{eq .db "callee_db_callee_task2" }}'
+                flags: [failfast,]
+
+  - name: callee_task1
+    task:
+      - func: call
+        vars:
+          a: local_aaa_callee_task1
+          b: local_bbb_callee_task1
+        dvars:
+          - name: da
+            value: local_da_callee_task1
+          - name: db
+            value: local_db_callee_task1
+        do:
+          - callee_task2

@@ -19,29 +19,29 @@ import (
 	"strconv"
 )
 
-func runFlow(f *BlockFuncAction, taskname string) {
-	u.PpmsgvvvvvhintHigh(u.Spf("caller's vars to task (%s):", taskname), f.Vars)
-	ExecTask(taskname, f.Vars)
-
-	//	RefDir string		//load ref task
-	//	refdir := u.CoreConfig.RefDir
-	//
-	//	if task.Ref != "" {
-	//		if task.RefDir != "" {
-	//			rawdir := task.RefDir
-	//			refdir = core.Render(rawdir, core.RuntimeVarsAndDvarsMerged)
-	//		}
-	//
-	//		rawref := task.Ref
-	//		ref := core.Render(rawref, core.RuntimeVarsAndDvarsMerged)
-	//
-	//		yamlflowroot := u.YamlLoader("flow ref", refdir, ref)
-	//		flow := loadRefFlow(yamlflowroot)
-	//		(*tasks)[idx].Task = flow
-	//	}
-	//}
-
-}
+//func runFlow(f *BlockFuncAction, taskname string) {
+//	u.PpmsgvvvvvhintHigh(u.Spf("caller's vars to task (%s):", taskname), f.Vars)
+//	ExecTask(taskname, f.Vars)
+//
+//	//	RefDir string		//load ref task
+//	//	refdir := u.CoreConfig.RefDir
+//	//
+//	//	if task.Ref != "" {
+//	//		if task.RefDir != "" {
+//	//			rawdir := task.RefDir
+//	//			refdir = core.Render(rawdir, core.RuntimeVarsAndDvarsMerged)
+//	//		}
+//	//
+//	//		rawref := task.Ref
+//	//		ref := core.Render(rawref, core.RuntimeVarsAndDvarsMerged)
+//	//
+//	//		yamlflowroot := u.YamlLoader("flow ref", refdir, ref)
+//	//		flow := loadRefFlow(yamlflowroot)
+//	//		(*tasks)[idx].Task = flow
+//	//	}
+//	//}
+//
+//}
 
 type BlockFuncAction struct {
 	Do        interface{}
@@ -50,7 +50,6 @@ type BlockFuncAction struct {
 	Steps     *Steps
 }
 
-//adapt the abstract step.Do to concrete ShellFuncAction Cmds
 func (f *BlockFuncAction) Adapt() {
 	var flowname string
 	var flow Steps
@@ -79,7 +78,7 @@ func (f *BlockFuncAction) Exec() {
 	//	taskname := core.Render(tmptaskname, f.Vars)
 	//	runTask(f, taskname)
 	//}
-	u.Ptmpdebug("88", f.Vars)
+	//u.Ptmpdebug("88", f.Vars)
 	BlockFlowRun(f.Steps, f.Vars)
 }
 
@@ -89,7 +88,9 @@ func BlockFlowRun(flow *Steps, execVars *core.Cache) {
 	}
 	core.BlockStack.Push(&rtContext)
 
-	flow.ExecFlow()
+	//switch to test code
+	//flow.ExecFlow()
+	flow.Exec(true)
 	core.BlockStack.Pop()
 }
 
@@ -160,7 +161,7 @@ func (step *Step) ExecTest() {
 	var bizErr *ee.Error = ee.New()
 	var stepExecVars *core.Cache
 	stepExecVars = step.getRuntimeExecVarsTest("get plain exec vars")
-	u.Ptmpdebug("99", stepExecVars)
+	//u.Ptmpdebug("99", stepExecVars)
 	validation(stepExecVars)
 
 	if step.Flags != nil && u.Contains(step.Flags, "pause") {
@@ -348,11 +349,12 @@ func (step *Step) getRuntimeExecVarsTest(mark string) *core.Cache {
 
 	execvars = deepcopy.Copy(*core.TaskRuntime().ExecbaseVars).(core.Cache)
 
-	u.Ptmpdebug("11", execvars)
+	//u.Ptmpdebug("11", execvars)
+	u.Ptmpdebug("11", "blcok get runtime")
 	taskVars := core.TaskRuntime().TaskVars
 	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
-	u.Ptmpdebug("33", execvars)
-	u.Ptmpdebug("44", step.Vars)
+	//u.Ptmpdebug("33", execvars)
+	//u.Ptmpdebug("44", step.Vars)
 	//if IsCalled() {
 	//	u.Ptmpdebug("if", "if")
 	//	if step.Vars != nil {

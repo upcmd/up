@@ -44,33 +44,39 @@ ExecbaseVars is the the scope containing passed in caller vars
 local vars will be merged depending if it is a callee task
 merge taskvars before final merge as task vars will be the calculated result of current stack
 */
-func (step *Step) getRuntimeExecVars(mark string) *core.Cache {
+func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 	var execvars core.Cache
 	var resultVars *core.Cache
 
 	execvars = deepcopy.Copy(*core.TaskRuntime().ExecbaseVars).(core.Cache)
-
+	//u.Ptmpdebug("22", "others get runtime")
 	//u.Ptmpdebug("11", execvars)
 	taskVars := core.TaskRuntime().TaskVars
 	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
 	//u.Ptmpdebug("33", execvars)
 	//u.Ptmpdebug("44", step.Vars)
 
-	if IsCalled() {
-		//u.Ptmpdebug("if", "if")
-		if step.Vars != nil {
-			mergo.Merge(&step.Vars, &execvars, mergo.WithOverride)
-			resultVars = &step.Vars
-		} else {
-			resultVars = &execvars
-		}
-	} else {
-		//u.Ptmpdebug("else", "else")
+	if fromBlock {
+		blockvars := core.BlockStack.GetTop().(*core.BlockRuntimeContext).BlockBaseVars
+		mergo.Merge(&execvars, blockvars, mergo.WithOverride)
 		mergo.Merge(&execvars, &step.Vars, mergo.WithOverride)
 		resultVars = &execvars
+	} else {
+		if IsCalledTask() {
+			//u.Ptmpdebug("if", "if")
+			if step.Vars != nil {
+				mergo.Merge(&step.Vars, &execvars, mergo.WithOverride)
+				resultVars = &step.Vars
+			} else {
+				resultVars = &execvars
+			}
+		} else {
+			//u.Ptmpdebug("else", "else")
+			mergo.Merge(&execvars, &step.Vars, mergo.WithOverride)
+			resultVars = &execvars
+		}
 	}
-
-	u.Pfvvvv("current exec runtime[%s] vars:", mark)
+	u.Pfvvvv("current exec runtime vars:")
 	u.Ppmsgvvvv(resultVars)
 	//u.Ptmpdebug("55", resultVars)
 
@@ -114,12 +120,12 @@ func validation(vars *core.Cache) {
 
 }
 
-func (step *Step) Exec() {
+func (step *Step) Exec(fromBlock bool) {
 	var action biz.Do
 
 	var bizErr *ee.Error = ee.New()
 	var stepExecVars *core.Cache
-	stepExecVars = step.getRuntimeExecVars("get plain exec vars")
+	stepExecVars = step.getRuntimeExecVars(fromBlock)
 	//u.Ptmpdebug("99", stepExecVars)
 	validation(stepExecVars)
 
@@ -340,7 +346,7 @@ func doElse(elseCalls interface{}, execVars *core.Cache) {
 
 }
 
-func (steps *Steps) Exec() {
+func (steps *Steps) Exec(fromBlock bool) {
 
 	for idx, step := range *steps {
 
@@ -355,7 +361,7 @@ func (steps *Steps) Exec() {
 			core.StepStack.Push(&rtContext)
 
 			//TODO: consider move task vars merging to here
-			step.Exec()
+			step.Exec(fromBlock)
 
 			result := core.StepStack.GetTop().(*core.StepRuntimeContext).Result
 			taskname := core.TaskStack.GetTop().(*core.TaskRuntimeContext).Taskname

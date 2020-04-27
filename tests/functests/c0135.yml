@@ -1,0 +1,62 @@
+doc_meta: |
+  folder: block-func
+  title: call block from task
+  head: |
+    Showcase calling block task from within normal task
+
+    It should override vars in callee's task, however inherits all vars from vars within block func
+
+  sections:
+    - title: Demo
+      log: yes
+
+vars:
+  a: global_aaa
+  b: global_bbb
+  c: global_ccc
+
+tasks:
+  - name: callee_task
+    task:
+      - func: block
+        vars:
+          a: callee_aaa
+        dvars:
+          - name: db
+            value: callee_db
+        do:
+          - func: cmd
+            do:
+              -
+                name: print
+                cmd: |
+                  layer 1
+                  up_runtime_task_layer_number: {{.up_runtime_task_layer_number}}
+                  a: {{.a}}
+                  b: {{.b}}
+                  c: {{.c}}
+                  da: {{.da}}
+                  db: {{.db}}
+              -
+                name: assert
+                cmd:
+                  - '{{eq .a "local_aaa" }}'
+                  - '{{eq .b "local_bbb" }}'
+                  - '{{eq .c "global_ccc" }}'
+                  - '{{eq .da "local_da" }}'
+                  - '{{eq .db "callee_db" }}'
+                flags: [failfast,]
+
+  - name: task
+    task:
+      - func: call
+        vars:
+          a: local_aaa
+          b: local_bbb
+        dvars:
+          - name: da
+            value: local_da
+          - name: db
+            value: local_db
+        do:
+          - callee_task

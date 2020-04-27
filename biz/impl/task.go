@@ -271,7 +271,7 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 					os.Exit(-1)
 				}
 
-				steps.Exec()
+				steps.Exec(false)
 
 				returnVars := core.TaskRuntime().ReturnVars
 				core.TaskStack.Pop()

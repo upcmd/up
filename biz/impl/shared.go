@@ -83,7 +83,7 @@ enter: continue
 	}
 }
 
-func IsCalled() (called bool) {
+func IsCalledTask() (called bool) {
 	if core.TaskStack.GetLen() > 1 {
 		called = true
 	} else {
