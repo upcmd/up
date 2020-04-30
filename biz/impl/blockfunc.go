@@ -19,30 +19,6 @@ import (
 	"strconv"
 )
 
-//func runFlow(f *BlockFuncAction, taskname string) {
-//	u.PpmsgvvvvvhintHigh(u.Spf("caller's vars to task (%s):", taskname), f.Vars)
-//	ExecTask(taskname, f.Vars)
-//
-//	//	RefDir string		//load ref task
-//	//	refdir := u.CoreConfig.RefDir
-//	//
-//	//	if task.Ref != "" {
-//	//		if task.RefDir != "" {
-//	//			rawdir := task.RefDir
-//	//			refdir = core.Render(rawdir, core.RuntimeVarsAndDvarsMerged)
-//	//		}
-//	//
-//	//		rawref := task.Ref
-//	//		ref := core.Render(rawref, core.RuntimeVarsAndDvarsMerged)
-//	//
-//	//		yamlflowroot := u.YamlLoader("flow ref", refdir, ref)
-//	//		flow := loadRefFlow(yamlflowroot)
-//	//		(*tasks)[idx].Task = flow
-//	//	}
-//	//}
-//
-//}
-
 type BlockFuncAction struct {
 	Do        interface{}
 	Vars      *core.Cache
@@ -74,11 +50,6 @@ func (f *BlockFuncAction) Adapt() {
 }
 
 func (f *BlockFuncAction) Exec() {
-	//for _, step := range *f.Steps {
-	//	taskname := core.Render(tmptaskname, f.Vars)
-	//	runTask(f, taskname)
-	//}
-	//u.Ptmpdebug("88", f.Vars)
 	BlockFlowRun(f.Steps, f.Vars)
 }
 

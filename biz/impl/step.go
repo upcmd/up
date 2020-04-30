@@ -24,6 +24,7 @@ import (
 type Step struct {
 	Name   string
 	Do     interface{} //FuncImpl
+	Dox    interface{}
 	Func   string
 	Vars   core.Cache
 	Dvars  core.Dvars
@@ -361,7 +362,11 @@ func (steps *Steps) Exec(fromBlock bool) {
 			core.StepStack.Push(&rtContext)
 
 			//TODO: consider move task vars merging to here
-			step.Exec(fromBlock)
+			if step.Do == nil && step.Dox != nil {
+				u.LogWarn("*", "Step is deactivated!")
+			} else {
+				step.Exec(fromBlock)
+			}
 
 			result := core.StepStack.GetTop().(*core.StepRuntimeContext).Result
 			taskname := core.TaskStack.GetTop().(*core.TaskRuntimeContext).Taskname

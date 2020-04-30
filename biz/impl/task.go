@@ -231,6 +231,7 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 			found = true
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
+
 			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
 			func() {
 				//step name validation

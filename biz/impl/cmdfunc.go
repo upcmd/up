@@ -43,7 +43,6 @@ func (f *CmdFuncAction) Adapt() {
 	var cmds CmdCmds
 
 	switch f.Do.(type) {
-
 	case []interface{}:
 		err := ms.Decode(f.Do, &cmds)
 		u.LogErrorAndExit("Cmd adapter", err, "please fix cmd command configuration")
@@ -51,7 +50,6 @@ func (f *CmdFuncAction) Adapt() {
 	default:
 		u.LogWarn("cmd", "Not implemented or void for no action!")
 	}
-
 	f.Cmds = &cmds
 
 }

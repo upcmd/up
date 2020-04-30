@@ -1,0 +1,28 @@
+doc_meta: |
+  folder: test-debug
+  title: deactivated step
+  head: |
+    A step with a func could be temporarily deactivated by denoated using a extra x, so use dox instead of do
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  - name: task
+    task:
+      - func: cmd
+        do:
+          - name: print
+            cmd: "step1"
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: "step2"
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: "step3"
+
