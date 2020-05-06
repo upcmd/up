@@ -1,6 +1,28 @@
-goal:
-  - showcase the dvar to render value using data field as
-    source rather the global var name space
+doc_meta: |
+  folder: dvars
+  title: datakey as source
+  head: |
+    Previously when we render a dvar, we implicitly use all vars from global runtime scope, however sometimes we need to use a specific data object as the data source to render dvar.
+
+    In this case, we showcase to render dvar value using data field as source rather the global var name space
+
+  sections:
+
+    - title: What's the difference
+      content: |
+        Please note the datakey tag is used and it is pointing to a variable named student. In this caes the reference of {{.school}} will locate the school from global runtime var: .student.school
+
+        Without this tag, the reference of {{.school}} will try to locate a var name school from global runtime
+
+        Please also note that the datakey could be a dynamic using var, this gives you a little extra programmingbility for dynamic routing when you combine with logical if tag
+
+    - title: Demo
+      log: yes
+
+
+notes:
+  goal:
+    - showcase the dvar to render value using data field as source rather the global var name space
 
 vars:
   student:

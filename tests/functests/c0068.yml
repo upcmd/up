@@ -1,19 +1,31 @@
-not_a_bug:
-  given:
-    - the middel step fails
-    - no ignore_error present
-  expect:
-    - it should fail and return the error code
-    - it should not progress to the next step
-  desc: |
-    note that for one step, there will be only one
-    return, which will be the last do cmd
-    in this case, since the step3 exit code is 0
-    the whole step will have the return code of 0
-    if you need to use the exit code of the step
-    you need to consider to reduce the number of do cmds
-    or put it to last step, this is not a bug
-    this is a feature
+doc_meta: |
+  folder: flow-controll
+  title: Exit result per step
+  head: |
+    note that for one step, there will be only one return, which will be the last line in do cmd in this case. Since the step3 exit code is 0 the whole step will have the return code of 0 if you need to use the exit code of the step you need to consider to reduce the number of do cmds or put it to last step, this is not a bug this is a feature
+
+  sections:
+    - title: Demo
+      log: yes
+
+
+notes:
+  not_a_bug:
+    given:
+      - the middel step fails
+      - no ignore_error present
+    expect:
+      - it should fail and return the error code
+      - it should not progress to the next step
+    desc: |
+      note that for one step, there will be only one
+      return, which will be the last do cmd
+      in this case, since the step3 exit code is 0
+      the whole step will have the return code of 0
+      if you need to use the exit code of the step
+      you need to consider to reduce the number of do cmds
+      or put it to last step, this is not a bug
+      this is a feature
 
 tasks:
   -

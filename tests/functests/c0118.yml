@@ -1,5 +1,16 @@
-goal:
-  - use conditional loop
+doc_meta: |
+  folder: loop
+  title: loop with condition
+  head: |
+    This showcases the conditional loop
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - use conditional loop
 
 vars:
   items:

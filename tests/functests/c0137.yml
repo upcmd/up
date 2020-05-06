@@ -17,7 +17,7 @@ tasks:
             cmd: "step1"
 
       - func: cmd
-        do:
+        dox:
           - name: print
             cmd: "step2"
 

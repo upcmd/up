@@ -1,3 +1,20 @@
+doc_meta: |
+  folder: flow-controll
+  title: use break in call
+  head: |
+    Introduce the advanced usage of break cmd in callee task
+
+  sections:
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: break cmd func
+        link: ../../cmd-func/c0120
+      - title: use break to exit from loop
+        link: ../../loop/c0125
+
 goal:
   - demo advanced break usage in callee task
 

@@ -1,5 +1,32 @@
-goal:
-  - demo how to template a file
+doc_meta: |
+  folder: templating
+  title: templating using dvar
+  head: |
+    Showcase how to use external tool, eg shell script to tempate content
+
+  sections:
+    - title: template dynamic content
+      content: |
+        Note that the content of school_address is templated from defined global runtime var
+
+        ```
+        address:
+          suburb:
+            name: {{.student.address.suburb.name}}
+            postcode: 2000
+            CBD: yes
+          school: {{.student.address.school}}
+
+        ```
+
+        The rendered content is dumped to a file and shown afterwards
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - demo how to template a file
 
 vars:
   student:

@@ -1,7 +1,51 @@
-goal:
-  - add featuer to template cmd to support sub element
-  - path format is like a.b.c(name=fr*).value
-  - prefix will be used to get the obj from cache, the rest will be used as yq path
+doc_meta: |
+  folder: templating
+  title: datakey and datapath
+  head: |
+    By default you just implicitly use the global runtime vars as datasource to render a template file.
+
+    This shows that you can use datakey and datapath to reference to a varname and a sub element of a var in global runtime scope
+
+  sections:
+    - title: How to use
+      content: |
+        * the datakey would be a plain text of a var name, or a dynamic templating value to pointing to a var name
+
+        * datapath:
+          format is like a.b.c(name=fr*).value, following the yq path format:
+
+          1. 'a.b.c'
+          2. 'a.*.c'
+          3. 'a.**.c'
+          4. 'a.(child.subchild==co*).c'
+          5. 'a.array[0].blah'
+          6. 'a.array[*].blah'
+
+    - title: Relavant
+      content: render using dvar and datakey
+      refs:
+        - title: use dvar to render
+          link: ../../dvars/c0082
+
+    - title: query and yq datapath
+      content: query details
+      refs:
+        - title: query object
+          link: ../../query-object/c0100
+
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: default golang template reference
+        link: https://github.com/mikefarah/yq
+
+notes:
+  goal:
+    - add featuer to template cmd to support sub element
+    - path format is like a.b.c(name=fr*).value
+    - prefix will be used to get the obj from cache, the rest will be used as yq path
 
 vars:
   school_details_object:

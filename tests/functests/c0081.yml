@@ -1,3 +1,31 @@
+doc_meta: |
+  folder: design-patterns
+  title: externalise task def
+  head: |
+    To extend further more from previous example to show that you can use ref tag to externalise detailed task to separate files, in such a way it is much tidy and clear of your main skeleton of your program and focus what you want to achieve in high level
+
+  sections:
+    - title: Relavant
+      content: Externalise tasks
+      refs:
+        - title: externalise task and use flow
+          link: ../../organization/c0059
+        - title: externalise task and use flow
+          link: ../../organization/c0060
+        - title: externalise task and use flow
+          link: ../../organization/c0061
+        - title: externalise task and use tasksref
+          link: ../../organization/c0062
+
+    - title: c0081_task_compose_required_object.yml reference
+      filelookup: c0081_task_compose_required_object.yml
+
+    - title: c0081_task_render.yml reference
+      filelookup: c0081_task_render.yml
+
+    - title: Demo
+      log: yes
+
 docs:
   mddoc: |
     extend c0080 to use composible main tasks using externised flow configuration

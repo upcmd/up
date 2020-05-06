@@ -1,6 +1,17 @@
-goal:
-  - test a sleep delay cmd
-  - test a dynamic call in a loop
+doc_meta: |
+  folder: cmd-func
+  title: sleep
+  head: |
+    Showcase sleep cmd
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - test a sleep delay cmd
+    - test a dynamic call in a loop
 
 tasks:
   -
@@ -28,7 +39,6 @@ tasks:
         do:
           - '{{.loopitem}}'
         loop: [impl1, impl2]
-
 
   -
     name: impl1

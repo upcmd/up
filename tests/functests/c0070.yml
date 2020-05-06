@@ -1,5 +1,22 @@
-goal:
-  - demo use dvar ref to load common file only
+doc_meta: |
+  folder: dvars
+  title: load file using dvar
+  head: |
+    Showcase dvar ref mechanism could be used to load file
+
+  sections:
+    - title: load a plain file using dvar
+      content: |
+        This demo shows that the ref element in dvar could be used to load a plain text file and the file does not have to be a template file
+
+        This could be used as one style for file loading
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - demo use dvar ref to load common file only
 
 dvars:
 

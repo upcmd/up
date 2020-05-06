@@ -1,7 +1,15 @@
+doc_meta: |
+  folder: call-func
+  title: overriden in callee
+  head: |
+    This showcases the vars in callee will be overriden if there is a same name var passed from caller. This is a feature of call func
+
+  sections:
+    - title: Demo
+      log: yes
 
 notes:
   - to test out that that the caller's var will override callees' local var
-
 
 vars:
   global_a: aaa
@@ -29,6 +37,11 @@ tasks:
           - name: print
             cmd: '{{.tom}}'
 
+          -
+            name: assert
+            cmd:
+              - '{{eq .tom "my name is tom"}}'
+
       -
         func: cmd
         vars:
@@ -36,3 +49,7 @@ tasks:
         do:
           - name: print
             cmd: '{{.tom}}'
+          -
+            name: assert
+            cmd:
+              - '{{eq .tom "my name is tom"}}'

@@ -1,10 +1,23 @@
-goal:
-  - add new feature of return from callee task
-  - |
-    application could be use as auto returned vars to parent var scope,
-    or use as a callerable task module to do a callback data injection
-    for other client caller tasks
-  - notice the difference between c0107 and this case
+doc_meta: |
+  folder: call-func
+  title: return values
+  head: |
+    As we know you will actually implicitly creaet a whole private call stack and spawn a private local vars in this scope, in such a case the work you have done, including register some values to global(relatively to this private stack), will not be reflected in your caller's var scope. So how do you keep your result in case that you really need to do so.
+
+    We can use return cmd to achieve that. When you use return cmd, all the listed var names' values will be registered to its caller's var scope
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - add new feature of return from callee task
+    - |
+      application could be use as auto returned vars to parent var scope,
+      or use as a callerable task module to do a callback data injection
+      for other client caller tasks
+    - notice the difference between c0107 and this case
 
 vars:
   tom: this is tom in global
@@ -27,6 +40,12 @@ tasks:
           - name: print
             cmd: 'in main task print3: {{.tom}}'
 
+          -
+            name: assert
+            desc: since .tom is returned from callee, it should be accessible here
+            cmd:
+              - '{{eq .tom "tom created in sub_loop"}}'
+
   -
     name: subtask
     desc: subtask to test reg and return
@@ -46,6 +65,11 @@ tasks:
           - name: print
             cmd: 'in sub_loop print1: {{.tom}}'
 
+          -
+            name: assert
+            cmd:
+              - '{{eq .tom "tom created in sub_loop"}}'
+
       -
         func: cmd
         desc: check value of tom and it should be available in current stack
@@ -55,8 +79,16 @@ tasks:
           - name: print
             cmd: 'in sub_loop print2: {{.tom}}'
 
+          -
+            name: assert
+            desc: since .tom is in callee's global, it should be accessible here
+            cmd:
+              - '{{eq .tom "tom created in sub_loop"}}'
+
           - name: return
-            desc: it should return and merge tom to parent's vars scope and it should report warning as jason does not exist
+            desc: |
+              it should return and merge tom to parent's vars scope
+              it should report warning as jason does not exist
             cmd:
               - tom
               - jason

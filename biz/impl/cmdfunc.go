@@ -29,6 +29,7 @@ type CmdCmd struct {
 	Name  string
 	Desc  string
 	Cmd   interface{}
+	Cmdx  interface{}
 	Flags []string
 }
 
@@ -51,7 +52,6 @@ func (f *CmdFuncAction) Adapt() {
 		u.LogWarn("cmd", "Not implemented or void for no action!")
 	}
 	f.Cmds = &cmds
-
 }
 
 func (cmdCmd *CmdCmd) runCmd(whichtype string, f func()) {
@@ -85,6 +85,13 @@ func (cmdCmd *CmdCmd) runCmd(whichtype string, f func()) {
 			f()
 		} else {
 			invalidTypeHint("array")
+		}
+
+	case nil:
+		if cmdCmd.Cmdx != nil {
+			u.LogWarn("cmd", "temporarily deactivated")
+		} else {
+			u.LogWarn("cmd", "lacking detailed implementation yet")
 		}
 
 	default:
@@ -397,8 +404,6 @@ func (f *CmdFuncAction) Exec() {
 						yqpath = core.Render(raw, f.Vars)
 					case "verbose":
 						verbose = v.(string)
-					case "inplace":
-						inplace = v.(bool)
 					case "reg":
 						raw = v.(string)
 						reg = core.Render(raw, f.Vars)
@@ -407,6 +412,9 @@ func (f *CmdFuncAction) Exec() {
 
 				doFlag("localonly", func() {
 					localonly = true
+				})
+				doFlag("inplace", func() {
+					inplace = true
 				})
 
 				if yqpath == "" || ymlfile == "" {
@@ -478,7 +486,7 @@ func (f *CmdFuncAction) Exec() {
 					modified, err = yq.UpWriteNodeFromStrForComplexValueFromYmlStr(ymlstr, yqpath, nodevalue, verbose)
 				}
 
-				u.LogErrorAndContinue("write node in yml", err, u.Spf("please ensure correct yml query path: %s", yqpath))
+				u.LogErrorAndContinue("write node in yml", err, u.Spf("please ensure correct yml query path: %s\nand check yml content validity:\n%s\n", yqpath, u.PrintContentWithLineNuber(ymlstr)))
 
 				u.Ppmsgvvvvvhint("yml modified:", modified)
 
@@ -605,6 +613,10 @@ func (f *CmdFuncAction) Exec() {
 			})
 			u.Ppmsgvvvvvhint("after reg the var - contextual global:", core.TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
+
+		case "":
+			u.LogWarn("cmd", "temporarily deactivated")
+
 		default:
 			u.Pferror("warrning: check cmd name:(%s),%s\n", cmdItem.Name, "cmd not implemented")
 		}

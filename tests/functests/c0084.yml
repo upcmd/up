@@ -1,5 +1,9 @@
-goal:
-  - check that writefile command do not append
+
+notes:
+  goal:
+    - internal test
+    - do not include into docs
+    - check that writefile command do not append
 
 tasks:
   -

@@ -1,5 +1,31 @@
-goal:
-  - add pause cmd
+doc_meta: |
+  folder: test-debug
+  title: pause and inspect
+  head: |
+    pause cmd is mainly for debugging purpose, you can use it inspect internal exec runtime vars
+
+  sections:
+    - title: How to use
+      content: |
+        during the runtime, if a pause cmd is executed, then it will pause to give a user prompt:
+
+        ```
+        Enter Value For pause action to continue:
+
+        enter: continue
+          q: quit
+          i: inspect
+        ```
+
+        You can hit enter to continue, or q to quite, or i to inspect the runtime exec vars
+
+    - title: Demo
+      log: yes
+
+
+notes:
+  goal:
+    - add pause cmd
 
 tasks:
   -

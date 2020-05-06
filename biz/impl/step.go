@@ -410,6 +410,7 @@ func (steps *Steps) Exec(fromBlock bool) {
 			execStep()
 		} else {
 			core.TaskBreak = false
+			u.LogWarn("break", "client chose to break")
 			break
 		}
 

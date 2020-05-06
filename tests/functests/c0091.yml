@@ -1,8 +1,12 @@
-goal:
-  - |
-    demo 3 layers loop to show the loopitem in each layer
-    is from parent
-  - the callee will inherit all vars/dvars from caller chain through to the root caller
+doc_meta: |
+  folder: loop
+  title: multi-layers loop 1
+  head: |
+    This case demos 3 layers of loop to show the loopitem in each layer is from parent and the callee will inherit all vars/dvars from caller chain through to the root caller
+
+  sections:
+    - title: Demo
+      log: yes
 
 tasks:
 

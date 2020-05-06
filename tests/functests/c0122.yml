@@ -12,6 +12,13 @@ doc_meta: |
     - title: Demo
       log: yes
 
+  related:
+    refs:
+      - title: advanced usage of break in call func
+        link: ../../flow-controll/c0121
+      - title: use break to exit from loop
+        link: ../../loop/c0125
+
 notes:
   goal:
     - demo how to reference to a non exist element

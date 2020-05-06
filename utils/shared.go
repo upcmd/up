@@ -9,6 +9,8 @@ package utils
 
 import (
 	"fmt"
+	"io/ioutil"
+	"path"
 	"strings"
 	"time"
 )
@@ -63,5 +65,13 @@ func PrintContentWithLineNuber(content string) string {
 		withLineNuber += fmt.Sprintf("%5d:%s\n", idx+1, line)
 	}
 	return withLineNuber
+}
+
+func DebugYmlContent(dir, filename string) {
+	filepath := path.Join(dir, filename)
+
+	content, err := ioutil.ReadFile(filepath)
+	LogErrorAndExit(Spf("loading raw content: %s", filepath), err, "please fix file path and name issues")
+	LogWarn("Check validity of yml content", PrintContentWithLineNuber(string(content)))
 }
 

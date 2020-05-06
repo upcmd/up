@@ -1,3 +1,20 @@
+doc_meta: |
+  folder: cmd-func
+  title: break cmd
+  head: |
+    Introduce the break cmd
+
+  sections:
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: advanced usage of break in call func
+        link: ../../flow-controll/c0121
+      - title: use break to exit from loop
+        link: ../../loop/c0125
+
 goal:
   - introduce break cmd
 

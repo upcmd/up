@@ -1,16 +1,30 @@
-goal:
-  - show call func can be use to segregate a var scope due to its nature
-  - |
-    because all called tasks inerit the vars/dvars from calling func, so
-    if you want to have a bound scope of vars/dvars, you can define the
-    vars/dvars in calling func and they will be availabe in all funcs in
-    called funcs within the task
-  - |
-    this example shows that defined vars layer1_aaa, layer1_bbb are available
-    in both funcss of task layer2
-  - |
-    it is powerful to wrap up reusable code into a task which sharing the same
-    set of vars/dvars
+doc_meta: |
+  folder: design-pattern
+  title: private var scope
+  head: |
+    A important feature of call func is to segregate a group of vars, including local vars and all inheriting vars in callee from other func's local vars
+
+    The key to use this patter is to use multiple layers of call hierarchical structure, for example, main task, the routing layer func, the implmentation layer tasks. You will put all local vars to a call func, so that the global vars scope will not be polluted, changes will be made and applied within the layer of called implementation only
+
+  sections:
+    - title: Demo
+      log: yes
+
+
+notes:
+  goal:
+    - show call func can be used to segregate a var scope due to its nature
+    - |
+      because all called tasks inerit the vars/dvars from calling func, so
+      if you want to have a bound scope of vars/dvars, you can define the
+      vars/dvars in calling func and they will be availabe in all funcs in
+      called funcs within the task
+    - |
+      this example shows that defined vars layer1_aaa, layer1_bbb are available
+      in both funcss of task layer2
+    - |
+      it is powerful to wrap up reusable code into a task which sharing the same
+      set of vars/dvars
 
 tasks:
 

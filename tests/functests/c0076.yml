@@ -1,6 +1,27 @@
+doc_meta: |
+  folder: vars
+  title: local vs reg global
+  head: |
+    Showcase that local var is only available in local runtime for that func, if you need to use it global runtime, you will need to use template func reg or reg cmd to set it in global runtime
 
-goal:
-  - showcase cmd in a formal way
+  sections:
+    - title: Prerequisites
+      content: |
+        * template reg action
+        * reg cmd
+      refs:
+        - title: template reg action
+          link: ../../template/c0042/
+        - title: reg cmd
+          link: ../../cmd-func/c0066/
+
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: default golang template reference
+        link: https://golang.org/pkg/text/template/
 
 tasks:
 
@@ -16,7 +37,10 @@ tasks:
 
       -
         func: cmd
-        desc: test register a variable to global vars
+        desc: |
+          test register a variable to global vars
+          the reg_hello should be <no value> since this is a template action
+          you should really use dvar name void instead
         dvars:
           - name: reg_hello
             value: |

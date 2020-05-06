@@ -1,13 +1,18 @@
-docs:
-  mddoc: |
+doc_meta: |
+  folder: design-patterns
+  title: data structure
+  head: |
     show how to use the design pattern of composibility to form a data structure
 
-    ## Firstly, the proper way using UP cmd is to use defined template to gradually stubstitue
-    all the required variables, then register it with a formal name, remember the yaml doc is a
-     text, also it's convertable to become a object, so that you can use it in your template
+    Firstly, the proper way using UP cmd is to use defined template to gradually stubstitue all the required variables, then register it with a formal name, remember the yaml doc is a text, also it's convertable to become a object, so that you can use it in your template
 
-    ## The reason why the school_* vars are defined in local func scope is to show that this var
-    could be obtained in runtime in complex scenarios
+    The reason why the school_* vars are defined in local func scope is to show that this var could be obtained in runtime in complex scenarios
+
+    Please note the expand level does make it more dynamic and you should make wise use of this feature
+
+  sections:
+    - title: Demo
+      log: yes
 
 vars:
   complex_data_structure_template: |

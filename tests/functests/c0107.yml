@@ -1,7 +1,20 @@
-goal:
-  - to fix a bug in callee task which var has been updated but not reflected
-  - introduce trace to set a colorful trace marker to easily locate problem in verbose log
-  - demo that the vars in callee task has its own stack
+doc_meta: |
+  folder: test-debug
+  title: ues trace
+  head: |
+    For a complicated workflow, if you need to trace and pin point a step, you can use trace cmd. This introduces trace to set a colorful trace marker to easily locate problem in verbose log
+
+    Please note that the display of trace is colored in terminal output
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to fix a bug in callee task which var has been updated but not reflected
+    - introduce trace to set a colorful trace marker to easily locate problem in verbose log
+    - demo that the vars in callee task has its own stack
 
 vars:
   tom: this is tom in global
@@ -13,7 +26,7 @@ tasks:
     task:
       -
         func: call
-        do: sub_loop
+        do: sub
 
       -
         func: cmd
@@ -23,22 +36,22 @@ tasks:
             cmd: 'in main task print3: {{.tom}}'
 
   -
-    name: sub_loop
+    name: sub
     task:
       -
         func: cmd
         desc: check value of tom 1
         vars:
-          john: john in sub_loop func1
+          john: john in sub func1
         do:
           - name: reg
             cmd:
               name: tom
-              desc: by default hitom is registered in to global context
-              value: 'tom created in sub_loop'
+              desc: by default tom is registered in to global context
+              value: 'tom created in sub'
 
           - name: print
-            cmd: 'in sub_loop print1: {{.tom}}'
+            cmd: 'in sub print1: {{.tom}}'
 
       -
         func: cmd
@@ -50,10 +63,10 @@ tasks:
         func: cmd
         desc: check value of tom 2
         vars:
-          john: john in sub_loop func2
+          john: john in sub func2
         do:
           - name: print
-            cmd: 'in sub_loop print2: {{.tom}}'
+            cmd: 'in sub print2: {{.tom}}'
 
       -
         func: cmd

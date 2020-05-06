@@ -1,5 +1,17 @@
-goal:
-  - to test out the task vars dealing in sub task is all correct and expected
+doc_meta: |
+  folder: vars
+  title: taskscope vars in callee
+  head: |
+    This is a test case to show that the taskscope var could be passed to callee task and it will override what has been defined in callee if the var name is same
+
+  sections:
+    - title: Demo
+      log: yes
+
+
+notes:
+  goal:
+    - to test out the task vars dealing in sub task is all correct and expected
 
 vars:
   tom: this is tom
@@ -40,10 +52,12 @@ tasks:
       -
         func: cmd
         vars:
-          jerry: jerry is overrided in local scope
+          jerry: jerry is overriden in local scope
         do:
           - name: print
-            desc: var jerry in task scope is overrided by local var jerry
+            desc: |
+              remember that the caller's vars should override callee's vars
+              so jerry's value should the one from caller instead this local value
             cmd: '{{.jerry}}'
           - name: trace
             cmd: <===

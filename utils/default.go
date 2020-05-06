@@ -29,6 +29,10 @@ var (
 version: 1.0.0
 Verbose: v
 MaxCallLayers: 8
+RefDir: .
+TaskFile: up
+ConfigDir: .
+ConfigFile: upconfig
 `
 
 	DEFAULT_UP_TASK_YML = `

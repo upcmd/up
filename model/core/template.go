@@ -107,7 +107,7 @@ func Render(tstr string, obj interface{}) string {
 
 	var result bytes.Buffer
 	err = t.Execute(&result, obj)
-	u.LogErrorAndContinue("template rendering", err, "Please fix the template issue and try again")
+	u.LogErrorAndContinue("template rendering problem", err, u.PrintContentWithLineNuber(tstr))
 
 	return result.String()
 }

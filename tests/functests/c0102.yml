@@ -1,8 +1,36 @@
-goal:
-  - add feature to delete a node from yaml file
-  - inplace and reg/localonly are mutual exclusive
-  - refdir is optional, if empty then default to global configured
+doc_meta: |
+  folder: cmd-func
+  title: delete in yml file
+  head: |
+    yml_delte cmd allow you to delete key from a yml file.
 
+  sections:
+    - title: How to use
+      content: |
+        * ymlfile: the yml filename
+        * refdir: optional directory of the ymlfile located, default to the global refdir from command line, or global configured
+        * path: path is the yq path
+        * reg: the var name to register to
+        * flags:
+          * localonly: to indicate that the registered var is in local func var scope
+          * inpace: the delete operation applied directly to file, otherwise the change will be made to the registered var only
+
+        Note that inplace and reg/localonly are mutual exclusive
+
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: yq and yq path reference
+        link: https://github.com/mikefarah/yq
+
+
+notes:
+  goal:
+    - add feature to delete a node from yaml file
+    - inplace and reg/localonly are mutual exclusive
+    - refdir is optional, if empty then default to global configured
 
 vars:
   mock_yml: |
@@ -33,8 +61,10 @@ tasks:
               ymlfile: mock_yml.yml
               refdir: /tmp
               path: jason.sex
-              inplace: true
               verbose: v
+            flags:
+              - inplace
+
 
           - name: readfile
             desc: check new file content

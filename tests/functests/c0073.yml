@@ -1,18 +1,25 @@
-goal:
-  - demo yaml multiple line usage
-  - demo the line break could be controlled with different indicator
-  - it will be used in c0072
+doc_meta: |
+  folder: syntax
+  title: multiline styles
+  head: |
+    Demos the yaml multiple line usage and shows that the line break could be controlled with different indicator
 
-notes: |
-  ref: https://yaml-multiline.info/
-  Block Scalars
-  A block scalar header has three parts:
+  sections:
+    - title: Block Scalars
+      content: |
+        Block Style Indicator: The block style indicates how newlines inside the block should behave. If you would like them to be kept as newlines, use the literal style, indicated by a pipe (|). If instead you want them to be replaced by spaces, use the folded style, indicated by a right angle bracket (>). (To get a newline using the folded style, leave a blank line by putting two newlines in. Lines with extra indentation are also not folded.)
 
-  Block Style Indicator: The block style indicates how newlines inside the block should behave. If you would like them to be kept as newlines, use the literal style, indicated by a pipe (|). If instead you want them to be replaced by spaces, use the folded style, indicated by a right angle bracket (>). (To get a newline using the folded style, leave a blank line by putting two newlines in. Lines with extra indentation are also not folded.)
+          Block Chomping Indicator: The chomping indicator controls what should happen with newlines at the end of the string. The default, clip, puts a single newline at the end of the string. To remove all newlines, strip them by putting a minus sign (-) after the style indicator. Both clip and strip ignore how many newlines are actually at the end of the block; to keep them all put a plus sign (+) after the style indicator.
 
-  Block Chomping Indicator: The chomping indicator controls what should happen with newlines at the end of the string. The default, clip, puts a single newline at the end of the string. To remove all newlines, strip them by putting a minus sign (-) after the style indicator. Both clip and strip ignore how many newlines are actually at the end of the block; to keep them all put a plus sign (+) after the style indicator.
+          Indentation Indicator: Ordinarily, the number of spaces you're using to indent a block will be automatically guessed from its first line. You may need a block indentation indicator if the first line of the block starts with extra spaces. In this case, simply put the number of spaces used for indentation (between 1 and 9) at the end of the header.
 
-  Indentation Indicator: Ordinarily, the number of spaces you're using to indent a block will be automatically guessed from its first line. You may need a block indentation indicator if the first line of the block starts with extra spaces. In this case, simply put the number of spaces used for indentation (between 1 and 9) at the end of the header.
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: Block Scalars
+        link: https://yaml-multiline.info/
 
 vars:
   my_interesting_story1: |

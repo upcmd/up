@@ -1,3 +1,12 @@
+doc_meta: |
+  folder: call-func
+  title: multiple layers overriding
+  head: |
+    This showcases the vars in callee will be overriden if there is a same name var passed from caller. This is a feature of call func
+
+  sections:
+    - title: Demo
+      log: yes
 
 notes:
   - need a new design of caller vars passing down to callee
@@ -34,6 +43,12 @@ tasks:
           - name: print
             cmd: '{{.tom}}'
 
+          -
+            name: assert
+            cmd:
+              - '{{eq .tom "my name is tom"}}'
+
+
       -
         func: cmd
         vars:
@@ -41,6 +56,11 @@ tasks:
         do:
           - name: print
             cmd: '{{.tom}}'
+
+          -
+            name: assert
+            cmd:
+              - '{{eq .tom "my name is tom"}}'
 
       -
         func: call
@@ -56,6 +76,11 @@ tasks:
           - name: print
             cmd: '{{.tom}}'
 
+          -
+            name: assert
+            cmd:
+              - '{{eq .tom "my name is tom"}}'
+
       -
         func: cmd
         vars:
@@ -63,3 +88,9 @@ tasks:
         do:
           - name: print
             cmd: '{{.tom}}'
+
+
+          -
+            name: assert
+            cmd:
+              - '{{eq .tom "my name is tom"}}'

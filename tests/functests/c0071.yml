@@ -1,7 +1,32 @@
-goal:
-  - demo use dvar ref to load common file only
-  - add cmd cmd readfile and register to a named var
-  - add cmd cmd write file to save to a file
+doc_meta: |
+  folder: cmd-func
+  title: read/write file
+  head: |
+    Showcase how to use readfile and writefile cmd
+
+  sections:
+    - title: my story text file reference
+      filelookup: d0070.txt
+
+    - title: How to use?
+      content: |
+        * writefile
+          conent: the static or dynamic content
+          filename: the filename to write to
+          dir: directory of the file to save to
+        * readfile
+          filename: the filename to read from
+          dir: directory of the file to read from
+          reg: the register var name of the file content will be loaded to
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - use dvar ref to load common file only
+    - add cmd readfile and register to a named var
+    - add cmd write file to save to a file
 
 dvars:
 

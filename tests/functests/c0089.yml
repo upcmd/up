@@ -1,5 +1,35 @@
-goal:
-  - add dynamic refdir support for task ref
+doc_meta: |
+  folder: organization
+  title: load from refdir
+  head: |
+    By default when you use ref tag to load taskfrom a file, it will use the default refdir from cli command line args, however this could be overriden using the refdir tag in task configuration
+
+  sections:
+    - title: how does it work?
+      content: |
+        By default the the refdir should be from below command line, its value will be: ./tests/functests
+
+        ```
+        up ngo -d ./tests/functests -t $1 -i dev -v vvvv --configdir=./tests/functests
+        ```
+
+        In this case, the refdir is overriden using your own customised location
+
+    - title: Relavant
+      content: load dvar using refdir
+      refs:
+        - title: externalise dvar and use refdir
+          link: ../../organization/c0088
+
+    - title: Externalized c0089-task-main.yml reference
+      filelookup: c0089-task-main.yml
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - add dynamic refdir support for task ref
 
 vars:
   dynadir: ./tests/functests

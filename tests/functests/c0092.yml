@@ -1,5 +1,16 @@
-goal:
-  - add feature of dynamic call routing
+doc_meta: |
+  folder: flow-controll
+  title: dynamic routing
+  head: |
+    This case shows that you can use a var reference in your callee task name so that the action could be dynamic and you can program your workflow using this feature
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - add feature of dynamic call routing
 
 tasks:
 

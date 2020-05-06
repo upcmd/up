@@ -1,3 +1,25 @@
+doc_meta: |
+  folder: query-object
+  title: parse yml to object
+  head: |
+    Showcase you can load a yml file and parse the content to object
+
+  sections:
+    - title: How to use
+      content: |
+        Simply use dvar ref to load the content and also flag it to be converted to_object
+
+        The print cmd shows how to use the object and reference in golang template to iterate through the elements
+
+    - title: Relavant
+      content: to_object cmd
+      refs:
+        - title: to_object cmd
+          link: ../../cmd-func/c0095
+
+    - title: Demo
+      log: yes
+
 docs:
   goal:
     - to test that I can parse this file to an object and use it in templating

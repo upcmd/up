@@ -1,5 +1,16 @@
-goal:
-  - to test the var scope and its aviablity
+doc_meta: |
+  folder: vars
+  title: var scope and accessibility
+  head: |
+    Showcase the var scope, how local var and global is diffent
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to test the var scope and its aviablity
 
 vars:
   tom: this is tom
@@ -55,5 +66,5 @@ tasks:
         func: cmd
         do:
           - name: print
-            desc: by default hitom is accessible from global context, that's why it is accessiable cross func
+            desc: hijerry is not accessible here and got <no value>
             cmd: '{{.hijerry}}'

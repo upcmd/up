@@ -277,7 +277,7 @@ func LogErrorAndContinue(mark string, err interface{}, hint string) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
 		hiColor := color.New(color.FgHiYellow, color.BgHiMagenta)
-		hiColor.Printf("WARN: %s\n", hint)
+		hiColor.Printf("WARN:\n%s\n", hint)
 	}
 }
 

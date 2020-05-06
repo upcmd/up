@@ -1,9 +1,30 @@
-goal:
-  - add a cmd to convert yml to object
-  - |
-    to_object in dvar is limited and can not inherit
-    the loopitem unless you register the loopitem to another var
-  - it does not need load to implment load from file, use readfile instead
+doc_meta: |
+  folder: cmd-func
+  title: to_object
+  head: |
+    to_object is a cmd to convert yml string to a a registered variable. By default it will register the var to global runtime scope, you can use flag localonly to indicate that this var will be only registered to local scope
+
+  sections:
+    - title: Difference from to_object in dvar
+      content: |
+        to_object in dvar is limited and can not inherit the loopitem unless you register the loopitem to another var
+
+    - title: Relavant
+      content: to_object in dvar
+      refs:
+        - title: to_object in dvar
+          link: ../../query-object/c0074
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - add a cmd to convert yml to object
+    - |
+      to_object in dvar is limited and can not inherit
+      the loopitem unless you register the loopitem to another var
+    - it does not need load to implment load from file, use readfile instead
 
 tasks:
 

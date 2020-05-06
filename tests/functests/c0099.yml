@@ -1,3 +1,19 @@
+doc_meta: |
+  folder: dvars
+  title: datatemplate
+  head: |
+    Sometime you may need to do some adhoc message transformation in an elegant way, you would like to implementate your internal code or logic based on a interface / contract rather than external direct mapping. In such a scenario, it is better we could use a mapping layer to sheld your code suffering the impact of external change. We can use datatemplate for this purpose. In datatemplate definition, you map your own data structure/object with external vars/objects, then in your rendered value, you use the reference to your own object/key/value etc to generate the value required for your own business
+
+  sections:
+    - title: Relavant
+      content: templating using datakey and datapath
+      refs:
+        - title: use datakey and datapath in templating
+          link: ../../dvars/c0096
+
+    - title: Demo
+      log: yes
+
 goal:
   - showcase the dvar to render value using sub element of an var rather the global var name space
   - extension to c0082 and c0098

@@ -1,7 +1,21 @@
-goal:
-  - |
-    add feature dvar void var, which is a name that doing something,
-    eg reg a var but makes no sense to be used globally at all
+doc_meta: |
+  folder: dvars
+  title: void for action
+  head: |
+    Showcase that you can use void as name of a dvar in case your intention is to use golang template func for an action rather than just rendering
+
+  sections:
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: reg and void
+        link: ../../template/c0042
+notes:
+  goal:
+    - |
+      add feature dvar void var, which is a name that doing something, eg reg a var but makes no sense to be used globally at all
 
 vars:
   lines: |-

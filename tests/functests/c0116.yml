@@ -1,7 +1,9 @@
-goal:
-  - add feature to show task tree
-  - test task inspect
-  - goup list task -d ./tests/functests -t c0116.yml -i dev --configdir=./tests/functests
+notes:
+  goal:
+    - not included to docs
+    - add feature to show task tree
+    - test task inspect
+    - goup list task -d ./tests/functests -t c0116.yml -i dev --configdir=./tests/functests
 
 tasks:
   -

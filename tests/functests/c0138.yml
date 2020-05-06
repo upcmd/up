@@ -1,0 +1,52 @@
+doc_meta: |
+  folder: test-debug
+  title: deactivated sub step in cmd
+  head: |
+    This shows how to deactivate a sub step
+
+  sections:
+    - title: cmd
+      content: |
+        add a extra x to cmd to make it cmdx as indication to deactivate for the time being
+
+    - title: name
+      content: |
+        add a extra x to name to make it namex as indication to deactivate for the time being, this is for the cases for the simple cmd only, such as exit, break etc
+
+    - title: Demo
+      log: yes
+
+tasks:
+  - name: task
+    task:
+      - func: cmd
+        do:
+          - name: print
+            cmdy: "step1"
+          - name: print
+            cmdx: "step2"
+          - name: print
+            cmd: "step3"
+
+
+      - func: cmd
+        do:
+          - name: print
+            cmdy: "step4"
+
+          - namex: exit
+
+          - namex: break
+
+          - name: print
+            cmdy: "step4"
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: "step5"
+
+      - func: cmd
+        do:
+          - name: print
+            cmdx: "step6"

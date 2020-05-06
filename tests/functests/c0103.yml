@@ -1,5 +1,33 @@
-goal:
-  - add feature to modify a node value of a yml string
+doc_meta: |
+  folder: cmd-func
+  title: modify yml content
+  head: |
+    yml_write cmd allow you to modify yml content with provide simple or complex value
+
+  sections:
+    - title: How to use
+      content: |
+        * ymlstr: use a templating expression to load a predefined yml value, you could use readfile or other mechansim to preload yml content to a var name
+        * path: path is the yq path
+        * value: a simple value of string
+        * nodevalue: a complex value in yml content
+        * reg: the var name to register to
+        * flags:
+          * localonly: to indicate that the registered var is in local func var scope
+
+        Note that value and nodevalue are mutual exclusive
+
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: yq and yq path reference
+        link: https://github.com/mikefarah/yq
+
+notes:
+  goal:
+    - add feature to modify a node value of a yml string
 
 vars:
   tom: |

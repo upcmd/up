@@ -1,6 +1,17 @@
-goal:
-  - make loop item and index parsablele in dvar
-  - loopitem and index will never be availab in dvar expansion phase as designed
+doc_meta: |
+  folder: loop
+  title: loopitem in dvar
+  head: |
+    This showcases that the loopitem, loopindex should be available in the dvar as reference. This will be useful when you use a call func to loop through a list of items
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - make loop item and index parsablele in dvar
+    - loopitem and index will never be availab in dvar expansion phase as designed
 
 tasks:
   -

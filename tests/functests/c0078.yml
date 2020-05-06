@@ -1,6 +1,12 @@
-docs:
-  mddoc: |
-    demo how to make the dvar auto extend to global wide accessible
+doc_meta: |
+  folder: dvars
+  title: dvar to global
+  head: |
+    Showcase that you can use flag reg to extend the local defined dvar to be available in global runtime so that other func step could reference and use it
+
+  sections:
+    - title: Demo
+      log: yes
 
 tasks:
   -

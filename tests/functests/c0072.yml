@@ -1,7 +1,31 @@
-goal:
-  - add cmd cmd template as a shortcut to render file
-  - test case shows that you can use vars in src and dest
-  -
+doc_meta: |
+  folder: templating
+  title: use template cmd
+  head: |
+    Showcase use template cmd to template
+
+  sections:
+    - title: my story text file reference
+      filelookup: d0072.template
+
+    - title: How to use?
+      content: |
+        By default, all the vars from within the template will be substituted from the vars
+
+        It also demos that the rendered result could be a dynamic variable which pointing to a filename
+
+    - title: Demo a use env var as input to determine working dir
+      content: |
+        This demos that if GOTEST env variable is set, then load the file from testing directory or root dir
+
+    - title: Demo
+      log: yes
+
+
+notes:
+  goal:
+    - add cmd template as a shortcut to render file
+    - test case shows that you can use vars in src and dest
 
 vars:
   name: little prince
@@ -34,7 +58,7 @@ tasks:
           - name: reg
             cmd:
               name: correct_working_dir
-              desc: the value of .intest is string but not bool so you can not simple use if .intest for condition
+              desc: the value of .intest is string but not bool so you can not simply use if .intest for condition
               value: >-
                 {{if eq .intest "true" }}{{.register_task_root}}{{else}}{{.register_task_root}}{{end}}
 

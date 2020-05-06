@@ -1,7 +1,20 @@
-goal:
-  - demo a workflow using return in different cases
-  - the location of return cmd used could result in different result in parent vars scope
-  - this proves the design of local
+doc_meta: |
+  folder: call-func
+  title: sequence matters in return 2
+  head: |
+    This shows that the sequence of the return matters.
+
+    In this demo, when callee's var value is updated in its own stack or callee stack, the return cmd will return the updated value to caller
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - demo a workflow using return in different cases
+    - the location of return cmd used could result in different result in parent vars scope
+    - this proves the design of local
 
 vars:
   tom: this is tom in global

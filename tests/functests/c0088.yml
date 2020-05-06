@@ -1,5 +1,33 @@
-goal:
-  - to test out dvars object can be loaded from a dynamic ref dir
+doc_meta: |
+  folder: dvars
+  title: load from refdir
+  head: |
+    By default when you use ref tag to load dvar value from a file, it will use the default refdir from cli command line args, however this could be overriden using the refdir tag in dvar config
+
+  sections:
+    - title: how does it work?
+      content: |
+        By default the the refdir should be from below command line, its value will be: ./tests/functests
+
+        ```
+        up ngo -d ./tests/functests -t $1 -i dev -v vvvv --configdir=./tests/functests
+        ```
+
+        In this case, the refdir is overriden using your own customised location
+
+    - title: Relavant
+      content: load task using refdir
+      refs:
+        - title: externalise task and use refdir
+          link: ../../organization/c0089
+
+    - title: Demo
+      log: yes
+
+
+notes:
+  goal:
+    - to test out dvars object can be loaded from a dynamic ref dir
 
 vars:
   student:
@@ -11,7 +39,6 @@ vars:
         postcode: 2000
         CBD: yes
       school: Sydney Grammar
-
 
 tasks:
 

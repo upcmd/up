@@ -1,3 +1,13 @@
+doc_meta: |
+  folder: loop
+  title: condition with until
+  head: |
+    This showcases using until key word to exit loop
+
+  sections:
+    - title: Demo
+      log: yes
+
 goal:
   - introduce until key word to exit loop
   - deom 3 loop cases

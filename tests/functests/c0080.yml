@@ -1,5 +1,15 @@
-docs:
-  mddoc: |
+doc_meta: |
+  folder: design-patterns
+  title: modular tasks
+  head: |
+    To extend from previous example to show that you can use call func to chain through your tasks so it is more modular and clear
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal: |
     extend c0079 to use composible call to make tasks configuration modular
 
 vars:

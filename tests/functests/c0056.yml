@@ -1,6 +1,6 @@
 doc_meta: |
-  folder: flow-controll
-  title: loop
+  folder: loop
+  title: loop basics
   weight: 1400
   head: |
     Showcase use loop in UP cmd cli

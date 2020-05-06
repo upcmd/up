@@ -1,6 +1,17 @@
-goal:
-  - add feature of dynamic call routing
-  - show a little dynamic using if
+doc_meta: |
+  folder: flow-controll
+  title: dynamic routing extra
+  head: |
+    This case shows that you can use combination of if statement and a var reference in your callee task name
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - add feature of dynamic call routing
+    - show a little dynamic using if
 
 tasks:
 

@@ -1,6 +1,46 @@
-goal:
-  - showcase the dvar to render value using sub element of an var rather the global var name space
-  - extension to c0082
+doc_meta: |
+  folder: dvars
+  title: datapath
+  head: |
+    Other than use datakey as data source for dvar rending, you can use datapath to reference to a varname and a sub element of a var in global runtime scope
+
+  sections:
+    - title: How to use
+      content: |
+        * datapath:
+          format is like a.b.c(name=fr*).value, following the yq path format:
+
+          1. 'a.b.c'
+          2. 'a.*.c'
+          3. 'a.**.c'
+          4. 'a.(child.subchild==co*).c'
+          5. 'a.array[0].blah'
+          6. 'a.array[*].blah'
+
+    - title: Relavant
+      content: templating using datakey and datapath
+      refs:
+        - title: use datakey and datapath in templating
+          link: ../../dvars/c0096
+
+    - title: query and yq datapath
+      content: query details
+      refs:
+        - title: query object
+          link: ../../query-object/c0100
+
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: yq and yq path reference
+        link: https://github.com/mikefarah/yq
+
+notes:
+  goal:
+    - showcase the dvar to render value using sub element of an var rather the global var name space
+    - extension to c0082
 
 vars:
   student:

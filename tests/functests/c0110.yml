@@ -1,3 +1,12 @@
+doc_meta: |
+  folder: flow-controll
+  title: loopitem in callee's dvar
+  head: |
+    This showcases the loopitem/loopindex will be available in the dvars scope for reference
+
+  sections:
+    - title: Demo
+      log: yes
 
 notes:
   - to test out the internal var loopitem could be used in dvar reference
@@ -23,7 +32,16 @@ tasks:
         func: cmd
         do:
           - name: print
-            cmd: '{{.loopitem}}'
+            cmd: '{{.loopindex1}}:{{.loopitem}}'
+
+      -
+        func: cmd
+        do:
+          -
+            name: assert
+            cmd:
+              - '{{eq .loopitem "tom"}}'
+        if: '{{eq .loopindex1 1}}'
 
       -
         func: cmd
@@ -41,4 +59,3 @@ tasks:
         do:
           - name: print
             cmd: '{{.theone}}'
-

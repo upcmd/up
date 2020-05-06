@@ -1,13 +1,65 @@
-goal:
-  - add query demo
-  - ymlkey to ref to a var name pointing to a yml string
-  - path is the path refer to yml element, ref to the usage example
-  - reg is the varname register to
-  - |
-    localonly indicate it is registered to local func var scope only
-    otherwise it will be in global scope
-  - collect is to indicate whether result will be put into array using yml format
-  - ymlonly will register a query result in yml string instead
+doc_meta: |
+  folder: query-object
+  title: query
+  head: |
+    query cmd is powerful. It provides a generic way to query either from global runtime vars or a content of yml to register the result to a new var name
+
+  sections:
+    - title: query yml content
+      content: |
+        * ymlkey: use this to point to a var containing the content of yml
+
+        * path: this is a yq like path to use to query/select the node/sub elements/wildcard matched reslt
+
+        * reg: this is the var name to register the queried value
+
+
+    - title: query var object in global runtime scope
+      content: |
+        * ymlkey: not required at all
+
+        * path: this is a path to address an object then follow by dot . assignment for sub element
+
+
+    - title: flags
+      content: |
+        * localonly: register the result to local func scope but not global runtime scope
+
+        * collect: register the result to be an yml array/list of values
+
+    - title: query using wildcard
+      content: |
+        you can use wildcard format to match your selection criteria
+
+        * datapath:
+          format is like a.b.c(name=fr*).value, following the yq path format:
+
+          1. 'a.b.c'
+          2. 'a.*.c'
+          3. 'a.**.c'
+          4. 'a.(child.subchild==co*).c'
+          5. 'a.array[0].blah'
+          6. 'a.array[*].blah'
+
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: yq and yq path reference
+        link: https://github.com/mikefarah/yq
+
+notes:
+  goal:
+    - add query demo
+    - ymlkey to ref to a var name pointing to a yml string
+    - path is the path refer to yml element, ref to the usage example
+    - reg is the varname register to
+    - |
+      localonly indicate it is registered to local func var scope only
+      otherwise it will be in global scope
+    - collect is to indicate whether result will be put into array using yml format
+    - ymlonly will register a query result in yml string instead
 
 vars:
   query_name: jason

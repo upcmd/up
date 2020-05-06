@@ -1,5 +1,16 @@
-goal:
-  - to introduce a implicit task vars scope for easier sharing vars in same task
+doc_meta: |
+  folder: vars
+  title: task scope
+  head: |
+    So far, we have scoped vars and eventually they will be living in global runtime or local scope in a func, when you need to access the var across funcs, then you will have to define it in global runtime vars, or grouped vars scope, or register a var to glbale runtime. In this demo, we show that you can use taskscope flag to mark a dvar to be in task scope, so that you can easily access this task scope var accross different funcs
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - to introduce a implicit task vars scope for easier sharing vars in same task
 
 vars:
   tom: this is tom

@@ -1,5 +1,17 @@
-goal:
-  - splitLine test
+doc_meta: |
+  folder: template
+  title: splitLines func
+  head: |
+    Showcase the usage of splitLines func
+
+  sections:
+
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - splitLine test
 
 vars:
   workers:
@@ -18,7 +30,6 @@ tasks:
     name: task
     desc: generate logs
     task:
-
 
       -
         func: shell

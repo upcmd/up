@@ -1,12 +1,19 @@
 doc_meta: |
-  folder: flow-controll
-  title: use block
+  folder: loop
+  title: break recursive loop
   head: |
     Introduce a internal var: up_runtime_task_layer_number. It is used for a force exit or an conditional break. The typical usecase would be a business logic to attempt to maximize the possibility ub a recurisve maner in code execution to probe. For example, web page scraping and a implementation of web spider etc.
 
   sections:
     - title: Demo
       log: yes
+
+  related:
+    refs:
+      - title: break cmd func
+        link: ../../cmd-func/c0120
+      - title: advanced usage of break in call func
+        link: ../../flow-controll/c0121
 
 notes:
   goal:

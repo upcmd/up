@@ -1,5 +1,33 @@
-goal:
-  - to test the registered global var should be availabe in global context
+doc_meta: |
+  folder: vars
+  title: var scope in callee
+  head: |
+    Showcase the var scope, how local var and global var are diffent and used in different context
+
+  sections:
+    - title: Demo
+      log: yes
+
+    - title: vars accessibility in call stack
+      content: |
+        Understanding of global vars scope in call stack
+
+        global vars scope is not unique, it is a concept of relative scope for its call stack. within that call stack, all changes(new registered global vars) will be valid only for its own stack in that call func only
+
+      refs:
+        - title: show the problem
+          link: ../../test-debug/c0107
+
+    - title: taskscope
+      content: |
+        use taskscope
+      refs:
+        - title: taskscope
+          link: ../../test-debug/c0108
+
+notes:
+  goal:
+    - to test the registered global var should be availabe in global context
 
 vars:
   tom: this is tom
@@ -14,7 +42,9 @@ tasks:
 
       -
         func: cmd
-        desc: check if hitom is available in global context
+        desc: |
+          check if hitom is available in global context
+          it should be <no value> as hitom in sub1 is marked localonly
         do:
           - name: print
             cmd: '{{.hitom}}'
@@ -25,7 +55,10 @@ tasks:
 
       -
         func: cmd
-        desc: check if hitom is available in global context
+        desc: |
+          check if hitom is available in global context
+          though hitom was regiser as global var, but it was registered to its own call stack
+          however this is only available in its own call stack global but not return and available to its parent var scope
         do:
           - name: print
             cmd: '{{.hitom}}'
@@ -51,7 +84,7 @@ tasks:
         func: cmd
         do:
           - name: print
-            desc: by default hitom is accessible from global context, that's why it is accessiable cross func
+            desc: should be <no value> since it is marked localonly
             cmd: '{{.hitom}}'
 
   -
@@ -74,5 +107,7 @@ tasks:
         func: cmd
         do:
           - name: print
-            desc: by default hitom is accessible from global context, that's why it is accessiable cross func
+            desc: |
+              by default hitom is accessible from global context, that's why it is accessiable cross func
+              however this is only available in its own call stack global but not return and available to its parent var scope
             cmd: '{{.hitom}}'

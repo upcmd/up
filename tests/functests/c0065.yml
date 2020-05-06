@@ -1,1 +1,57 @@
-TODO:
+doc_meta: |
+  folder: test-debug
+  title: verbose flag
+  head: |
+    You can use different verbose level as a flag for debugging and reveal the information you would like to trace
+
+    This showcases that the dvar's rendered result will be printed out with that flagged verbose level
+
+    For example, if the set flag is vvv, then when you run below command with verbose level vvv, the result will be printed
+
+    ```
+    up task -d ./tests/functests -t $1 -i dev -v vvvv --configdir=./tests/functests
+    ```
+
+  sections:
+    - title: Demo
+      log: yes
+
+docs: |
+
+vars:
+  person: peter
+  managers:
+    - tom
+    - jason
+    - alice
+
+dvars:
+
+  - name: var_with_range_v
+    value: "{{range .managers}} x {{end}}"
+    flags: [v,]
+
+  - name: var_with_range_vv
+    value: "{{range .managers}} x {{end}}"
+    flags: [vv,]
+
+  - name: var_with_range_vvv
+    value: "{{range .managers}} x {{end}}"
+    flags: [vvv,]
+
+  - name: var_with_range_vvvv
+    value: "{{range .managers}} x {{end}}"
+    flags: [vvvv,]
+
+  - name: var_with_range_vvvvv
+    value: "{{range .managers}} x {{end}}"
+    flags: [vvvvv,]
+
+  - name: var_with_range_vvvvvv
+    value: "{{range .managers}} x {{end}}"
+    flags: [vvvvvvv,]
+
+tasks:
+  -
+    name: task
+    task:

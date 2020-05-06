@@ -1,6 +1,17 @@
-goal:
-  - demo how to do double layered loop
-  - use call func to achieve that
+doc_meta: |
+  folder: loop
+  title: multi-layers loop 2
+  head: |
+    This showcases that you can use call func to achieve multiple layers of loop
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  goal:
+    - demo how to do double layered loop
+    - use call func to achieve that
 
 tasks:
   -
