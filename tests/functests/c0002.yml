@@ -21,6 +21,13 @@ doc_meta: |
     - title: Demo
       log: yes
 
+  related:
+    refs:
+      - title: Multiple steps
+        link: ../../shell-func/c0052/
+      - title: error handling
+        link: ../../test-debug/error_handling/
+
 tasks:
   -
     name: task

@@ -60,12 +60,12 @@ tasks:
               name: correct_working_dir
               desc: the value of .intest is string but not bool so you can not simply use if .intest for condition
               value: >-
-                {{if eq .intest "true" }}{{.register_task_root}}{{else}}{{.register_task_root}}{{end}}
+                {{if eq .intest "true" }}{{.register_task_root.Output}}{{else}}{{.register_task_root.Output}}{{end}}
 
       - func: cmd
         do:
           - name: print
-            cmd: 'root dir is: [{{.register_task_root}}]'
+            cmd: 'root dir is: [{{.register_task_root.Output}}]'
 
           - name: print
             cmd: 'correct working dir is: [{{.correct_working_dir}}]'

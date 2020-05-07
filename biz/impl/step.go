@@ -374,9 +374,13 @@ func (steps *Steps) Exec(fromBlock bool) {
 			//TODO: add support for block
 			if u.Contains([]string{FUNC_SHELL, FUNC_CALL}, step.Func) {
 				if step.Reg == "auto" {
-					core.TaskRuntime().ExecbaseVars.Put(u.Spf("register_%s_%s", taskname, step.Name), result.Output)
+					if step.Name == "" {
+						core.TaskRuntime().ExecbaseVars.Put(u.Spf("%s_%d_result", taskname, idx), result)
+					} else {
+						core.TaskRuntime().ExecbaseVars.Put(u.Spf("%s_%s_result", taskname, step.Name), result)
+					}
 				} else if step.Reg != "" {
-					core.TaskRuntime().ExecbaseVars.Put(u.Spf("%s", step.Reg), result.Output)
+					core.TaskRuntime().ExecbaseVars.Put(u.Spf("%s", step.Reg), result)
 				}
 				if step.Func == FUNC_SHELL {
 					core.TaskRuntime().ExecbaseVars.Put("last_result", result)

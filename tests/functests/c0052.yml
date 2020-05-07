@@ -8,6 +8,13 @@ doc_meta: |
     - title: Demo
       log: yes
 
+  related:
+    refs:
+      - title: shell func
+        link: ../../quick-start/c0002/
+      - title: error handling
+        link: ../../test-debug/error_handling/
+
 notes:
   goal:
     - workflow status management

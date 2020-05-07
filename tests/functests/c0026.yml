@@ -7,12 +7,11 @@ doc_meta: |
   sections:
     - title: Rules
       content: |
-        * if reg=auto, it will use naming pattern: register_taskname_stepname
+        * if reg=auto, it will use naming pattern: taskname_stepname_result, if stepname is empty, then it will use the index of the step instead, eg: taskname_0_result
         * otherwise use the defined name as var name
 
     - title: Demo
       log: yes
-
 
 notes:
   goal:
@@ -24,26 +23,74 @@ notes:
     - otherwise use the defined name as var name
 
 tasks:
+  -
+    name: task
+    task:
+      -
+        func: call
+        do:
+          - test1
+          - test2
+          - test3
 
-  - name: task
+  -
+    name: test1
+    desc: |
+      test reg with an auto registered name
+      in this case the step name is empty, then the idx will be used
     task:
       -
         func: shell
-        name: sayhello
+        desc: if this step does not have a name, then the auto reg name would be task_0_reslt
         do:
-          - echo "hello,sayhello"
+          - 'curl -s -X GET "https://httpbin.org/get" -H "accept: application/json"'
         reg: auto
 
+      - func: cmd
+        do:
+          - name: print
+            cmd: '{{.test1_0_result.Code}}'
+          - name: print
+            cmd: '{{.test1_0_result.Output}}'
+
+  -
+    name: test2
+    desc: |
+      test reg with a auto registered name and the step name is not empty
+      in this case the registered reslt name is: test2_httpbinget_result
+    task:
       -
         func: shell
-        name: woohoo
+        name: httpbinget
+        desc: if this step does not have a name, then the auto reg name would be task_0_reslt
         do:
-          - echo "woohoo"
-        reg: woohooyaa
+          - 'curl -s -X GET "https://httpbin.org/get" -H "accept: application/json"'
+        reg: auto
 
+      - func: cmd
+        do:
+          - name: print
+            cmd: '{{.test2_httpbinget_result.Code}}'
+          - name: print
+            cmd: '{{.test2_httpbinget_result.Output}}'
+
+  -
+    name: test3
+    desc: |
+      test reg with a registered name
+      in this case the registered reslt name is: test2_httpbinget_result
+    task:
       -
         func: shell
+        name: httpbinget
+        desc: it will use the given name as var name to register the result
         do:
-          - echo "{{.register_task_sayhello}}"
-          - echo "{{.woohooyaa}}"
+          - 'curl -s -X GET "https://httpbin.org/get" -H "accept: application/json"'
+        reg: httpbin_get_result
 
+      - func: cmd
+        do:
+          - name: print
+            cmd: '{{.httpbin_get_result.Code}}'
+          - name: print
+            cmd: '{{.httpbin_get_result.Output}}'
