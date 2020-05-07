@@ -13,6 +13,7 @@ import (
 	"github.com/stephencheng/go-spew/spew"
 	"os"
 	"runtime"
+	"runtime/debug"
 	"strings"
 )
 
@@ -187,6 +188,12 @@ func Pfvvvvv(format string, a ...interface{}) {
 	}
 }
 
+func PStackTrace() {
+	if permitted("vvvvv") {
+		debug.PrintStack()
+	}
+}
+
 func Trace() {
 	if permitted("vvvvv") {
 		pc := make([]uintptr, 15)
@@ -263,6 +270,7 @@ func LogErrorAndExit(mark string, err interface{}, hint string) {
 		color.Red("      %s -> %s", mark, err)
 		hiColor := color.New(color.FgHiCyan, color.BgRed)
 		hiColor.Printf("ERROR: %s\n", hint)
+		PStackTrace()
 		os.Exit(-1)
 	}
 }
@@ -270,6 +278,7 @@ func LogErrorAndExit(mark string, err interface{}, hint string) {
 func LogError(mark string, err interface{}) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
+		PStackTrace()
 	}
 }
 
@@ -278,6 +287,7 @@ func LogErrorAndContinue(mark string, err interface{}, hint string) {
 		color.Red("      %s -> %s", mark, err)
 		hiColor := color.New(color.FgHiYellow, color.BgHiMagenta)
 		hiColor.Printf("WARN:\n%s\n", hint)
+		PStackTrace()
 	}
 }
 
@@ -290,6 +300,12 @@ func InvalidAndExit(mark string, hint string) {
 func GraceExit(mark string, hint string) {
 	hiColor := color.New(color.FgHiCyan, color.FgHiWhite)
 	hiColor.Printf("  Exit: %s [%s]\n", mark, hint)
-	os.Exit(-3)
+	os.Exit(0)
+}
+
+func Fail(mark string, hint string) {
+	hiColor := color.New(color.FgHiCyan, color.FgHiWhite)
+	hiColor.Printf("  Failed: %s [%s]\n", mark, hint)
+	os.Exit(-255)
 }
 

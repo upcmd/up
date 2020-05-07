@@ -1,5 +1,5 @@
 doc_meta: |
-  folder: design-pattern
+  folder: design-patterns
   title: private var scope
   head: |
     A important feature of call func is to segregate a group of vars, including local vars and all inheriting vars in callee from other func's local vars

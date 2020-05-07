@@ -68,7 +68,7 @@ func InitTasks() {
 }
 
 func ListTasks() {
-
+	caps := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	u.Pln("-task list")
 	maxlen := 0
 	for _, task := range *Tasks {
@@ -77,9 +77,15 @@ func ListTasks() {
 			maxlen = tasknamelen
 		}
 	}
-	format := "  %4d| %" + u.Spf("%d", maxlen) + "s: %s \n"
+	format := "  %4d  | %" + u.Spf("%d", maxlen) + "s: |%9s| %s "
 	for idx, task := range *Tasks {
-		u.Pf(format, idx+1, task.Name, task.Desc)
+		start := task.Name[0:1]
+		if strings.Contains(caps, start) {
+			color.HiGreen("%s", u.Spf(format, idx+1, task.Name, "public", task.Desc))
+		} else {
+			color.Yellow("%s", u.Spf(format, idx+1, task.Name, "protected", task.Desc))
+		}
+
 		u.Ppmsgvvvv(task)
 	}
 	u.Pln("-\n")

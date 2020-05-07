@@ -101,8 +101,9 @@ func ToJson(str string) string {
 }
 
 func Render(tstr string, obj interface{}) string {
-	tname := "step_item_exec"
+	tname := "."
 	t, err := template.New(tname).Funcs(templateFuncs).Parse(tstr)
+
 	u.LogErrorAndExit("template creating", err, "Please fix the template issue and try again")
 
 	var result bytes.Buffer

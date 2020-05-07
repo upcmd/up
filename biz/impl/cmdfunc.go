@@ -159,6 +159,9 @@ func (f *CmdFuncAction) Exec() {
 		case "exit":
 			u.GraceExit("exit", "client choose to exit")
 
+		case "fail":
+			u.Fail("fail", "fail and exit")
+
 		case "break":
 			core.TaskBreak = true
 

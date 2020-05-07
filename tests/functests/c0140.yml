@@ -1,0 +1,65 @@
+doc_meta: |
+  folder: usage
+  title: public and protected tasks
+  head: |
+    It is a implicit rule that it is a public task if the task name start with a upper case letter, otherwise it is a protected task
+
+    The intention is that public tasks is a callerable one from CLI command, which could have a chaine of depenent protected tasks for detailed implementations
+
+    Also, for collaboration of different projects, it is a implicit rule that public task is more like a interface to be consumable and protected tasks are internal private business.
+
+    There is no hard rule to forbid you to use protected tasks, it is just a mutual common contract to collaborate with each other in a clear standard
+
+  sections:
+    - title: How to run
+      content: |
+        ```
+        up list  -d ./tests/functests -t c0140.yml -i dev --configdir=./tests/functests
+        loading [Config]:  ./tests/functests/upconfig
+        loading [Task]:  ./tests/functests/c0140.yml
+        instance id: dev
+        -task list
+         1  |     Main: |   public| main entry
+         2  |    Build: |   public| A build task
+         3  | internal: |protected| a internal process needed by Build
+        -
+        ```
+
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: 'I am the main entry'
+  -
+    name: Build
+    desc: A build task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: 'I am the build task'
+
+      -
+        func: call
+        do:
+          - internal
+
+  -
+    name: internal
+    desc: a internal process needed by Build
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: 'I am a internal task'
+

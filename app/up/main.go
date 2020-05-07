@@ -21,8 +21,10 @@ var (
 	ngo              = app.Command("ngo", "run a entry task")
 	ngoTaskName      = ngo.Arg("taskname", "task name to run").Default("Main").String()
 	initDefault      = app.Command("init", "create a default skeleton for a quick start")
-	list             = app.Command("list", "list tasks and plays")
+	list             = app.Command("list", "list tasks")
 	listName         = list.Arg("taskname", "task name to inspect").String()
+	assist           = app.Command("assist", "assist: templatefunc|")
+	assistName       = assist.Arg("assistname", "what to assist").String()
 	validate         = app.Command("validate", "validate tasks and plays")
 	validateTaskName = validate.Arg("validatetaskname", "taskname").Required().String()
 	verbose          = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
@@ -74,6 +76,19 @@ func main() {
 			impl.ListTask(*listName)
 		} else {
 			impl.ListTasks()
+		}
+
+	case assist.FullCommand():
+		u.Pf("-assist: %s\n", *assistName)
+		if *assistName == "templatefunc" {
+			u.Pln("=List of golang template funcs")
+			core.FuncMapInit()
+			core.ListAllFuncs()
+		} else {
+			u.LogWarn("What kind of assist do you need?", "Please input a name:")
+			u.Pln(`#supported:
+templatefunc
+`)
 		}
 
 	case validate.FullCommand():
