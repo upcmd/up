@@ -1,0 +1,41 @@
+doc_meta: |
+  folder: query-object
+  title: map structure result
+  head: |
+    Showcase automatically convert a api call result, which is a json response, to a internal object, so that you can retrieve sub nodes and fields to map to your result
+
+  sections:
+
+tasks:
+  -
+    name: task
+    desc: |
+      test reg with a registered name
+      in this case the registered reslt name is: test2_httpbinget_result
+    task:
+      -
+        func: shell
+        name: httpbinget
+        desc: it will use the given name as var name to register the result
+        do:
+          - 'curl -s -X GET "https://httpbin.org/get" -H "accept: application/json"'
+        reg: httpbin_get_result
+
+      - func: cmd
+        dvars:
+          - name: api_response
+            value: '{{.httpbin_get_result.Output}}'
+            flags:
+              - to_object
+        do:
+          - name: print
+            cmd: '{{.httpbin_get_result.Code}}'
+          - name: print
+            cmd: '{{.httpbin_get_result.Output}}'
+          - name: print
+            cmd: '{{.api_response}}'
+          - name: inspect
+            cmd:
+              - exec_vars
+          - name: print
+            cmd: '{{.api_response_object.headers.Host}}'

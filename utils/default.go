@@ -12,11 +12,11 @@ import "github.com/fatih/color"
 var (
 	defaults map[string]string = map[string]string{
 		"RefDir":        ".",
-		"TaskFile":      "up",
+		"TaskFile":      "up.yml",
 		"Verbose":       "v",
 		"MaxCallLayers": "256",
 		"ConfigDir":     ".",
-		"ConfigFile":    "upconfig",
+		"ConfigFile":    "upconfig.yml",
 	}
 	vvvv_color_printf   = color.Magenta
 	verror_color_printf = color.Red
@@ -30,9 +30,9 @@ version: 1.0.0
 Verbose: v
 MaxCallLayers: 8
 RefDir: .
-TaskFile: up
+TaskFile: up.yml
 ConfigDir: .
-ConfigFile: upconfig
+ConfigFile: upconfig.yml
 `
 
 	DEFAULT_UP_TASK_YML = `

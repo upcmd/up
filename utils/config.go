@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
+	"os"
+	"path"
 	"reflect"
 )
 
@@ -34,24 +36,29 @@ func SetConfigYamlFile(filename string) {
 }
 
 func InitConfig() {
-	Config = YamlLoader("Config",
-		func() (s string) {
-			if configYamlDir == "" {
-				s = defaults["ConfigDir"]
-			} else {
-				s = configYamlDir
-			}
-			return
-		}(),
-		func() (s string) {
-			if configYamlFile == "" {
-				s = defaults["ConfigFile"]
-			} else {
-				s = configYamlFile
-			}
-			return
-		}())
+	dir := func() (s string) {
+		if configYamlDir == "" {
+			s = defaults["ConfigDir"]
+		} else {
+			s = configYamlDir
+		}
+		return
+	}()
+	filename := func() (s string) {
+		if configYamlFile == "" {
+			s = defaults["ConfigFile"]
+		} else {
+			s = configYamlFile
+		}
+		return
+	}()
 
+	filepath := path.Join(dir, filename)
+	if _, err := os.Stat(filepath); err == nil {
+		Config = YamlLoader("Config", dir, filename)
+	} else {
+		LogWarn("config file does not exist", "use builtin defaults")
+	}
 	CoreConfig = GetCoreConfig()
 }
 
@@ -65,12 +72,11 @@ func SetMockConfig() {
 func GetCoreConfig() *model.CoreConfig {
 
 	cfg := new(model.CoreConfig)
-	err := Config.Unmarshal(cfg)
-
-	//fmt.Printf("1025: %#v\n", Config.AllSettings())
-
-	if err != nil {
-		fmt.Println("unable to decode into struct:", err.Error())
+	if Config != nil {
+		err := Config.Unmarshal(cfg)
+		if err != nil {
+			fmt.Println("unable to decode into struct:", err.Error())
+		}
 	}
 
 	e := reflect.ValueOf(cfg).Elem()
