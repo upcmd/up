@@ -115,7 +115,7 @@ func ListTask(taskname string) {
 				if step.Func == FUNC_CALL {
 					branch := tree.AddMetaBranch(func() string {
 						if step.Loop != "" {
-							return step.Name + color.HiYellowString("%s", " /loop..")
+							return step.Name + color.HiYellowString("%s", " /call.")
 						} else {
 							return step.Name
 						}

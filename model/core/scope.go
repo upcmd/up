@@ -78,16 +78,18 @@ func SetRuntimeGlobalDvars(dvars *Dvars) {
 }
 
 //validate and extend the features
-func procDvars(dvars *Dvars, mergeTarget *Cache) {
+func procDvars_to_x(dvars *Dvars, mergeTarget *Cache) {
 
+	u.PStackTrace()
+	vlevels := []string{"v", "vv", "vvv", "vvvv", "vvvvv", "vvvvv"}
 	for _, dvar := range *dvars {
 		//convert the yaml to object
 		if dvar.Flags != nil && len(dvar.Flags) != 0 {
-			if u.Contains(dvar.Flags, "vvvv") {
-				u.PpmsgvvvvhintHigh("dvar> "+dvar.Name, dvar.Rendered)
-			}
-			if u.Contains(dvar.Flags, "vvv") {
-				u.PpmsgvvvhintHigh("dvar> "+dvar.Name, dvar.Rendered)
+
+			for _, vlevel := range vlevels {
+				if u.Contains(dvar.Flags, vlevel) {
+					u.PpmsgHintHighPermitted("v", "dvar> "+dvar.Name, dvar.Rendered)
+				}
 			}
 
 			if u.Contains(dvar.Flags, "to_object") {
@@ -112,11 +114,10 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 					}
 				}
 
-				if u.Contains(dvar.Flags, "vvvv") {
-					u.PpmsgvvvvhintHigh("dvar> "+dvarObjName, *obj)
-				}
-				if u.Contains(dvar.Flags, "vvv") {
-					u.PpmsgvvvhintHigh("dvar> "+dvarObjName, *obj)
+				for _, vlevel := range vlevels {
+					if u.Contains(dvar.Flags, vlevel) {
+						u.PpmsgHintHighPermitted("v", "dvar> "+dvarObjName, *obj)
+					}
 				}
 			}
 
@@ -134,7 +135,7 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 			}
 
 			if u.Contains(dvar.Flags, "secure") {
-				decryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget)
+				//decryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget)
 			}
 
 			if u.Contains(dvar.Flags, "prompt") {
@@ -153,12 +154,98 @@ func procDvars(dvars *Dvars, mergeTarget *Cache) {
 		}
 
 		if dvar.Secure != nil {
-			decryptAndRegister(dvar.Secure, &dvar, mergeTarget)
+			//decryptAndRegister(dvar.Secure, &dvar, mergeTarget)
 		}
 	}
 }
 
-func decryptAndRegister(securetag *model.SecureSetting, dvar *Dvar, mergeTarget *Cache) {
+//validate and extend the features
+func procDvarsNew_to_x(dvars *Dvars, mergeTarget *Cache) {
+
+	u.Ptmpdebug("88", *mergeTarget)
+	u.PStackTrace()
+	vlevels := []string{"v", "vv", "vvv", "vvvv", "vvvvv", "vvvvv"}
+	for _, dvar := range *dvars {
+		//convert the yaml to object
+		func() {
+			if dvar.Flags != nil && len(dvar.Flags) != 0 {
+
+				for _, vlevel := range vlevels {
+					if u.Contains(dvar.Flags, vlevel) {
+						u.PpmsgHintHighPermitted("v", "dvar> "+dvar.Name, dvar.Rendered)
+					}
+				}
+
+				if u.Contains(dvar.Flags, "to_object") {
+					rawyml := dvar.Rendered
+
+					obj := new(interface{})
+					err := yaml.Unmarshal([]byte(rawyml), obj)
+					u.LogErrorAndExit("dvar conversion to object:", err, "please validate the ymal content")
+
+					dvarObjName := u.Spf("%s_%s", dvar.Name, "object")
+					if dvar.Name != "void" {
+						(*mergeTarget).Put(dvarObjName, *obj)
+					}
+
+					if TaskStack.GetLen() > 0 {
+						if u.Contains(dvar.Flags, "reg") {
+							if dvar.Name != "void" {
+								TaskRuntime().ExecbaseVars.Put(dvarObjName, *obj)
+							} else {
+								u.LogWarn("?reg a void", "you can't register a object with void name, use a proper name instead or split to multiple steps")
+							}
+						}
+					}
+
+					for _, vlevel := range vlevels {
+						if u.Contains(dvar.Flags, vlevel) {
+							u.PpmsgHintHighPermitted("v", "dvar> "+dvarObjName, *obj)
+						}
+					}
+				}
+
+				if u.Contains(dvar.Flags, "envvar") {
+					envvarName := u.Spf("%s_%s", "envvar", dvar.Name)
+					(*mergeTarget).Put(envvarName, dvar.Rendered)
+				}
+
+				if TaskStack.GetLen() > 0 {
+					if u.Contains(dvar.Flags, "reg") {
+						if dvar.Name != "void" {
+							TaskRuntime().ExecbaseVars.Put(dvar.Name, dvar.Rendered)
+						}
+					}
+				}
+
+				if u.Contains(dvar.Flags, "secure") {
+					//decryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget)
+				}
+
+				if u.Contains(dvar.Flags, "prompt") {
+					//hiColor := color.NewCache(color.FgHiWhite, color.BgBlack)
+					//hiColor.Printf("Enter Value For Dvar: %s\n", dvar.Name)
+					u.Ppromptvvvvv("Dvar", "This will be saved as a dvar value")
+					reader := bufio.NewReader(os.Stdin)
+					dvarInputValue, _ := reader.ReadString('\n')
+					(*mergeTarget).Put(dvar.Name, dvarInputValue)
+				}
+
+				if u.Contains(dvar.Flags, "taskscope") {
+					TaskRuntime().TaskVars.Put(dvar.Name, dvar.Rendered)
+				}
+
+			}
+
+		}()
+
+		if dvar.Secure != nil {
+			//decryptAndRegister(dvar.Secure, &dvar, mergeTarget)
+		}
+	}
+}
+
+func decryptAndRegister(securetag *model.SecureSetting, dvar *Dvar, contextVars *Cache, mergeTarget *Cache) {
 	s := securetag
 
 	if s == nil {
@@ -172,7 +259,7 @@ func decryptAndRegister(securetag *model.SecureSetting, dvar *Dvar, mergeTarget 
 	}
 
 	if s.Key != "" {
-		encryptionkey = (*mergeTarget).Get(s.Key).(string)
+		encryptionkey = (*contextVars).Get(s.Key).(string)
 	}
 
 	encrypted := dvar.Rendered
@@ -200,7 +287,7 @@ func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
 
 	RuntimeVarsAndDvarsMerged = &mergedVars
 	u.Ppmsgvvvvhint("-------runtime global final merged with dvars-------", mergedVars)
-	procDvars(RuntimeGlobalDvars, RuntimeVarsAndDvarsMerged)
+	//procDvars(RuntimeGlobalDvars, RuntimeVarsAndDvarsMerged)
 
 	return RuntimeVarsAndDvarsMerged
 }
@@ -222,13 +309,12 @@ func VarsMergedWithDvars(mark string, baseVars *Cache, dvars *Dvars, contextMerg
 
 	if dvars != nil {
 		expandedVars := dvars.Expand(mark, contextMergedVars)
-		//mergo.Merge(&mergedVars, *expandedVars, mergo.WithOverride)
 		mergo.Merge(&mergedVars, expandedVars, mergo.WithOverride)
 	}
 
 	u.Pfvvvvv("scope[%s] merged: %s", mark, u.Sppmsg(mergedVars))
 
-	procDvars(dvars, &mergedVars)
+	//procDvarsNew(dvars, &mergedVars)
 
 	return &mergedVars
 }

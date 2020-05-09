@@ -69,9 +69,8 @@ func PrintContentWithLineNuber(content string) string {
 
 func DebugYmlContent(dir, filename string) {
 	filepath := path.Join(dir, filename)
-
 	content, err := ioutil.ReadFile(filepath)
-	LogErrorAndExit(Spf("loading raw content: %s", filepath), err, "please fix file path and name issues")
-	LogWarn("Check validity of yml content", PrintContentWithLineNuber(string(content)))
+	LogErrorAndContinue(Spf("loading raw content: %s", filepath), err, "please fix file path and name issues")
+	LogWarn("Check validity of yml content\n", PrintContentWithLineNuber(string(content)))
 }
 

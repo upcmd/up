@@ -82,10 +82,10 @@ dvars:
 #      keyref: /a/secure/location/key.file
 
   - name: bank_password_using_defause_config
-    desc: simply use secure flat, it will use default configured Secure setting in upconfig.yml file
+    desc: simply use secure flag, it will use default configured Secure setting in upconfig.yml file
     value: '6HmsmiJIW1PfIXcF4WwOKOMDiL7PstgfKs2aRFajrwY='
     flags:
-      - vvvv
+      - v
       - secure
 
 tasks:
@@ -107,4 +107,3 @@ tasks:
           - echo "secure bank password [{{.secure_bank_password}}]"
           - echo "bank password using default config [{{.bank_password_using_defause_config}}]"
           - echo "secure bank password using default config [{{.secure_bank_password_using_defause_config}}]"
-

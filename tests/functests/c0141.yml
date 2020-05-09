@@ -27,6 +27,19 @@ tasks:
             value: '{{.httpbin_get_result.Output}}'
             flags:
               - to_object
+              - v
+
+          - name: api_response_headers
+            desc: test if I can get immediately access of converted object
+            value: '{{.api_response_object.headers}}'
+            flags:
+              - v
+
+          - name: api_response_headers_host
+            value: '{{.api_response_object.headers.Host}}'
+            flags:
+              - v
+
         do:
           - name: print
             cmd: '{{.httpbin_get_result.Code}}'
@@ -39,3 +52,11 @@ tasks:
               - exec_vars
           - name: print
             cmd: '{{.api_response_object.headers.Host}}'
+          - name: printobj
+            cmd: api_response_headers
+          - name: print
+            desc: |
+              you can not use this header directly, if you intend to use a sub node, then you should use query and register a sub node
+            cmd: '{{.api_response_headers}}'
+          - name: print
+            cmd: '{{.api_response_headers_host}}'

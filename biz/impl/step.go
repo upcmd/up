@@ -79,7 +79,6 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 	}
 	u.Pfvvvv("current exec runtime vars:")
 	u.Ppmsgvvvv(resultVars)
-	//u.Ptmpdebug("55", resultVars)
 
 	//so far the execvars includes: scope vars + scope dvars + global runtime vars + task vars
 	resultVars = core.VarsMergedWithDvars("local", resultVars, &step.Dvars, resultVars)
@@ -315,7 +314,6 @@ func doElse(elseCalls interface{}, execVars *core.Cache) {
 	var tasknames []string
 	var flow Steps
 
-	u.Ptmpdebug("haha", "else .....")
 	switch elseCalls.(type) {
 	case string:
 		taskname = elseCalls.(string)
@@ -323,7 +321,6 @@ func doElse(elseCalls interface{}, execVars *core.Cache) {
 
 	case []interface{}:
 		elseStr := u.Spf("%s", elseCalls)
-		u.Ptmpdebug("kak", elseStr)
 		if strings.Index(elseStr, "map") != -1 && strings.Index(elseStr, "func:") != -1 {
 			err := ms.Decode(elseCalls, &flow)
 			u.LogErrorAndExit("load steps in else", err, "steps has configuration problem, please fix it")
