@@ -5,6 +5,8 @@ doc_meta: |
     Showcase automatically convert a api call result, which is a json response, to a internal object, so that you can retrieve sub nodes and fields to map to your result
 
   sections:
+    - title: Demo
+      log: yes
 
 tasks:
   -

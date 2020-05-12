@@ -8,14 +8,12 @@
 package core
 
 import (
-	"bufio"
 	"github.com/imdario/mergo"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/mohae/deepcopy"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
 	u "github.com/stephencheng/up/utils"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 )
@@ -75,174 +73,6 @@ func SetRuntimeGlobalVars(vars *Cache) {
 
 func SetRuntimeGlobalDvars(dvars *Dvars) {
 	RuntimeGlobalDvars = dvars
-}
-
-//validate and extend the features
-func procDvars_to_x(dvars *Dvars, mergeTarget *Cache) {
-
-	u.PStackTrace()
-	vlevels := []string{"v", "vv", "vvv", "vvvv", "vvvvv", "vvvvv"}
-	for _, dvar := range *dvars {
-		//convert the yaml to object
-		if dvar.Flags != nil && len(dvar.Flags) != 0 {
-
-			for _, vlevel := range vlevels {
-				if u.Contains(dvar.Flags, vlevel) {
-					u.PpmsgHintHighPermitted("v", "dvar> "+dvar.Name, dvar.Rendered)
-				}
-			}
-
-			if u.Contains(dvar.Flags, "to_object") {
-				rawyml := dvar.Rendered
-
-				obj := new(interface{})
-				err := yaml.Unmarshal([]byte(rawyml), obj)
-				u.LogErrorAndExit("dvar conversion to object:", err, "please validate the ymal content")
-
-				dvarObjName := u.Spf("%s_%s", dvar.Name, "object")
-				if dvar.Name != "void" {
-					(*mergeTarget).Put(dvarObjName, *obj)
-				}
-
-				if TaskStack.GetLen() > 0 {
-					if u.Contains(dvar.Flags, "reg") {
-						if dvar.Name != "void" {
-							TaskRuntime().ExecbaseVars.Put(dvarObjName, *obj)
-						} else {
-							u.LogWarn("?reg a void", "you can't register a object with void name, use a proper name instead or split to multiple steps")
-						}
-					}
-				}
-
-				for _, vlevel := range vlevels {
-					if u.Contains(dvar.Flags, vlevel) {
-						u.PpmsgHintHighPermitted("v", "dvar> "+dvarObjName, *obj)
-					}
-				}
-			}
-
-			if u.Contains(dvar.Flags, "envvar") {
-				envvarName := u.Spf("%s_%s", "envvar", dvar.Name)
-				(*mergeTarget).Put(envvarName, dvar.Rendered)
-			}
-
-			if TaskStack.GetLen() > 0 {
-				if u.Contains(dvar.Flags, "reg") {
-					if dvar.Name != "void" {
-						TaskRuntime().ExecbaseVars.Put(dvar.Name, dvar.Rendered)
-					}
-				}
-			}
-
-			if u.Contains(dvar.Flags, "secure") {
-				//decryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget)
-			}
-
-			if u.Contains(dvar.Flags, "prompt") {
-				//hiColor := color.NewCache(color.FgHiWhite, color.BgBlack)
-				//hiColor.Printf("Enter Value For Dvar: %s\n", dvar.Name)
-				u.Ppromptvvvvv("Dvar", "This will be saved as a dvar value")
-				reader := bufio.NewReader(os.Stdin)
-				dvarInputValue, _ := reader.ReadString('\n')
-				(*mergeTarget).Put(dvar.Name, dvarInputValue)
-			}
-
-			if u.Contains(dvar.Flags, "taskscope") {
-				TaskRuntime().TaskVars.Put(dvar.Name, dvar.Rendered)
-			}
-
-		}
-
-		if dvar.Secure != nil {
-			//decryptAndRegister(dvar.Secure, &dvar, mergeTarget)
-		}
-	}
-}
-
-//validate and extend the features
-func procDvarsNew_to_x(dvars *Dvars, mergeTarget *Cache) {
-
-	u.Ptmpdebug("88", *mergeTarget)
-	u.PStackTrace()
-	vlevels := []string{"v", "vv", "vvv", "vvvv", "vvvvv", "vvvvv"}
-	for _, dvar := range *dvars {
-		//convert the yaml to object
-		func() {
-			if dvar.Flags != nil && len(dvar.Flags) != 0 {
-
-				for _, vlevel := range vlevels {
-					if u.Contains(dvar.Flags, vlevel) {
-						u.PpmsgHintHighPermitted("v", "dvar> "+dvar.Name, dvar.Rendered)
-					}
-				}
-
-				if u.Contains(dvar.Flags, "to_object") {
-					rawyml := dvar.Rendered
-
-					obj := new(interface{})
-					err := yaml.Unmarshal([]byte(rawyml), obj)
-					u.LogErrorAndExit("dvar conversion to object:", err, "please validate the ymal content")
-
-					dvarObjName := u.Spf("%s_%s", dvar.Name, "object")
-					if dvar.Name != "void" {
-						(*mergeTarget).Put(dvarObjName, *obj)
-					}
-
-					if TaskStack.GetLen() > 0 {
-						if u.Contains(dvar.Flags, "reg") {
-							if dvar.Name != "void" {
-								TaskRuntime().ExecbaseVars.Put(dvarObjName, *obj)
-							} else {
-								u.LogWarn("?reg a void", "you can't register a object with void name, use a proper name instead or split to multiple steps")
-							}
-						}
-					}
-
-					for _, vlevel := range vlevels {
-						if u.Contains(dvar.Flags, vlevel) {
-							u.PpmsgHintHighPermitted("v", "dvar> "+dvarObjName, *obj)
-						}
-					}
-				}
-
-				if u.Contains(dvar.Flags, "envvar") {
-					envvarName := u.Spf("%s_%s", "envvar", dvar.Name)
-					(*mergeTarget).Put(envvarName, dvar.Rendered)
-				}
-
-				if TaskStack.GetLen() > 0 {
-					if u.Contains(dvar.Flags, "reg") {
-						if dvar.Name != "void" {
-							TaskRuntime().ExecbaseVars.Put(dvar.Name, dvar.Rendered)
-						}
-					}
-				}
-
-				if u.Contains(dvar.Flags, "secure") {
-					//decryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget)
-				}
-
-				if u.Contains(dvar.Flags, "prompt") {
-					//hiColor := color.NewCache(color.FgHiWhite, color.BgBlack)
-					//hiColor.Printf("Enter Value For Dvar: %s\n", dvar.Name)
-					u.Ppromptvvvvv("Dvar", "This will be saved as a dvar value")
-					reader := bufio.NewReader(os.Stdin)
-					dvarInputValue, _ := reader.ReadString('\n')
-					(*mergeTarget).Put(dvar.Name, dvarInputValue)
-				}
-
-				if u.Contains(dvar.Flags, "taskscope") {
-					TaskRuntime().TaskVars.Put(dvar.Name, dvar.Rendered)
-				}
-
-			}
-
-		}()
-
-		if dvar.Secure != nil {
-			//decryptAndRegister(dvar.Secure, &dvar, mergeTarget)
-		}
-	}
 }
 
 func decryptAndRegister(securetag *model.SecureSetting, dvar *Dvar, contextVars *Cache, mergeTarget *Cache) {

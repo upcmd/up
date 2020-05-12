@@ -1,0 +1,66 @@
+doc_meta: |
+  folder: cmd-func
+  title: color print
+  head: |
+    Showcase a extended color print cmd, it is a improved cmd to support color printing for both plain text message, template rendering message and object
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+
+      - func: cmd
+        vars:
+          person:
+            name: tom
+            age: 18
+          objectname: person
+        do:
+          - name: colorprint
+            cmd:
+              msg: hello, world
+              bg: blue
+              fg: white
+
+          - name: colorprint
+            cmd:
+              msg: hello, world
+              bg: yellow
+
+          - name: colorprint
+            cmd:
+              msg: hello, world
+              fg: white
+
+          - name: colorprint
+            cmd:
+              msg: hello, world
+
+          - name: colorprint
+            cmd:
+              msg: '{{.person.name}}: {{.person.age}}'
+              fg: blue
+              bg: red
+
+          - name: colorprint
+            cmd:
+              object: 'person'
+              fg: blue
+              bg: black
+
+          - name: colorprint
+            cmd:
+              object: '{{.objectname}}'
+              fg: blue
+              bg: green
+
+          - name: colorprint
+            cmd:
+              object: 'person'
+              msg: 'person'
+              fg: blue
+              bg: black

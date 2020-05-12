@@ -123,6 +123,66 @@ func (f *CmdFuncAction) Exec() {
 				u.Pfv("%s\n", color.HiGreenString("%s", cmdRendered))
 			})
 
+		case "colorprint":
+
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+				var raw, msg, fg, bg, object string
+
+				for k, v := range cmd {
+					switch k.(string) {
+					case "msg":
+						raw = v.(string)
+						msg = core.Render(raw, f.Vars)
+					case "fg":
+						raw = v.(string)
+						fg = core.Render(raw, f.Vars)
+					case "bg":
+						raw = v.(string)
+						bg = core.Render(raw, f.Vars)
+					case "object":
+						raw = v.(string)
+						object = core.Render(raw, f.Vars)
+					}
+				}
+
+				var fgcolor, bgcolor color.Attribute
+				if fg!=""{
+					if c, ok := u.FgColorMap[fg]; ok {
+						fgcolor=c
+					} else {
+						fgcolor=color.FgWhite
+					}
+				} else {
+					fgcolor=color.FgWhite
+				}
+				if bg!=""{
+					if c, ok := u.BgColorMap[bg]; ok {
+						bgcolor=c
+					} else {
+						bgcolor=color.BgBlack
+					}
+				}else {
+					bgcolor=color.BgBlack
+				}
+
+				c := color.New( bgcolor ,fgcolor)
+				u.Pln(color.FgWhite ,color.BgBlue)
+
+				if msg!="" && object!=""{
+					u.LogWarn("colorprint", "msg and object can not coexist")
+				}else{
+					if msg!=""{
+						c.Printf("%s\n", msg)
+					}
+
+					if object!=""{
+						obj := f.Vars.Get(object)
+						c.Printf("object %s:\n %s", object, u.Sppmsg(obj))
+					}
+				}
+			})
+
 		case "trace":
 			cmdItem.runCmd("string", func() {
 				cmdRendered := core.Render(cmdItem.Cmd.(string), f.Vars)
