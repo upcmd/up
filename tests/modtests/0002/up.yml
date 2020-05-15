@@ -1,0 +1,11 @@
+
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: shell
+        desc: main job
+        do:
+          - 'curl -X GET "https://httpbin.org/get" -H "accept: application/json"'

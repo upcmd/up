@@ -129,6 +129,5 @@ func ShowCoreConfig() {
 			Pfvvvv("%20s -> %s\n", fname, f.String())
 		}
 	}
-
 }
 

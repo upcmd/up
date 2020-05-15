@@ -1,0 +1,24 @@
+
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: shell
+        desc: main job
+        do:
+          - 'echo "hello world"'
+
+      -
+        func: call
+        cmd: internal_task
+
+  -
+    name: internal_task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: "this is a internal task"

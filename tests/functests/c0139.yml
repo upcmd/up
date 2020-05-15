@@ -21,7 +21,7 @@ tasks:
           person: tom
         do:
           - name: fail
-        if: '{{eq .person "tom"}}'
+        if: '{{eq .person "tom-s-name"}}'
 
       - func: cmd
         do:

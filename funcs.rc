@@ -93,3 +93,14 @@ inspect_task_example(){
 #  goup list task -d ./tests/functests -t c0116.yml -i dev --configdir=./tests/functests
   goup list task -d ./tests/functests -t wip.yml -i dev --configdir=./tests/functests
 }
+
+
+modtestx(){
+echo "syntax: modtestx 0003"
+if [ "$1" != "" ];then
+  dir=./tests/modtests/$1
+  goup ngo -d $dir -i dev --configdir=$dir
+else
+  echo "please input a case number"
+fi
+}

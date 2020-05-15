@@ -63,19 +63,20 @@ func main() {
 		initArgs()
 		if *ngoTaskName != "" {
 			u.Pln("-exec task:", *ngoTaskName)
-			impl.InitTasks()
-			impl.ExecTask(*ngoTaskName, nil)
+			t := impl.NewTasker()
+			t.ExecTask(*ngoTaskName, nil)
+			u.Ptmpdebug("88", u.CoreConfig)
 		}
 
 	case list.FullCommand():
 		initArgs()
-		impl.InitTasks()
+		t := impl.NewTasker()
 		if *listName == "=" {
-			impl.ListAllTasks()
+			t.ListAllTasks()
 		} else if *listName != "" {
-			impl.ListTask(*listName)
+			t.ListTask(*listName)
 		} else {
-			impl.ListTasks()
+			t.ListTasks()
 		}
 
 	case assist.FullCommand():
@@ -93,10 +94,10 @@ templatefunc
 
 	case validate.FullCommand():
 		initArgs()
-		impl.InitTasks()
+		t := impl.NewTasker()
 		taskname := *validateTaskName
 		u.Pf("validate task: %s\n")
-		impl.ValidateTask(taskname)
+		t.ValidateTask(taskname)
 	}
 }
 

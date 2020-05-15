@@ -147,36 +147,36 @@ func (f *CmdFuncAction) Exec() {
 				}
 
 				var fgcolor, bgcolor color.Attribute
-				if fg!=""{
+				if fg != "" {
 					if c, ok := u.FgColorMap[fg]; ok {
-						fgcolor=c
+						fgcolor = c
 					} else {
-						fgcolor=color.FgWhite
+						fgcolor = color.FgWhite
 					}
 				} else {
-					fgcolor=color.FgWhite
+					fgcolor = color.FgWhite
 				}
-				if bg!=""{
+				if bg != "" {
 					if c, ok := u.BgColorMap[bg]; ok {
-						bgcolor=c
+						bgcolor = c
 					} else {
-						bgcolor=color.BgBlack
+						bgcolor = color.BgBlack
 					}
-				}else {
-					bgcolor=color.BgBlack
+				} else {
+					bgcolor = color.BgBlack
 				}
 
-				c := color.New( bgcolor ,fgcolor)
-				u.Pln(color.FgWhite ,color.BgBlue)
+				c := color.New(bgcolor, fgcolor)
+				u.Pln(color.FgWhite, color.BgBlue)
 
-				if msg!="" && object!=""{
+				if msg != "" && object != "" {
 					u.LogWarn("colorprint", "msg and object can not coexist")
-				}else{
-					if msg!=""{
+				} else {
+					if msg != "" {
 						c.Printf("%s\n", msg)
 					}
 
-					if object!=""{
+					if object != "" {
 						obj := f.Vars.Get(object)
 						c.Printf("object %s:\n %s", object, u.Sppmsg(obj))
 					}

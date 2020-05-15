@@ -13,12 +13,22 @@ type SecureSetting struct {
 	KeyRef string
 }
 
+type Module struct {
+	Repo  string
+	Tag   string
+	Sha   string
+	Alias string
+	Dir   string
+}
+
 type CoreConfig struct {
 	Version       string
 	RefDir        string
 	TaskFile      string
 	Verbose       string
+	ModuleName    string
 	MaxCallLayers string
 	Secure        *SecureSetting
+	Modules       *[]Module
 }
 

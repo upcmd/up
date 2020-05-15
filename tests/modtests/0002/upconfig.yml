@@ -2,12 +2,10 @@
 version: 1.0.0
 Verbose: v
 MaxCallLayers: 8
-ModuleName: UpDevTest
-Secure:
-  Type: default_aes
-  #the key value will be a var name used for the value
-  Key: enc_key
-#      keyref: /a/secure/location/key.file
+RefDir: .
+TaskFile: up
+ConfigDir: .
+ConfigFile: upconfig
 
 Modules:
   - repo: https://github.com/up/sayhi.git

@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/core"
+	"github.com/stephencheng/up/model/stack"
 	u "github.com/stephencheng/up/utils"
 	"github.com/xlab/treeprint"
 	"io/ioutil"
@@ -24,20 +25,6 @@ import (
 	"strings"
 )
 
-var (
-	TaskYmlRoot *viper.Viper
-	Tasks       *model.Tasks
-)
-
-//func InitDefaultTaskYml() {
-//	//filepath = path.Join(".", "up.yml")
-//	//ioutil.WriteFile(filepath, []byte(u.DEFAULT_UP_TASK_YML), 0644)
-//}
-//func InitDefaultConfig() {
-//	filepath := path.Join(".", "upconfig.yml")
-//	ioutil.WriteFile(filepath, []byte(u.DEFAULT_CONFIG), 0644)
-//}
-
 func InitDefaultSkeleton() {
 	filepath := path.Join(".", "upconfig.yml")
 	ioutil.WriteFile(filepath, []byte(u.DEFAULT_CONFIG), 0644)
@@ -45,40 +32,81 @@ func InitDefaultSkeleton() {
 	ioutil.WriteFile(filepath, []byte(u.DEFAULT_UP_TASK_YML), 0644)
 }
 
-func InitTasks() {
+type Tasker struct {
+	TaskYmlRoot  *viper.Viper
+	Tasks        *model.Tasks
+	InstanceName string
+	Dryrun       bool
+	TaskStack    *stack.ExecStack
+	StepStack    *stack.ExecStack
+	BlockStack   *stack.ExecStack
+	TaskBreak    bool
+}
 
+type TaskerRuntimeContext struct {
+	Taskername string
+	Tasker     *Tasker
+	//TaskVars        *Cache
+	//ReturnVars      *Cache
+}
+
+func NewTasker() *Tasker {
 	priorityLoadingTaskFile := filepath.Join(".", u.CoreConfig.TaskFile)
 	refDir := "."
 	if _, err := os.Stat(priorityLoadingTaskFile); err != nil {
 		refDir = u.CoreConfig.RefDir
 	}
 
-	TaskYmlRoot = u.YamlLoader("Task", refDir, u.CoreConfig.TaskFile)
+	taskYmlRoot := u.YamlLoader("Task", refDir, u.CoreConfig.TaskFile)
+	tasker := &Tasker{
+		TaskYmlRoot: taskYmlRoot,
+	}
+
+	tasker.initRuntime()
+
+	taskerContext := TaskerRuntimeContext{
+		Taskername: "abcde",
+		Tasker:     tasker,
+		//TODO: use namegen to generate random name in config default settings
+	}
+
+	core.TaskerStack.Push(&taskerContext)
 
 	//TODO: refactory of the runtime init after config is loaded to a proper place
 	core.FuncMapInit()
-	loadScopes()
+	tasker.loadScopes()
 	core.ScopeProfiles.InitContextInstances()
-	loadRuntimeGlobalVars()
-	loadRuntimeDvars()
+	tasker.loadRuntimeGlobalVars()
+	tasker.loadRuntimeDvars()
 	core.SetRuntimeVarsMerged(core.InstanceName)
 	core.SetRuntimeGlobalMergedWithDvars()
-	//t.ListAllFuncs()
-	loadTasks()
+	tasker.loadTasks()
+
+	return tasker
 }
 
-func ListTasks() {
+func (t *Tasker) initRuntime() {
+	//InstanceName string
+	//Dryrun       bool
+	t.TaskStack = stack.New("task")
+	t.StepStack = stack.New("step")
+	t.BlockStack = stack.New("block")
+	//TaskBreak    bool
+
+}
+
+func (t *Tasker) ListTasks() {
 	caps := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	u.Pln("-task list")
 	maxlen := 0
-	for _, task := range *Tasks {
+	for _, task := range *t.Tasks {
 		tasknamelen := len(task.Name)
 		if tasknamelen > maxlen {
 			maxlen = tasknamelen
 		}
 	}
 	format := "  %4d  | %" + u.Spf("%d", maxlen) + "s: |%9s| %s "
-	for idx, task := range *Tasks {
+	for idx, task := range *t.Tasks {
 		start := task.Name[0:1]
 		if strings.Contains(caps, start) {
 			color.HiGreen("%s", u.Spf(format, idx+1, task.Name, "public", task.Desc))
@@ -91,18 +119,18 @@ func ListTasks() {
 	u.Pln("-\n")
 }
 
-func ListAllTasks() {
+func (t *Tasker) ListAllTasks() {
 	u.Pln("-inspect all tasks:")
-	for _, task := range *Tasks {
-		ListTask(task.Name)
+	for _, task := range *t.Tasks {
+		t.ListTask(task.Name)
 	}
 }
 
-func ListTask(taskname string) {
+func (tasker *Tasker) ListTask(taskname string) {
 	var tree = treeprint.New()
 	//u.Pln("\ninspect task:")
 	level := 0
-	for _, task := range *Tasks {
+	for _, task := range *tasker.Tasks {
 		if task.Name == taskname {
 			desc := strings.Split(task.Desc, "\n")[0]
 			u.Pf("%s: %s", color.BlueString("%s", task.Name), desc)
@@ -124,7 +152,7 @@ func ListTask(taskname string) {
 					switch t := step.Do.(type) {
 					case string:
 						callee = step.Do.(string)
-						if !InspectTask(callee, branch, &level) {
+						if !tasker.InspectTask(callee, branch, &level) {
 							break
 						}
 						level -= 1
@@ -134,7 +162,7 @@ func ListTask(taskname string) {
 						breakFlag := false
 						for _, x := range calleeTasknames {
 							callee = x.(string)
-							if !InspectTask(callee, branch, &level) {
+							if !tasker.InspectTask(callee, branch, &level) {
 								breakFlag = true
 								break
 							}
@@ -156,14 +184,25 @@ func ListTask(taskname string) {
 	u.Pln(tree.String())
 }
 
-func InspectTask(taskname string, branch treeprint.Tree, level *int) bool {
+func (t *Tasker) kk() {
+	l := 34
+	t.ddd("taskname", nil, &l)
+}
+
+func (t *Tasker) ddd(taskname string, branch treeprint.Tree, level *int) bool {
+	l := 34
+	t.ddd("taskname", nil, &l)
+	return false
+}
+
+func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level *int) bool {
 	*level += 1
 	maxLayers, _ := strconv.Atoi(u.CoreConfig.MaxCallLayers)
 	if *level > maxLayers {
 		u.LogWarn("evaluate max task stack layer", "please setup max MaxCallLayers correctly, or fix recursive cycle calls")
 		return false
 	}
-	for _, task := range *Tasks {
+	for _, task := range *tasker.Tasks {
 		if task.Name == taskname {
 			desc := strings.Split(task.Desc, "\n")[0]
 			br := branch.AddMetaBranch(color.BlueString("%s", task.Name), desc)
@@ -187,7 +226,7 @@ func InspectTask(taskname string, branch treeprint.Tree, level *int) bool {
 						}(), desc)
 
 						callee = step.Do.(string)
-						InspectTask(callee, brnode, level)
+						tasker.InspectTask(callee, brnode, level)
 					case []interface{}:
 						calleeTasknames := step.Do.([]interface{})
 						for _, x := range calleeTasknames {
@@ -200,7 +239,7 @@ func InspectTask(taskname string, branch treeprint.Tree, level *int) bool {
 							}(), desc)
 
 							callee = x.(string)
-							InspectTask(callee, brnode, level)
+							tasker.InspectTask(callee, brnode, level)
 						}
 					default:
 						u.Pf("type: %T", t)
@@ -214,14 +253,42 @@ func InspectTask(taskname string, branch treeprint.Tree, level *int) bool {
 	return true
 }
 
-func ValidateTask(taskname string) {
+func (t *Tasker) ValidateTask(taskname string) {
 	core.SetDryrun()
-	ExecTask(taskname, nil)
+	t.ExecTask(taskname, nil)
 }
 
-func ExecTask(taskname string, callerVars *core.Cache) {
+func ExecTask(fulltaskname string, callerVars *core.Cache) {
+	var modname string
+	var taskname string
+
+	func() {
+		subnames := strings.Split(fulltaskname, ".")
+		if len(subnames) > 2 {
+			u.InvalidAndExit("task name validation", "task naming pattern: modulename.taskname")
+		}
+
+		if len(subnames) == 1 {
+			modname = "self"
+			taskname = subnames[0]
+		} else if len(subnames) == 2 {
+			modname = subnames[0]
+			taskname = subnames[1]
+		}
+	}()
+
+	if modname == "self" {
+		TaskerRuntime().Tasker.ExecTask(taskname, callerVars)
+	} else {
+		//TODO: load the external module
+		//change workdir to that dir and load task entry
+	}
+
+}
+
+func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
 	found := false
-	for idx, task := range *Tasks {
+	for idx, task := range *t.Tasks {
 		if taskname == task.Name {
 			u.Pfvvvv("  located task-> %d [%s]: \n", idx+1, task.Name)
 
@@ -294,15 +361,15 @@ func ExecTask(taskname string, callerVars *core.Cache) {
 
 	if !found {
 		u.Pferror("Task %s is not defined!", taskname)
-		ListTasks()
+		t.ListTasks()
 	}
 }
 
-func validateAndLoadTaskRef(tasks *model.Tasks) {
+func (t *Tasker) validateAndLoadTaskRef() {
 	//validation
 
 	invalidNames := []string{}
-	for idx, task := range *tasks {
+	for idx, task := range *t.Tasks {
 		if strings.Contains(task.Name, "-") {
 			invalidNames = append(invalidNames, task.Name)
 		}
@@ -325,7 +392,7 @@ func validateAndLoadTaskRef(tasks *model.Tasks) {
 
 			yamlflowroot := u.YamlLoader("flow ref", refdir, ref)
 			flow := loadRefFlow(yamlflowroot)
-			(*tasks)[idx].Task = flow
+			(*t.Tasks)[idx].Task = flow
 		}
 	}
 
@@ -334,8 +401,8 @@ func validateAndLoadTaskRef(tasks *model.Tasks) {
 	}
 }
 
-func loadRefTasks() {
-	tasksRefList := TaskYmlRoot.Get("tasksref")
+func (t *Tasker) loadRefTasks() {
+	tasksRefList := t.TaskYmlRoot.Get("tasksref")
 	if tasksRefList != nil {
 		for _, ref := range tasksRefList.([]interface{}) {
 			tasksYamlName := ref.(string)
@@ -346,21 +413,20 @@ func loadRefTasks() {
 			err := ms.Decode(tasksData, &tasks)
 			u.LogErrorAndExit(u.Spf("decode tasks:%s", tasksYamlName), err, "please fix configuration in tasks yaml file")
 			for _, task := range tasks {
-				*Tasks = append(*Tasks, task)
+				*t.Tasks = append(*t.Tasks, task)
 			}
 		}
 	}
 }
 
-func loadTasks() error {
-	tasksData := TaskYmlRoot.Get("tasks")
+func (t *Tasker) loadTasks() error {
+	tasksData := t.TaskYmlRoot.Get("tasks")
 	var tasks model.Tasks
 	err := ms.Decode(tasksData, &tasks)
 	u.LogErrorAndExit("decode tasks:main", err, "please fix configuration in tasks yaml file")
-	Tasks = &tasks
-
-	loadRefTasks()
-	validateAndLoadTaskRef(Tasks)
+	t.Tasks = &tasks
+	t.loadRefTasks()
+	t.validateAndLoadTaskRef()
 
 	return err
 }
@@ -373,8 +439,8 @@ func loadRefFlow(yamlroot *viper.Viper) *Steps {
 	return &flow
 }
 
-func loadScopes() {
-	scopesData := TaskYmlRoot.Get("scopes")
+func (t *Tasker) loadScopes() {
+	scopesData := t.TaskYmlRoot.Get("scopes")
 	var scopes core.Scopes
 	err := ms.Decode(scopesData, &scopes)
 	core.SetScopeProfiles(&scopes)
@@ -382,16 +448,16 @@ func loadScopes() {
 	u.LogErrorAndExit("load full scopes", err, "please assess your scope configuration carefully")
 }
 
-func loadRuntimeGlobalVars() {
-	varsData := TaskYmlRoot.Get("vars")
+func (t *Tasker) loadRuntimeGlobalVars() {
+	varsData := t.TaskYmlRoot.Get("vars")
 	var vars core.Cache
 	err := ms.Decode(varsData, &vars)
 	u.LogError("loadRuntimeGlobalVars", err)
 	core.SetRuntimeGlobalVars(&vars)
 }
 
-func loadRuntimeDvars() *core.Dvars {
-	dvarsData := TaskYmlRoot.Get("dvars")
+func (t *Tasker) loadRuntimeDvars() *core.Dvars {
+	dvarsData := t.TaskYmlRoot.Get("dvars")
 	var dvars core.Dvars
 	err := ms.Decode(dvarsData, &dvars)
 	u.LogErrorAndExit("loadRuntimeDvars",

@@ -50,9 +50,9 @@ func Setup(prefix string, t *testing.T) {
 func TestT(prefix string, t *testing.T) {
 	core.SetInstanceName("dev")
 	Setup(prefix, t)
-	impl.InitTasks()
-	impl.ListTasks()
-	impl.ExecTask("task", nil)
+	tasker := impl.NewTasker()
+	tasker.ListTasks()
+	tasker.ExecTask("task", nil)
 }
 
 //mock required settings

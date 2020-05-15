@@ -18,6 +18,8 @@ var (
 	StepStack    = stack.New("step")
 	BlockStack   = stack.New("block")
 	TaskBreak    bool
+
+	TaskerStack = stack.New("tasker")
 )
 
 const (

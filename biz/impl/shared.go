@@ -101,3 +101,7 @@ func IsAtRootTaskLevel() (called bool) {
 	return
 }
 
+func TaskerRuntime() *TaskerRuntimeContext {
+	return core.TaskerStack.GetTop().(*TaskerRuntimeContext)
+}
+

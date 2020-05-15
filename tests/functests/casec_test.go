@@ -29,8 +29,8 @@ func TestC(t *testing.T) {
 	for _, x := range files {
 		u.Pln("testing:", x)
 		tests.Setupx(x)
-		impl.InitTasks()
-		impl.ExecTask("task", nil)
+		t := impl.NewTasker()
+		t.ExecTask("task", nil)
 		core.Unset()
 	}
 }
