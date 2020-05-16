@@ -90,6 +90,7 @@ func DecryptAndRegister(securetag *model.SecureSetting, dvar *Dvar, contextVars 
 	}
 
 	if s.Key != "" {
+		u.Ptmpdebug("33", contextVars, s.Key)
 		encryptionkey = (*contextVars).Get(s.Key).(string)
 	}
 

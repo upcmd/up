@@ -49,7 +49,6 @@ func main() {
 		u.SetRefdir(*refdir)
 		u.SetTaskfile(*taskfile)
 		u.Pfvvvv(" :verbose level:  %s", u.CoreConfig.Verbose)
-		u.Pfvvvv(" :instance name:  %s", *instanceName)
 	}
 
 	switch cmd {
@@ -61,15 +60,14 @@ func main() {
 		initArgs()
 		if *ngoTaskName != "" {
 			u.Pln("-exec task:", *ngoTaskName)
-			t := impl.NewTasker()
-			t.SetInstanceName(*instanceName)
+			t := impl.NewTasker(*instanceName)
 			t.ExecTask(*ngoTaskName, nil)
 			u.Ptmpdebug("88", u.CoreConfig)
 		}
 
 	case list.FullCommand():
 		initArgs()
-		t := impl.NewTasker()
+		t := impl.NewTasker(*instanceName)
 		if *listName == "=" {
 			t.ListAllTasks()
 		} else if *listName != "" {
@@ -93,7 +91,7 @@ templatefunc
 
 	case validate.FullCommand():
 		initArgs()
-		t := impl.NewTasker()
+		t := impl.NewTasker(*instanceName)
 		taskname := *validateTaskName
 		u.Pf("validate task: %s\n")
 		t.ValidateTask(taskname)

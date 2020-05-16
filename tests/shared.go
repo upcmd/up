@@ -48,8 +48,7 @@ func Setup(prefix string, t *testing.T) {
 
 func TestT(prefix string, t *testing.T) {
 	Setup(prefix, t)
-	tasker := impl.NewTasker()
-	tasker.SetInstanceName("dev")
+	tasker := impl.NewTasker("dev")
 	tasker.ListTasks()
 	tasker.ExecTask("task", nil)
 }

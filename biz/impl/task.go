@@ -50,7 +50,7 @@ type TaskerRuntimeContext struct {
 	//ReturnVars      *Cache
 }
 
-func NewTasker() *Tasker {
+func NewTasker(id string) *Tasker {
 	priorityLoadingTaskFile := filepath.Join(".", u.CoreConfig.TaskFile)
 	refDir := "."
 	if _, err := os.Stat(priorityLoadingTaskFile); err != nil {
@@ -71,7 +71,7 @@ func NewTasker() *Tasker {
 	}
 
 	TaskerStack.Push(&taskerContext)
-
+	tasker.SetInstanceName(id)
 	//TODO: refactory of the runtime init after config is loaded to a proper place
 	FuncMapInit()
 	tasker.loadScopes()
@@ -279,7 +279,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 	} else {
 		//TODO: load the external module
 		//change workdir to that dir and load task entry
-		eTasker := NewTasker()
+		eTasker := NewTasker("something_to_be_defined")
 		//TODO: to implemente
 		eTasker.ExecTask(taskname, callerVars)
 		TaskerStack.Pop()
