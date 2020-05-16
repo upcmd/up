@@ -27,7 +27,7 @@ type Step struct {
 	Dox    interface{}
 	Func   string
 	Vars   core.Cache
-	Dvars  core.Dvars
+	Dvars  Dvars
 	Desc   string
 	Reg    string
 	Flags  []string
@@ -49,16 +49,16 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 	var execvars core.Cache
 	var resultVars *core.Cache
 
-	execvars = deepcopy.Copy(*core.TaskRuntime().ExecbaseVars).(core.Cache)
+	execvars = deepcopy.Copy(*TaskRuntime().ExecbaseVars).(core.Cache)
 	//u.Ptmpdebug("22", "others get runtime")
 	//u.Ptmpdebug("11", execvars)
-	taskVars := core.TaskRuntime().TaskVars
+	taskVars := TaskRuntime().TaskVars
 	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
 	//u.Ptmpdebug("33", execvars)
 	//u.Ptmpdebug("44", step.Vars)
 
 	if fromBlock {
-		blockvars := core.BlockStack.GetTop().(*core.BlockRuntimeContext).BlockBaseVars
+		blockvars := BlockStack().GetTop().(*BlockRuntimeContext).BlockBaseVars
 		mergo.Merge(&execvars, blockvars, mergo.WithOverride)
 		mergo.Merge(&execvars, &step.Vars, mergo.WithOverride)
 		resultVars = &execvars
@@ -81,7 +81,7 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 	u.Ppmsgvvvv(resultVars)
 
 	//so far the execvars includes: scope vars + scope dvars + global runtime vars + task vars
-	resultVars = core.VarsMergedWithDvars("local", resultVars, &step.Dvars, resultVars)
+	resultVars = VarsMergedWithDvars("local", resultVars, &step.Dvars, resultVars)
 
 	//so far the resultVars includes: the local vars + dvars rendered using execvars
 	u.Ppmsgvvvhint("overall final exec vars:", resultVars)
@@ -201,7 +201,7 @@ func (step *Step) Exec(fromBlock bool) {
 						func() {
 							//loop points to a var name which is a slice
 							if reflect.TypeOf(step.Loop).Kind() == reflect.String {
-								loopVarName := core.Render(step.Loop.(string), stepExecVars)
+								loopVarName := Render(step.Loop.(string), stepExecVars)
 								loopObj := stepExecVars.Get(loopVarName)
 								if loopObj == nil {
 									u.InvalidAndExit("Evaluating loop var and object", u.Spf("Please use a correct varname:(%s) containing a list of values", loopVarName))
@@ -212,7 +212,7 @@ func (step *Step) Exec(fromBlock bool) {
 										for idx, item := range loopObj.([]interface{}) {
 											routeFuncType(&LoopItem{idx, idx + 1, item})
 											if rawUtil != "" {
-												untilEval := core.Render(rawUtil, stepExecVars)
+												untilEval := Render(rawUtil, stepExecVars)
 												toBreak, err := strconv.ParseBool(untilEval)
 												u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
 												if toBreak {
@@ -230,7 +230,7 @@ func (step *Step) Exec(fromBlock bool) {
 										for idx, item := range loopObj.([]string) {
 											routeFuncType(&LoopItem{idx, idx + 1, item})
 											if rawUtil != "" {
-												untilEval := core.Render(rawUtil, stepExecVars)
+												untilEval := Render(rawUtil, stepExecVars)
 												toBreak, err := strconv.ParseBool(untilEval)
 												u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
 												if toBreak {
@@ -255,7 +255,7 @@ func (step *Step) Exec(fromBlock bool) {
 								for idx, item := range step.Loop.([]interface{}) {
 									routeFuncType(&LoopItem{idx, idx + 1, item})
 									if rawUtil != "" {
-										untilEval := core.Render(rawUtil, stepExecVars)
+										untilEval := Render(rawUtil, stepExecVars)
 										toBreak, err := strconv.ParseBool(untilEval)
 										u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
 										if toBreak {
@@ -285,7 +285,7 @@ func (step *Step) Exec(fromBlock bool) {
 
 	func() {
 		if step.If != "" {
-			IfEval := core.Render(step.If, stepExecVars)
+			IfEval := Render(step.If, stepExecVars)
 			if IfEval != "<no value>" {
 				goahead, err := strconv.ParseBool(IfEval)
 				u.LogErrorAndExit("evaluate condition", err, u.Spf("please fix if condition evaluation: [%s]", IfEval))
@@ -336,7 +336,7 @@ func doElse(elseCalls interface{}, execVars *core.Cache) {
 
 	if len(tasknames) > 0 {
 		for _, tmptaskname := range tasknames {
-			taskname := core.Render(tmptaskname, execVars)
+			taskname := Render(tmptaskname, execVars)
 			u.PpmsgvvvvvhintHigh(u.Spf("else caller vars to task (%s):", taskname), execVars)
 			ExecTask(taskname, execVars)
 		}
@@ -348,15 +348,15 @@ func (steps *Steps) Exec(fromBlock bool) {
 
 	for idx, step := range *steps {
 
-		taskLayerCnt := core.TaskStack.GetLen()
+		taskLayerCnt := TaskerRuntime().Tasker.TaskStack.GetLen()
 		u.LogDesc("step", idx+1, taskLayerCnt, step.Name, step.Desc)
 		u.Ppmsgvvvv(step)
 
 		execStep := func() {
-			rtContext := core.StepRuntimeContext{
+			rtContext := StepRuntimeContext{
 				Stepname: step.Name,
 			}
-			core.StepStack.Push(&rtContext)
+			StepStack().Push(&rtContext)
 
 			//TODO: consider move task vars merging to here
 			if step.Do == nil && step.Dox != nil {
@@ -365,28 +365,28 @@ func (steps *Steps) Exec(fromBlock bool) {
 				step.Exec(fromBlock)
 			}
 
-			result := core.StepStack.GetTop().(*core.StepRuntimeContext).Result
-			taskname := core.TaskStack.GetTop().(*core.TaskRuntimeContext).Taskname
+			result := StepRuntime().Result
+			taskname := TaskerRuntime().Tasker.TaskStack.GetTop().(*TaskRuntimeContext).Taskname
 
 			//TODO: add support for block
 			if u.Contains([]string{FUNC_SHELL, FUNC_CALL}, step.Func) {
 				if step.Reg == "auto" {
 					if step.Name == "" {
-						core.TaskRuntime().ExecbaseVars.Put(u.Spf("%s_%d_result", taskname, idx), result)
+						TaskRuntime().ExecbaseVars.Put(u.Spf("%s_%d_result", taskname, idx), result)
 					} else {
-						core.TaskRuntime().ExecbaseVars.Put(u.Spf("%s_%s_result", taskname, step.Name), result)
+						TaskRuntime().ExecbaseVars.Put(u.Spf("%s_%s_result", taskname, step.Name), result)
 					}
 				} else if step.Reg != "" {
-					core.TaskRuntime().ExecbaseVars.Put(u.Spf("%s", step.Reg), result)
+					TaskRuntime().ExecbaseVars.Put(u.Spf("%s", step.Reg), result)
 				}
 				if step.Func == FUNC_SHELL {
-					core.TaskRuntime().ExecbaseVars.Put("last_result", result)
+					TaskRuntime().ExecbaseVars.Put("last_result", result)
 				}
 
 			}
 
 			func() {
-				result := core.StepStack.GetTop().(*core.StepRuntimeContext).Result
+				result := StepRuntime().Result
 
 				if result != nil && result.Code == 0 {
 					u.LogOk(".")
@@ -404,13 +404,13 @@ func (steps *Steps) Exec(fromBlock bool) {
 
 			}()
 
-			core.StepStack.Pop()
+			StepStack().Pop()
 		}
 
-		if !core.TaskBreak {
+		if !TaskerRuntime().Tasker.TaskBreak {
 			execStep()
 		} else {
-			core.TaskBreak = false
+			TaskerRuntime().Tasker.TaskBreak = false
 			u.LogWarn("break", "client chose to break")
 			break
 		}

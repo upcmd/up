@@ -107,7 +107,7 @@ func (f *CmdFuncAction) Exec() {
 			u.Pfvvvvv("%s\n", color.MagentaString("%s", cmdItem.Cmd))
 		}
 
-		taskLayerCnt := core.TaskStack.GetLen()
+		taskLayerCnt := TaskerRuntime().Tasker.TaskStack.GetLen()
 		u.LogDesc("substep", idx+1, taskLayerCnt, cmdItem.Name, cmdItem.Desc)
 
 		doFlag := func(flag string, doFlagFunc func()) {
@@ -119,7 +119,7 @@ func (f *CmdFuncAction) Exec() {
 		switch cmdItem.Name {
 		case "print":
 			cmdItem.runCmd("string", func() {
-				cmdRendered := core.Render(cmdItem.Cmd.(string), f.Vars)
+				cmdRendered := Render(cmdItem.Cmd.(string), f.Vars)
 				u.Pfv("%s\n", color.HiGreenString("%s", cmdRendered))
 			})
 
@@ -133,16 +133,16 @@ func (f *CmdFuncAction) Exec() {
 					switch k.(string) {
 					case "msg":
 						raw = v.(string)
-						msg = core.Render(raw, f.Vars)
+						msg = Render(raw, f.Vars)
 					case "fg":
 						raw = v.(string)
-						fg = core.Render(raw, f.Vars)
+						fg = Render(raw, f.Vars)
 					case "bg":
 						raw = v.(string)
-						bg = core.Render(raw, f.Vars)
+						bg = Render(raw, f.Vars)
 					case "object":
 						raw = v.(string)
-						object = core.Render(raw, f.Vars)
+						object = Render(raw, f.Vars)
 					}
 				}
 
@@ -185,26 +185,26 @@ func (f *CmdFuncAction) Exec() {
 
 		case "trace":
 			cmdItem.runCmd("string", func() {
-				cmdRendered := core.Render(cmdItem.Cmd.(string), f.Vars)
+				cmdRendered := Render(cmdItem.Cmd.(string), f.Vars)
 				u.Ptrace("Trace:", cmdRendered)
 			})
 
 		case "printobj":
 			u.Dvvvv(cmdItem.Cmd)
 			cmdItem.runCmd("string", func() {
-				objname := core.Render(cmdItem.Cmd.(string), f.Vars)
+				objname := Render(cmdItem.Cmd.(string), f.Vars)
 				obj := f.Vars.Get(objname)
 				u.Ppfmsg(u.Spf("object:\n %s", objname), obj)
 			})
 
 		case "dereg":
 			cmdItem.runCmd("string", func() {
-				varname := core.Render(cmdItem.Cmd.(string), f.Vars)
+				varname := Render(cmdItem.Cmd.(string), f.Vars)
 				u.Pfv("deregister var: %s\n", color.HiGreenString("%s", varname))
-				core.TaskRuntime().ExecbaseVars.Delete(varname)
+				TaskRuntime().ExecbaseVars.Delete(varname)
 				f.Vars.Delete(varname)
 			})
-			u.Ppmsgvvvvvhint("after reg the var - contextual global:", core.TaskRuntime().ExecbaseVars)
+			u.Ppmsgvvvvvhint("after reg the var - contextual global:", TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 
 		case "sleep":
@@ -223,7 +223,7 @@ func (f *CmdFuncAction) Exec() {
 			u.Fail("fail", "fail and exit")
 
 		case "break":
-			core.TaskBreak = true
+			TaskerRuntime().Tasker.TaskBreak = true
 
 		case "assert":
 			cmdItem.runCmd("array", func() {
@@ -233,7 +233,7 @@ func (f *CmdFuncAction) Exec() {
 				var failed bool
 				for idx, v := range conditions {
 					raw := v.(string)
-					condition = core.Render(raw, f.Vars)
+					condition = Render(raw, f.Vars)
 					succeeded, err := strconv.ParseBool(condition)
 					if !succeeded {
 						color.Red("%2d ASSERT FAILED: [%s]", idx+1, raw)
@@ -261,7 +261,7 @@ func (f *CmdFuncAction) Exec() {
 					u.Pf("%2d: inspect[%s]", idx+1, v)
 					switch what {
 					case "exec_base_vars":
-						u.Ppmsg(*core.TaskRuntime().ExecbaseVars)
+						u.Ppmsg(*TaskRuntime().ExecbaseVars)
 					case "exec_vars":
 						u.Ppmsg(f.Vars)
 					}
@@ -278,13 +278,13 @@ func (f *CmdFuncAction) Exec() {
 					switch k.(string) {
 					case "reg":
 						raw = v.(string)
-						varname = core.Render(raw, f.Vars)
+						varname = Render(raw, f.Vars)
 					case "filename":
 						raw = v.(string)
-						filename = core.Render(raw, f.Vars)
+						filename = Render(raw, f.Vars)
 					case "dir":
 						raw = v.(string)
-						dir = core.Render(raw, f.Vars)
+						dir = Render(raw, f.Vars)
 					}
 				}
 
@@ -300,13 +300,13 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					f.Vars.Put(varname, string(content))
 				} else {
-					core.TaskRuntime().ExecbaseVars.Put(varname, string(content))
+					TaskRuntime().ExecbaseVars.Put(varname, string(content))
 					f.Vars.Put(varname, string(content))
 				}
 
 			})
 
-			u.Ppmsgvvvvvhint("after reg the var - contextual global:", core.TaskRuntime().ExecbaseVars)
+			u.Ppmsgvvvvvhint("after reg the var - contextual global:", TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 
 		case "writefile":
@@ -317,13 +317,13 @@ func (f *CmdFuncAction) Exec() {
 					switch k.(string) {
 					case "content":
 						contentRaw := v.(string)
-						content = core.Render(contentRaw, f.Vars)
+						content = Render(contentRaw, f.Vars)
 					case "filename":
 						raw = v.(string)
-						filename = core.Render(raw, f.Vars)
+						filename = Render(raw, f.Vars)
 					case "dir":
 						raw = v.(string)
-						dir = core.Render(raw, f.Vars)
+						dir = Render(raw, f.Vars)
 					}
 				}
 				filepath := path.Join(dir, filename)
@@ -339,27 +339,27 @@ func (f *CmdFuncAction) Exec() {
 					switch k.(string) {
 					case "src":
 						raw = v.(string)
-						src = core.Render(raw, f.Vars)
+						src = Render(raw, f.Vars)
 					case "datakey":
 						raw = v.(string)
-						datakey = core.Render(raw, f.Vars)
+						datakey = Render(raw, f.Vars)
 						data = f.Vars.Get(datakey)
 					case "datapath":
 						raw = v.(string)
-						datapath = core.Render(raw, f.Vars)
+						datapath = Render(raw, f.Vars)
 						data = core.GetSubObjectFromCache(f.Vars, datapath, false)
 						u.Ppmsgvvvvv("sub object:", data)
 					case "dest":
 						raw = v.(string)
-						dest = core.Render(raw, f.Vars)
+						dest = Render(raw, f.Vars)
 					}
 				}
 
 				tbuf, err := ioutil.ReadFile(src)
 				if data == nil || data == "" {
-					rendered = core.Render(string(tbuf), f.Vars)
+					rendered = Render(string(tbuf), f.Vars)
 				} else {
-					rendered = core.Render(string(tbuf), data)
+					rendered = Render(string(tbuf), data)
 				}
 
 				u.LogErrorAndExit("cmd template", err, "please fix file path and name issues")
@@ -377,22 +377,22 @@ func (f *CmdFuncAction) Exec() {
 					switch k.(string) {
 					case "ymlkey":
 						raw = v.(string)
-						ymlkey = core.Render(raw, f.Vars)
+						ymlkey = Render(raw, f.Vars)
 					case "ymlfile":
 						raw = v.(string)
-						ymlfile = core.Render(raw, f.Vars)
+						ymlfile = Render(raw, f.Vars)
 					case "refdir":
 						raw = v.(string)
-						refdir = core.Render(raw, f.Vars)
+						refdir = Render(raw, f.Vars)
 					case "reg":
 						raw = v.(string)
-						reg = core.Render(raw, f.Vars)
+						reg = Render(raw, f.Vars)
 					case "path":
 						//yqpath used as:
 						//1. a yqpath ref in yml content
 						//2. a yqpath ref in cached object
 						raw = v.(string)
-						yqpath = core.Render(raw, f.Vars)
+						yqpath = Render(raw, f.Vars)
 					}
 				}
 
@@ -440,7 +440,7 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					f.Vars.Put(reg, data)
 				} else {
-					core.TaskRuntime().ExecbaseVars.Put(reg, data)
+					TaskRuntime().ExecbaseVars.Put(reg, data)
 					f.Vars.Put(reg, data)
 				}
 
@@ -458,18 +458,18 @@ func (f *CmdFuncAction) Exec() {
 					switch k.(string) {
 					case "ymlfile":
 						raw = v.(string)
-						ymlfile = core.Render(raw, f.Vars)
+						ymlfile = Render(raw, f.Vars)
 					case "refdir":
 						raw = v.(string)
-						refdir = core.Render(raw, f.Vars)
+						refdir = Render(raw, f.Vars)
 					case "path":
 						raw = v.(string)
-						yqpath = core.Render(raw, f.Vars)
+						yqpath = Render(raw, f.Vars)
 					case "verbose":
 						verbose = v.(string)
 					case "reg":
 						raw = v.(string)
-						reg = core.Render(raw, f.Vars)
+						reg = Render(raw, f.Vars)
 					}
 				}
 
@@ -496,7 +496,7 @@ func (f *CmdFuncAction) Exec() {
 					if localonly {
 						f.Vars.Put(reg, modified)
 					} else {
-						core.TaskRuntime().ExecbaseVars.Put(reg, modified)
+						TaskRuntime().ExecbaseVars.Put(reg, modified)
 						f.Vars.Put(reg, modified)
 					}
 				}
@@ -514,21 +514,21 @@ func (f *CmdFuncAction) Exec() {
 					switch k.(string) {
 					case "ymlstr":
 						raw = v.(string)
-						ymlstr = core.Render(raw, f.Vars)
+						ymlstr = Render(raw, f.Vars)
 					case "value":
 						raw = v.(string)
-						value = core.Render(raw, f.Vars)
+						value = Render(raw, f.Vars)
 					case "nodevalue":
 						raw = v.(string)
-						nodevalue = core.Render(raw, f.Vars)
+						nodevalue = Render(raw, f.Vars)
 					case "path":
 						raw = v.(string)
-						yqpath = core.Render(raw, f.Vars)
+						yqpath = Render(raw, f.Vars)
 					case "verbose":
 						verbose = v.(string)
 					case "reg":
 						raw = v.(string)
-						reg = core.Render(raw, f.Vars)
+						reg = Render(raw, f.Vars)
 					}
 				}
 				doFlag("localonly", func() {
@@ -556,7 +556,7 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					f.Vars.Put(reg, modified)
 				} else {
-					core.TaskRuntime().ExecbaseVars.Put(reg, modified)
+					TaskRuntime().ExecbaseVars.Put(reg, modified)
 					f.Vars.Put(reg, modified)
 				}
 
@@ -573,7 +573,7 @@ func (f *CmdFuncAction) Exec() {
 					}
 					if k.(string) == "value" {
 						varvalueRaw := v.(string)
-						varvalue = core.Render(varvalueRaw, f.Vars)
+						varvalue = Render(varvalueRaw, f.Vars)
 					}
 				}
 
@@ -587,12 +587,12 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					f.Vars.Put(varname, varvalue)
 				} else {
-					core.TaskRuntime().ExecbaseVars.Put(varname, varvalue)
+					TaskRuntime().ExecbaseVars.Put(varname, varvalue)
 					f.Vars.Put(varname, varvalue)
 				}
 
 			})
-			u.Ppmsgvvvvvhint("after reg the var - contextual global:", core.TaskRuntime().ExecbaseVars)
+			u.Ppmsgvvvvvhint("after reg the var - contextual global:", TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 
 		case "return":
@@ -600,23 +600,23 @@ func (f *CmdFuncAction) Exec() {
 				retNames := cmdItem.Cmd.([]interface{})
 				var retName string
 
-				if core.TaskRuntime().ReturnVars == nil {
-					core.TaskRuntime().ReturnVars = core.NewCache()
+				if TaskRuntime().ReturnVars == nil {
+					TaskRuntime().ReturnVars = core.NewCache()
 				}
 
 				for _, v := range retNames {
 					rawName := v.(string)
-					retName = core.Render(rawName, f.Vars)
+					retName = Render(rawName, f.Vars)
 					ret := f.Vars.Get(retName)
 					if ret != nil {
-						core.TaskRuntime().ReturnVars.Put(retName, f.Vars.Get(retName))
+						TaskRuntime().ReturnVars.Put(retName, f.Vars.Get(retName))
 					} else {
 						u.LogWarn("return validation", u.Spf("The referencing var name: (%s) not exist", retName))
 					}
 				}
 
 			})
-			u.Ppmsgvvvvvhint("contextual return vars:", core.TaskRuntime().ReturnVars)
+			u.Ppmsgvvvvvhint("contextual return vars:", TaskRuntime().ReturnVars)
 
 		case "to_object":
 			//src: a var name to get the yml content from
@@ -629,15 +629,15 @@ func (f *CmdFuncAction) Exec() {
 				for k, v := range cmd {
 					if k.(string) == "fromkey" {
 						keyRaw := v.(string)
-						fromkey = core.Render(keyRaw, f.Vars)
+						fromkey = Render(keyRaw, f.Vars)
 					}
 					if k.(string) == "src" {
 						srcRaw := v.(string)
-						src = core.Render(srcRaw, f.Vars)
+						src = Render(srcRaw, f.Vars)
 					}
 					if k.(string) == "reg" {
 						regRaw := v.(string)
-						reg = core.Render(regRaw, f.Vars)
+						reg = Render(regRaw, f.Vars)
 					}
 				}
 				doFlag("localonly", func() {
@@ -669,12 +669,12 @@ func (f *CmdFuncAction) Exec() {
 				if localonly {
 					(*f.Vars).Put(reg, *obj)
 				} else {
-					core.TaskRuntime().ExecbaseVars.Put(src, reg)
+					TaskRuntime().ExecbaseVars.Put(src, reg)
 					(*f.Vars).Put(reg, *obj)
 				}
 
 			})
-			u.Ppmsgvvvvvhint("after reg the var - contextual global:", core.TaskRuntime().ExecbaseVars)
+			u.Ppmsgvvvvvhint("after reg the var - contextual global:", TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 
 		case "":

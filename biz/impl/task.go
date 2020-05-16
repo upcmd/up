@@ -70,19 +70,27 @@ func NewTasker() *Tasker {
 		//TODO: use namegen to generate random name in config default settings
 	}
 
-	core.TaskerStack.Push(&taskerContext)
+	TaskerStack.Push(&taskerContext)
 
 	//TODO: refactory of the runtime init after config is loaded to a proper place
-	core.FuncMapInit()
+	FuncMapInit()
 	tasker.loadScopes()
-	core.ScopeProfiles.InitContextInstances()
+	ScopeProfiles.InitContextInstances()
 	tasker.loadRuntimeGlobalVars()
 	tasker.loadRuntimeDvars()
-	core.SetRuntimeVarsMerged(core.InstanceName)
-	core.SetRuntimeGlobalMergedWithDvars()
+	SetRuntimeVarsMerged(tasker.InstanceName)
+	SetRuntimeGlobalMergedWithDvars()
 	tasker.loadTasks()
 
 	return tasker
+}
+
+func (t *Tasker) SetInstanceName(id string) {
+	if id != "" {
+		t.InstanceName = id
+	} else {
+		t.InstanceName = "nonamed"
+	}
 }
 
 func (t *Tasker) initRuntime() {
@@ -184,17 +192,6 @@ func (tasker *Tasker) ListTask(taskname string) {
 	u.Pln(tree.String())
 }
 
-func (t *Tasker) kk() {
-	l := 34
-	t.ddd("taskname", nil, &l)
-}
-
-func (t *Tasker) ddd(taskname string, branch treeprint.Tree, level *int) bool {
-	l := 34
-	t.ddd("taskname", nil, &l)
-	return false
-}
-
 func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level *int) bool {
 	*level += 1
 	maxLayers, _ := strconv.Atoi(u.CoreConfig.MaxCallLayers)
@@ -254,7 +251,7 @@ func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level 
 }
 
 func (t *Tasker) ValidateTask(taskname string) {
-	core.SetDryrun()
+	SetDryrun()
 	t.ExecTask(taskname, nil)
 }
 
@@ -282,6 +279,10 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 	} else {
 		//TODO: load the external module
 		//change workdir to that dir and load task entry
+		eTasker := NewTasker()
+		//TODO: to implemente
+		eTasker.ExecTask(taskname, callerVars)
+		TaskerStack.Pop()
 	}
 
 }
@@ -293,13 +294,13 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
 			u.Pfvvvv("  located task-> %d [%s]: \n", idx+1, task.Name)
 
 			var ctxCallerTaskname string
-			if core.TaskStack.GetLen() > 0 {
-				ctxCallerTaskname = core.TaskRuntime().TasknameLayered
+			if TaskerRuntime().Tasker.TaskStack.GetLen() > 0 {
+				ctxCallerTaskname = TaskRuntime().TasknameLayered
 			} else {
 				ctxCallerTaskname = taskname
 			}
 
-			taskLayerCnt := core.TaskStack.GetLen()
+			taskLayerCnt := TaskerRuntime().Tasker.TaskStack.GetLen()
 			u.LogDesc("task", idx+1, taskLayerCnt, u.Spf("%s ==> %s", ctxCallerTaskname, taskname), task.Desc)
 			found = true
 			var steps Steps
@@ -321,38 +322,38 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
 			}()
 
 			func() {
-				rtContext := core.TaskRuntimeContext{
+				rtContext := TaskRuntimeContext{
 					Taskname: taskname,
 					TaskVars: core.NewCache(),
 				}
 
 				if IsAtRootTaskLevel() {
-					rtContext.ExecbaseVars = core.RuntimeVarsAndDvarsMerged
+					rtContext.ExecbaseVars = RuntimeVarsAndDvarsMerged
 					rtContext.TasknameLayered = taskname
 				} else {
 					rtContext.ExecbaseVars = callerVars
-					rtContext.TasknameLayered = u.Spf("%s/%s", core.TaskRuntime().TasknameLayered, taskname)
+					rtContext.TasknameLayered = u.Spf("%s/%s", TaskRuntime().TasknameLayered, taskname)
 				}
-				rtContext.ExecbaseVars.Put(core.UP_RUNTIME_TASK_LAYER_NUMBER, core.TaskStack.GetLen())
+				rtContext.ExecbaseVars.Put(UP_RUNTIME_TASK_LAYER_NUMBER, TaskerRuntime().Tasker.TaskStack.GetLen())
 
-				core.TaskStack.Push(&rtContext)
-				u.Pvvvv("Executing task stack layer:", core.TaskStack.GetLen())
+				TaskerRuntime().Tasker.TaskStack.Push(&rtContext)
+				u.Pvvvv("Executing task stack layer:", TaskerRuntime().Tasker.TaskStack.GetLen())
 				maxLayers, err := strconv.Atoi(u.CoreConfig.MaxCallLayers)
 				u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
 
-				if maxLayers != 0 && core.TaskStack.GetLen() > maxLayers {
+				if maxLayers != 0 && TaskerRuntime().Tasker.TaskStack.GetLen() > maxLayers {
 					u.LogError("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
 					os.Exit(-1)
 				}
 
 				steps.Exec(false)
 
-				returnVars := core.TaskRuntime().ReturnVars
-				core.TaskStack.Pop()
-				if core.TaskStack.GetLen() > 0 && returnVars != nil {
-					mergo.Merge(core.TaskRuntime().ExecbaseVars, returnVars, mergo.WithOverride)
-				} else if core.TaskStack.GetLen() == 0 && returnVars != nil {
-					mergo.Merge(core.RuntimeVarsAndDvarsMerged, returnVars, mergo.WithOverride)
+				returnVars := TaskRuntime().ReturnVars
+				TaskerRuntime().Tasker.TaskStack.Pop()
+				if TaskerRuntime().Tasker.TaskStack.GetLen() > 0 && returnVars != nil {
+					mergo.Merge(TaskRuntime().ExecbaseVars, returnVars, mergo.WithOverride)
+				} else if TaskerRuntime().Tasker.TaskStack.GetLen() == 0 && returnVars != nil {
+					mergo.Merge(RuntimeVarsAndDvarsMerged, returnVars, mergo.WithOverride)
 				}
 			}()
 
@@ -384,11 +385,11 @@ func (t *Tasker) validateAndLoadTaskRef() {
 		if task.Ref != "" {
 			if task.RefDir != "" {
 				rawdir := task.RefDir
-				refdir = core.Render(rawdir, core.RuntimeVarsAndDvarsMerged)
+				refdir = Render(rawdir, RuntimeVarsAndDvarsMerged)
 			}
 
 			rawref := task.Ref
-			ref := core.Render(rawref, core.RuntimeVarsAndDvarsMerged)
+			ref := Render(rawref, RuntimeVarsAndDvarsMerged)
 
 			yamlflowroot := u.YamlLoader("flow ref", refdir, ref)
 			flow := loadRefFlow(yamlflowroot)
@@ -441,9 +442,9 @@ func loadRefFlow(yamlroot *viper.Viper) *Steps {
 
 func (t *Tasker) loadScopes() {
 	scopesData := t.TaskYmlRoot.Get("scopes")
-	var scopes core.Scopes
+	var scopes Scopes
 	err := ms.Decode(scopesData, &scopes)
-	core.SetScopeProfiles(&scopes)
+	SetScopeProfiles(&scopes)
 
 	u.LogErrorAndExit("load full scopes", err, "please assess your scope configuration carefully")
 }
@@ -453,12 +454,12 @@ func (t *Tasker) loadRuntimeGlobalVars() {
 	var vars core.Cache
 	err := ms.Decode(varsData, &vars)
 	u.LogError("loadRuntimeGlobalVars", err)
-	core.SetRuntimeGlobalVars(&vars)
+	SetRuntimeGlobalVars(&vars)
 }
 
-func (t *Tasker) loadRuntimeDvars() *core.Dvars {
+func (t *Tasker) loadRuntimeDvars() *Dvars {
 	dvarsData := t.TaskYmlRoot.Get("dvars")
-	var dvars core.Dvars
+	var dvars Dvars
 	err := ms.Decode(dvarsData, &dvars)
 	u.LogErrorAndExit("loadRuntimeDvars",
 		err,
@@ -466,7 +467,7 @@ func (t *Tasker) loadRuntimeDvars() *core.Dvars {
 	)
 
 	//dvars.ValidateAndLoading()
-	core.SetRuntimeGlobalDvars(&dvars)
+	SetRuntimeGlobalDvars(&dvars)
 	return &dvars
 }
 

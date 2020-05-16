@@ -10,7 +10,6 @@ package tests
 import (
 	"github.com/stephencheng/up/biz/impl"
 	m "github.com/stephencheng/up/model"
-	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	"os/exec"
 	"path"
@@ -48,9 +47,9 @@ func Setup(prefix string, t *testing.T) {
 }
 
 func TestT(prefix string, t *testing.T) {
-	core.SetInstanceName("dev")
 	Setup(prefix, t)
 	tasker := impl.NewTasker()
+	tasker.SetInstanceName("dev")
 	tasker.ListTasks()
 	tasker.ExecTask("task", nil)
 }

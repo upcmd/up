@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-package core
+package impl
 
 import (
 	"github.com/imdario/mergo"
@@ -13,6 +13,7 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
+	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	"io/ioutil"
 	"os"
@@ -27,13 +28,13 @@ var (
 	ScopeProfiles    *Scopes
 
 	//this is the merged vars from within scope: global, groups level (if there is), instance varss, then global runtime vars
-	RuntimeVarsMerged *Cache
+	RuntimeVarsMerged *core.Cache
 
 	//this is the merged vars and dvars to a vars cache from within scope: global, groups level (if there is), instance varss, then global runtime vars
 	//this vars should be used instead of RuntimeVarsMerged as it include both runtime vars and dvars except the local vars and dvars
-	RuntimeVarsAndDvarsMerged *Cache
+	RuntimeVarsAndDvarsMerged *core.Cache
 
-	RuntimeGlobalVars  *Cache
+	RuntimeGlobalVars  *core.Cache
 	RuntimeGlobalDvars *Dvars
 )
 
@@ -42,13 +43,13 @@ type Scope struct {
 	Ref     string
 	RefDir  string
 	Members []string
-	Vars    Cache
+	Vars    core.Cache
 	Dvars   Dvars
 }
 
 type Scopes []Scope
 
-type ExpandedContext map[string]*Cache
+type ExpandedContext map[string]*core.Cache
 type ContextInstances []ExpandedContext
 
 //clear up everything in scope and cache
@@ -67,7 +68,7 @@ func SetScopeProfiles(sp *Scopes) {
 	ScopeProfiles = sp
 }
 
-func SetRuntimeGlobalVars(vars *Cache) {
+func SetRuntimeGlobalVars(vars *core.Cache) {
 	RuntimeGlobalVars = vars
 }
 
@@ -75,7 +76,7 @@ func SetRuntimeGlobalDvars(dvars *Dvars) {
 	RuntimeGlobalDvars = dvars
 }
 
-func decryptAndRegister(securetag *model.SecureSetting, dvar *Dvar, contextVars *Cache, mergeTarget *Cache) {
+func DecryptAndRegister(securetag *model.SecureSetting, dvar *Dvar, contextVars *core.Cache, mergeTarget *core.Cache) {
 	s := securetag
 
 	if s == nil {
@@ -105,9 +106,9 @@ func decryptAndRegister(securetag *model.SecureSetting, dvar *Dvar, contextVars 
 
 }
 
-func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
-	var mergedVars Cache
-	mergedVars = deepcopy.Copy(*RuntimeVarsMerged).(Cache)
+func SetRuntimeGlobalMergedWithDvars() (vars *core.Cache) {
+	var mergedVars core.Cache
+	mergedVars = deepcopy.Copy(*RuntimeVarsMerged).(core.Cache)
 
 	expandedVars := RuntimeGlobalDvars.Expand("runtime global", RuntimeVarsMerged)
 
@@ -122,20 +123,20 @@ func SetRuntimeGlobalMergedWithDvars() (vars *Cache) {
 	return RuntimeVarsAndDvarsMerged
 }
 
-func GlobalVarsMergedWithDvars(scope *Scope) (vars *Cache) {
+func GlobalVarsMergedWithDvars(scope *Scope) (vars *core.Cache) {
 	return VarsMergedWithDvars(scope.Name, &scope.Vars, &scope.Dvars, &(scope.Vars))
 }
 
-func ScopeVarsMergedWithDvars(scope *Scope, contextMergedVars *Cache) *Cache {
+func ScopeVarsMergedWithDvars(scope *Scope, contextMergedVars *core.Cache) *core.Cache {
 	return VarsMergedWithDvars(scope.Name, &scope.Vars, &scope.Dvars, contextMergedVars)
 }
 
 /*
 given vars as base vars space to expand from, expand dvars against contextVars
 */
-func VarsMergedWithDvars(mark string, baseVars *Cache, dvars *Dvars, contextMergedVars *Cache) *Cache {
-	var mergedVars Cache
-	mergedVars = deepcopy.Copy(*baseVars).(Cache)
+func VarsMergedWithDvars(mark string, baseVars *core.Cache, dvars *Dvars, contextMergedVars *core.Cache) *core.Cache {
+	var mergedVars core.Cache
+	mergedVars = deepcopy.Copy(*baseVars).(core.Cache)
 
 	if dvars != nil {
 		expandedVars := dvars.Expand(mark, contextMergedVars)
@@ -149,9 +150,9 @@ func VarsMergedWithDvars(mark string, baseVars *Cache, dvars *Dvars, contextMerg
 	return &mergedVars
 }
 
-func loadRefVars(yamlroot *viper.Viper) *Cache {
+func loadRefVars(yamlroot *viper.Viper) *core.Cache {
 	scopesData := yamlroot.Get("vars")
-	vars := Cache{}
+	vars := core.Cache{}
 	err := ms.Decode(scopesData, &vars)
 	u.Dvvvvv(vars)
 	u.LogError("load ref vars", err)
@@ -206,11 +207,11 @@ func (ss *Scopes) InitContextInstances() {
 	}
 
 	//expand dvars into global scope's vars space
-	var globalvarsMergedWithDvars *Cache
+	var globalvarsMergedWithDvars *core.Cache
 	if globalScope != nil {
 		globalvarsMergedWithDvars = GlobalVarsMergedWithDvars(globalScope)
 	} else {
-		globalvarsMergedWithDvars = NewCache()
+		globalvarsMergedWithDvars = core.NewCache()
 	}
 
 	for idx, s := range *ss {
@@ -224,12 +225,12 @@ func (ss *Scopes) InitContextInstances() {
 				MemberGroupMap[m] = s.Name
 			}
 
-			var groupvars Cache = deepcopy.Copy(*globalvarsMergedWithDvars).(Cache)
+			var groupvars core.Cache = deepcopy.Copy(*globalvarsMergedWithDvars).(core.Cache)
 			mergo.Merge(&groupvars, s.Vars, mergo.WithOverride)
 
 			//expand dvars into group scope's vars space
 			groupScope := &(*ss)[idx]
-			var groupvarsMergedWithDvars *Cache = ScopeVarsMergedWithDvars(groupScope, &groupvars)
+			var groupvarsMergedWithDvars *core.Cache = ScopeVarsMergedWithDvars(groupScope, &groupvars)
 
 			expandedContext[s.Name] = groupvarsMergedWithDvars
 		}
@@ -249,7 +250,7 @@ func ListContextInstances() {
 }
 
 //get instance vars from scope definition, eg dev
-func (ss *Scopes) GetInstanceVars(instanceName string) *Cache {
+func (ss *Scopes) GetInstanceVars(instanceName string) *core.Cache {
 	for _, s := range *ss {
 		if s.Name == instanceName {
 			return &s.Vars
@@ -273,10 +274,10 @@ then merge runtimevars to global varss,
 This has chained dvar expansion through global to group then to instance level
 and finally merge with global var, except the global dvars
 */
-func SetRuntimeVarsMerged(runtimeid string) *Cache {
-	u.Pln("instance id:", runtimeid)
-	var runtimevars Cache
-	runtimevars = deepcopy.Copy(*expandedContext["global"]).(Cache)
+func SetRuntimeVarsMerged(runtimeid string) *core.Cache {
+	u.Pf("module: [%s] instance id: [%s]\n", u.CoreConfig.ModuleName, runtimeid)
+	var runtimevars core.Cache
+	runtimevars = deepcopy.Copy(*expandedContext["global"]).(core.Cache)
 
 	if u.Contains(GroupMembersList, runtimeid) {
 		groupname := MemberGroupMap[runtimeid]
@@ -297,7 +298,7 @@ func SetRuntimeVarsMerged(runtimeid string) *Cache {
 		}
 	}
 
-	var instanceVarsMergedWithDvars *Cache
+	var instanceVarsMergedWithDvars *core.Cache
 	if instanceScope != nil {
 		instanceVarsMergedWithDvars = VarsMergedWithDvars(instanceScope.Name, &instanceScope.Vars, &instanceScope.Dvars, &runtimevars)
 		//merge back the expanded merged scope vars and dvars

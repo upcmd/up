@@ -29,7 +29,7 @@ func DryRunOrExit(mark string, mustCondition MustConditionToContinueFunc, condit
 
 	ok := mustCondition()
 
-	if core.Dryrun {
+	if TaskerRuntime().Tasker.Dryrun {
 		color.Green("      %s -> %s", mark, "in dryrun, try to ignore")
 		if !ok {
 			color.Red("      %s -> %s", mark, "can not continue further due to critical condition not satisfied")
@@ -52,7 +52,7 @@ func DryRunAndSkip(mark string, allowedErrors []string, continueFunc ContinueFun
 		continueFunc()
 	} else if u.Contains(allowedErrors, mark) {
 		//do nothing
-		if core.Dryrun {
+		if TaskerRuntime().Tasker.Dryrun {
 			u.Pdryrun("in dry run and skip further")
 		}
 	} else {
@@ -84,7 +84,7 @@ enter: continue
 }
 
 func IsCalledTask() (called bool) {
-	if core.TaskStack.GetLen() > 1 {
+	if TaskerRuntime().Tasker.TaskStack.GetLen() > 1 {
 		called = true
 	} else {
 		called = false
@@ -93,15 +93,11 @@ func IsCalledTask() (called bool) {
 }
 
 func IsAtRootTaskLevel() (called bool) {
-	if core.TaskStack.GetLen() == 0 {
+	if TaskerRuntime().Tasker.TaskStack.GetLen() == 0 {
 		called = true
 	} else {
 		called = false
 	}
 	return
-}
-
-func TaskerRuntime() *TaskerRuntimeContext {
-	return core.TaskerStack.GetTop().(*TaskerRuntimeContext)
 }
 

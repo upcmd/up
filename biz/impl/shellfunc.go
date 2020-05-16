@@ -29,9 +29,9 @@ func runCmd(f *ShellFuncAction, cmd string) {
 		}
 	}()
 
-	var result core.ExecResult
+	var result ExecResult
 
-	if core.Dryrun {
+	if TaskerRuntime().Tasker.Dryrun {
 		u.Pdryrun("in dryrun mode and skipping the actual commands")
 		result.Code = 0
 		result.Output = strings.TrimSpace("dryrun result")
@@ -57,7 +57,7 @@ type ShellFuncAction struct {
 	Do     interface{}
 	Vars   *core.Cache
 	Cmds   []string
-	Result core.ExecResult
+	Result ExecResult
 }
 
 //adapt the abstract step.Do to concrete ShellFuncAction Cmds
@@ -85,7 +85,7 @@ func (f *ShellFuncAction) Exec() {
 	for idx, tcmd := range f.Cmds {
 		u.Pfv("cmd(%2d):\n", idx+1)
 		u.Pvv(tcmd)
-		cmd := core.Render(tcmd, f.Vars)
+		cmd := Render(tcmd, f.Vars)
 		u.Pfvvvv(" \\_ %+v\n", color.HiBlueString("%s", cmd))
 		runCmd(f, cmd)
 		u.Pfv("%s\n", color.HiGreenString("%s", f.Result.Output))
@@ -97,6 +97,7 @@ func (f *ShellFuncAction) Exec() {
 		u.Dvvvvv(f.Result)
 	}
 
-	core.StepStack.GetTop().(*core.StepRuntimeContext).Result = &f.Result
+	StepRuntime().Result = &f.Result
+
 }
 

@@ -94,6 +94,9 @@ func GetCoreConfig() *model.CoreConfig {
 		}
 	}
 
+	if cfg.ModuleName == "" {
+		cfg.ModuleName = GetRandomName(1)
+	}
 	return cfg
 }
 

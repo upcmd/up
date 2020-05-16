@@ -10,7 +10,6 @@ package main
 import (
 	"github.com/alecthomas/kingpin"
 	"github.com/stephencheng/up/biz/impl"
-	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	"os"
 )
@@ -51,7 +50,6 @@ func main() {
 		u.SetTaskfile(*taskfile)
 		u.Pfvvvv(" :verbose level:  %s", u.CoreConfig.Verbose)
 		u.Pfvvvv(" :instance name:  %s", *instanceName)
-		core.SetInstanceName(*instanceName)
 	}
 
 	switch cmd {
@@ -64,6 +62,7 @@ func main() {
 		if *ngoTaskName != "" {
 			u.Pln("-exec task:", *ngoTaskName)
 			t := impl.NewTasker()
+			t.SetInstanceName(*instanceName)
 			t.ExecTask(*ngoTaskName, nil)
 			u.Ptmpdebug("88", u.CoreConfig)
 		}
@@ -83,8 +82,8 @@ func main() {
 		u.Pf("-assist: %s\n", *assistName)
 		if *assistName == "templatefunc" {
 			u.Pln("=List of golang template funcs")
-			core.FuncMapInit()
-			core.ListAllFuncs()
+			impl.FuncMapInit()
+			impl.ListAllFuncs()
 		} else {
 			u.LogWarn("What kind of assist do you need?", "Please input a name:")
 			u.Pln(`#supported:

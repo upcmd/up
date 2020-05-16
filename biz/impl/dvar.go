@@ -5,12 +5,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-package core
+package impl
 
 import (
 	"bufio"
 	"github.com/mohae/deepcopy"
 	"github.com/stephencheng/up/model"
+	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -36,7 +37,7 @@ type Dvar struct {
 	DataTemplate string
 }
 
-func (dvars *Dvars) ValidateAndLoading(contextVars *Cache) {
+func (dvars *Dvars) ValidateAndLoading(contextVars *core.Cache) {
 	var identified bool
 	for idx, dvar := range *dvars {
 
@@ -77,16 +78,16 @@ func (dvars *Dvars) ValidateAndLoading(contextVars *Cache) {
 }
 
 //given a dvars with the vars context, it expands with rendered result
-func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
+func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 
 	dvars.ValidateAndLoading(contextVars)
-	var expandedVars *Cache = NewCache()
+	var expandedVars *core.Cache = core.NewCache()
 
 	if *contextVars == nil {
-		contextVars = NewCache()
+		contextVars = core.NewCache()
 	}
 
-	var tmpVars Cache = deepcopy.Copy(*contextVars).(Cache)
+	var tmpVars core.Cache = deepcopy.Copy(*contextVars).(core.Cache)
 	var tmpDvars Dvars
 	tmpDvars = deepcopy.Copy(*dvars).(Dvars)
 
@@ -119,7 +120,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 
 		if dvar.DataPath != "" {
 			datapath := Render(dvar.DataPath, tmpVars)
-			datasource = GetSubObjectFromCache(&tmpVars, datapath, false)
+			datasource = core.GetSubObjectFromCache(&tmpVars, datapath, false)
 			rval = Render(dvarRaw, datasource)
 		} else {
 			rval = tmpDvars[idx].Value
@@ -127,7 +128,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 
 		if dvar.DataTemplate != "" {
 			datatemplate := Render(dvar.DataTemplate, tmpVars)
-			datasource = YamlToObj(datatemplate)
+			datasource = core.YamlToObj(datatemplate)
 			rval = Render(dvarRaw, datasource)
 		} else {
 			rval = tmpDvars[idx].Value
@@ -165,7 +166,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 						(*expandedVars).Put(dvarObjName, *obj)
 					}
 
-					if TaskStack.GetLen() > 0 {
+					if TaskerRuntime().Tasker.TaskStack.GetLen() > 0 {
 						if u.Contains(dvar.Flags, "reg") {
 							if dvar.Name != "void" {
 								TaskRuntime().ExecbaseVars.Put(dvarObjName, *obj)
@@ -188,7 +189,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 					(*expandedVars).Put(envvarName, dvar.Rendered)
 				}
 
-				if TaskStack.GetLen() > 0 {
+				if TaskerRuntime().Tasker.TaskStack.GetLen() > 0 {
 					if u.Contains(dvar.Flags, "reg") {
 						if dvar.Name != "void" {
 							TaskRuntime().ExecbaseVars.Put(dvar.Name, dvar.Rendered)
@@ -197,7 +198,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 				}
 
 				if u.Contains(dvar.Flags, "secure") {
-					decryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget, expandedVars)
+					DecryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget, expandedVars)
 				}
 
 				if u.Contains(dvar.Flags, "prompt") {
@@ -217,7 +218,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *Cache) *Cache {
 			}
 
 			if dvar.Secure != nil {
-				decryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget, expandedVars)
+				DecryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget, expandedVars)
 			}
 
 		}()
