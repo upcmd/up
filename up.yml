@@ -202,6 +202,23 @@ tasks:
             {{end}}
 
   -
+    name: testm
+    desc: test specific module
+    task:
+      - func: call
+        do: release_local
+      -
+        func: shell
+        dvars:
+          - name: casename
+            flags:
+              - prompt
+        do: |
+          cd ./tests/modtests/{{.casename}}
+          ls -lart
+          up ngo
+
+  -
     name: testx
     desc: test specific the function test
     task:

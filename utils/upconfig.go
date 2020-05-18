@@ -19,11 +19,11 @@ type SecureSetting struct {
 }
 
 type Module struct {
-	Repo  string
-	Tag   string
-	Sha   string
-	Alias string
-	Dir   string
+	Repo    string
+	Tag     string
+	Version string
+	Alias   string
+	Dir     string
 }
 
 type UpConfig struct {
@@ -55,10 +55,10 @@ func (cfg *UpConfig) SetTaskfile(taskfile string) {
 	}
 }
 
-func (cfg *UpConfig) ShowCoreConfig() {
+func (cfg *UpConfig) ShowCoreConfig(mark string) {
 	e := reflect.ValueOf(cfg).Elem()
 	et := reflect.Indirect(e).Type()
-
+	fmt.Printf("%s config:\n", mark)
 	for i := 0; i < e.NumField(); i++ {
 		if f := e.Field(i); f.Kind() == reflect.String {
 			fname := et.Field(i).Name

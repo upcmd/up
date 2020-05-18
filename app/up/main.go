@@ -21,7 +21,9 @@ var (
 	ngoTaskName      = ngo.Arg("taskname", "task name to run").Default("Main").String()
 	initDefault      = app.Command("init", "create a default skeleton for a quick start")
 	list             = app.Command("list", "list tasks")
-	listName         = list.Arg("taskname", "task name to inspect").String()
+	listName         = list.Arg("taskname|=", "task name to inspect").String()
+	mod              = app.Command("mod", "module cmd")
+	modList          = mod.Arg("list", "list module").String()
 	assist           = app.Command("assist", "assist: templatefunc|")
 	assistName       = assist.Arg("assistname", "what to assist").String()
 	validate         = app.Command("validate", "validate tasks and plays")
@@ -40,7 +42,7 @@ func main() {
 	initConfig := func() *u.UpConfig {
 		cfg := u.NewUpConfig(*configDir, *configFile).InitConfig()
 		u.MainConfig = cfg
-		cfg.ShowCoreConfig()
+		cfg.ShowCoreConfig("Main")
 		u.Pfvvvv(" :release version:  %s", u.MainConfig.Version)
 
 		cfg.SetVerbose(*verbose)
@@ -72,6 +74,10 @@ func main() {
 		} else {
 			t.ListTasks()
 		}
+
+	case mod.FullCommand():
+		t := impl.NewTasker(*instanceName, initConfig)
+		t.ListAllModules()
 
 	case assist.FullCommand():
 		u.Pf("-assist: %s\n", *assistName)

@@ -8,57 +8,17 @@ tasks:
         func: shell
         desc: main job
         do:
-          - echo "hello world"
-
-      -
-        func: call
-        desc: |
-          internal test without input arg
-        do:
-          - HttpGet
-
-      -
-        func: cmd
-        do:
-          - name: print
-            cmd: 'caller1 -> {{.http_response}}'
-
-      -
-        func: call
-        desc: |
-          internal test with input arg
-        vars:
-          endpoint: https://httpbin.org/get
-        do:
-          - HttpGet
-
-      -
-        func: cmd
-        do:
-          - name: print
-            cmd: 'caller2 -> {{.http_response}}'
+          - echo "hello "
 
   -
-    name: HttpGet
+    name: Say_world
     task:
       -
-        func: shell
-        vars:
-          endpoint: http://example.org
-        do:
-          - 'curl -s -X GET "{{.endpoint}}" -H "accept: application/json"'
-        reg: get_result
-
-      -
         func: cmd
-        dvars:
-          - name: http_response
-            value: '{{.get_result.Output}}'
+        vars:
+          a: aaa
         do:
           - name: print
-            cmd: '{{.get_result.Output}}'
-          - name: return
-            cmd:
-              - http_response
+            cmd: "... world"
 
 

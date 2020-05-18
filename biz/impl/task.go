@@ -135,6 +135,13 @@ func (t *Tasker) ListAllTasks() {
 	}
 }
 
+func (t *Tasker) ListAllModules() {
+	u.Pln("-inspect all modules:")
+	//for _, mod := range *ConfigRuntime().Modules {
+	//mod.Dir
+	//}
+}
+
 func (tasker *Tasker) ListTask(taskname string) {
 	var tree = treeprint.New()
 	//u.Pln("\ninspect task:")
@@ -275,16 +282,41 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 		}
 	}()
 
+	u.Ptmpdebug("11", ConfigRuntime().Modules)
+
 	if modname == "self" {
 		TaskerRuntime().Tasker.ExecTask(taskname, callerVars)
 	} else {
 		//TODO: load the external module
 		//change workdir to that dir and load task entry
 		//TODO: replace nil with real cfg
-		eTasker := NewTasker("something_to_be_defined", nil)
-		//TODO: to implemente
-		eTasker.ExecTask(taskname, callerVars)
-		TaskerStack.Pop()
+
+		cwd, err := os.Getwd()
+		if err != nil {
+			u.LogErrorAndExit("cwd", err, "working directory error")
+		}
+
+		mdir := "hello-module/"
+		func() {
+			if _, err := os.Stat(mdir); !os.IsNotExist(err) {
+				os.Chdir(mdir)
+				/*
+					in module loading, since you can not pass in the cli options, so:
+					version: will not be used at all
+					Verbose: determined by caller, so not relevant
+					MaxCallLayers: determined by caller
+					RefDir: applied
+					TaskFile: applied
+					ConfigDir: will not be used at all since no cli option to override this, it will be always be current dir .
+					ConfigFile: will not be used at all since no cli option to override this, it will be always be upconfig.yml from default
+				*/
+				mcfg := u.NewUpConfig("", "").InitConfig()
+				mTasker := NewTasker(modname, mcfg)
+				mTasker.ExecTask(taskname, callerVars)
+				TaskerStack.Pop()
+				os.Chdir(cwd)
+			}
+		}()
 	}
 
 }

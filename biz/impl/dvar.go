@@ -202,9 +202,13 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 				}
 
 				if u.Contains(dvar.Flags, "prompt") {
-					//hiColor := color.NewCache(color.FgHiWhite, color.BgBlack)
-					//hiColor.Printf("Enter Value For Dvar: %s\n", dvar.Name)
-					u.Ppromptvvvvv("Dvar", "This will be saved as a dvar value")
+					u.Ppromptvvvvv(dvar.Name, func() string {
+						if dvar.Desc != "" {
+							return dvar.Desc
+						} else {
+							return u.Spf("This will be saved as %s's value", dvar.Name)
+						}
+					}())
 					reader := bufio.NewReader(os.Stdin)
 					dvarInputValue, _ := reader.ReadString('\n')
 					(*mergeTarget).Put(dvar.Name, dvarInputValue)

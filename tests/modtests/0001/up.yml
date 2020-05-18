@@ -12,7 +12,11 @@ tasks:
 
       -
         func: call
-        cmd: internal_task
+        do: internal_task
+
+      -
+        func: call
+        do: hello-module.Say_world
 
   -
     name: internal_task
