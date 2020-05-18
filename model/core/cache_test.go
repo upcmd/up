@@ -19,7 +19,8 @@ type TestObj struct {
 }
 
 func TestCache(t *testing.T) {
-	u.SetMockConfig()
+	//TODO: fix it
+	//u.SetMockConfig()
 	u.Pln("start testing")
 
 	c := GetCache()

@@ -347,7 +347,7 @@ func (f *CmdFuncAction) Exec() {
 					case "datapath":
 						raw = v.(string)
 						datapath = Render(raw, f.Vars)
-						data = core.GetSubObjectFromCache(f.Vars, datapath, false)
+						data = core.GetSubObjectFromCache(f.Vars, datapath, false, ConfigRuntime().Verbose)
 						u.Ppmsgvvvvv("sub object:", data)
 					case "dest":
 						raw = v.(string)
@@ -371,7 +371,7 @@ func (f *CmdFuncAction) Exec() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
 				var raw, reg, ymlkey, ymlfile, yqpath string
 				var collect, localonly, ymlonly bool
-				refdir := u.CoreConfig.RefDir
+				refdir := ConfigRuntime().RefDir
 				var data interface{}
 				for k, v := range cmd {
 					switch k.(string) {
@@ -417,23 +417,23 @@ func (f *CmdFuncAction) Exec() {
 					}
 					ymlstr := tmpymlstr.(string)
 					if ymlonly {
-						data = core.GetSubYmlFromYml(ymlstr, yqpath, collect)
+						data = core.GetSubYmlFromYml(ymlstr, yqpath, collect, ConfigRuntime().Verbose)
 					} else {
-						data = core.GetSubObjectFromYml(ymlstr, yqpath, collect)
+						data = core.GetSubObjectFromYml(ymlstr, yqpath, collect, ConfigRuntime().Verbose)
 					}
 				} else if ymlfile != "" {
 					filepath := path.Join(refdir, ymlfile)
 					if ymlonly {
-						data = core.GetSubYmlFromFile(filepath, yqpath, collect)
+						data = core.GetSubYmlFromFile(filepath, yqpath, collect, ConfigRuntime().Verbose)
 					} else {
-						data = core.GetSubObjectFromFile(filepath, yqpath, collect)
+						data = core.GetSubObjectFromFile(filepath, yqpath, collect, ConfigRuntime().Verbose)
 					}
 				} else if yqpath != "" {
 					//means to retrieve from cache
 					if ymlonly {
-						data = core.GetSubYmlFromCache(f.Vars, yqpath, collect)
+						data = core.GetSubYmlFromCache(f.Vars, yqpath, collect, ConfigRuntime().Verbose)
 					} else {
-						data = core.GetSubObjectFromCache(f.Vars, yqpath, collect)
+						data = core.GetSubObjectFromCache(f.Vars, yqpath, collect, ConfigRuntime().Verbose)
 					}
 				}
 
@@ -451,8 +451,8 @@ func (f *CmdFuncAction) Exec() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
 				var raw, ymlfile, yqpath, reg string
 
-				refdir := u.CoreConfig.RefDir
-				verbose := u.CoreConfig.Verbose
+				refdir := ConfigRuntime().RefDir
+				verbose := ConfigRuntime().Verbose
 				var inplace, localonly bool
 				for k, v := range cmd {
 					switch k.(string) {
@@ -508,7 +508,7 @@ func (f *CmdFuncAction) Exec() {
 				var raw, yqpath, ymlstr, reg, value, nodevalue, modified string
 				var err error
 
-				verbose := u.CoreConfig.Verbose
+				verbose := ConfigRuntime().Verbose
 				var localonly bool
 				for k, v := range cmd {
 					switch k.(string) {

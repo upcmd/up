@@ -41,6 +41,7 @@ type Tasker struct {
 	StepStack    *stack.ExecStack
 	BlockStack   *stack.ExecStack
 	TaskBreak    bool
+	Config       *u.UpConfig
 }
 
 type TaskerRuntimeContext struct {
@@ -50,18 +51,18 @@ type TaskerRuntimeContext struct {
 	//ReturnVars      *Cache
 }
 
-func NewTasker(id string) *Tasker {
-	priorityLoadingTaskFile := filepath.Join(".", u.CoreConfig.TaskFile)
+func NewTasker(id string, cfg *u.UpConfig) *Tasker {
+	priorityLoadingTaskFile := filepath.Join(".", cfg.TaskFile)
 	refDir := "."
 	if _, err := os.Stat(priorityLoadingTaskFile); err != nil {
-		refDir = u.CoreConfig.RefDir
+		refDir = cfg.RefDir
 	}
 
-	taskYmlRoot := u.YamlLoader("Task", refDir, u.CoreConfig.TaskFile)
+	taskYmlRoot := u.YamlLoader("Task", refDir, cfg.TaskFile)
 	tasker := &Tasker{
 		TaskYmlRoot: taskYmlRoot,
 	}
-
+	tasker.Config = cfg
 	tasker.initRuntime()
 
 	taskerContext := TaskerRuntimeContext{
@@ -71,7 +72,7 @@ func NewTasker(id string) *Tasker {
 	}
 
 	TaskerStack.Push(&taskerContext)
-	tasker.SetInstanceName(id)
+	tasker.setInstanceName(id)
 	//TODO: refactory of the runtime init after config is loaded to a proper place
 	FuncMapInit()
 	tasker.loadScopes()
@@ -85,7 +86,7 @@ func NewTasker(id string) *Tasker {
 	return tasker
 }
 
-func (t *Tasker) SetInstanceName(id string) {
+func (t *Tasker) setInstanceName(id string) {
 	if id != "" {
 		t.InstanceName = id
 	} else {
@@ -194,7 +195,7 @@ func (tasker *Tasker) ListTask(taskname string) {
 
 func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level *int) bool {
 	*level += 1
-	maxLayers, _ := strconv.Atoi(u.CoreConfig.MaxCallLayers)
+	maxLayers, _ := strconv.Atoi(ConfigRuntime().MaxCallLayers)
 	if *level > maxLayers {
 		u.LogWarn("evaluate max task stack layer", "please setup max MaxCallLayers correctly, or fix recursive cycle calls")
 		return false
@@ -279,7 +280,8 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 	} else {
 		//TODO: load the external module
 		//change workdir to that dir and load task entry
-		eTasker := NewTasker("something_to_be_defined")
+		//TODO: replace nil with real cfg
+		eTasker := NewTasker("something_to_be_defined", nil)
 		//TODO: to implemente
 		eTasker.ExecTask(taskname, callerVars)
 		TaskerStack.Pop()
@@ -338,7 +340,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
 
 				TaskerRuntime().Tasker.TaskStack.Push(&rtContext)
 				u.Pvvvv("Executing task stack layer:", TaskerRuntime().Tasker.TaskStack.GetLen())
-				maxLayers, err := strconv.Atoi(u.CoreConfig.MaxCallLayers)
+				maxLayers, err := strconv.Atoi(ConfigRuntime().MaxCallLayers)
 				u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
 
 				if maxLayers != 0 && TaskerRuntime().Tasker.TaskStack.GetLen() > maxLayers {
@@ -380,7 +382,7 @@ func (t *Tasker) validateAndLoadTaskRef() {
 		}
 
 		//load ref task
-		refdir := u.CoreConfig.RefDir
+		refdir := ConfigRuntime().RefDir
 
 		if task.Ref != "" {
 			if task.RefDir != "" {
@@ -407,7 +409,7 @@ func (t *Tasker) loadRefTasks() {
 	if tasksRefList != nil {
 		for _, ref := range tasksRefList.([]interface{}) {
 			tasksYamlName := ref.(string)
-			tasksYmlRoot := u.YamlLoader(tasksYamlName, u.CoreConfig.RefDir, tasksYamlName)
+			tasksYmlRoot := u.YamlLoader(tasksYamlName, ConfigRuntime().RefDir, tasksYamlName)
 
 			var tasks model.Tasks
 			tasksData := tasksYmlRoot.Get("tasks")

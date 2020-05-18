@@ -5,7 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-package model
+package utils
+
+import (
+	"fmt"
+	"reflect"
+)
 
 type SecureSetting struct {
 	Type   string
@@ -21,7 +26,7 @@ type Module struct {
 	Dir   string
 }
 
-type CoreConfig struct {
+type UpConfig struct {
 	Version       string
 	RefDir        string
 	TaskFile      string
@@ -30,5 +35,35 @@ type CoreConfig struct {
 	MaxCallLayers string
 	Secure        *SecureSetting
 	Modules       *[]Module
+}
+
+func (cfg *UpConfig) SetVerbose(cmdV string) {
+	if cmdV != "" {
+		cfg.Verbose = cmdV
+	}
+}
+
+func (cfg *UpConfig) SetRefdir(refdir string) {
+	if refdir != "" {
+		cfg.RefDir = refdir
+	}
+}
+
+func (cfg *UpConfig) SetTaskfile(taskfile string) {
+	if taskfile != "" {
+		cfg.TaskFile = taskfile
+	}
+}
+
+func (cfg *UpConfig) ShowCoreConfig() {
+	e := reflect.ValueOf(cfg).Elem()
+	et := reflect.Indirect(e).Type()
+
+	for i := 0; i < e.NumField(); i++ {
+		if f := e.Field(i); f.Kind() == reflect.String {
+			fname := et.Field(i).Name
+			fmt.Printf("%20s -> %s\n", fname, f.String())
+		}
+	}
 }
 

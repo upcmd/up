@@ -30,7 +30,11 @@ var (
 )
 
 func permitted(v string) bool {
-	vconfigured := len(CoreConfig.Verbose)
+	vconfigured := 3
+	if MainConfig != nil {
+		vconfigured = len(MainConfig.Verbose)
+	}
+
 	vallowed := len(v)
 	if vconfigured >= vallowed {
 		return true

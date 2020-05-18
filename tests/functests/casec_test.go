@@ -21,14 +21,14 @@ func init() {
 }
 
 func TestC(t *testing.T) {
-	u.InitConfig()
+	cfg := u.NewUpConfig("", "").InitConfig()
 
 	files := tests.GetUnitTestCollection()
 
 	for _, x := range files {
 		u.Pln("testing:", x)
-		tests.Setupx(x)
-		t := impl.NewTasker("dev")
+		tests.Setupx(x, cfg)
+		t := impl.NewTasker("dev", cfg)
 		t.ExecTask("task", nil)
 		impl.Unset()
 	}

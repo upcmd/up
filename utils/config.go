@@ -10,70 +10,69 @@ package utils
 import (
 	"fmt"
 	"github.com/spf13/viper"
-	"github.com/stephencheng/up/model"
 	"os"
 	"path"
 	"reflect"
 )
 
 var (
-	Config         *viper.Viper
-	CoreConfig     *model.CoreConfig
-	configYamlDir  = ""
-	configYamlFile = ""
+	MainConfig *UpConfig
 )
 
-func SetConfigYamlDir(dir string) {
-	if dir != "" {
-		configYamlDir = dir
-	}
+type UpConfigLoader struct {
+	Dir     string
+	YmlFile string
 }
 
-func SetConfigYamlFile(filename string) {
-	if filename != "" {
-		configYamlFile = filename
+func NewUpConfig(configdir, configymlfile string) *UpConfigLoader {
+	upCfg := UpConfigLoader{
+		Dir:     configdir,
+		YmlFile: configymlfile,
 	}
+	return &upCfg
 }
 
-func InitConfig() {
+func (upcfg *UpConfigLoader) InitConfig() *UpConfig {
 	dir := func() (s string) {
-		if configYamlDir == "" {
+		if upcfg.Dir == "" {
 			s = defaults["ConfigDir"]
 		} else {
-			s = configYamlDir
+			s = upcfg.Dir
 		}
 		return
 	}()
 	filename := func() (s string) {
-		if configYamlFile == "" {
+		if upcfg.YmlFile == "" {
 			s = defaults["ConfigFile"]
 		} else {
-			s = configYamlFile
+			s = upcfg.YmlFile
 		}
 		return
 	}()
 
 	filepath := path.Join(dir, filename)
+	var config *viper.Viper
 	if _, err := os.Stat(filepath); err == nil {
-		Config = YamlLoader("Config", dir, filename)
+		config = YamlLoader("Config", dir, filename)
 	} else {
 		LogWarn("config file does not exist", "use builtin defaults")
 	}
-	CoreConfig = GetCoreConfig()
+
+	return GetCoreConfig(config)
 }
 
 //for unit test only
-func SetMockConfig() {
-	cfg := new(model.CoreConfig)
-	CoreConfig = cfg
-	CoreConfig.Verbose = "vvvv"
-}
+//func SetMockConfig() {
+//cfg := new(model.UpConfig)
+//UpConfig = cfg
+//UpConfig.Verbose = "vvvv"
+//}
 
-func GetCoreConfig() *model.CoreConfig {
+func GetCoreConfig(config *viper.Viper) *UpConfig {
 
-	cfg := new(model.CoreConfig)
-	if Config != nil {
-		err := Config.Unmarshal(cfg)
+	cfg := new(UpConfig)
+	if config != nil {
+		err := config.Unmarshal(cfg)
 		if err != nil {
 			fmt.Println("unable to decode into struct:", err.Error())
 		}
@@ -98,39 +97,5 @@ func GetCoreConfig() *model.CoreConfig {
 		cfg.ModuleName = GetRandomName(1)
 	}
 	return cfg
-}
-
-func SetVerbose(cmdV string) {
-	if cmdV != "" {
-		CoreConfig.Verbose = cmdV
-	}
-}
-
-func SetRefdir(refdir string) {
-	if refdir != "" {
-		CoreConfig.RefDir = refdir
-	}
-}
-
-func SetTaskfile(taskfile string) {
-	if taskfile != "" {
-		CoreConfig.TaskFile = taskfile
-	}
-}
-
-func ShowCoreConfigMsg() {
-	Ppmsgvvvvhint("core config", CoreConfig)
-}
-
-func ShowCoreConfig() {
-	e := reflect.ValueOf(CoreConfig).Elem()
-	et := reflect.Indirect(e).Type()
-
-	for i := 0; i < e.NumField(); i++ {
-		if f := e.Field(i); f.Kind() == reflect.String {
-			fname := et.Field(i).Name
-			Pfvvvv("%20s -> %s\n", fname, f.String())
-		}
-	}
 }
 

@@ -12,7 +12,6 @@ import (
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/mohae/deepcopy"
 	"github.com/spf13/viper"
-	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	"io/ioutil"
@@ -76,7 +75,7 @@ func SetRuntimeGlobalDvars(dvars *Dvars) {
 	RuntimeGlobalDvars = dvars
 }
 
-func DecryptAndRegister(securetag *model.SecureSetting, dvar *Dvar, contextVars *core.Cache, mergeTarget *core.Cache) {
+func DecryptAndRegister(securetag *u.SecureSetting, dvar *Dvar, contextVars *core.Cache, mergeTarget *core.Cache) {
 	s := securetag
 
 	if s == nil {
@@ -178,7 +177,7 @@ func (ss *Scopes) InitContextInstances() {
 			u.Dvvvvv(s)
 			os.Exit(-1)
 		}
-		refdir := u.CoreConfig.RefDir
+		refdir := ConfigRuntime().RefDir
 		if s.Ref != "" {
 			if s.RefDir != "" {
 				refdir = s.RefDir
@@ -276,7 +275,7 @@ This has chained dvar expansion through global to group then to instance level
 and finally merge with global var, except the global dvars
 */
 func SetRuntimeVarsMerged(runtimeid string) *core.Cache {
-	u.Pf("module: [%s] instance id: [%s]\n", u.CoreConfig.ModuleName, runtimeid)
+	u.Pf("module: [%s] instance id: [%s]\n", ConfigRuntime().ModuleName, runtimeid)
 	var runtimevars core.Cache
 	runtimevars = deepcopy.Copy(*expandedContext["global"]).(core.Cache)
 

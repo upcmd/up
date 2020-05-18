@@ -37,19 +37,18 @@ var (
 func main() {
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	initArgs := func() {
-		u.SetConfigYamlDir(*configDir)
-		u.SetConfigYamlFile(*configFile)
-		u.InitConfig()
-		u.ShowCoreConfig()
-		u.Pfvvvv(" :release version:  %s", u.CoreConfig.Version)
+	initConfig := func() *u.UpConfig {
+		cfg := u.NewUpConfig(*configDir, *configFile).InitConfig()
+		u.MainConfig = cfg
+		cfg.ShowCoreConfig()
+		u.Pfvvvv(" :release version:  %s", u.MainConfig.Version)
 
-		u.SetVerbose(*verbose)
-
-		u.SetRefdir(*refdir)
-		u.SetTaskfile(*taskfile)
-		u.Pfvvvv(" :verbose level:  %s", u.CoreConfig.Verbose)
-	}
+		cfg.SetVerbose(*verbose)
+		cfg.SetRefdir(*refdir)
+		cfg.SetTaskfile(*taskfile)
+		u.Pfvvvv(" :verbose level:  %s", u.MainConfig.Verbose)
+		return cfg
+	}()
 
 	switch cmd {
 	case initDefault.FullCommand():
@@ -57,17 +56,15 @@ func main() {
 		impl.InitDefaultSkeleton()
 
 	case ngo.FullCommand():
-		initArgs()
 		if *ngoTaskName != "" {
 			u.Pln("-exec task:", *ngoTaskName)
-			t := impl.NewTasker(*instanceName)
+			t := impl.NewTasker(*instanceName, initConfig)
 			t.ExecTask(*ngoTaskName, nil)
-			u.Ptmpdebug("88", u.CoreConfig)
+			u.Ptmpdebug("88", impl.ConfigRuntime())
 		}
 
 	case list.FullCommand():
-		initArgs()
-		t := impl.NewTasker(*instanceName)
+		t := impl.NewTasker(*instanceName, initConfig)
 		if *listName == "=" {
 			t.ListAllTasks()
 		} else if *listName != "" {
@@ -90,8 +87,7 @@ templatefunc
 		}
 
 	case validate.FullCommand():
-		initArgs()
-		t := impl.NewTasker(*instanceName)
+		t := impl.NewTasker(*instanceName, initConfig)
 		taskname := *validateTaskName
 		u.Pf("validate task: %s\n")
 		t.ValidateTask(taskname)

@@ -10,6 +10,7 @@ package impl
 import (
 	"github.com/stephencheng/up/model/core"
 	"github.com/stephencheng/up/model/stack"
+	"github.com/stephencheng/up/utils"
 )
 
 var (
@@ -65,5 +66,9 @@ type BlockRuntimeContext struct {
 
 func BlockStack() *stack.ExecStack {
 	return TaskerRuntime().Tasker.BlockStack
+}
+
+func ConfigRuntime() *utils.UpConfig {
+	return TaskerRuntime().Tasker.Config
 }
 

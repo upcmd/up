@@ -35,39 +35,39 @@ obj is a cache item
 path format: a.b.c(name=fr*).value
 prefix will be used to get the obj, rest will be used as yq path
 */
-func GetSubObjectFromCache(cache *Cache, path string, collect bool) interface{} {
-	yqresult := GetSubYmlFromCache(cache, path, collect)
+func GetSubObjectFromCache(cache *Cache, path string, collect bool, verboseLevel string) interface{} {
+	yqresult := GetSubYmlFromCache(cache, path, collect, verboseLevel)
 	obj := YamlToObj(yqresult)
 	return obj
 }
 
-func GetSubObjectFromYml(ymlstr string, path string, collect bool) interface{} {
-	yqresult, err := yq.UpReadYmlStr(ymlstr, path, u.CoreConfig.Verbose, collect)
+func GetSubObjectFromYml(ymlstr string, path string, collect bool, verboseLevel string) interface{} {
+	yqresult, err := yq.UpReadYmlStr(ymlstr, path, verboseLevel, collect)
 	u.LogErrorAndContinue("parse sub element in yml", err, u.Spf("please ensure correct yml query path: %s", path))
 	obj := YamlToObj(yqresult)
 	return obj
 }
 
-func GetSubObjectFromFile(ymlfile string, path string, collect bool) interface{} {
-	yqresult, err := yq.UpReadYmlFile(ymlfile, path, u.CoreConfig.Verbose, collect)
+func GetSubObjectFromFile(ymlfile string, path string, collect bool, verboseLevel string) interface{} {
+	yqresult, err := yq.UpReadYmlFile(ymlfile, path, verboseLevel, collect)
 	u.LogErrorAndContinue("parse sub element in yml", err, u.Spf("please ensure correct yml query path: %s", path))
 	obj := YamlToObj(yqresult)
 	return obj
 }
 
-func GetSubYmlFromYml(ymlstr string, path string, collect bool) string {
-	yqresult, err := yq.UpReadYmlStr(ymlstr, path, u.CoreConfig.Verbose, collect)
+func GetSubYmlFromYml(ymlstr string, path string, collect bool, verboseLevel string) string {
+	yqresult, err := yq.UpReadYmlStr(ymlstr, path, verboseLevel, collect)
 	u.LogErrorAndContinue("parse sub element in yml", err, u.Spf("please ensure correct yml query path: %s", path))
 	return yqresult
 }
 
-func GetSubYmlFromFile(ymlfile string, path string, collect bool) string {
-	yqresult, err := yq.UpReadYmlFile(ymlfile, path, u.CoreConfig.Verbose, collect)
+func GetSubYmlFromFile(ymlfile string, path string, collect bool, verboseLevel string) string {
+	yqresult, err := yq.UpReadYmlFile(ymlfile, path, verboseLevel, collect)
 	u.LogErrorAndContinue("parse sub element in yml", err, u.Spf("please ensure correct yml query path: %s", path))
 	return yqresult
 }
 
-func GetSubYmlFromCache(cache *Cache, path string, collect bool) string {
+func GetSubYmlFromCache(cache *Cache, path string, collect bool, verboseLevel string) string {
 	//obj -> yml -> yq to get node in yml -> obj
 	elist := strings.Split(path, ".")
 	func() {
@@ -82,7 +82,7 @@ func GetSubYmlFromCache(cache *Cache, path string, collect bool) string {
 	ymlstr := ObjToYaml(obj)
 	u.Dvvvvv("sub yml str")
 	u.Dvvvvv(ymlstr)
-	yqresult, err := yq.UpReadYmlStr(ymlstr, yqpath, u.CoreConfig.Verbose, collect)
+	yqresult, err := yq.UpReadYmlStr(ymlstr, yqpath, verboseLevel, collect)
 	u.LogErrorAndContinue("parse sub element in yml", err, u.Spf("please ensure correct yml query path: %s", yqpath))
 	return yqresult
 }

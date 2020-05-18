@@ -10,7 +10,6 @@ package impl
 import (
 	"bufio"
 	"github.com/mohae/deepcopy"
-	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/core"
 	u "github.com/stephencheng/up/utils"
 	"gopkg.in/yaml.v2"
@@ -29,7 +28,7 @@ type Dvar struct {
 	Expand       int
 	Flags        []string //supported: vvvv, to_object,envvar,
 	Rendered     string
-	Secure       *model.SecureSetting
+	Secure       *u.SecureSetting
 	Ref          string
 	RefDir       string
 	DataKey      string
@@ -54,7 +53,7 @@ func (dvars *Dvars) ValidateAndLoading(contextVars *core.Cache) {
 			u.InvalidAndExit("validating dvar ref and value", "ref and value can not both exist at the same time")
 		}
 
-		refdir := u.CoreConfig.RefDir
+		refdir := ConfigRuntime().RefDir
 		if dvar.Ref != "" {
 			if dvar.RefDir != "" {
 				rawdir := dvar.RefDir
@@ -120,7 +119,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 
 		if dvar.DataPath != "" {
 			datapath := Render(dvar.DataPath, tmpVars)
-			datasource = core.GetSubObjectFromCache(&tmpVars, datapath, false)
+			datasource = core.GetSubObjectFromCache(&tmpVars, datapath, false, ConfigRuntime().Verbose)
 			rval = Render(dvarRaw, datasource)
 		} else {
 			rval = tmpDvars[idx].Value
@@ -198,8 +197,8 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 				}
 
 				if u.Contains(dvar.Flags, "secure") {
-					u.Ptmpdebug("11", u.CoreConfig.Secure, &dvar, mergeTarget, expandedVars)
-					DecryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget, expandedVars)
+					u.Ptmpdebug("11", ConfigRuntime().Secure, &dvar, mergeTarget, expandedVars)
+					DecryptAndRegister(ConfigRuntime().Secure, &dvar, mergeTarget, expandedVars)
 				}
 
 				if u.Contains(dvar.Flags, "prompt") {
@@ -219,8 +218,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 			}
 
 			if dvar.Secure != nil {
-				u.Ptmpdebug("22", u.CoreConfig.Secure, &dvar, mergeTarget, expandedVars)
-				DecryptAndRegister(u.CoreConfig.Secure, &dvar, mergeTarget, expandedVars)
+				DecryptAndRegister(ConfigRuntime().Secure, &dvar, mergeTarget, expandedVars)
 			}
 
 		}()

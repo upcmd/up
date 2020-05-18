@@ -9,7 +9,6 @@ package tests
 
 import (
 	"github.com/stephencheng/up/biz/impl"
-	m "github.com/stephencheng/up/model"
 	u "github.com/stephencheng/up/utils"
 	"os/exec"
 	"path"
@@ -36,37 +35,38 @@ func RunCmd(t *testing.T, cmd string) string {
 	return string(cmdOutput)
 }
 
-func Setup(prefix string, t *testing.T) {
-	u.InitConfig()
-	u.CoreConfig.TaskFile = GetTestName(u.Spfv("%s%s", prefix, t.Name()))
-	u.ShowCoreConfig()
+func Setup(prefix string, t *testing.T) *u.UpConfig {
+	cfg := u.NewUpConfig("", "").InitConfig()
+	cfg.SetTaskfile(GetTestName(u.Spfv("%s%s", prefix, t.Name())))
+	cfg.ShowCoreConfig()
 
-	u.Pln(" :test task file:", u.CoreConfig.TaskFile)
-	u.Pln(" :release version:", u.CoreConfig.Version)
-	u.Pln(" :verbose level:", u.CoreConfig.Verbose)
+	u.Pln(" :test task file:", impl.ConfigRuntime().TaskFile)
+	u.Pln(" :release version:", impl.ConfigRuntime().Version)
+	u.Pln(" :verbose level:", impl.ConfigRuntime().Verbose)
+	return cfg
 }
 
 func TestT(prefix string, t *testing.T) {
-	Setup(prefix, t)
-	tasker := impl.NewTasker("dev")
+	cfg := Setup(prefix, t)
+	tasker := impl.NewTasker("dev", cfg)
 	tasker.ListTasks()
 	tasker.ExecTask("task", nil)
 }
 
 //mock required settings
-func Setupx(filename string) {
+func Setupx(filename string, cfg *u.UpConfig) {
 
 	filenameonly := path.Base(filename)
 
 	filenoext := strings.TrimSuffix(filenameonly, filepath.Ext(filenameonly))
-	u.CoreConfig.TaskFile = GetTestName(filenoext)
-	u.CoreConfig.RefDir = "./tests/functests"
-	u.CoreConfig.Secure = &m.SecureSetting{Type: "default_aes", Key: "enc_key"}
-	u.ShowCoreConfig()
-	u.ShowCoreConfigMsg()
-	u.Pln(" :test task file:", u.CoreConfig.TaskFile)
-	u.Pln(" :release version:", u.CoreConfig.Version)
-	u.Pln(" :verbose level:", u.CoreConfig.Verbose)
+	cfg.SetTaskfile(GetTestName(filenoext))
+	cfg.SetRefdir("./tests/functests")
+	cfg.Secure = &u.SecureSetting{Type: "default_aes", Key: "enc_key"}
+	cfg.ShowCoreConfig()
+	u.Ppmsgvvvvhint("core config", cfg)
+	u.Pln(" :test task file:", cfg.TaskFile)
+	u.Pln(" :release version:", cfg.Version)
+	u.Pln(" :verbose level:", cfg.Verbose)
 
 }
 
