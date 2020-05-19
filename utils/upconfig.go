@@ -76,8 +76,6 @@ func (cfg *UpConfig) GetWorkdir() (wkdir string) {
 	} else {
 		InvalidAndExit("GetWorkdir", "Work dir setup is not proper")
 	}
-
-	Ptmpdebug("wkdir", wkdir)
 	return
 }
 

@@ -84,10 +84,24 @@ enter: continue
 }
 
 func IsCalledTask() (called bool) {
-	if TaskerRuntime().Tasker.TaskStack.GetLen() > 1 {
+	if TaskerStack.GetLen() > 1 {
+		called = true
+	} else {
+		if TaskerRuntime().Tasker.TaskStack.GetLen() > 1 {
+			called = true
+		} else {
+			called = false
+		}
+	}
+	return
+}
+
+func IsCalledExternally() (called bool) {
+	if TaskerStack.GetLen() > 1 {
 		called = true
 	} else {
 		called = false
+
 	}
 	return
 }

@@ -197,7 +197,6 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 				}
 
 				if u.Contains(dvar.Flags, "secure") {
-					u.Ptmpdebug("11", ConfigRuntime().Secure, &dvar, mergeTarget, expandedVars)
 					DecryptAndRegister(ConfigRuntime().Secure, &dvar, mergeTarget, expandedVars)
 				}
 

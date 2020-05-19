@@ -65,8 +65,8 @@ func main() {
 		if *ngoTaskName != "" {
 			u.Pln("-exec task:", *ngoTaskName)
 			t := impl.NewTasker(*instanceName, initConfig)
-			t.ExecTask(*ngoTaskName, nil)
-			u.Ptmpdebug("88", impl.ConfigRuntime())
+			t.ExecTask(*ngoTaskName, nil, false)
+			//u.Ptmpdebug("88", impl.ConfigRuntime())
 		}
 
 	case list.FullCommand():
