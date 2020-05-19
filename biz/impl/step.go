@@ -84,7 +84,7 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 	resultVars = VarsMergedWithDvars("local", resultVars, &step.Dvars, resultVars)
 
 	//so far the resultVars includes: the local vars + dvars rendered using execvars
-	u.Ppmsgvvvhint("overall final exec vars:", resultVars)
+	u.Ppmsgvvvhint(u.Spf("%s: overall final exec vars:", ConfigRuntime().ModuleName), resultVars)
 	//u.Ptmpdebug("99", resultVars)
 	return resultVars
 }

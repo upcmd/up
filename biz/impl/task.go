@@ -45,13 +45,12 @@ type Tasker struct {
 }
 
 type TaskerRuntimeContext struct {
-	Taskername string
-	Tasker     *Tasker
+	Tasker *Tasker
 	//TaskVars        *Cache
 	//ReturnVars      *Cache
 }
 
-func NewTasker(id string, cfg *u.UpConfig) *Tasker {
+func NewTasker(instanceId string, cfg *u.UpConfig) *Tasker {
 	priorityLoadingTaskFile := filepath.Join(".", cfg.TaskFile)
 	refDir := "."
 	if _, err := os.Stat(priorityLoadingTaskFile); err != nil {
@@ -66,13 +65,13 @@ func NewTasker(id string, cfg *u.UpConfig) *Tasker {
 	tasker.initRuntime()
 
 	taskerContext := TaskerRuntimeContext{
-		Taskername: "abcde",
-		Tasker:     tasker,
+		Tasker: tasker,
 		//TODO: use namegen to generate random name in config default settings
 	}
 
 	TaskerStack.Push(&taskerContext)
-	tasker.setInstanceName(id)
+
+	tasker.setInstanceName(instanceId)
 	//TODO: refactory of the runtime init after config is loaded to a proper place
 	FuncMapInit()
 	tasker.loadScopes()
@@ -297,6 +296,8 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 		}
 
 		mdir := "hello-module/"
+		iid := "dev"
+
 		func() {
 			if _, err := os.Stat(mdir); !os.IsNotExist(err) {
 				os.Chdir(mdir)
@@ -310,8 +311,12 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 					ConfigDir: will not be used at all since no cli option to override this, it will be always be current dir .
 					ConfigFile: will not be used at all since no cli option to override this, it will be always be upconfig.yml from default
 				*/
-				mcfg := u.NewUpConfig("", "").InitConfig()
-				mTasker := NewTasker(modname, mcfg)
+				mcfg := u.NewUpConfig("", "")
+				mcfg.SetModulename(modname)
+				mcfg.InitConfig()
+				mTasker := NewTasker(iid, mcfg)
+				u.Pf("=>call module: [%s] task: [%s]\n", modname, taskname)
+				u.Ptmpdebug("55", callerVars)
 				mTasker.ExecTask(taskname, callerVars)
 				TaskerStack.Pop()
 				os.Chdir(cwd)

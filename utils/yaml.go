@@ -23,7 +23,8 @@ func YamlLoader(id, path, filename string) *viper.Viper {
 	err := newV.ReadInConfig()
 
 	if err != nil {
-		fmt.Printf("yml file: %s/%s ", path, filename)
+		fmt.Printf("yml dir: %s\n", path)
+		fmt.Printf("yml file: %s\n", filename)
 		fmt.Println("errored:", err.Error())
 		LogError("Yaml loading error", err)
 		DebugYmlContent(path, filename)

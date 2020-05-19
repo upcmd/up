@@ -1,42 +1,14 @@
 
 version: 1.0.0
-Verbose: v
+Verbose: vvv
 MaxCallLayers: 8
 RefDir: .
-TaskFile: up
+TaskFile: up.yml
 ConfigDir: .
-ConfigFile: upconfig
+ConfigFile: upconfig.yml
 
 Modules:
-    #clone the repo, repo name will be the module name
-    #version==empty, then it will use master
-    #dir==empty, it will use cloned git repo root dir
-  - repo: https://github.com/up/sayhi.git
 
-    #this is to use sub directory ./sayhi/a/b as the module location instead of root repo dir
-  - repo: https://github.com/up/sayhi.git
-    dir: a/b
-
-    #use version value as tag name to check it out
-  - repo: https://github.com/up/sayhi.git
-    version: 1.0.0
-
-    #the alias will be a translated name to be uesd in caller's code base
-    #eg, call: hi.SayHiTask, without alias, you will have to use sayhi.SayHiTask
-    #this is to just to avoid duplicated repo name, eg: https://github.com/somethingeles/sayhi.git
-  - repo: https://github.com/up/sayhi.git
-    alias: hi
-
-    #sha value is a specific value to checkout if it presents as version
-  - repo: https://github.com/up/sayhello.git
-    version: abc123e
-
-  - #if there is no repo, then it will use the dir as module and incorporate as module
-    dir: c/d
-
-  - #if there is no repo, then it will use the dir as module and incorporate as module
-    dir: c/d
-    alias: hi
-
-    #you can use absolute path for dir to be the location of a module
-  - dir: /etc/c/d
+   #if there is no repo, then it will use the dir as module and incorporate as module
+  - dir: hello-module/
+    iid: dev

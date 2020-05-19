@@ -1,3 +1,14 @@
+doc_meta: |
+  folder: module
+  title: HelloWorld example
+  head: |
+    Showcase a simplest module example by using only a sub directory
+
+    It shows that the caller task to call the module task Say_world
+
+  sections:
+    - title: Demo
+      log: yes
 
 tasks:
   -

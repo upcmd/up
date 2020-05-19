@@ -1,0 +1,49 @@
+doc_meta: |
+  folder: usage
+  title: working directory
+  head: |
+    By default, you will be using current working directory for an execution of your task
+
+    Sometimes, we need a protected way or simly we need a jailed execution to where the task up.yml is located, in this case, we could config the working directory to be the refdir and in this case the refdir is out side of current directory
+
+  sections:
+    - title: How it works
+      content: |
+        By default, the WorkDir setting is "cwd", which is the current working directory you execute the up command
+
+        There are two ways doing it:
+
+        * You can configure it in the upconfig.yml
+        ```
+        version: 1.0.0
+        Verbose: v
+        MaxCallLayers: 8
+        RefDir: .
+        WorkDir: refdir      -> use "refdir" to dictate the execution working directory will be in the refdir instead of current work dir
+        TaskFile: up.yml
+        ConfigDir: .
+        ConfigFile: upconfig.yml
+        ```
+
+        * You can use cmd arg in CLI to specify that you want it to be refdir
+
+        ```
+          -w, --workdir=WORKDIR        working directory: cwd | refdir
+
+          eg:
+          up ngo task -d ./tests/functests -t wip.yml -i dev --configdir=./tests/functests -w refdir
+        ```
+
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    desc: main entry
+    task:
+      -
+        func: shell
+        desc: main job
+        do:
+          - pwd

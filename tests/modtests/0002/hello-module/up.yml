@@ -16,8 +16,12 @@ tasks:
       -
         func: cmd
         vars:
-          a: aaa
+          a: module-aaa
+          b: module-bbb
         do:
           - name: print
-            cmd: "... world"
+            cmd: |
+              ... module world
+              a: {{.a}}
+              b: {{.b}}
 

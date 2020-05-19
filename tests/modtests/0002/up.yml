@@ -1,3 +1,17 @@
+doc_meta: |
+  folder: module
+  title: simple vars
+  head: |
+    Showcase a simplest module example by using only a sub directory
+
+    It shows that the caller task to call the module task Say_world
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  - see if callers vars could be passed to module's func
 
 tasks:
   -
@@ -8,4 +22,23 @@ tasks:
         func: shell
         desc: main job
         do:
-          - 'curl -X GET "https://httpbin.org/get" -H "accept: application/json"'
+          - 'echo "hello world"'
+
+      -
+        func: call
+        do: internal_task
+
+      -
+        func: call
+        vars:
+          a: caller-aaa
+        do: hello-module.Say_world
+
+  -
+    name: internal_task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: "this is a internal task"

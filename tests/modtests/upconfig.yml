@@ -1,8 +1,8 @@
 
 version: 1.0.0
-Verbose: v
+Verbose: vvv
 MaxCallLayers: 8
 RefDir: .
 TaskFile: up
 ConfigDir: .
-ConfigFile: upconfig
+ConfigFile: upconfig.yml

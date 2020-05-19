@@ -12,6 +12,7 @@ import "github.com/fatih/color"
 var (
 	defaults map[string]string = map[string]string{
 		"RefDir":        ".",
+		"WorkDir":       "cwd",
 		"TaskFile":      "up.yml",
 		"Verbose":       "v",
 		"MaxCallLayers": "256",
@@ -30,6 +31,7 @@ version: 1.0.0
 Verbose: v
 MaxCallLayers: 8
 RefDir: .
+WorkDir: cwd
 TaskFile: up.yml
 ConfigDir: .
 ConfigFile: upconfig.yml

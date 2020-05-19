@@ -12,12 +12,7 @@ import (
 	"testing"
 )
 
-//auto locate test case in file pattern: x0001.yml
-//func Test0001(t *testing.T) {
-//	tests.TestT("x", t)
-//}
-
-func Test0009(t *testing.T) {
+func TestX(t *testing.T) {
 	tests.TestT("x", t)
 }
 

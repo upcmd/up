@@ -30,6 +30,7 @@ var (
 	validateTaskName = validate.Arg("validatetaskname", "taskname").Required().String()
 	verbose          = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
 	refdir           = app.Flag("refdir", "ref yml files directory").Short('d').String()
+	workdir          = app.Flag("workdir", "working directory: cwd | refdir").Short('w').String()
 	taskfile         = app.Flag("taskfile", "task file to load (without yml extension)").Short('t').String()
 	instanceName     = app.Flag("instance", "instance name for execution").Short('i').String()
 	configDir        = app.Flag("configdir", "config file directory to load from|default .").String()
@@ -40,15 +41,18 @@ func main() {
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	initConfig := func() *u.UpConfig {
-		cfg := u.NewUpConfig(*configDir, *configFile).InitConfig()
+		cfg := u.NewUpConfig(*configDir, *configFile)
+		cfg.SetVerbose(*verbose)
+		cfg.SetRefdir(*refdir)
+		cfg.SetWorkdir(*workdir)
+		cfg.SetTaskfile(*taskfile)
+		cfg.InitConfig()
 		u.MainConfig = cfg
 		cfg.ShowCoreConfig("Main")
 		u.Pfvvvv(" :release version:  %s", u.MainConfig.Version)
-
-		cfg.SetVerbose(*verbose)
-		cfg.SetRefdir(*refdir)
-		cfg.SetTaskfile(*taskfile)
 		u.Pfvvvv(" :verbose level:  %s", u.MainConfig.Verbose)
+		os.Chdir(cfg.GetWorkdir())
+		u.Pln("work dir:", cfg.GetWorkdir())
 		return cfg
 	}()
 

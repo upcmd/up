@@ -34,6 +34,21 @@ wiptestvalidate(){
     goup validate task task -d ./tests/functests -t wip.yml -i dev -v vvvvv
 }
 
+mwiptest(){
+  dir=./tests/modtests/wip
+  goup ngo -d $dir -i dev --configdir=$dir -w refdir
+}
+
+mwiptestx(){
+  if [ "$1" == "" ];then
+    echo "please input the casename(dir name)"
+  else
+    dir=./tests/modtests/$1
+    goup ngo -d $dir -i dev --configdir=$dir -w refdir
+  fi
+}
+
+
 uplist(){
 goup list task
 }

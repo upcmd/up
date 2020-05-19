@@ -24,28 +24,25 @@ type UpConfigLoader struct {
 	YmlFile string
 }
 
-func NewUpConfig(configdir, configymlfile string) *UpConfigLoader {
+func NewUpConfig(configdir, configymlfile string) *UpConfig {
 	upCfg := UpConfigLoader{
 		Dir:     configdir,
 		YmlFile: configymlfile,
 	}
-	return &upCfg
-}
 
-func (upcfg *UpConfigLoader) InitConfig() *UpConfig {
 	dir := func() (s string) {
-		if upcfg.Dir == "" {
+		if upCfg.Dir == "" {
 			s = defaults["ConfigDir"]
 		} else {
-			s = upcfg.Dir
+			s = upCfg.Dir
 		}
 		return
 	}()
 	filename := func() (s string) {
-		if upcfg.YmlFile == "" {
+		if upCfg.YmlFile == "" {
 			s = defaults["ConfigFile"]
 		} else {
-			s = upcfg.YmlFile
+			s = upCfg.YmlFile
 		}
 		return
 	}()
@@ -58,18 +55,6 @@ func (upcfg *UpConfigLoader) InitConfig() *UpConfig {
 		LogWarn("config file does not exist", "use builtin defaults")
 	}
 
-	return GetCoreConfig(config)
-}
-
-//for unit test only
-//func SetMockConfig() {
-//cfg := new(model.UpConfig)
-//UpConfig = cfg
-//UpConfig.Verbose = "vvvv"
-//}
-
-func GetCoreConfig(config *viper.Viper) *UpConfig {
-
 	cfg := new(UpConfig)
 	if config != nil {
 		err := config.Unmarshal(cfg)
@@ -78,6 +63,10 @@ func GetCoreConfig(config *viper.Viper) *UpConfig {
 		}
 	}
 
+	return cfg
+}
+
+func (cfg *UpConfig) InitConfig() *UpConfig {
 	e := reflect.ValueOf(cfg).Elem()
 	et := reflect.Indirect(e).Type()
 
@@ -98,4 +87,11 @@ func GetCoreConfig(config *viper.Viper) *UpConfig {
 	}
 	return cfg
 }
+
+//for unit test only
+//func SetMockConfig() {
+//cfg := new(model.UpConfig)
+//UpConfig = cfg
+//UpConfig.Verbose = "vvvv"
+//}
 

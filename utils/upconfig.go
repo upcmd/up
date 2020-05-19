@@ -9,6 +9,8 @@ package utils
 
 import (
 	"fmt"
+	"os"
+	"path"
 	"reflect"
 )
 
@@ -24,11 +26,15 @@ type Module struct {
 	Version string
 	Alias   string
 	Dir     string
+	Iid     string
 }
 
 type UpConfig struct {
-	Version       string
-	RefDir        string
+	Version string
+	RefDir  string
+	//choice of cwd | refdir
+	//default to be cwd
+	WorkDir       string
 	TaskFile      string
 	Verbose       string
 	ModuleName    string
@@ -49,9 +55,51 @@ func (cfg *UpConfig) SetRefdir(refdir string) {
 	}
 }
 
+func (cfg *UpConfig) GetWorkdir() (wkdir string) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		LogErrorAndExit("GetWorkdir", err, "working directory error")
+	}
+
+	if cfg.WorkDir == "cwd" {
+		wkdir = cwd
+	} else if cfg.WorkDir == "refdir" {
+		//assume refdir is relative path
+		abpath := path.Join(cwd, cfg.RefDir)
+		if _, err := os.Stat(abpath); !os.IsNotExist(err) {
+			wkdir = abpath
+		} else {
+			if _, err := os.Stat(cfg.RefDir); !os.IsNotExist(err) {
+				wkdir = cfg.RefDir
+			}
+		}
+	} else {
+		InvalidAndExit("GetWorkdir", "Work dir setup is not proper")
+	}
+
+	Ptmpdebug("wkdir", wkdir)
+	return
+}
+
+func (cfg *UpConfig) SetWorkdir(workdir string) {
+	if workdir != "" {
+		if Contains([]string{"cwd", "refdir"}, workdir) {
+			cfg.WorkDir = workdir
+		}
+	} else {
+		cfg.WorkDir = ""
+	}
+}
+
 func (cfg *UpConfig) SetTaskfile(taskfile string) {
 	if taskfile != "" {
 		cfg.TaskFile = taskfile
+	}
+}
+
+func (cfg *UpConfig) SetModulename(modulename string) {
+	if modulename != "" {
+		cfg.ModuleName = modulename
 	}
 }
 

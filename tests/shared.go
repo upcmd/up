@@ -38,7 +38,7 @@ func RunCmd(t *testing.T, cmd string) string {
 func Setup(prefix string, t *testing.T) *u.UpConfig {
 	cfg := u.NewUpConfig("", "").InitConfig()
 	cfg.SetTaskfile(GetTestName(u.Spfv("%s%s", prefix, t.Name())))
-	cfg.ShowCoreConfig()
+	cfg.ShowCoreConfig("mocktest")
 
 	u.Pln(" :test task file:", impl.ConfigRuntime().TaskFile)
 	u.Pln(" :release version:", impl.ConfigRuntime().Version)
@@ -62,7 +62,7 @@ func Setupx(filename string, cfg *u.UpConfig) {
 	cfg.SetTaskfile(GetTestName(filenoext))
 	cfg.SetRefdir("./tests/functests")
 	cfg.Secure = &u.SecureSetting{Type: "default_aes", Key: "enc_key"}
-	cfg.ShowCoreConfig()
+	cfg.ShowCoreConfig("mocktest")
 	u.Ppmsgvvvvhint("core config", cfg)
 	u.Pln(" :test task file:", cfg.TaskFile)
 	u.Pln(" :release version:", cfg.Version)
@@ -71,6 +71,21 @@ func Setupx(filename string, cfg *u.UpConfig) {
 }
 
 func GetUnitTestCollection() []string {
+	_, filename, _, _ := runtime.Caller(1)
+	dir := path.Dir(filename)
+
+	files, err := filepath.Glob(u.Spfv("%s/%s", dir, "c0*.yml"))
+	u.LogError("list func test cases", err)
+
+	for _, f := range files {
+		u.Pln(f)
+	}
+
+	return files
+}
+
+func GetModuleTestCollection() []string {
+	//TODO: to implemene this, delete all below
 	_, filename, _, _ := runtime.Caller(1)
 	dir := path.Dir(filename)
 
