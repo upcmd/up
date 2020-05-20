@@ -50,7 +50,7 @@ func TestT(prefix string, t *testing.T) {
 	cfg := Setup(prefix, t)
 	tasker := impl.NewTasker("dev", cfg)
 	tasker.ListTasks()
-	tasker.ExecTask("task", nil, false)
+	tasker.ExecTask("task", nil)
 }
 
 //mock required settings

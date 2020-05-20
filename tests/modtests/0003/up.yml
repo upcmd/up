@@ -1,0 +1,77 @@
+doc_meta: |
+  folder: module
+  title: return value
+  head: |
+    Showcase a simplest module example by using only a sub directory
+
+    It shows that the caller task to call the module task Say_world
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  - see if callers vars could be passed to module's func
+
+
+vars:
+  a: caller-aaa
+
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: shell
+        desc: main job
+        do:
+          - 'echo "hello world"'
+
+      -
+        func: cmd
+        do:
+          -
+            name: inspect
+            cmd:
+              - exec_vars
+              - exec_base_vars
+
+      -
+        func: call
+        do: internal_task
+
+      -
+        func: call
+        do: hello-module.Say_world
+
+      -
+        func: cmd
+        do:
+          -
+            name: inspect
+            cmd:
+              - exec_vars
+              - exec_base_vars
+
+          - name: print
+            cmd: |
+              back to main caller
+              a: {{.a}}
+              b: {{.b}}
+
+#      -
+#        name: assert
+#        cmd:
+#          - '{{eq .a "caller-aaa"}}'
+#          - '{{eq .b "module-bbb"}}'
+
+
+  -
+    name: internal_task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: "this is a internal task"

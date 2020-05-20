@@ -30,3 +30,11 @@ tasks:
             cmd:
               - '{{eq .a "caller-aaa"}}'
               - '{{eq .b "module-bbb"}}'
+
+          - name: return
+            desc: |
+              it should return and merge tom to parent's vars scope
+              it should report warning as jason does not exist
+            cmd:
+              - b
+

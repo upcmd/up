@@ -30,7 +30,7 @@ func TestC(t *testing.T) {
 		//TODO: re-implemente this
 		tests.SetupMx(x, cfg)
 		t := impl.NewTasker("dev", cfg)
-		t.ExecTask("task", nil, false)
+		t.ExecTask("task", nil)
 		impl.Unset()
 	}
 }

@@ -34,6 +34,24 @@ doc_meta: |
           up ngo task -d ./tests/functests -t wip.yml -i dev --configdir=./tests/functests -w refdir
         ```
 
+    - title: Application using current directory as work directory
+      content: |
+        Normally, if you intend to do project based work, then you will need to use the default setting: cwd - current work directory as the working directory.
+
+        In this case, you cd to the project directory, all the directories in your up.yml will be reletive path to your project directory
+
+    - title: Application using refdir
+      content: |
+        If the up.yml tasks are wrapped as a service to do something system wide and not relevent to your specific project, all the changes made in the task are confined within the refdir, than the WorkDir should be refdir
+
+        For example, you could use below alias: install_apps to install and update all your softwares, this task will manage to install all defined softwares and if it requires to caches some files and temp directories, it will put them into the refdir
+
+        ```
+        alias install_apps='up ngo task -d /myapps/install_all_required_softwards -w refdir'
+        ```
+
+        So, when you consider publish your own task(s) for other people to use as a standalone tool/cli cmd, you should use this setting
+
     - title: Demo
       log: yes
 

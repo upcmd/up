@@ -45,7 +45,8 @@ type Tasker struct {
 }
 
 type TaskerRuntimeContext struct {
-	Tasker *Tasker
+	Tasker       *Tasker
+	TaskerCaller *Tasker
 	//TaskVars        *Cache
 	//ReturnVars      *Cache
 }
@@ -259,7 +260,7 @@ func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level 
 
 func (t *Tasker) ValidateTask(taskname string) {
 	SetDryrun()
-	t.ExecTask(taskname, nil, false)
+	t.ExecTask(taskname, nil)
 }
 
 func ExecTask(fulltaskname string, callerVars *core.Cache) {
@@ -281,10 +282,10 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 		}
 	}()
 
-	u.Ptmpdebug("11", ConfigRuntime().Modules)
+	//u.Ptmpdebug("11", ConfigRuntime().Modules)
 
 	if modname == "self" {
-		TaskerRuntime().Tasker.ExecTask(taskname, callerVars, false)
+		TaskerRuntime().Tasker.ExecTask(taskname, callerVars)
 	} else {
 		//TODO: load the external module
 		//change workdir to that dir and load task entry
@@ -314,11 +315,14 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 				mcfg := u.NewUpConfig("", "")
 				mcfg.SetModulename(modname)
 				mcfg.InitConfig()
+				taskerCaller := TaskerRuntime().Tasker
 				mTasker := NewTasker(iid, mcfg)
+				TaskerRuntime().TaskerCaller = taskerCaller
 				u.Pf("=>call module: [%s] task: [%s]\n", modname, taskname)
-				u.Ptmpdebug("55", callerVars)
-				mTasker.ExecTask(taskname, callerVars, true)
+				//u.Ptmpdebug("55", callerVars)
+				mTasker.ExecTask(taskname, callerVars)
 				TaskerStack.Pop()
+
 				os.Chdir(cwd)
 			}
 		}()
@@ -326,7 +330,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 
 }
 
-func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, calledFromExternal bool) {
+func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
 	found := false
 	for idx, task := range *t.Tasks {
 		if taskname == task.Name {
@@ -334,7 +338,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, calledFromExt
 
 			var ctxCallerTaskname string
 
-			u.Ptmpdebug("RRR", TaskerStack.GetLen())
+			//u.Ptmpdebug("RRR", TaskerStack.GetLen())
 
 			if IsCalledExternally() {
 				ctxCallerTaskname = "TODO: Main Caller Taskname"
@@ -373,10 +377,10 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, calledFromExt
 					TaskVars: core.NewCache(),
 				}
 
-				u.Ptmpdebug("44", callerVars)
+				//u.Ptmpdebug("44", callerVars)
 				if IsCalledExternally() {
 					rtContext.ExecbaseVars = callerVars
-					u.Ptmpdebug("55", rtContext.ExecbaseVars)
+					//u.Ptmpdebug("55", rtContext.ExecbaseVars)
 					rtContext.TasknameLayered = u.Spf("%s/%s", "TODO: Main Caller Taskname", taskname)
 				} else {
 					if IsAtRootTaskLevel() {
@@ -388,7 +392,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, calledFromExt
 					}
 				}
 
-				u.Ptmpdebug("23", rtContext.ExecbaseVars)
+				//u.Ptmpdebug("23", rtContext.ExecbaseVars)
 				rtContext.ExecbaseVars.Put(UP_RUNTIME_TASK_LAYER_NUMBER, TaskerRuntime().Tasker.TaskStack.GetLen())
 
 				TaskerRuntime().Tasker.TaskStack.Push(&rtContext)
@@ -404,18 +408,24 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, calledFromExt
 				steps.Exec(false)
 
 				returnVars := TaskRuntime().ReturnVars
+				u.Ptmpdebug("xx", returnVars)
+
 				TaskerRuntime().Tasker.TaskStack.Pop()
 				if IsCalledExternally() {
+					u.Ptmpdebug("yy", returnVars)
 					if returnVars != nil {
-						mergo.Merge(callerVars, returnVars, mergo.WithOverride)
+						//mergo.Merge(callerVars, returnVars, mergo.WithOverride)
+						callerExecBaseVars := TaskerRuntime().TaskerCaller.TaskStack.GetTop().(*TaskRuntimeContext).ExecbaseVars
+						mergo.Merge(callerExecBaseVars, returnVars, mergo.WithOverride)
 					}
 				} else {
 					if !IsAtRootTaskLevel() && returnVars != nil {
 						mergo.Merge(TaskRuntime().ExecbaseVars, returnVars, mergo.WithOverride)
-					} else if TaskerRuntime().Tasker.TaskStack.GetLen() == 0 && returnVars != nil {
+					} else if IsAtRootTaskLevel() && returnVars != nil {
 						mergo.Merge(RuntimeVarsAndDvarsMerged, returnVars, mergo.WithOverride)
 					}
 				}
+				u.Ptmpdebug("zz", callerVars)
 			}()
 
 		}
