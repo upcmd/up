@@ -55,11 +55,10 @@ func TestT(prefix string, t *testing.T) {
 
 //mock required settings
 func Setupx(filename string, cfg *u.UpConfig) {
-
 	filenameonly := path.Base(filename)
-
-	filenoext := strings.TrimSuffix(filenameonly, filepath.Ext(filenameonly))
-	cfg.SetTaskfile(GetTestName(filenoext))
+	//filenoext := strings.TrimSuffix(filenameonly, filepath.Ext(filenameonly))
+	//cfg.SetTaskfile(GetTestName(filenoext))
+	cfg.SetTaskfile(filenameonly)
 	cfg.SetRefdir("./tests/functests")
 	cfg.Secure = &u.SecureSetting{Type: "default_aes", Key: "enc_key"}
 	cfg.ShowCoreConfig("mocktest")

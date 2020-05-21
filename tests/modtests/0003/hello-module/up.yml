@@ -33,8 +33,7 @@ tasks:
 
           - name: return
             desc: |
-              it should return and merge tom to parent's vars scope
-              it should report warning as jason does not exist
+              var b should be return to caler
             cmd:
               - b
 

@@ -2,26 +2,8 @@
 version: 1.0.0
 Verbose: v
 MaxCallLayers: 8
-#ModuleName: UpDevTest
 Secure:
   Type: default_aes
   #the key value will be a var name used for the value
   Key: enc_key
 #      keyref: /a/secure/location/key.file
-
-Modules:
-  - repo: https://github.com/up/sayhi.git
-    version: 1.0.0
-    alias: hi
-
-  - repo: https://github.com/up/sayhello.git
-    sha: abc123e
-    alias: hello
-
-  - repo: https://github.com/up/sum.git
-    #if there is no version or sha, then it will take master version
-    #if there is no alias, it will just use the repo name
-    dir: a/b
-
-  - #if there is no repo, then it will use the dir as module and incorporate as module
-    dir: c/d

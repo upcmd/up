@@ -48,6 +48,16 @@ mwiptestx(){
   fi
 }
 
+mwiptestxvvv(){
+  if [ "$1" == "" ];then
+    echo "please input the casename(dir name)"
+  else
+    dir=./tests/modtests/$1
+    goup ngo -d $dir -i dev --configdir=$dir -w refdir -v vvv
+  fi
+}
+
+
 
 uplist(){
 goup list task

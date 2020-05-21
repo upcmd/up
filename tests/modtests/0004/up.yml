@@ -1,0 +1,53 @@
+doc_meta: |
+  folder: module
+  title: jailed exec context
+  head: |
+    Showcase that the execution context for module will be jaied in its own exontext based on its own configuration or default settings
+
+  sections:
+    - title: How does it work?
+      content: |
+        In this case, you will see:
+        * Even though the same name of "internal_task" presents in both caller and module task file, the call func will locate the right one within its own execution context.
+
+        * You can see that the shell executions are all relevant to its own workdir, but will not be influenced by its caller. This guarantees the stability and certainty of third party module, with this feature, community members can collaborate together to come out of shared modules easily with predictable results
+
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+
+      -
+        func: call
+        do: internal_task
+
+
+      -
+        func: call
+        do: hello-module.Say_world
+
+      -
+        func: call
+        do: internal_task
+
+
+  -
+    name: internal_task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: "this is a internal task in caller"
+
+      -
+        func: shell
+        do:
+          - ls -lart
+          - ls |grep up
+          - pwd
+          - ls ../..|grep modtests

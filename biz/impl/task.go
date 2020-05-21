@@ -11,6 +11,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/imdario/mergo"
 	ms "github.com/mitchellh/mapstructure"
+	"github.com/mohae/deepcopy"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/core"
@@ -33,16 +34,31 @@ func InitDefaultSkeleton() {
 }
 
 type Tasker struct {
-	TaskYmlRoot  *viper.Viper
-	Tasks        *model.Tasks
-	InstanceName string
-	Dryrun       bool
-	TaskStack    *stack.ExecStack
-	StepStack    *stack.ExecStack
-	BlockStack   *stack.ExecStack
-	TaskBreak    bool
-	Config       *u.UpConfig
+	TaskYmlRoot      *viper.Viper
+	Tasks            *model.Tasks
+	InstanceName     string
+	Dryrun           bool
+	TaskStack        *stack.ExecStack
+	StepStack        *stack.ExecStack
+	BlockStack       *stack.ExecStack
+	TaskBreak        bool
+	Config           *u.UpConfig
+	GroupMembersList []string
+	MemberGroupMap   map[string]string
+	//expanded context only contains group and global scope, but not each instance vars
+	ExpandedContext ScopeContext
+	ScopeProfiles   *Scopes
+	//this is the merged vars from within scope: global, groups level (if there is), instance varss, then global runtime vars
+	RuntimeVarsMerged *core.Cache
+	//this is the merged vars and dvars to a vars cache from within scope: global, groups level (if there is), instance varss, then global runtime vars
+	//this vars should be used instead of RuntimeVarsMerged as it include both runtime vars and dvars except the local vars and dvars
+	RuntimeVarsAndDvarsMerged *core.Cache
+	RuntimeGlobalVars         *core.Cache
+	RuntimeGlobalDvars        *Dvars
 }
+
+type ScopeContext map[string]*core.Cache
+type ContextInstances []ScopeContext
 
 type TaskerRuntimeContext struct {
 	Tasker       *Tasker
@@ -60,7 +76,10 @@ func NewTasker(instanceId string, cfg *u.UpConfig) *Tasker {
 
 	taskYmlRoot := u.YamlLoader("Task", refDir, cfg.TaskFile)
 	tasker := &Tasker{
-		TaskYmlRoot: taskYmlRoot,
+		TaskYmlRoot:      taskYmlRoot,
+		MemberGroupMap:   map[string]string{},
+		GroupMembersList: []string{},
+		ExpandedContext:  ScopeContext{},
 	}
 	tasker.Config = cfg
 	tasker.initRuntime()
@@ -76,14 +95,185 @@ func NewTasker(instanceId string, cfg *u.UpConfig) *Tasker {
 	//TODO: refactory of the runtime init after config is loaded to a proper place
 	FuncMapInit()
 	tasker.loadScopes()
-	ScopeProfiles.InitContextInstances()
+	tasker.InitContextInstances(tasker.ScopeProfiles)
 	tasker.loadRuntimeGlobalVars()
 	tasker.loadRuntimeDvars()
-	SetRuntimeVarsMerged(tasker.InstanceName)
-	SetRuntimeGlobalMergedWithDvars()
+	tasker.SetRuntimeVarsMerged(tasker.InstanceName)
+	tasker.SetRuntimeGlobalMergedWithDvars()
 	tasker.loadTasks()
 
 	return tasker
+}
+
+/*
+Get the merged vars for specific scope instance
+Validate the scopes
+1. for the scope name equal to global, there should be no value for members, otherwise errors
+2. for the scope with group members, it is a group itself
+3. for the scope with no members and name is not global, it is a final instance
+*/
+
+func (t *Tasker) InitContextInstances(ss *Scopes) {
+
+	//validation
+	for idx, s := range *ss {
+
+		if s.Ref != "" && s.Vars != nil {
+			u.LogError("verify scope ref and member coexistence", "ref and members can not both exist")
+			u.Dvvvvv(s)
+			os.Exit(-1)
+		}
+		refdir := ConfigRuntime().RefDir
+		if s.Ref != "" {
+			if s.RefDir != "" {
+				refdir = s.RefDir
+			}
+			yamlvarsroot := u.YamlLoader("ref vars", refdir, s.Ref)
+			vars := *loadRefVars(yamlvarsroot)
+			u.Pvvvv("loading vars from:", s.Ref)
+			u.Ppmsgvvvv(vars)
+			(*ss)[idx].Vars = vars
+		}
+
+	}
+
+	u.Pvvvvv("-------full vars in scopes------")
+	//u.Dpplnvvvv(ss)
+	u.Dvvvvv(ss)
+
+	var globalScope *Scope
+	for idx, s := range *ss {
+		if s.Name == "global" {
+			if s.Members != nil {
+				u.LogError("scope expand", "global scope should not contains members")
+				os.Exit(-1)
+			}
+			globalScope = &(*ss)[idx]
+		}
+	}
+
+	//expand dvars into global scope's vars space
+	var globalvarsMergedWithDvars *core.Cache
+	if globalScope != nil {
+		globalvarsMergedWithDvars = GlobalVarsMergedWithDvars(globalScope)
+	} else {
+		globalvarsMergedWithDvars = core.NewCache()
+	}
+
+	for idx, s := range *ss {
+		if s.Members != nil {
+			for _, m := range s.Members {
+				if u.Contains(t.GroupMembersList, m) {
+					u.LogError("scope expand", u.Spfv("duplicated member: %s\n", m))
+					os.Exit(-1)
+				}
+				t.GroupMembersList = append(t.GroupMembersList, m)
+				t.MemberGroupMap[m] = s.Name
+			}
+
+			var groupvars core.Cache = deepcopy.Copy(*globalvarsMergedWithDvars).(core.Cache)
+			mergo.Merge(&groupvars, s.Vars, mergo.WithOverride)
+
+			//expand dvars into group scope's vars space
+			groupScope := &(*ss)[idx]
+			var groupvarsMergedWithDvars *core.Cache = ScopeVarsMergedWithDvars(groupScope, &groupvars)
+
+			t.ExpandedContext[s.Name] = groupvarsMergedWithDvars
+		}
+	}
+
+	t.ExpandedContext["global"] = globalvarsMergedWithDvars
+	func() {
+		u.Pvvvv("---------group vars----------")
+		for k, v := range t.ExpandedContext {
+			u.Pfvvvv("%s: %s", k, u.Sppmsg(*v))
+		}
+		u.Pfvvvv("groups members:%s\n", t.GroupMembersList)
+
+	}()
+
+}
+
+func (t *Tasker) SetRuntimeGlobalMergedWithDvars() {
+	var mergedVars core.Cache
+	mergedVars = deepcopy.Copy(*t.RuntimeVarsMerged).(core.Cache)
+
+	expandedVars := t.RuntimeGlobalDvars.Expand("runtime global", t.RuntimeVarsMerged)
+
+	if t.RuntimeGlobalDvars != nil {
+		mergo.Merge(&mergedVars, *expandedVars, mergo.WithOverride)
+	}
+
+	t.RuntimeVarsAndDvarsMerged = &mergedVars
+	u.Ppmsgvvvvhint("-------runtime global final merged with dvars-------", mergedVars)
+}
+
+//clear up everything in scope and cache
+//TODO: refactory
+func (t *Tasker) Unset() {
+	t.ExpandedContext = ScopeContext{}
+	t.GroupMembersList = []string{}
+	t.MemberGroupMap = map[string]string{}
+	t.ScopeProfiles = nil
+	t.RuntimeVarsMerged = nil
+	t.RuntimeVarsAndDvarsMerged = nil
+	t.RuntimeGlobalVars = nil
+	t.RuntimeGlobalDvars = nil
+}
+
+/*
+This will generate a one off vars merged from top level down to runtime
+global and merge them all together,the result vars will be used to finally
+merge with local func vars to be used in runtime execution time
+
+pass in runtime id, if runtime id is in member list, eg dev -> nonprod
+then merge runtimevars to group(nonprod)'s varss,
+
+if runtime id (nonname) is not in member list,
+then merge runtimevars to global varss,
+
+This has chained dvar expansion through global to group then to instance level
+and finally merge with global var, except the global dvars
+*/
+func (t *Tasker) SetRuntimeVarsMerged(runtimeid string) {
+	u.Pf("module: [%s] instance id: [%s]\n", ConfigRuntime().ModuleName, runtimeid)
+	var runtimevars core.Cache
+	runtimevars = deepcopy.Copy(*t.ExpandedContext["global"]).(core.Cache)
+
+	if u.Contains(t.GroupMembersList, runtimeid) {
+		groupname := t.MemberGroupMap[runtimeid]
+		mergo.Merge(&runtimevars, *t.ExpandedContext[groupname], mergo.WithOverride)
+
+		instanceVars := t.ScopeProfiles.GetInstanceVars(runtimeid)
+		if instanceVars != nil {
+			mergo.Merge(&runtimevars, instanceVars, mergo.WithOverride)
+		}
+
+	}
+
+	//merge dvars for the instance
+	var instanceScope *Scope
+	for idx, s := range *t.ScopeProfiles {
+		if s.Name == runtimeid {
+			instanceScope = &(*t.ScopeProfiles)[idx]
+		}
+	}
+
+	var instanceVarsMergedWithDvars *core.Cache
+	if instanceScope != nil {
+		instanceVarsMergedWithDvars = VarsMergedWithDvars(instanceScope.Name, &instanceScope.Vars, &instanceScope.Dvars, &runtimevars)
+		//merge back the expanded merged scope vars and dvars
+		mergo.Merge(&runtimevars, *instanceVarsMergedWithDvars, mergo.WithOverride)
+	}
+
+	//merge with global vars
+	mergo.Merge(&runtimevars, *t.RuntimeGlobalVars, mergo.WithOverride)
+
+	u.Pfvvvv("merged[ %s ] runtime vars:", runtimeid)
+	u.Ppmsgvvvv(runtimevars)
+	u.Dvvvvv(runtimevars)
+
+	t.RuntimeVarsMerged = &runtimevars
 }
 
 func (t *Tasker) setInstanceName(id string) {
@@ -321,6 +511,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 				u.Pf("=>call module: [%s] task: [%s]\n", modname, taskname)
 				//u.Ptmpdebug("55", callerVars)
 				mTasker.ExecTask(taskname, callerVars)
+
 				TaskerStack.Pop()
 
 				os.Chdir(cwd)
@@ -384,7 +575,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
 					rtContext.TasknameLayered = u.Spf("%s/%s", "TODO: Main Caller Taskname", taskname)
 				} else {
 					if IsAtRootTaskLevel() {
-						rtContext.ExecbaseVars = RuntimeVarsAndDvarsMerged
+						rtContext.ExecbaseVars = t.RuntimeVarsAndDvarsMerged
 						rtContext.TasknameLayered = taskname
 					} else {
 						rtContext.ExecbaseVars = callerVars
@@ -408,13 +599,10 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
 				steps.Exec(false)
 
 				returnVars := TaskRuntime().ReturnVars
-				u.Ptmpdebug("xx", returnVars)
 
 				TaskerRuntime().Tasker.TaskStack.Pop()
 				if IsCalledExternally() {
-					u.Ptmpdebug("yy", returnVars)
 					if returnVars != nil {
-						//mergo.Merge(callerVars, returnVars, mergo.WithOverride)
 						callerExecBaseVars := TaskerRuntime().TaskerCaller.TaskStack.GetTop().(*TaskRuntimeContext).ExecbaseVars
 						mergo.Merge(callerExecBaseVars, returnVars, mergo.WithOverride)
 					}
@@ -422,10 +610,9 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
 					if !IsAtRootTaskLevel() && returnVars != nil {
 						mergo.Merge(TaskRuntime().ExecbaseVars, returnVars, mergo.WithOverride)
 					} else if IsAtRootTaskLevel() && returnVars != nil {
-						mergo.Merge(RuntimeVarsAndDvarsMerged, returnVars, mergo.WithOverride)
+						mergo.Merge(t.RuntimeVarsAndDvarsMerged, returnVars, mergo.WithOverride)
 					}
 				}
-				u.Ptmpdebug("zz", callerVars)
 			}()
 
 		}
@@ -456,11 +643,11 @@ func (t *Tasker) validateAndLoadTaskRef() {
 		if task.Ref != "" {
 			if task.RefDir != "" {
 				rawdir := task.RefDir
-				refdir = Render(rawdir, RuntimeVarsAndDvarsMerged)
+				refdir = Render(rawdir, t.RuntimeVarsAndDvarsMerged)
 			}
 
 			rawref := task.Ref
-			ref := Render(rawref, RuntimeVarsAndDvarsMerged)
+			ref := Render(rawref, t.RuntimeVarsAndDvarsMerged)
 
 			yamlflowroot := u.YamlLoader("flow ref", refdir, ref)
 			flow := loadRefFlow(yamlflowroot)
@@ -515,7 +702,7 @@ func (t *Tasker) loadScopes() {
 	scopesData := t.TaskYmlRoot.Get("scopes")
 	var scopes Scopes
 	err := ms.Decode(scopesData, &scopes)
-	SetScopeProfiles(&scopes)
+	t.ScopeProfiles = &scopes
 
 	u.LogErrorAndExit("load full scopes", err, "please assess your scope configuration carefully")
 }
@@ -525,10 +712,10 @@ func (t *Tasker) loadRuntimeGlobalVars() {
 	var vars core.Cache
 	err := ms.Decode(varsData, &vars)
 	u.LogError("loadRuntimeGlobalVars", err)
-	SetRuntimeGlobalVars(&vars)
+	t.RuntimeGlobalVars = &vars
 }
 
-func (t *Tasker) loadRuntimeDvars() *Dvars {
+func (t *Tasker) loadRuntimeDvars() {
 	dvarsData := t.TaskYmlRoot.Get("dvars")
 	var dvars Dvars
 	err := ms.Decode(dvarsData, &dvars)
@@ -536,9 +723,7 @@ func (t *Tasker) loadRuntimeDvars() *Dvars {
 		err,
 		"You must fix the data type to be\n string for a dvar value and try again. possible problems:\nthe name can not be single character 'y' or 'n' ",
 	)
-
 	//dvars.ValidateAndLoading()
-	SetRuntimeGlobalDvars(&dvars)
-	return &dvars
+	t.RuntimeGlobalDvars = &dvars
 }
 

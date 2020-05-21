@@ -1,0 +1,42 @@
+
+vars:
+  a: module-global-aaa
+  c: module-global-ccc
+
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: shell
+        desc: main job
+        do:
+          - echo "hello "
+
+      -
+        func: call
+        do: Say_world
+
+  -
+    name: Say_world
+    task:
+      -
+        func: cmd
+        vars:
+          a: module-local-aaa
+          b: module-local-bbb
+        do:
+          -
+            name: inspect
+            desc: inspect in module
+            cmd:
+              - exec_vars
+              - exec_base_vars
+
+#          -
+#            name: assert
+#            cmd:
+#              - '{{eq .a "caller-aaa"}}'
+#              - '{{eq .b "module-bbb"}}'
+#

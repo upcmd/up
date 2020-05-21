@@ -12,7 +12,6 @@ import (
 	"github.com/stephencheng/up/tests"
 	u "github.com/stephencheng/up/utils"
 	"os"
-
 	"testing"
 )
 

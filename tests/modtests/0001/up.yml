@@ -7,6 +7,10 @@ doc_meta: |
     It shows that the caller task to call the module task Say_world
 
   sections:
+    - title: How does it work?
+      content: |
+        If you need to call an external module task, then you will need to use module name with a dot, eg: "hello-module.Say_world" stands for module name hello-module, then call Say_world task
+
     - title: Demo
       log: yes
 

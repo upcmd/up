@@ -18,13 +18,24 @@ notes:
   - see if callers vars could be passed to module's func
 
 vars:
-  a: caller-aaa
+  a: caller-global-aaa
+  b: caller-global-bbb
 
 tasks:
   -
     name: Main
     desc: main entry
     task:
+
+      -
+        func: cmd
+        do:
+          -
+            name: inspect
+            desc: the vars in caller before invoking module task
+            cmd:
+              - exec_vars
+              - exec_base_vars
 
       -
         func: call
@@ -35,20 +46,15 @@ tasks:
         do:
           -
             name: inspect
+            desc: the vars in caller after invoking module task
             cmd:
               - exec_vars
               - exec_base_vars
 
-          - name: print
-            cmd: |
-              back to main caller
-              a: {{.a}}
-              b: {{.b}}
-
-          -
-            name: assert
-            des: |
-              var b is returned from module
-            cmd:
-              - '{{eq .a "caller-aaa"}}'
-              - '{{eq .b "module-bbb"}}'
+#          -
+#            name: assert
+#            des: |
+#              var b is returned from module
+#            cmd:
+#              - '{{eq .a "caller-aaa"}}'
+#              - '{{eq .b "module-bbb"}}'

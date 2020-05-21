@@ -12,12 +12,13 @@ import (
 	"github.com/stephencheng/up/tests"
 	u "github.com/stephencheng/up/utils"
 	"os"
-
 	"testing"
 )
 
 func init() {
 	os.Chdir("../..")
+	//cwd, _ := os.Getwd()
+	//u.Ptmpdebug("pwd:", cwd)
 }
 
 func TestC(t *testing.T) {
@@ -30,7 +31,7 @@ func TestC(t *testing.T) {
 		tests.Setupx(x, cfg)
 		t := impl.NewTasker("dev", cfg)
 		t.ExecTask("task", nil)
-		impl.Unset()
+		t.Unset()
 	}
 }
 

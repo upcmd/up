@@ -1,0 +1,50 @@
+
+tasks:
+
+  -
+    name: Say_world
+    task:
+      -
+        func: shell
+        do:
+          - ls -lart
+          - ls |grep up
+          - pwd
+          - ls ../../..|grep modtests
+
+      -
+        func: call
+        desc: |
+          this should call its own internal task
+        do: internal_task
+
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: shell
+        desc: main job
+        do:
+          - 'echo "hello world"'
+
+      -
+        func: call
+        do: internal_task
+
+  -
+    name: internal_task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: "this is a internal task in module"
+
+      -
+        func: shell
+        do:
+          - ls -lart
+          - ls |grep up
+          - pwd
+          - ls ../../..|grep modtests
