@@ -50,7 +50,7 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 	var resultVars *core.Cache
 
 	execvars = deepcopy.Copy(*TaskRuntime().ExecbaseVars).(core.Cache)
-	u.Ptmpdebug("11", execvars)
+	//u.Ptmpdebug("11", execvars)
 	taskVars := TaskRuntime().TaskVars
 	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
 	//u.Ptmpdebug("33", execvars)

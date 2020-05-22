@@ -17,17 +17,15 @@ import (
 
 func init() {
 	os.Chdir("../..")
-	//cwd, _ := os.Getwd()
-	//u.Ptmpdebug("pwd:", cwd)
 }
 
 func TestC(t *testing.T) {
 	cfg := u.NewUpConfig("", "").InitConfig()
-
 	files := tests.GetUnitTestCollection()
 
 	for _, x := range files {
 		u.Pln("testing:", x)
+		u.Pln("work dir:", cfg.GetWorkdir())
 		tests.Setupx(x, cfg)
 		t := impl.NewTasker("dev", cfg)
 		t.ExecTask("task", nil)
