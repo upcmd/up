@@ -1,15 +1,17 @@
 doc_meta: |
   folder: module
-  title: return value
+  title: Complex vars
   head: |
-    Showcase the return value from module
+    Showcase how vars are passed into module task func and value returns to caller
 
   sections:
     - title: How does it work?
       content: |
-        In this demo, the var b from module is returned to caller
+        In this demo, the vars are processed exactly same way like a internal caller func invoke a callee task
 
-        Pleas note that the two vars used in Say_world will produce the result based on the input, the var a is passed in from external caller and overriden. This is a design pattern of IOC - inverse of controll, a feature to allow consumer code to inject data to module, and the module will focus on detailed implementation
+        So, at the entry point of the call func, it has assembled a list of execution vars. When these vars passed to callee func, these vars will firstly override callee's globle runtime vars, then override callee's local vars
+
+        The magic here is that the caller func carries external vars to influence callee's behavior, while callee still derives all necessary settings from its global runtime vars(inclding group scope vars)
 
     - title: Demo
       log: yes
@@ -20,7 +22,7 @@ notes:
 vars:
   a: caller-global-aaa
   b: caller-global-bbb
-
+  e: caller-global-eee
 tasks:
   -
     name: Main
@@ -51,10 +53,10 @@ tasks:
               - exec_vars
               - exec_base_vars
 
-#          -
-#            name: assert
-#            des: |
-#              var b is returned from module
-#            cmd:
-#              - '{{eq .a "caller-aaa"}}'
-#              - '{{eq .b "module-bbb"}}'
+          -
+            name: assert
+            cmd:
+              - '{{eq .a "caller-global-aaa"}}'
+              - '{{eq .b "caller-global-bbb"}}'
+              - '{{eq .c "module-global-ccc"}}'
+              - '{{eq .e "caller-global-eee"}}'

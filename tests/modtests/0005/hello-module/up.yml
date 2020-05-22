@@ -26,17 +26,30 @@ tasks:
         vars:
           a: module-local-aaa
           b: module-local-bbb
+          d: module-local-ddd
         do:
           -
             name: inspect
-            desc: inspect in module
+            desc: |
+              the result would be:
+              a: caller-global-aaa
+              b: caller-global-bbb
+              c: module-global-ccc
+              d: module-local-ddd
+              e: caller-global-eee
             cmd:
               - exec_vars
               - exec_base_vars
 
-#          -
-#            name: assert
-#            cmd:
-#              - '{{eq .a "caller-aaa"}}'
-#              - '{{eq .b "module-bbb"}}'
-#
+          -
+            name: assert
+            cmd:
+              - '{{eq .a "caller-global-aaa"}}'
+              - '{{eq .b "caller-global-bbb"}}'
+              - '{{eq .c "module-global-ccc"}}'
+              - '{{eq .d "module-local-ddd"}}'
+              - '{{eq .e "caller-global-eee"}}'
+
+          - name: return
+            cmd:
+              - c
