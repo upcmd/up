@@ -12,6 +12,7 @@ import (
 	"github.com/imdario/mergo"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/mohae/deepcopy"
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/core"
@@ -86,14 +87,11 @@ func NewTasker(instanceId string, cfg *u.UpConfig) *Tasker {
 
 	taskerContext := TaskerRuntimeContext{
 		Tasker: tasker,
-		//TODO: use namegen to generate random name in config default settings
 	}
 
 	TaskerStack.Push(&taskerContext)
 
 	tasker.setInstanceName(instanceId)
-	//TODO: refactory of the runtime init after config is loaded to a proper place
-	FuncMapInit()
 	tasker.loadScopes()
 	tasker.InitContextInstances(tasker.ScopeProfiles)
 	tasker.loadRuntimeGlobalVars()
@@ -326,10 +324,26 @@ func (t *Tasker) ListAllTasks() {
 }
 
 func (t *Tasker) ListAllModules() {
-	u.Pln("-inspect all modules:")
-	//for _, mod := range *ConfigRuntime().Modules {
-	//mod.Dir
-	//}
+	u.Pln("-list all modules:")
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"idx", "alias", "dir", "repo", "version", "instanceid", "subdir"})
+
+	for idx, m := range *ConfigRuntime().Modules {
+		m.Normalize()
+		table.Append([]string{
+			strconv.Itoa(idx + 1),
+			m.Alias,
+			m.Dir,
+			m.Repo,
+			m.Version,
+			m.Iid,
+			m.Subdir,
+		})
+	}
+
+	table.Render()
+	u.Ptmpdebug("88", *ConfigRuntime().Modules)
+
 }
 
 func (tasker *Tasker) ListTask(taskname string) {
@@ -450,7 +464,7 @@ func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level 
 
 func (t *Tasker) ValidateTask(taskname string) {
 	SetDryrun()
-	t.ExecTask(taskname, nil)
+	t.ExecTask(taskname, nil, false)
 }
 
 func ExecTask(fulltaskname string, callerVars *core.Cache) {
@@ -475,23 +489,23 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 	//u.Ptmpdebug("11", ConfigRuntime().Modules)
 
 	if modname == "self" {
-		TaskerRuntime().Tasker.ExecTask(taskname, callerVars)
+		TaskerRuntime().Tasker.ExecTask(taskname, callerVars, false)
 	} else {
-		//TODO: load the external module
-		//change workdir to that dir and load task entry
-		//TODO: replace nil with real cfg
-
 		cwd, err := os.Getwd()
 		if err != nil {
 			u.LogErrorAndExit("cwd", err, "working directory error")
 		}
 
-		mdir := "hello-module/"
-		iid := "dev"
+		//(mods *Modules) LocateModule(modname string) *Module
+		mod := u.Modules(*TaskerRuntime().Tasker.Config.Modules).LocateModule(modname)
+		u.Ptmpdebug("33", mod)
+		//mdir := "hello-module/"
+		//iid := "dev"
 
 		func() {
-			if _, err := os.Stat(mdir); !os.IsNotExist(err) {
-				os.Chdir(mdir)
+			//TODO: exclude the subdir case
+			if _, err := os.Stat(mod.Dir); !os.IsNotExist(err) {
+				os.Chdir(mod.Dir)
 				/*
 					in module loading, since you can not pass in the cli options, so:
 					version: will not be used at all
@@ -506,14 +520,12 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 				mcfg.SetModulename(modname)
 				mcfg.InitConfig()
 				taskerCaller := TaskerRuntime().Tasker
-				mTasker := NewTasker(iid, mcfg)
+				mTasker := NewTasker(mod.Iid, mcfg)
 				TaskerRuntime().TaskerCaller = taskerCaller
 				u.Pf("=>call module: [%s] task: [%s]\n", modname, taskname)
 				//u.Ptmpdebug("55", callerVars)
-				mTasker.ExecTask(taskname, callerVars)
-
+				mTasker.ExecTask(taskname, callerVars, true)
 				TaskerStack.Pop()
-
 				os.Chdir(cwd)
 			}
 		}()
@@ -521,7 +533,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 
 }
 
-func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
+func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCall bool) {
 	found := false
 	for idx, task := range *t.Tasks {
 		if taskname == task.Name {
@@ -531,7 +543,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
 
 			//u.Ptmpdebug("RRR", TaskerStack.GetLen())
 
-			if IsCalledExternally() {
+			if isExternalCall {
 				ctxCallerTaskname = "TODO: Main Caller Taskname"
 			} else {
 				if IsAtRootTaskLevel() {
@@ -564,12 +576,13 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
 
 			func() {
 				rtContext := TaskRuntimeContext{
-					Taskname: taskname,
-					TaskVars: core.NewCache(),
+					Taskname:           taskname,
+					TaskVars:           core.NewCache(),
+					IsCalledExternally: isExternalCall,
 				}
 
 				//u.Ptmpdebug("44", callerVars)
-				if IsCalledExternally() {
+				if isExternalCall {
 					var passinvars core.Cache
 					passinvars = deepcopy.Copy(*t.RuntimeVarsAndDvarsMerged).(core.Cache)
 					mergo.Merge(&passinvars, callerVars, mergo.WithOverride)
@@ -605,7 +618,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache) {
 				returnVars := TaskRuntime().ReturnVars
 
 				TaskerRuntime().Tasker.TaskStack.Pop()
-				if IsCalledExternally() {
+				if isExternalCall {
 					if returnVars != nil {
 						callerExecBaseVars := TaskerRuntime().TaskerCaller.TaskStack.GetTop().(*TaskRuntimeContext).ExecbaseVars
 						mergo.Merge(callerExecBaseVars, returnVars, mergo.WithOverride)

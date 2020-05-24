@@ -357,7 +357,6 @@ func (steps *Steps) Exec(fromBlock bool) {
 			}
 			StepStack().Push(&rtContext)
 
-			//TODO: consider move task vars merging to here
 			if step.Do == nil && step.Dox != nil {
 				u.LogWarn("*", "Step is deactivated!")
 			} else {

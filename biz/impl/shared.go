@@ -96,16 +96,6 @@ func IsCalledTask() (called bool) {
 	return
 }
 
-func IsCalledExternally() (called bool) {
-	if TaskerStack.GetLen() > 1 {
-		called = true
-	} else {
-		called = false
-
-	}
-	return
-}
-
 func IsAtRootTaskLevel() (called bool) {
 	if TaskerRuntime().Tasker.TaskStack.GetLen() == 0 {
 		called = true

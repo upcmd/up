@@ -1,0 +1,57 @@
+doc_meta: |
+  folder: module
+  title: Complex call layers
+  head: |
+    Showcase a combination of an external module call and internal func call would work properly and the vars returned from multple layers will return to caller
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  - regression test the multiple layer's call would work and vars will be handled properly
+
+vars:
+  a: caller-global-aaa
+  b: caller-global-bbb
+  e: caller-global-eee
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+
+      -
+        func: cmd
+        do:
+          -
+            name: inspect
+            desc: the vars in caller before invoking module task
+            cmd:
+              - exec_vars
+              - exec_base_vars
+
+      -
+        func: call
+        do: hello-module.Say_world
+
+      -
+        func: cmd
+        do:
+          -
+            name: inspect
+            desc: the vars in caller after invoking module task
+            cmd:
+              - exec_vars
+              - exec_base_vars
+
+          -
+            name: assert
+            desc: |
+              note the k is the result from the 2nd layer call
+            cmd:
+              - '{{eq .a "caller-global-aaa"}}'
+              - '{{eq .b "caller-global-bbb"}}'
+              - '{{eq .c "module-global-ccc"}}'
+              - '{{eq .e "caller-global-eee"}}'
+              - '{{eq .k "module-second_layer_local-kkk"}}'

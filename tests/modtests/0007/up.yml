@@ -1,0 +1,17 @@
+doc_meta: |
+  folder: module
+  title: Complex call layers
+  head: |
+    Showcase a combination of an external module call and internal func call would work properly and the vars returned from multple layers will return to caller
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  - test module list
+
+tasks:
+  -
+    name: Main
+    desc: main entry

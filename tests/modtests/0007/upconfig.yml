@@ -1,0 +1,14 @@
+
+version: 1.0.0
+Verbose: v
+MaxCallLayers: 8
+RefDir: .
+TaskFile: up.yml
+ConfigDir: .
+ConfigFile: upconfig.yml
+
+Modules:
+
+   #if there is no repo, then it will use the dir as module and incorporate as module
+  - dir: hello-module/
+    alias: hello

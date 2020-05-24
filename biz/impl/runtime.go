@@ -22,11 +22,12 @@ const (
 )
 
 type TaskRuntimeContext struct {
-	Taskname        string
-	TasknameLayered string
-	ExecbaseVars    *core.Cache
-	TaskVars        *core.Cache
-	ReturnVars      *core.Cache
+	Taskname           string
+	TasknameLayered    string
+	ExecbaseVars       *core.Cache
+	TaskVars           *core.Cache
+	ReturnVars         *core.Cache
+	IsCalledExternally bool
 }
 
 func TaskerRuntime() *TaskerRuntimeContext {

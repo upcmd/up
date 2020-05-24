@@ -28,7 +28,7 @@ func TestC(t *testing.T) {
 		u.Pln("work dir:", cfg.GetWorkdir())
 		tests.Setupx(x, cfg)
 		t := impl.NewTasker("dev", cfg)
-		t.ExecTask("task", nil)
+		t.ExecTask("task", nil, false)
 		t.Unset()
 	}
 }

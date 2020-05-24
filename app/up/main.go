@@ -56,6 +56,8 @@ func main() {
 		return cfg
 	}()
 
+	impl.FuncMapInit()
+
 	switch cmd {
 	case initDefault.FullCommand():
 		u.Pln("-init default skeleton and configuration")
@@ -65,7 +67,7 @@ func main() {
 		if *ngoTaskName != "" {
 			u.Pln("-exec task:", *ngoTaskName)
 			t := impl.NewTasker(*instanceName, initConfig)
-			t.ExecTask(*ngoTaskName, nil)
+			t.ExecTask(*ngoTaskName, nil, false)
 			//u.Ptmpdebug("88", impl.ConfigRuntime())
 		}
 

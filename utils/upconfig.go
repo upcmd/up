@@ -26,6 +26,7 @@ type Module struct {
 	Version string
 	Alias   string
 	Dir     string
+	Subdir  string
 	Iid     string
 }
 
@@ -41,6 +42,49 @@ type UpConfig struct {
 	MaxCallLayers string
 	Secure        *SecureSetting
 	Modules       *[]Module
+}
+
+type Modules []Module
+
+func (ms Modules) LocateModule(modname string) *Module {
+	for _, m := range ms {
+		m.Normalize()
+		if m.Alias == modname {
+			return &m
+		}
+	}
+	return nil
+}
+
+func (m *Module) Normalize() {
+	if m.Dir != "" && m.Alias == "" {
+		InvalidAndExit("module validation", Spf("You need to use a alias to name the module: dir [%s]", m.Dir))
+	}
+
+	if m.Iid == "" {
+		m.Iid = "nonamed"
+	}
+
+	if m.Repo != "" {
+		if m.Version == "" {
+			m.Version = "master"
+		}
+
+		if m.Dir == "" {
+			m.Dir = "TODO: repo name"
+		}
+
+		if m.Alias == "" {
+			m.Alias = "TODO: repo name"
+		}
+
+		if m.Subdir != "" {
+			if m.Alias == "" {
+				InvalidAndExit("module validation", Spf("You need to use a alias to name the module: subdir [%s]", m.Subdir))
+			}
+		}
+
+	}
 }
 
 func (cfg *UpConfig) SetVerbose(cmdV string) {
