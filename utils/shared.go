@@ -113,3 +113,10 @@ func DebugYmlContent(dir, filename string) {
 	LogWarn("Check validity of yml content\n", PrintContentWithLineNuber(string(content)))
 }
 
+func GetGitRepoName(url string) string {
+	s := strings.Split(url, "/")
+	repoWithGit := s[len(s)-1]
+	repoName := strings.Split(repoWithGit, ".")[0]
+	return repoName
+}
+

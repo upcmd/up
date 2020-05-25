@@ -19,6 +19,12 @@ Modules:
     _version: master
     _iid: noname
 
+    #skip: if repo exist already, then skip it and do not pull, this is the default if it is not configured
+    #manual: if repo exist already, then stop processing and fails straight away
+    #always: if repo exist already, then delete it and repull from remote again
+  - repo: https://github.com/up/sayhi.git
+    pullpolicy: manual | always | skip
+
     #if both repo and dir exist, then the repo will be cloned to be named to dir name
   - repo: https://github.com/up/sayhi.git
     dir: himodule
@@ -77,6 +83,8 @@ Modules:
   - dir: /etc/c/d
     :>alias: require setup to make it clear what the module name is
     iid: dev
+
+    #TODO: add feature to freeze/lock the commit
 
 note: |
 

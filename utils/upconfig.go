@@ -9,9 +9,13 @@ package utils
 
 import (
 	"fmt"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/olekukonko/tablewriter"
 	"os"
 	"path"
 	"reflect"
+	"strings"
 )
 
 type SecureSetting struct {
@@ -21,13 +25,14 @@ type SecureSetting struct {
 }
 
 type Module struct {
-	Repo    string
-	Tag     string
-	Version string
-	Alias   string
-	Dir     string
-	Subdir  string
-	Iid     string
+	Repo       string
+	Tag        string
+	Version    string
+	Alias      string
+	Dir        string
+	Subdir     string
+	Iid        string
+	PullPolicy string
 }
 
 type UpConfig struct {
@@ -42,9 +47,12 @@ type UpConfig struct {
 	MaxCallLayers string
 	Secure        *SecureSetting
 	Modules       *[]Module
+	ModuleLock    bool
 }
 
 type Modules []Module
+
+type ModuleLockMap map[string]string
 
 func (ms Modules) LocateModule(modname string) *Module {
 	for _, m := range ms {
@@ -54,6 +62,91 @@ func (ms Modules) LocateModule(modname string) *Module {
 		}
 	}
 	return nil
+}
+
+func (m *Module) PullRepo(revMap *ModuleLockMap, uselock bool) {
+	println("pull repo")
+	m.Details()
+	clone := func() {
+		_, err := git.PlainClone(m.Dir, false, &git.CloneOptions{
+			URL:      m.Repo,
+			Progress: os.Stdout,
+		})
+		LogErrorAndExit("Clone Module", err, "Clone errored, please fix the issue first and retry")
+	}
+	Ptmpdebug("12", m.Dir)
+	if _, err := os.Stat(m.Dir); !os.IsNotExist(err) {
+		if m.PullPolicy == "always" {
+			Pf("removing %s ...", m.Dir)
+			err := os.RemoveAll(m.Dir)
+			LogErrorAndExit("Remove directory", err, Spf("removing [%s] failed", m.Dir))
+			clone()
+		} else if m.PullPolicy == "skip" {
+			LogWarn("module repo exist: skipped", Spf("repo: [%s]", m.Dir))
+		} else if m.PullPolicy == "manual" {
+			InvalidAndExit(Spf("repo: [%s] already exist", m.Dir),
+				`manual resolution need:
+1. You can git pull to update the module
+2. If you work on the module, then you will need to commit and push your code accordingly, or
+3. You will need to just delete it by yourself, or
+4. Use pull policy: skip to not to do anything until you decide`)
+		}
+	} else {
+		clone()
+	}
+
+	println("checkout version")
+	if m.Version != "" {
+		var versionDecided string
+
+		if uselock {
+			if lockedVersion, ok := (*revMap)[m.Alias]; ok {
+				if lockedVersion != m.Version {
+					if !strings.Contains(lockedVersion, m.Version) {
+						LogWarn("Locked version differs, use locked version", Spf("locked: %s, configured: %s", lockedVersion, m.Version))
+						versionDecided = lockedVersion
+					}
+				}
+			}
+		}
+
+		if versionDecided == "" {
+			versionDecided = m.Version
+		}
+
+		cmd := Spf("git checkout %s", versionDecided)
+		Pf("checkout version: %s ...\n", versionDecided)
+		Pln(cmd)
+		err := RunShellCmd(m.Dir, cmd)
+		if err != nil {
+			LogWarn("checkout version", `
+You may want to re-pull the repo again to ensure it is up to date to avoid missing branch, commit or tag
+`)
+		}
+	}
+
+}
+
+func GetHeadRev(repodir string) string {
+	r, err := git.PlainOpen(repodir)
+	LogErrorAndExit("Open repo", err, Spf("please check repo:[%s]", repodir))
+	h, err := r.ResolveRevision(plumbing.Revision("HEAD"))
+	return (h.String())
+}
+
+func (m *Module) Details() {
+	if m != nil {
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"property", "value"})
+		table.Append([]string{"alias", m.Alias})
+		table.Append([]string{"dir", m.Dir})
+		table.Append([]string{"repo", m.Repo})
+		table.Append([]string{"version", m.Version})
+		table.Append([]string{"pullpolicy", m.PullPolicy})
+		table.Append([]string{"instanceid", m.Iid})
+		table.Append([]string{"subdir", m.Subdir})
+		table.Render()
+	}
 }
 
 func (m *Module) Normalize() {
@@ -70,12 +163,16 @@ func (m *Module) Normalize() {
 			m.Version = "master"
 		}
 
-		if m.Dir == "" {
-			m.Dir = "TODO: repo name"
+		if m.PullPolicy == "" {
+			m.PullPolicy = "skip"
 		}
 
 		if m.Alias == "" {
-			m.Alias = "TODO: repo name"
+			m.Alias = GetGitRepoName(m.Repo)
+		}
+
+		if m.Dir == "" {
+			m.Dir = path.Join(GetDefaultModuleDir(), m.Alias)
 		}
 
 		if m.Subdir != "" {

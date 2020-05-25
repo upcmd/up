@@ -7,7 +7,10 @@
 
 package utils
 
-import "github.com/fatih/color"
+import (
+	"github.com/fatih/color"
+	"path"
+)
 
 var (
 	defaults map[string]string = map[string]string{
@@ -25,6 +28,7 @@ var (
 	himsg_color_printf  = color.HiWhite
 	msg_color_sprintf   = color.YellowString
 	dryrun_color_print  = color.Cyan
+	UpModuleDir         = ".upmodule"
 
 	DEFAULT_CONFIG = `
 version: 1.0.0
@@ -60,4 +64,8 @@ path format:
 6. 'a.array[*].blah'
 `
 )
+
+func GetDefaultModuleDir() string {
+	return path.Join("./", UpModuleDir)
+}
 

@@ -22,6 +22,7 @@ func init() {
 func TestC(t *testing.T) {
 	cfg := u.NewUpConfig("", "").InitConfig()
 	files := tests.GetUnitTestCollection()
+	impl.FuncMapInit()
 
 	for _, x := range files {
 		u.Pln("testing:", x)

@@ -17,13 +17,15 @@ import (
 var (
 	app = kingpin.New("up", "UP: The Ultimate Provisioner")
 
-	ngo              = app.Command("ngo", "run a entry task")
-	ngoTaskName      = ngo.Arg("taskname", "task name to run").Default("Main").String()
-	initDefault      = app.Command("init", "create a default skeleton for a quick start")
-	list             = app.Command("list", "list tasks")
-	listName         = list.Arg("taskname|=", "task name to inspect").String()
-	mod              = app.Command("mod", "module cmd")
-	modList          = mod.Arg("list", "list module").String()
+	ngo         = app.Command("ngo", "run a entry task")
+	ngoTaskName = ngo.Arg("taskname", "task name to run").Default("Main").String()
+	initDefault = app.Command("init", "create a default skeleton for a quick start")
+	list        = app.Command("list", "list tasks")
+	listName    = list.Arg("taskname|=", "task name to inspect").String()
+	mod         = app.Command("mod", "module cmd")
+	modCmd      = mod.Arg("cmd", "list | update").Required().String()
+	//modList          = mod.Arg("list", "list module").Required().String()
+	//modUpdate        = mod.Arg("update", "update module").Required().String()
 	assist           = app.Command("assist", "assist: templatefunc|")
 	assistName       = assist.Arg("assistname", "what to assist").String()
 	validate         = app.Command("validate", "validate tasks and plays")
@@ -83,7 +85,15 @@ func main() {
 
 	case mod.FullCommand():
 		t := impl.NewTasker(*instanceName, initConfig)
-		t.ListAllModules()
+		if *modCmd == "list" {
+			t.ListAllModules()
+		}
+		if *modCmd == "update" {
+			t.PullAllModules()
+		}
+		if *modCmd == "lock" {
+			t.LockModules()
+		}
 
 	case assist.FullCommand():
 		u.Pf("-assist: %s\n", *assistName)

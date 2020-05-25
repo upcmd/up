@@ -59,6 +59,27 @@ mlistx(){
 }
 
 
+mupdatex(){
+  if [ "$1" == "" ];then
+    echo "please input the casename(dir name)"
+  else
+    dir=./tests/modtests/$1
+    goup mod update -d $dir -i dev --configdir=$dir -w refdir
+  fi
+}
+
+mlockx(){
+  if [ "$1" == "" ];then
+    echo "please input the casename(dir name)"
+  else
+    dir=./tests/modtests/$1
+    goup mod lock -d $dir -i dev --configdir=$dir -w refdir
+  fi
+}
+
+
+
+
 mtestxvvv(){
   if [ "$1" == "" ];then
     echo "please input the casename(dir name)"
