@@ -576,6 +576,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 		if mod != nil {
 			func() {
 				//TODO: exclude the subdir case
+
 				if _, err := os.Stat(mod.Dir); !os.IsNotExist(err) {
 					os.Chdir(mod.Dir)
 					/*

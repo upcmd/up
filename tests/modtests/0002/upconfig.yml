@@ -11,4 +11,5 @@ Modules:
 
    #if there is no repo, then it will use the dir as module and incorporate as module
   - dir: hello-module/
+    alias: hello-module
     iid: dev

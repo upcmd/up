@@ -39,6 +39,23 @@ mwiptest(){
   goup ngo -d $dir -i dev --configdir=$dir -w refdir
 }
 
+
+mptestx(){
+echo "syntax: modtestx 0003"
+if [ "$1" != "" ];then
+  dir=./tests/modtests/$1
+  goup ngo -d $dir -i dev --configdir=$dir
+else
+  echo "please input a case number"
+fi
+}
+
+
+mregression(){
+  GOTEST=true gotest ./tests/modtests/mcasec_test.go -v
+}
+
+
 mtestx(){
   if [ "$1" == "" ];then
     echo "please input the casename(dir name)"
@@ -152,12 +169,3 @@ inspect_task_example(){
 }
 
 
-modtestx(){
-echo "syntax: modtestx 0003"
-if [ "$1" != "" ];then
-  dir=./tests/modtests/$1
-  goup ngo -d $dir -i dev --configdir=$dir
-else
-  echo "please input a case number"
-fi
-}

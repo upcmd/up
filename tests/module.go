@@ -9,25 +9,22 @@ package tests
 
 import (
 	u "github.com/stephencheng/up/utils"
-	"path"
-	"path/filepath"
-	"strings"
+	"os"
 )
 
 //mock required settings
-func SetupMx(filename string, cfg *u.UpConfig) {
-
-	filenameonly := path.Base(filename)
-
-	filenoext := strings.TrimSuffix(filenameonly, filepath.Ext(filenameonly))
-	cfg.SetTaskfile(GetTestName(filenoext))
-	cfg.SetRefdir("./tests/functests")
+func SetupMx(dirpath string) *u.UpConfig {
+	cfg := u.NewUpConfig(dirpath, "").InitConfig()
+	u.Pln("work dir:", cfg.GetWorkdir())
 	cfg.Secure = &u.SecureSetting{Type: "default_aes", Key: "enc_key"}
-	cfg.ShowCoreConfig("mocktest")
+	cfg.RefDir = dirpath
+	cfg.WorkDir = "refdir"
+	os.Chdir(cfg.GetWorkdir())
+	cfg.ShowCoreConfig("moduletest")
 	u.Ppmsgvvvvhint("core config", cfg)
 	u.Pln(" :test task file:", cfg.TaskFile)
 	u.Pln(" :release version:", cfg.Version)
 	u.Pln(" :verbose level:", cfg.Verbose)
-
+	return cfg
 }
 
