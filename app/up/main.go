@@ -23,7 +23,7 @@ var (
 	list        = app.Command("list", "list tasks")
 	listName    = list.Arg("taskname|=", "task name to inspect").String()
 	mod         = app.Command("mod", "module cmd")
-	modCmd      = mod.Arg("cmd", "list | update").Required().String()
+	modCmd      = mod.Arg("cmd", "list | update | lock").Required().String()
 	//modList          = mod.Arg("list", "list module").Required().String()
 	//modUpdate        = mod.Arg("update", "update module").Required().String()
 	assist           = app.Command("assist", "assist: templatefunc|")

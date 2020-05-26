@@ -28,7 +28,7 @@ var (
 	himsg_color_printf  = color.HiWhite
 	msg_color_sprintf   = color.YellowString
 	dryrun_color_print  = color.Cyan
-	UpModuleDir         = ".upmodule"
+	UpModuleDir         = ".upmodules"
 
 	DEFAULT_CONFIG = `
 version: 1.0.0

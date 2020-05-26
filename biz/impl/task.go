@@ -324,19 +324,12 @@ func (t *Tasker) ListAllTasks() {
 	}
 }
 
-//
-//type ModuleLockItem struct {
-//	Alias string
-//	Rev   string
-//}
-//
-//type ModuleLockList []ModuleLockItem
-
 func (t *Tasker) LockModules() {
+	if !t.ValidateAllModules() {
+		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
+	}
 	u.Pln("-lock repos:")
 
-	//revlist:=loadModuleLockRevs()
-	//revList := ModuleLockList{}
 	lockMap := u.ModuleLockMap{}
 
 	mlist := (*ConfigRuntime()).Modules
@@ -345,10 +338,6 @@ func (t *Tasker) LockModules() {
 			m.Normalize()
 			m.Details()
 			rev := u.GetHeadRev(m.Dir)
-			//revList = append(revList, ModuleLockItem{
-			//	Alias: m.Alias,
-			//	Rev:   rev,
-			//})
 			lockMap[m.Alias] = rev
 		}
 	}
@@ -361,16 +350,6 @@ func (t *Tasker) LockModules() {
 	u.Pf("Please check in: [%s] into code repo", "modlock.yml")
 }
 
-func YamlToObj(srcyml string) interface{} {
-	if srcyml == "" {
-		return ""
-	}
-	obj := new(interface{})
-	err := yaml.Unmarshal([]byte(srcyml), obj)
-	u.LogErrorAndContinue("yml to object:", err, u.Spf("please validate the ymal content\n---\n%s\n---\n", u.PrintContentWithLineNuber(srcyml)))
-	return obj
-}
-
 func loadModuleLockRevs() *u.ModuleLockMap {
 	yml, err := ioutil.ReadFile("./modlock.yml")
 	u.LogErrorAndExit("load locked file", err, "read file problem, please fix it")
@@ -381,6 +360,10 @@ func loadModuleLockRevs() *u.ModuleLockMap {
 }
 
 func (t *Tasker) PullAllModules() {
+	if !t.ValidateAllModules() {
+		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
+	}
+
 	u.Pln("-pull repos:")
 
 	mlist := (*ConfigRuntime()).Modules
@@ -393,13 +376,48 @@ func (t *Tasker) PullAllModules() {
 	}
 }
 
+func (t *Tasker) ValidateAllModules() bool {
+	u.Pln("-validate all modules:")
+	mlist := (*ConfigRuntime()).Modules
+
+	namelist := []string{}
+	policies := []string{"manual", "always", "skip"}
+	errCnt := 0
+	for idx, m := range *mlist {
+		m.Normalize()
+		if u.Contains(namelist, m.Alias) {
+			u.LogErrorMsg("alias duplication error", u.Spf("%d:%s", idx+1, m.Alias))
+			errCnt += 1
+		} else {
+			namelist = append(namelist, m.Alias)
+		}
+
+		if m.Repo != "" && !u.Contains(policies, m.PullPolicy) {
+			u.LogErrorMsg("pullpolicy error", u.Spf("%d:%s", idx+1, "must be one of: manual | always | skip"))
+			errCnt += 1
+		}
+
+		if m.Repo != "" && m.Subdir != "" && m.Alias == "" {
+			u.LogErrorMsg("alias must be set", u.Spf("%d:%s", idx+1, "alias is needed to avoid confusion"))
+			errCnt += 1
+		}
+	}
+
+	if errCnt == 0 {
+		return true
+	} else {
+		return false
+	}
+
+}
+
 func (t *Tasker) ListAllModules() {
 	u.Pln("-list all modules:")
 	mlist := (*ConfigRuntime()).Modules
 
 	if mlist != nil {
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"idx", "alias", "dir", "repo", "version", "instanceid", "subdir"})
+		table.SetHeader([]string{"idx", "alias", "dir", "repo", "version", "pullpolicy", "instanceid", "subdir"})
 		for idx, m := range *mlist {
 			m.Normalize()
 			table.Append([]string{
@@ -408,12 +426,15 @@ func (t *Tasker) ListAllModules() {
 				m.Dir,
 				m.Repo,
 				m.Version,
+				m.PullPolicy,
 				m.Iid,
 				m.Subdir,
 			})
 		}
 		table.Render()
+
 	}
+	t.ValidateAllModules()
 }
 
 func (tasker *Tasker) ListTask(taskname string) {

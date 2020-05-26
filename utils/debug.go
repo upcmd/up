@@ -276,6 +276,10 @@ func LogWarn(mark string, reason string) {
 	color.Red(" WARN: [%s] - [%s]", mark, reason)
 }
 
+func LogErrorMsg(mark string, reason string) {
+	color.Red(" Error must fix: [%s] - [%s]", mark, reason)
+}
+
 func LogErrorAndExit(mark string, err interface{}, hint string) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)

@@ -168,17 +168,19 @@ func (m *Module) Normalize() {
 		}
 
 		if m.Alias == "" {
-			m.Alias = GetGitRepoName(m.Repo)
+			if m.Subdir != "" {
+				InvalidAndExit("module validation", Spf("a alias is needed to avoid confusion i use subdir [%s]", m.Subdir))
+			} else {
+				m.Alias = GetGitRepoName(m.Repo)
+			}
 		}
 
 		if m.Dir == "" {
 			m.Dir = path.Join(GetDefaultModuleDir(), m.Alias)
 		}
 
-		if m.Subdir != "" {
-			if m.Alias == "" {
-				InvalidAndExit("module validation", Spf("You need to use a alias to name the module: subdir [%s]", m.Subdir))
-			}
+		if m.Alias == "" {
+			m.Alias = GetGitRepoName(m.Repo)
 		}
 
 	}

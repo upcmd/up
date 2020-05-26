@@ -1,4 +1,3 @@
-
 version: 1.0.0
 Verbose: v
 MaxCallLayers: 8
@@ -27,3 +26,80 @@ Modules:
     version: 25456bbcd17db524d1148e42bdcc3bb36ce90042
     pullpolicy: always
 
+notes: |
+  rules:
+
+  #clone the repo, repo name will be the module name
+  #version==empty, then it will use master
+  #dir==empty, it will use cloned git repo root dir
+  #dir==empty, then mod.dir will be auto mapped to repo name
+  - repo: https://github.com/up/sayhi.git
+  _dir: sayhi
+  _alias: sayhi
+  _version: master
+  _iid: noname
+
+  #skip: if repo exist already, then skip it and do not pull, this is the default if it is not configured
+  #manual: if repo exist already, then stop processing and fails straight away
+  #always: if repo exist already, then delete it and repull from remote again
+  - repo: https://github.com/up/sayhi.git
+  pullpolicy: manual | always | skip
+
+  #if both repo and dir exist, then the repo will be cloned to be named to dir name
+  - repo: https://github.com/up/sayhi.git
+  dir: himodule
+  _alias: himodule
+  _version: master
+  _iid: noname
+
+  #this is to use sub directory ./sayhi/a/b as the module location instead of root repo dir
+  - repo: https://github.com/up/sayhi.git
+  subdir: a/b
+  _dir: sayhi
+  :>alias: require setup to make it clear what the module name is
+  _version: master
+  _iid: noname
+
+  #use version value as tag name to check it out
+  - repo: https://github.com/up/sayhi.git
+  version: 1.0.0
+  _dir: sayhi
+  _alias: sayhi
+  _iid: noname
+
+  #the alias will be a translated name to be uesd in caller's code base
+  #eg, call: hi.SayHiTask, without alias, you will have to use sayhi.SayHiTask
+  #this is to just to avoid duplicated repo name, eg: https://github.com/somethingeles/sayhi.git
+  - repo: https://github.com/up/sayhi.git
+  alias: hi
+  _version: master
+  _dir: sayhi
+  _iid: noname
+
+  #sha value is a specific value to checkout if it presents as version
+  - repo: https://github.com/up/sayhello.git
+  version: abc123e
+  _alias: sayhello
+  _dir: sayhello
+  _iid: noname
+
+  - #if there is no repo, then it will use the dir as module and incorporate as module
+  #if
+  dir: c/d
+  :>alias: require setup to make it clear what the module name is
+  _iid: noname
+
+  - #if there is no repo, then it will use the dir as module and incorporate as module
+  dir: c/d
+  alias: hi
+  _iid: noname
+
+  #you can use absolute path for dir to be the location of a module
+  - dir: /etc/c/d
+  :>alias: require setup to make it clear what the module name is
+  _iid: noname
+
+  #iid is the instance id, which could be used in module, if it is empty then use default nonamed
+  - dir: /etc/c/d
+  :>alias: require setup to make it clear what the module name is
+  iid: dev

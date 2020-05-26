@@ -4,4 +4,4 @@ wip*.yml
 result
 functests-mock
 *_TODO*
-nix-container/
+.upmodules
