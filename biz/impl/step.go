@@ -16,6 +16,7 @@ import (
 	u "github.com/stephencheng/up/utils"
 	ee "github.com/stephencheng/up/utils/error"
 	"os"
+	"path"
 	"reflect"
 	"strconv"
 	"strings"
@@ -68,11 +69,21 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 			refdir = Render(raw, execvars)
 		}
 
-		yamlvarsroot := u.YamlLoader("varsfile", refdir, step.VarsFile)
-		filevars := loadRefVars(yamlvarsroot)
+		var varsfile string
+		if step.VarsFile != "" {
+			raw := step.VarsFile
+			varsfile = Render(raw, execvars)
+		}
 
-		mergo.Merge(filevars, &step.Vars, mergo.WithOverride)
-		step.Vars = *filevars
+		filepath := path.Join(refdir, varsfile)
+		if _, err := os.Stat(filepath); !os.IsNotExist(err) {
+			yamlvarsroot := u.YamlLoader("varsfile", refdir, varsfile)
+			filevars := loadRefVars(yamlvarsroot)
+			mergo.Merge(filevars, &step.Vars, mergo.WithOverride)
+			step.Vars = *filevars
+		} else {
+			u.LogWarn("varsfile is not loaded, ignored", u.Spf("%s does not exist", filepath))
+		}
 	}
 
 	if fromBlock {

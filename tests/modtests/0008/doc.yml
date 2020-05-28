@@ -1,0 +1,16 @@
+vars:
+  folder: module
+  title: moule lock
+  weight: 2148
+  head: |
+    Showcase the module lock
+
+  sections:
+
+    - title: lock module versions
+      content: |
+        Please refer to the module command to lock all module versions
+      filelookup: modlock.yml
+
+    - title: config file - upconfig.yml
+      filelookup: upconfig.yml

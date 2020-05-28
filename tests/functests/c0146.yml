@@ -7,11 +7,13 @@ doc_meta: |
   sections:
     - title: What's the use cae of this
       content: |
-        There are two benefits using vars loaded from a file
+        There are a few benefits using vars loaded from a file
 
         1. segregate the context in local scope
 
         2. the vars externalized will be used to render the template, while they are usable in that local scope for all sub steps and sub cmd calls
+
+        A typical use case would be the batch process in the loop to load its own vars set for that loop sub call. In this case, if you use varsfile to reder template, the vars will be cached in local, they can be used not only for templating, but also in all types of func calls
 
     - title: How does it work if you have the declared varss in that func at the same time
       content: |

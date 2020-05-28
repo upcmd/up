@@ -1,0 +1,49 @@
+vars:
+  folder: module
+  title: module validation
+  weight: 2149
+  head: |
+    Showcase the validation rules apply
+
+  sections:
+    - title: rules
+      content: |
+        1. no duplicated name of module, eg alias has to be unique
+
+    - title: example
+      content: |
+        ```
+        Ξ up-project/up-gitlab git:(v2) ▶  up mod list -d ./tests/modtests/$1 -i dev --configdir=./tests/modtests/$1 -w refdir 0009
+        loading [Config]:  ./tests/modtests/0009/upconfig.yml
+        Main config:
+          Version -> 1.0.0
+          RefDir -> ./tests/modtests/0009
+          WorkDir -> refdir
+          TaskFile -> up.yml
+          Verbose -> vvv
+          ModuleName -> silly_pare9
+          MaxCallLayers -> 8
+        work dir:
+        loading [Task]:  ./up.yml
+        module: [silly_pare9] instance id: [dev]
+        -list all modules:
+          +-----+-------------------------------+----------------------------+-------------------------------------------+---------+------------+------------+--------+
+          | IDX |             ALIAS             |            DIR             |                   REPO                    | VERSION | PULLPOLICY | INSTANCEID | SUBDIR |
+          +-----+-------------------------------+----------------------------+-------------------------------------------+---------+------------+------------+--------+
+          |   1 | hello-module                  | .upmodules/hello-module    | https://github.com/upcmd/hello-module.git | master  | skip       | nonamed    |        |
+          |   2 | module-a                      | .upmodules/module-a        | https://github.com/upcmd/module-a.git     | master  | always     | nonamed    |        |
+          |   3 | himodule                      | himodule                   | https://github.com/upcmd/hello-module.git | master  | skip       | nonamed    |        |
+          |   4 | module-b-subdir               | .upmodules/module-b-subdir | https://github.com/upcmd/module-b.git     | master  | skip       | nonamed    | a/b    |
+          |   5 | module-c                      | .upmodules/module-c        | https://github.com/upcmd/module-c.git     | 1.0.0   | skip       | nonamed    |        |
+          |   6 | hi                            | .upmodules/hi              | https://github.com/upcmd/hello-module.git | master  | skip       | nonamed    |        |
+          |   7 | sayhello                      | .upmodules/sayhello        | https://github.com/up/sayhello.git        | abc123e | skip       | nonamed    |        |
+          |   8 | a_relative_dir_module         | c/d                        |                                           |         |            | nonamed    |        |
+          |   9 | himod                         | c/d                        |                                           |         |            | nonamed    |        |
+          |  10 | absolute_path_module          | /etc/c/d                   |                                           |         |            | nonamed    |        |
+          |  11 | absolute_path_with_iid_module | /etc/c/d                   |                                           |         |            | dev        |        |
+          +-----+-------------------------------+----------------------------+-------------------------------------------+---------+------------+------------+--------+
+        -validate all modules:
+        ```
+
+    - title: config file - upconfig.yml
+      filelookup: upconfig.yml

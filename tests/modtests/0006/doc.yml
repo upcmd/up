@@ -1,0 +1,17 @@
+vars:
+  folder: module
+  title: Complex call layers
+  weight: 2146
+  head: |
+    Showcase a combination of an external module call and internal func call would work properly and the vars returned from multple layers will return to caller
+
+  sections:
+    - title: config file - upconfig.yml
+      filelookup: upconfig.yml
+
+    - title: up task - up.yml
+      filelookup: up.yml
+
+    - title: up module task - up.yml
+      filelookup: hello-module/up.yml
+

@@ -381,8 +381,10 @@ func (f *CmdFuncAction) Exec() {
 					rendered = Render(string(tbuf), data)
 				}
 
-				u.LogErrorAndExit("cmd template", err, "please fix file path and name issues")
-				ioutil.WriteFile(dest, []byte(rendered), 0644)
+				u.LogErrorAndExit("read template", err, "please fix file path and name issues")
+				err = ioutil.WriteFile(dest, []byte(rendered), 0644)
+				u.LogErrorAndExit("write template", err, "please fix file path and name issues")
+
 			})
 
 		case "query":

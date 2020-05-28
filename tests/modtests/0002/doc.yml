@@ -1,17 +1,13 @@
 vars:
   folder: module
-  title: HelloWorld example
-  weight: 2140
+  title: simple vars
+  weight: 2142
   head: |
     Showcase a simplest module example by using only a sub directory
 
     It shows that the caller task to call the module task Say_world
 
   sections:
-    - title: How does it work?
-      content: |
-        If you need to call an external module task, then you will need to use module name with a dot, eg: "hello-module.Say_world" stands for module name hello-module, then call Say_world task
-
     - title: config file - upconfig.yml
       filelookup: upconfig.yml
 

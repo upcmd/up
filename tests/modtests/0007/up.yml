@@ -1,20 +1,3 @@
-doc_meta: |
-  folder: module
-  title: use alias
-  head: |
-    This demos that you can use alias as module name and use this alias to address the module then followed by dot . to inoke its task
-
-  sections:
-    - title: How does it work?
-      content: |
-        The module's name will be the name of the git repo, however there are chances that the name could be conflicted, for example:
-        * other people could publish the same named module
-        * if you use a local directory as module
-        * if you checkout a git repo but the module sits in one of its sub directories
-
-    - title: Demo
-      log: yes
-
 notes:
   - test module list
 

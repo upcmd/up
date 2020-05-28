@@ -1,21 +1,3 @@
-doc_meta: |
-  folder: module
-  title: Complex vars
-  head: |
-    Showcase how vars are passed into module task func and value returns to caller
-
-  sections:
-    - title: How does it work?
-      content: |
-        In this demo, the vars are processed exactly same way like a internal caller func invoke a callee task
-
-        So, at the entry point of the call func, it has assembled a list of execution vars. When these vars passed to callee func, these vars will firstly override callee's globle runtime vars, then override callee's local vars
-
-        The magic here is that the caller func carries external vars to influence callee's behavior, while callee still derives all necessary settings from its global runtime vars(inclding group scope vars)
-
-    - title: Demo
-      log: yes
-
 notes:
   - see if callers vars could be passed to module's func
 

@@ -1,13 +1,3 @@
-doc_meta: |
-  folder: module
-  title: Complex call layers
-  head: |
-    Showcase a combination of an external module call and internal func call would work properly and the vars returned from multple layers will return to caller
-
-  sections:
-    - title: Demo
-      log: yes
-
 notes:
   - regression test the multiple layer's call would work and vars will be handled properly
 

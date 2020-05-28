@@ -1,15 +1,3 @@
-doc_meta: |
-  folder: module
-  title: simple vars
-  head: |
-    Showcase a simplest module example by using only a sub directory
-
-    It shows that the caller task to call the module task Say_world
-
-  sections:
-    - title: Demo
-      log: yes
-
 notes:
   - see if callers vars could be passed to module's func
 
