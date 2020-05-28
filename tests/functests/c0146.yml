@@ -1,0 +1,63 @@
+doc_meta: |
+  folder: vars
+  title: local vars from file
+  head: |
+    This showcases that you can use a set of local vars loaded from a file
+
+  sections:
+    - title: What's the use cae of this
+      content: |
+        There are two benefits using vars loaded from a file
+
+        1. segregate the context in local scope
+
+        2. the vars externalized will be used to render the template, while they are usable in that local scope for all sub steps and sub cmd calls
+
+    - title: How does it work if you have the declared varss in that func at the same time
+      content: |
+        The vars from the var file will be the base, the vars declared in func will be take high priority to overwrite if it has defined in the file already.
+
+        This example shows how it works
+
+    - title: Demo
+      log: yes
+
+notes:
+  - add support to load vars in func from file
+  - refdir apply
+
+tasks:
+
+  - name: task
+    desc: mock up test to test module.template rendering
+    task:
+      - func: cmd
+        varsfile: d0146_data.yml
+        vars:
+          personname: Tom Cruise
+          school: james rules
+        do:
+          -
+            name: inspect
+            desc: the vars in caller after invoking module task
+            cmd:
+              - exec_vars
+              - exec_base_vars
+
+          -
+            name: template
+            desc: render a template file to a file 1
+            cmd:
+              src: ./tests/functests/d0145.template
+              dest: /tmp/mockup_doc.md
+
+          -
+            name: assert
+            cmd:
+              - '{{eq .personname "Tom Cruise"}}'
+              - '{{eq .school "james rules"}}'
+              - '{{eq .title "HelloWorld example"}}'
+
+      - func: shell
+        do:
+          - cat /tmp/mockup_doc.md

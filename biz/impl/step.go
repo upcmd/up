@@ -22,20 +22,21 @@ import (
 )
 
 type Step struct {
-	Name   string
-	Do     interface{} //FuncImpl
-	Dox    interface{}
-	Func   string
-	Vars   core.Cache
-	Dvars  Dvars
-	Desc   string
-	Reg    string
-	Flags  []string
-	If     string
-	Else   interface{}
-	Loop   interface{}
-	Until  string
-	RefDir string
+	Name     string
+	Do       interface{} //FuncImpl
+	Dox      interface{}
+	Func     string
+	Vars     core.Cache
+	Dvars    Dvars
+	Desc     string
+	Reg      string
+	Flags    []string
+	If       string
+	Else     interface{}
+	Loop     interface{}
+	Until    string
+	RefDir   string
+	VarsFile string
 }
 
 type Steps []Step
@@ -49,12 +50,27 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 	var execvars core.Cache
 	var resultVars *core.Cache
 
-	execvars = deepcopy.Copy(*TaskRuntime().ExecbaseVars).(core.Cache)
-	//u.Ptmpdebug("11", execvars)
+	if u.Contains(step.Flags, "pure") {
+		execvars = *core.NewCache()
+	} else {
+		execvars = deepcopy.Copy(*TaskRuntime().ExecbaseVars).(core.Cache)
+	}
 	taskVars := TaskRuntime().TaskVars
 	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
-	//u.Ptmpdebug("33", execvars)
-	//u.Ptmpdebug("44", step.Vars)
+
+	if step.VarsFile != "" {
+		refdir := ConfigRuntime().RefDir
+		if step.RefDir != "" {
+			raw := step.RefDir
+			refdir = Render(raw, execvars)
+		}
+
+		yamlvarsroot := u.YamlLoader("varsfile", refdir, step.VarsFile)
+		filevars := loadRefVars(yamlvarsroot)
+
+		mergo.Merge(filevars, &step.Vars, mergo.WithOverride)
+		step.Vars = *filevars
+	}
 
 	if fromBlock {
 		blockvars := BlockStack().GetTop().(*BlockRuntimeContext).BlockBaseVars

@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	"io/ioutil"
+	"math/rand"
 	"path"
 	"strings"
 	"time"
@@ -60,7 +61,24 @@ var (
 		"hicyan":    color.BgHiCyan,
 		"hiwhite":   color.BgHiWhite,
 	}
+
+	ColorNames = func() []string {
+		keys := make([]string, 0, len(FgColorMap))
+		for k, _ := range FgColorMap {
+			keys = append(keys, k)
+		}
+		return keys
+	}()
 )
+
+func random(min, max int) int {
+	rand.Seed(time.Now().UTC().UnixNano())
+	return rand.Intn(max-min+1) + min
+}
+
+func RandomColorName() string {
+	return ColorNames[random(0, 15)]
+}
 
 // Contains tells whether a contains x.
 func Contains(a []string, x string) bool {

@@ -1,0 +1,69 @@
+doc_meta: |
+  folder: vars
+  title: use pure local vars
+  head: |
+    This showcases that you can use pure local vars without extending the scope vars and global vars
+
+  sections:
+    - title: What's the use cae of this
+      content: |
+        Sometimes, you want all the local vars to be pure and entired isolated in its own context, then you can setup a flag - pure to protect the local vars not to be impacted by the merging process
+
+        In this case, the local vars and its sub call stack's var stack will be all protected because the sub stack will be an extention of this func call
+
+    - title: Demo
+      log: yes
+
+notes:
+  - add support to use pure local vars without global var scope
+
+vars:
+  a: aaa
+  b: bbb
+  c: ccc
+
+tasks:
+  - name: task
+    desc: mock up test to test module.template rendering
+    task:
+      - func: cmd
+        vars:
+          b: bbb
+          d: ddd
+        flags:
+          - pure
+        do:
+          -
+            name: inspect
+            desc: the vars in caller after invoking module task
+            cmd:
+              - exec_vars
+              - exec_base_vars
+          -
+            name: assert
+            cmd:
+              - '{{eq .b  "bbb"}}'
+              - '{{eq .d  "ddd"}}'
+
+      - func: call
+        vars:
+          e: first_level_eee
+          f: first_level_fff
+        flags:
+          - pure
+        do: substack
+
+  - name: substack
+    task:
+      - func: cmd
+        vars:
+          f: fff
+          g: ggg
+          h: hhh
+        do:
+            -
+              name: inspect
+              desc: the vars in caller after invoking module task
+              cmd:
+                - exec_vars
+                - exec_base_vars

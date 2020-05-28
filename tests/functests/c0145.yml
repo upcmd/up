@@ -1,0 +1,32 @@
+doc_meta: |
+  folder: cmd-func
+  title: template using data file
+  head: |
+    This showcases the feature that you can render a template using the loaded vars from a file
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  - add datafile to load the vars from the datafile
+  - refdir apply to datafile
+
+tasks:
+
+  - name: task
+    desc: mock up test to test module.template rendering
+    task:
+      - func: cmd
+        do:
+          -
+            name: template
+            desc: render a template file to a file 1
+            cmd:
+              src: ./tests/functests/d0145.template
+              dest: /tmp/mockup_doc.md
+              datafile: d0145_data.yml
+
+      - func: shell
+        do:
+          - cat /tmp/mockup_doc.md

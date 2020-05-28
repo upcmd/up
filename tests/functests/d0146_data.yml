@@ -1,0 +1,4 @@
+vars:
+  folder: module
+  title: HelloWorld example
+  personname: Tom Hanks

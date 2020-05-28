@@ -11,6 +11,7 @@ import (
 	u "github.com/stephencheng/up/utils"
 	yq "github.com/stephencheng/yq/v3/cmd"
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"strings"
 )
 
@@ -18,6 +19,12 @@ func ObjToYaml(obj interface{}) string {
 	ymlbytes, err := yaml.Marshal(&obj)
 	u.LogErrorAndExit("obj to yaml converstion", err, "yml convesion failed")
 	return string(ymlbytes)
+}
+
+func LoadObjectFromFile(filepath string) interface{} {
+	data, err := ioutil.ReadFile(filepath)
+	u.LogErrorAndExit("load object", err, "read file error")
+	return YamlToObj(string(data))
 }
 
 func YamlToObj(srcyml string) interface{} {

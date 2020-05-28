@@ -333,26 +333,45 @@ func (f *CmdFuncAction) Exec() {
 		case "template":
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
-				var src, dest, raw, datakey, datapath, rendered string
+				refdir := ConfigRuntime().RefDir
+				var src, dest, raw, datakey, datapath, datafile, rendered string
 				var data interface{}
+				dataCnt := 0
 				for k, v := range cmd {
 					switch k.(string) {
 					case "src":
 						raw = v.(string)
 						src = Render(raw, f.Vars)
+					case "refdir":
+						raw = v.(string)
+						refdir = Render(raw, f.Vars)
+					case "datafile":
+						raw = v.(string)
+						datafile = Render(raw, f.Vars)
+						dataCnt += 1
 					case "datakey":
 						raw = v.(string)
 						datakey = Render(raw, f.Vars)
 						data = f.Vars.Get(datakey)
+						dataCnt += 1
 					case "datapath":
 						raw = v.(string)
 						datapath = Render(raw, f.Vars)
 						data = core.GetSubObjectFromCache(f.Vars, datapath, false, ConfigRuntime().Verbose)
 						u.Ppmsgvvvvv("sub object:", data)
+						dataCnt += 1
 					case "dest":
 						raw = v.(string)
 						dest = Render(raw, f.Vars)
 					}
+				}
+
+				if dataCnt > 1 {
+					u.InvalidAndExit("data validation", "only one data source is alllowed")
+				}
+
+				if datafile != "" {
+					data = core.LoadObjectFromFile(path.Join(refdir, datafile))
 				}
 
 				tbuf, err := ioutil.ReadFile(src)
