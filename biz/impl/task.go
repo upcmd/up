@@ -683,7 +683,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 					IsCalledExternally: isExternalCall,
 				}
 
-				//u.Ptmpdebug("44", callerVars)
+				u.Pdebugvvvvvv(callerVars)
 				if isExternalCall {
 					var passinvars core.Cache
 					passinvars = deepcopy.Copy(*t.RuntimeVarsAndDvarsMerged).(core.Cache)
@@ -702,8 +702,8 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 					}
 				}
 
-				//u.Ptmpdebug("23", rtContext.ExecbaseVars)
-				rtContext.ExecbaseVars.Put(UP_RUNTIME_TASK_LAYER_NUMBER, TaskerRuntime().Tasker.TaskStack.GetLen())
+				u.Pdebugvvvvvv(rtContext.ExecbaseVars)
+				UpRunTimeVars.Put(UP_RUNTIME_TASK_LAYER_NUMBER, TaskerRuntime().Tasker.TaskStack.GetLen())
 
 				TaskerRuntime().Tasker.TaskStack.Push(&rtContext)
 				u.Pvvvv("Executing task stack layer:", TaskerRuntime().Tasker.TaskStack.GetLen())

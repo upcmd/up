@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	TaskerStack = stack.New("tasker")
+	TaskerStack   = stack.New("tasker")
+	UpRunTimeVars = core.NewCache()
 )
 
 const (

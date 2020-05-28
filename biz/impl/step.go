@@ -55,6 +55,9 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 	} else {
 		execvars = deepcopy.Copy(*TaskRuntime().ExecbaseVars).(core.Cache)
 	}
+
+	mergo.Merge(&execvars, UpRunTimeVars, mergo.WithOverride)
+
 	taskVars := TaskRuntime().TaskVars
 	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
 
@@ -141,7 +144,6 @@ func (step *Step) Exec(fromBlock bool) {
 	var bizErr *ee.Error = ee.New()
 	var stepExecVars *core.Cache
 	stepExecVars = step.getRuntimeExecVars(fromBlock)
-	//u.Ptmpdebug("99", stepExecVars)
 	validation(stepExecVars)
 
 	if step.Flags != nil && u.Contains(step.Flags, "pause") {
