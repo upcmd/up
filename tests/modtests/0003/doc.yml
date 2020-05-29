@@ -2,6 +2,7 @@ vars:
   folder: module
   title: return value
   weight: 2143
+  log: yes
   head: |
     Showcase the return value from module
 

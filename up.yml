@@ -58,7 +58,7 @@ tasks:
           - log_gen_impl
 
   -
-    name: log_gen_in_mac
+    name: Log_gen_in_mac
     desc: generate all logs for the docs
     task:
       -
@@ -92,10 +92,80 @@ tasks:
     task:
       -
         func: call
-        do: log_gen_impl
+        do: log_gen_module
+      -
+        func: call
+        dox: log_gen_impl
         loop:
           - c????
           - f????
+
+  -
+    name: log_gen_module
+    task:
+
+      -
+        func: shell
+        dvars:
+          - name: moduletests_dir
+            value: ./tests/modtests
+            flags:
+              - taskscope
+        desc: |
+          get mod tests dirs
+          ./0001
+          ......
+        do:
+          - 'cd {{.moduletests_dir}}; find . -name "????" -maxdepth 1 -mindepth 1 -type d|sort|cut -d\/ -f2'
+        reg: cases
+
+      - func: cmd
+        desc: get the case list object
+        dvars:
+          - name: void
+            value: '{{ .cases.Output | splitLines |reg "caselist" }}'
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: 'caselist: {{.caselist}}'
+
+      - func: call
+        do: generate_each_module_logs
+        loop: caselist
+
+  -
+    name: generate_each_module_logs
+    desc: generate logs for each module
+    task:
+      -
+        func: shell
+        dvars:
+          - name: casename
+            value: '{{.loopitem}}'
+          - name: moddir
+            value: '{{.moduletests_dir}}/{{.loopitem}}'
+          - name: shcmd
+            value: '{{.upcmd}} ngo -d {{.moddir}} -i dev --configdir={{.moddir}} -w refdir'
+            flags:
+              - vvv
+          - name: shoutput
+            value: '> {{.hugo_doc_log_dir}}/m'
+            flags:
+              - vvv
+        do:
+          - 'echo """{{.shcmd}} -v {{.loopitem}} {{.shoutput}}{{.casename}}_{{.loopitem}}.log"""'
+          - '{{.shcmd}} -v {{.loopitem}} {{.shoutput}}{{.casename}}_{{.loopitem}}.log'
+        loop:
+          - v
+          - vv
+          - vvv
+          - vvvv
+          - vvvvv
+          - vvvvvv
+          - vvvvvvv
+        flags:
+          - ignore_error
 
   -
     name: log_gen_impl

@@ -1,6 +1,7 @@
 vars:
   folder: module
   title: module validation
+  log: yes
   weight: 2149
   head: |
     Showcase the validation rules apply

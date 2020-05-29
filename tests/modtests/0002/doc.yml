@@ -2,6 +2,7 @@ vars:
   folder: module
   title: simple vars
   weight: 2142
+  log: yes
   head: |
     Showcase a simplest module example by using only a sub directory
 

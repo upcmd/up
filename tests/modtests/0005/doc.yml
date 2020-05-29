@@ -1,6 +1,7 @@
 vars:
   folder: module
   title: Complex vars
+  log: yes
   weight: 2145
   head: |
     Showcase how vars are passed into module task func and value returns to caller

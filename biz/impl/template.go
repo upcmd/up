@@ -12,6 +12,7 @@ import (
 	"github.com/Masterminds/sprig/v3"
 	u "github.com/stephencheng/up/utils"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -68,11 +69,16 @@ func FuncMapInit() {
 			return ""
 		},
 		"filecontent": func(filepath string) string {
-			content, err := ioutil.ReadFile(filepath)
-			if err != nil {
+			if _, err := os.Stat(filepath); os.IsNotExist(err) {
 				u.LogWarn("filecontent readfile", u.Spf("please fix file path: %s", filepath))
+				return ""
+			} else {
+				content, err := ioutil.ReadFile(filepath)
+				if err != nil {
+					u.LogWarn("filecontent readfile", u.Spf("please fix file read error, path: %s", filepath))
+				}
+				return string(content)
 			}
-			return string(content)
 		},
 		"validateMandatoryFailIfNone": func(varname, varvalue string) string {
 			if varvalue == "" {

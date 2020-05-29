@@ -1,6 +1,7 @@
 vars:
   folder: module
   title: Complex call layers
+  log: yes
   weight: 2146
   head: |
     Showcase a combination of an external module call and internal func call would work properly and the vars returned from multple layers will return to caller

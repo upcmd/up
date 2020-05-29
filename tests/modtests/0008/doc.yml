@@ -1,6 +1,7 @@
 vars:
   folder: module
   title: moule lock
+  log: yes
   weight: 2148
   head: |
     Showcase the module lock

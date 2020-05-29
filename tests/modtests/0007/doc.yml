@@ -1,6 +1,7 @@
 vars:
   folder: module
   title: use alias
+  log: yes
   weight: 2147
   head: |
     This demos that you can use alias as module name and use this alias to address the module then followed by dot . to inoke its task

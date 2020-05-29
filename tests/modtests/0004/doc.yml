@@ -2,6 +2,7 @@ vars:
   folder: module
   title: jailed exec context
   weight: 2144
+  log: yes
   head: |
     Showcase that the execution context for module will be jaied in its own exontext based on its own configuration or default settings
 
