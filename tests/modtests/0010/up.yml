@@ -1,0 +1,8 @@
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: call
+        do: hello-module.Say_hello

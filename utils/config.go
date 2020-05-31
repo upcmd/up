@@ -85,6 +85,7 @@ func (cfg *UpConfig) InitConfig() *UpConfig {
 	if cfg.ModuleName == "" {
 		cfg.ModuleName = GetRandomName(1)
 	}
+
 	return cfg
 }
 

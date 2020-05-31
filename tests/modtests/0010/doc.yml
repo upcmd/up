@@ -1,0 +1,77 @@
+vars:
+  folder: module
+  title: multi module calls
+  weight: 2150
+  log: yes
+  head: |
+    Showcase the multple module calls
+
+    Things will get complicated if your main task invoke a module A.taskA, then module A result in another task call to module B.taskB.
+
+    Many programming language has the issue of dependency hell. It will break simply becuase of different version of different modules
+
+    UP cmd support two approaches to manage the dependencies, in this case, we introduce the basic one, manage the dependency statically under its own module path
+
+  sections:
+    - title: How does it work?
+      content: |
+        Simply saying, you will define all required modules and versions in that module's configuration upconfig.yml file. It's like a jailed execution for that module to pull all required modules and defined versions
+
+        ```
+        myproject
+        ├── doc.yml
+        ├── hello-module
+        │   ├── hi-module
+        │   │   └── up.yml
+        │   ├── up.yml
+        │   └── upconfig.yml
+        ├── world-module
+        │   ├── hi-module
+        │   │   └── up.yml
+        │   ├── up.yml
+        │   └── upconfig.yml
+        ├── up.yml
+        └── upconfig.yml
+        ```
+
+        In this case, the call flow is:
+        ```
+        main task -> hello-module.Say_hello -> hi-module.Say_hi
+        ```
+
+        The below module config to call hi-module will be under management of hello-module, in myproject/hello-module/upconfig.yml
+        ```
+        Modules:
+
+          -
+            dir: hi-module/
+            alias: hi-module
+        ```
+
+        Please notice that the world-module is configured in the same way, the hi-module is in its own path but not globally shared and dynamically linked
+
+        pros:
+        * the callee module is statically linked
+        * the callee module could be different version, so there is no compatibility issue at all, hence there won't be problems like below:
+          * the time you upgrade is the time start failing
+          * demanding one version fitting all
+          * demanding you will have to upgrade all components' version so that it could work
+
+        con:
+        * not too much, the only down side is the possible duplication of same version of module sitting in multiple places, but these codes will be gitignored if the module is a git repo, hence you will not be too disturbed at all
+
+
+    - title: config file - upconfig.yml
+      filelookup: upconfig.yml
+
+    - title: up task - up.yml
+      filelookup: up.yml
+
+    - title: up module task - up.yml
+      filelookup: hello-module/up.yml
+
+    - title: up module config - upconfig.yml
+      filelookup: hello-module/upconfig.yml
+
+    - title: hi module task - up.yml
+      filelookup: hello-module/hi-module/up.yml

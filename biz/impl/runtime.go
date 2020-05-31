@@ -11,11 +11,13 @@ import (
 	"github.com/stephencheng/up/model/core"
 	"github.com/stephencheng/up/model/stack"
 	"github.com/stephencheng/up/utils"
+	u "github.com/stephencheng/up/utils"
 )
 
 var (
 	TaskerStack   = stack.New("tasker")
 	UpRunTimeVars = core.NewCache()
+	BaseDir       string
 )
 
 const (
@@ -41,6 +43,14 @@ func TaskRuntime() *TaskRuntimeContext {
 
 func SetDryrun() {
 	TaskerRuntime().Tasker.Dryrun = true
+}
+
+func SetBaseDir(dir string) {
+	BaseDir = dir
+}
+
+func GetBaseModuleName() string {
+	return u.MainConfig.ModuleName
 }
 
 type ExecResult struct {

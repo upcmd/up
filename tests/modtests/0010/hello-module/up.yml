@@ -1,0 +1,26 @@
+
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: shell
+        desc: main job
+        do:
+          - echo "hello "
+  -
+    name: Say_hello
+    task:
+      -
+        func: cmd
+        vars:
+          a: aaa
+        do:
+          - name: print
+            cmd: "... hello"
+
+      -
+        func: call
+        do: hi-module.Say_hi
+

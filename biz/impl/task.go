@@ -577,68 +577,75 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 		}
 	}()
 
-	//u.Ptmpdebug("11", ConfigRuntime().Modules)
-
 	if modname == "self" {
 		TaskerRuntime().Tasker.ExecTask(taskname, callerVars, false)
 	} else {
-		cwd, err := os.Getwd()
+		if modname == GetBaseModuleName() {
+			u.InvalidAndExit("module name should not be the same as the main caller", "please check your task configuration")
+		} else {
 
-		if err != nil {
-			u.LogErrorAndExit("cwd", err, "working directory error")
-		}
+			cwd, err := os.Getwd()
 
-		mods := TaskerRuntime().Tasker.Config.Modules
-		//u.Pdebug(TaskerRuntime().Tasker.Config)
-		if mods != nil {
-			mod := u.Modules(TaskerRuntime().Tasker.Config.Modules).LocateModule(modname)
-			//u.Pdebug(cwd, mod)
-			//mdir := "hello-module/"
-			//iid := "dev"
-
-			if mod != nil {
-				func() {
-					//TODO: exclude the subdir case
-					//if "strategy" == "strategy" {
-
-					//} else {
-					if _, err := os.Stat(mod.Dir); !os.IsNotExist(err) {
-						os.Chdir(mod.Dir)
-						/*
-							in module loading, since you can not pass in the cli options, so:
-							version: will not be used at all
-							Verbose: determined by caller, so not relevant
-							MaxCallLayers: determined by caller
-							RefDir: applied
-							TaskFile: applied
-							ConfigDir: will not be used at all since no cli option to override this, it will be always be current dir .
-							ConfigFile: will not be used at all since no cli option to override this, it will be always be upconfig.yml from default
-						*/
-						mcfg := u.NewUpConfig("", "")
-						mcfg.SetModulename(modname)
-						mcfg.InitConfig()
-						taskerCaller := TaskerRuntime().Tasker
-						mTasker := NewTasker(mod.Iid, mcfg)
-						TaskerRuntime().TaskerCaller = taskerCaller
-						u.Pf("=>call module: [%s] task: [%s]\n", modname, taskname)
-						//u.Ptmpdebug("55", callerVars)
-						mTasker.ExecTask(taskname, callerVars, true)
-						TaskerStack.Pop()
-						os.Chdir(cwd)
-					} else {
-						//TODO: put the reasoning into the doco: not to auto update to avoid evil code injection problem
-						u.InvalidAndExit(u.Spf("module dir: [%s] does not exist under: [%s]\n", mod.Dir, cwd), "double check if you have change your module configuration, then you will probably need to update module again")
-					}
-					//}
-				}()
-			} else {
-				u.LogWarn("locating module name failed", u.Spf("module name: [%s] does not exist", modname))
-				TaskerRuntime().Tasker.ListAllModules()
+			if err != nil {
+				u.LogErrorAndExit("cwd", err, "working directory error")
 			}
 
-		} else {
-			callerName := TaskerRuntime().Tasker.Config.ModuleName
-			u.InvalidAndExit(u.Spf("caller Module [%s] is not configured,", callerName), u.Spf("module: [%s], task: [%s]", modname, taskname))
+			mods := TaskerRuntime().Tasker.Config.Modules
+			//u.Pdebug(TaskerRuntime().Tasker.Config)
+			if mods != nil {
+				mod := u.Modules(TaskerRuntime().Tasker.Config.Modules).LocateModule(modname)
+				//u.Pdebug(cwd, mod)
+				//mdir := "hello-module/"
+				//iid := "dev"
+
+				if mod != nil {
+					func() {
+						//TODO: exclude the subdir case
+						var modpath string
+						if path.IsAbs(mod.Dir) {
+							modpath = mod.Dir
+						} else {
+							modpath = path.Clean(path.Join(BaseDir, mod.Dir))
+						}
+						os.Chdir(modpath)
+						u.Pdebugvvvvvv(modpath)
+						if _, err := os.Stat(modpath); !os.IsNotExist(err) {
+							/*
+								in module loading, since you can not pass in the cli options, so:
+								version: will not be used at all
+								Verbose: determined by caller, so not relevant
+								MaxCallLayers: determined by caller
+								RefDir: applied
+								TaskFile: applied
+								ConfigDir: will not be used at all since no cli option to override this, it will be always be current dir .
+								ConfigFile: will not be used at all since no cli option to override this, it will be always be upconfig.yml from default
+							*/
+							mcfg := u.NewUpConfig("", "")
+							mcfg.SetModulename(modname)
+							mcfg.InitConfig()
+							taskerCaller := TaskerRuntime().Tasker
+							mTasker := NewTasker(mod.Iid, mcfg)
+							TaskerRuntime().TaskerCaller = taskerCaller
+							u.Pf("=>call module: [%s] task: [%s]\n", modname, taskname)
+							//u.Ptmpdebug("55", callerVars)
+							mTasker.ExecTask(taskname, callerVars, true)
+							TaskerStack.Pop()
+							os.Chdir(cwd)
+						} else {
+							//TODO: put the reasoning into the doco: not to auto update to avoid evil code injection problem
+							u.InvalidAndExit(u.Spf("module dir: [%s] does not exist under: [%s]\n", mod.Dir, cwd), "double check if you have change your module configuration, then you will probably need to update module again")
+						}
+						//}
+					}()
+				} else {
+					u.LogWarn("locating module name failed", u.Spf("module name: [%s] does not exist", modname))
+					TaskerRuntime().Tasker.ListAllModules()
+				}
+
+			} else {
+				callerName := TaskerRuntime().Tasker.Config.ModuleName
+				u.InvalidAndExit(u.Spf("caller Module [%s] is not configured,", callerName), u.Spf("module: [%s], task: [%s]", modname, taskname))
+			}
 		}
 
 	}

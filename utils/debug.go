@@ -192,13 +192,23 @@ func Pdebug(a ...interface{}) {
 	frames := runtime.CallersFrames(pc[:n])
 	frame, _ := frames.Next()
 	loc := fmt.Sprintf("  %s:%d %s", frame.File, frame.Line, frame.Function)
-
 	hiColor.Printf("------start-----\n[%s]\n\n%s\n------end-----\n\n", loc, spewMsgState.Sdump(a...))
+
+}
+
+func PdebugStack(a ...interface{}) {
+	Pln("==>")
+	Pdebug(a)
+	debug.PrintStack()
+	Pln("<==")
 }
 
 func Pdebugvvvvvv(a ...interface{}) {
 	if permitted("vvvvv") {
+		Pln("==>")
 		Pdebug(a)
+		debug.PrintStack()
+		Pln("<==")
 	}
 }
 

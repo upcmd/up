@@ -199,7 +199,7 @@ func (cfg *UpConfig) SetRefdir(refdir string) {
 	}
 }
 
-func (cfg *UpConfig) GetWorkdir() (wkdir string) {
+func (cfg *UpConfig) GetWorkdirOld() (wkdir string) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		LogErrorAndExit("GetWorkdir", err, "working directory error")
@@ -220,6 +220,33 @@ func (cfg *UpConfig) GetWorkdir() (wkdir string) {
 	} else {
 		InvalidAndExit("GetWorkdir", "Work dir setup is not proper")
 	}
+	return
+}
+
+//return abs path
+func (cfg *UpConfig) GetWorkdir() (wkdir string) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		LogErrorAndExit("GetWorkdir", err, "working directory error")
+	}
+
+	if cfg.WorkDir == "cwd" {
+		wkdir = cwd
+	} else if cfg.WorkDir == "refdir" {
+		if path.IsAbs(cfg.RefDir) {
+			if _, err := os.Stat(cfg.RefDir); !os.IsNotExist(err) {
+				wkdir = cfg.RefDir
+			}
+		} else {
+			abspath := path.Clean(path.Join(cwd, cfg.RefDir))
+			if _, err := os.Stat(abspath); !os.IsNotExist(err) {
+				wkdir = abspath
+			}
+		}
+	} else {
+		InvalidAndExit("GetWorkdir", "Work dir setup is not proper")
+	}
+
 	return
 }
 
