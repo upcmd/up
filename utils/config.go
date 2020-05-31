@@ -88,10 +88,3 @@ func (cfg *UpConfig) InitConfig() *UpConfig {
 	return cfg
 }
 
-//for unit test only
-//func SetMockConfig() {
-//cfg := new(model.UpConfig)
-//UpConfig = cfg
-//UpConfig.Verbose = "vvvv"
-//}
-

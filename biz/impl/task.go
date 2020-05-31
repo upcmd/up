@@ -334,7 +334,7 @@ func (t *Tasker) LockModules() {
 
 	mlist := (*ConfigRuntime()).Modules
 	if mlist != nil {
-		for _, m := range *mlist {
+		for _, m := range mlist {
 			m.Normalize()
 			m.Details()
 			rev := u.GetHeadRev(m.Dir)
@@ -369,7 +369,7 @@ func (t *Tasker) PullAllModules() {
 	mlist := (*ConfigRuntime()).Modules
 	lockMap := loadModuleLockRevs()
 	if mlist != nil {
-		for _, m := range *mlist {
+		for _, m := range mlist {
 			m.Normalize()
 			m.PullRepo(lockMap, t.Config.ModuleLock)
 		}
@@ -383,7 +383,7 @@ func (t *Tasker) ValidateAllModules() bool {
 	namelist := []string{}
 	policies := []string{"manual", "always", "skip"}
 	errCnt := 0
-	for idx, m := range *mlist {
+	for idx, m := range mlist {
 		m.Normalize()
 		if u.Contains(namelist, m.Alias) {
 			u.LogErrorMsg("alias duplication error", u.Spf("%d:%s", idx+1, m.Alias))
@@ -418,7 +418,7 @@ func (t *Tasker) ListAllModules() {
 	if mlist != nil {
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"idx", "alias", "dir", "repo", "version", "pullpolicy", "instanceid", "subdir"})
-		for idx, m := range *mlist {
+		for idx, m := range mlist {
 			m.Normalize()
 			table.Append([]string{
 				strconv.Itoa(idx + 1),
@@ -588,49 +588,59 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 			u.LogErrorAndExit("cwd", err, "working directory error")
 		}
 
-		//(mods *Modules) LocateModule(modname string) *Module
-		mod := u.Modules(*TaskerRuntime().Tasker.Config.Modules).LocateModule(modname)
-		u.Ptmpdebug("33", cwd, mod)
-		//mdir := "hello-module/"
-		//iid := "dev"
+		mods := TaskerRuntime().Tasker.Config.Modules
+		//u.Pdebug(TaskerRuntime().Tasker.Config)
+		if mods != nil {
+			mod := u.Modules(TaskerRuntime().Tasker.Config.Modules).LocateModule(modname)
+			//u.Pdebug(cwd, mod)
+			//mdir := "hello-module/"
+			//iid := "dev"
 
-		if mod != nil {
-			func() {
-				//TODO: exclude the subdir case
+			if mod != nil {
+				func() {
+					//TODO: exclude the subdir case
+					//if "strategy" == "strategy" {
 
-				if _, err := os.Stat(mod.Dir); !os.IsNotExist(err) {
-					os.Chdir(mod.Dir)
-					/*
-						in module loading, since you can not pass in the cli options, so:
-						version: will not be used at all
-						Verbose: determined by caller, so not relevant
-						MaxCallLayers: determined by caller
-						RefDir: applied
-						TaskFile: applied
-						ConfigDir: will not be used at all since no cli option to override this, it will be always be current dir .
-						ConfigFile: will not be used at all since no cli option to override this, it will be always be upconfig.yml from default
-					*/
-					mcfg := u.NewUpConfig("", "")
-					mcfg.SetModulename(modname)
-					mcfg.InitConfig()
-					taskerCaller := TaskerRuntime().Tasker
-					mTasker := NewTasker(mod.Iid, mcfg)
-					TaskerRuntime().TaskerCaller = taskerCaller
-					u.Pf("=>call module: [%s] task: [%s]\n", modname, taskname)
-					//u.Ptmpdebug("55", callerVars)
-					mTasker.ExecTask(taskname, callerVars, true)
-					TaskerStack.Pop()
-					os.Chdir(cwd)
-				} else {
-					//TODO: put the reasoning into the doco: not to auto update to avoid evil code injection problem
-					u.InvalidAndExit("module dir does not exist", "double check if you have change your module configuration, then you will probably need to update module again")
-				}
+					//} else {
+					if _, err := os.Stat(mod.Dir); !os.IsNotExist(err) {
+						os.Chdir(mod.Dir)
+						/*
+							in module loading, since you can not pass in the cli options, so:
+							version: will not be used at all
+							Verbose: determined by caller, so not relevant
+							MaxCallLayers: determined by caller
+							RefDir: applied
+							TaskFile: applied
+							ConfigDir: will not be used at all since no cli option to override this, it will be always be current dir .
+							ConfigFile: will not be used at all since no cli option to override this, it will be always be upconfig.yml from default
+						*/
+						mcfg := u.NewUpConfig("", "")
+						mcfg.SetModulename(modname)
+						mcfg.InitConfig()
+						taskerCaller := TaskerRuntime().Tasker
+						mTasker := NewTasker(mod.Iid, mcfg)
+						TaskerRuntime().TaskerCaller = taskerCaller
+						u.Pf("=>call module: [%s] task: [%s]\n", modname, taskname)
+						//u.Ptmpdebug("55", callerVars)
+						mTasker.ExecTask(taskname, callerVars, true)
+						TaskerStack.Pop()
+						os.Chdir(cwd)
+					} else {
+						//TODO: put the reasoning into the doco: not to auto update to avoid evil code injection problem
+						u.InvalidAndExit(u.Spf("module dir: [%s] does not exist under: [%s]\n", mod.Dir, cwd), "double check if you have change your module configuration, then you will probably need to update module again")
+					}
+					//}
+				}()
+			} else {
+				u.LogWarn("locating module name failed", u.Spf("module name: [%s] does not exist", modname))
+				TaskerRuntime().Tasker.ListAllModules()
+			}
 
-			}()
 		} else {
-			u.LogWarn("locating module name failed", u.Spf("module name: [%s] does not exist", modname))
-			TaskerRuntime().Tasker.ListAllModules()
+			callerName := TaskerRuntime().Tasker.Config.ModuleName
+			u.InvalidAndExit(u.Spf("caller Module [%s] is not configured,", callerName), u.Spf("module: [%s], task: [%s]", modname, taskname))
 		}
+
 	}
 
 }

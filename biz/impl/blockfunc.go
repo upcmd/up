@@ -320,8 +320,6 @@ func (step *Step) getRuntimeExecVarsTest(mark string) *core.Cache {
 
 	execvars = deepcopy.Copy(*TaskRuntime().ExecbaseVars).(core.Cache)
 
-	//u.Ptmpdebug("11", execvars)
-	//u.Ptmpdebug("11", "blcok get runtime")
 	taskVars := TaskRuntime().TaskVars
 	mergo.Merge(&execvars, taskVars, mergo.WithOverride)
 	//u.Ptmpdebug("33", execvars)

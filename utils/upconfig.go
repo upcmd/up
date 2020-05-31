@@ -45,9 +45,10 @@ type UpConfig struct {
 	Verbose       string
 	ModuleName    string
 	MaxCallLayers string
-	Secure        *SecureSetting
-	Modules       *[]Module
-	ModuleLock    bool
+	//TODO: get rid of pointer as it will result in nil pointer loading issue
+	Secure     *SecureSetting
+	Modules    []Module
+	ModuleLock bool
 }
 
 type Modules []Module
