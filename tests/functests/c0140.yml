@@ -30,7 +30,7 @@ doc_meta: |
 
 tasks:
   -
-    name: Main
+    name: task
     desc: main entry
     task:
       -

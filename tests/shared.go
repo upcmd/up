@@ -73,7 +73,7 @@ func GetUnitTestCollection() []string {
 	_, filename, _, _ := runtime.Caller(1)
 	dir := path.Dir(filename)
 
-	files, err := filepath.Glob(u.Spfv("%s/%s", dir, "c0*.yml"))
+	files, err := filepath.Glob(u.Spfv("%s/%s", dir, "c????.yml"))
 	u.LogError("list func test cases", err)
 
 	for _, f := range files {
