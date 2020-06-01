@@ -12,6 +12,8 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/olekukonko/tablewriter"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"os"
 	"path"
 	"reflect"
@@ -55,6 +57,21 @@ type Modules []Module
 
 type ModuleLockMap map[string]string
 
+func LoadModuleLockRevs() *ModuleLockMap {
+	lockfile := "./modlock.yml"
+	if _, err := os.Stat(lockfile); !os.IsNotExist(err) {
+		yml, err := ioutil.ReadFile(lockfile)
+		LogErrorAndExit("load locked file", err, "read file problem, please fix it")
+		revs := ModuleLockMap{}
+		err = yaml.Unmarshal(yml, &revs)
+		LogErrorAndExit("load locked revs", err, "the lock file has got configuration problem, please fix it")
+		return &revs
+	} else {
+		return nil
+	}
+
+}
+
 func (ms Modules) LocateModule(modname string) *Module {
 	for _, m := range ms {
 		m.Normalize()
@@ -65,43 +82,12 @@ func (ms Modules) LocateModule(modname string) *Module {
 	return nil
 }
 
-func (m *Module) PullRepo(revMap *ModuleLockMap, uselock bool) {
-	println("pull repo")
-	m.Details()
-	clone := func() {
-		_, err := git.PlainClone(m.Dir, false, &git.CloneOptions{
-			URL:      m.Repo,
-			Progress: os.Stdout,
-		})
-		LogErrorAndExit("Clone Module", err, "Clone errored, please fix the issue first and retry")
-	}
-	Ptmpdebug("12", m.Dir)
-	if _, err := os.Stat(m.Dir); !os.IsNotExist(err) {
-		if m.PullPolicy == "always" {
-			Pf("removing %s ...", m.Dir)
-			err := os.RemoveAll(m.Dir)
-			LogErrorAndExit("Remove directory", err, Spf("removing [%s] failed", m.Dir))
-			clone()
-		} else if m.PullPolicy == "skip" {
-			LogWarn("module repo exist: skipped", Spf("repo: [%s]", m.Dir))
-		} else if m.PullPolicy == "manual" {
-			InvalidAndExit(Spf("repo: [%s] already exist", m.Dir),
-				`manual resolution need:
-1. You can git pull to update the module
-2. If you work on the module, then you will need to commit and push your code accordingly, or
-3. You will need to just delete it by yourself, or
-4. Use pull policy: skip to not to do anything until you decide`)
-		}
-	} else {
-		clone()
-	}
-
-	println("checkout version")
+func (m *Module) getVersionAndPath() (string, string) {
+	var versionDecided string
+	lockMap := LoadModuleLockRevs()
 	if m.Version != "" {
-		var versionDecided string
-
-		if uselock {
-			if lockedVersion, ok := (*revMap)[m.Alias]; ok {
+		if MainConfig.ModuleLock {
+			if lockedVersion, ok := (*lockMap)[m.Alias]; ok {
 				if lockedVersion != m.Version {
 					if !strings.Contains(lockedVersion, m.Version) {
 						LogWarn("Locked version differs, use locked version", Spf("locked: %s, configured: %s", lockedVersion, m.Version))
@@ -114,11 +100,55 @@ func (m *Module) PullRepo(revMap *ModuleLockMap, uselock bool) {
 		if versionDecided == "" {
 			versionDecided = m.Version
 		}
+	}
 
+	clonePath := m.Dir
+	if versionDecided != "" {
+		clonePath = Spf("%s@%s", m.Dir, versionDecided)
+	}
+
+	return versionDecided, clonePath
+}
+
+func (m *Module) PullRepo(revMap *ModuleLockMap, uselock bool) {
+
+	clonePath := m.Dir
+	m.ShowDetails()
+	clone := func() {
+		_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
+			URL:      m.Repo,
+			Progress: os.Stdout,
+		})
+		LogErrorAndExit("Clone Module", err, "Clone errored, please fix the issue first and retry")
+	}
+
+	if _, err := os.Stat(clonePath); !os.IsNotExist(err) {
+		if m.PullPolicy == "always" {
+			Pf("removing %s ...", clonePath)
+			err := os.RemoveAll(clonePath)
+			LogErrorAndExit("Remove directory", err, Spf("removing [%s] failed", clonePath))
+			clone()
+		} else if m.PullPolicy == "skip" {
+			LogWarn("module repo exist: skipped", Spf("repo: [%s]", clonePath))
+		} else if m.PullPolicy == "manual" {
+			InvalidAndExit(Spf("repo: [%s] already exist", clonePath),
+				`manual resolution need:
+1. You can git pull to update the module
+2. If you work on the module, then you will need to commit and push your code accordingly, or
+3. You will need to just delete it by yourself, or
+4. Use pull policy: skip to not to do anything until you decide`)
+		}
+	} else {
+		clone()
+	}
+
+	Pln("checkout version")
+	versionDecided := m.Version
+	if versionDecided != "" {
 		cmd := Spf("git checkout %s", versionDecided)
 		Pf("checkout version: %s ...\n", versionDecided)
 		Pln(cmd)
-		err := RunShellCmd(m.Dir, cmd)
+		err := RunShellCmd(clonePath, cmd)
 		if err != nil {
 			LogWarn("checkout version", `
 You may want to re-pull the repo again to ensure it is up to date to avoid missing branch, commit or tag
@@ -135,7 +165,7 @@ func GetHeadRev(repodir string) string {
 	return (h.String())
 }
 
-func (m *Module) Details() {
+func (m *Module) ShowDetails() {
 	if m != nil {
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"property", "value"})
@@ -177,7 +207,9 @@ func (m *Module) Normalize() {
 		}
 
 		if m.Dir == "" {
-			m.Dir = path.Join(GetDefaultModuleDir(), m.Alias)
+			_, clonePath := m.getVersionAndPath()
+			//m.Dir = path.Join(GetDefaultModuleDir(), m.Alias)
+			m.Dir = Spf("%s%s", path.Join(GetDefaultModuleDir(), m.Alias), clonePath)
 		}
 
 		if m.Alias == "" {
@@ -240,6 +272,7 @@ func (cfg *UpConfig) GetWorkdir() (wkdir string) {
 		} else {
 			abspath := path.Clean(path.Join(cwd, cfg.RefDir))
 			if _, err := os.Stat(abspath); !os.IsNotExist(err) {
+				Pdebug(abspath)
 				wkdir = abspath
 			}
 		}

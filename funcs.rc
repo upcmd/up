@@ -76,6 +76,17 @@ mlistx(){
 }
 
 
+mcleanx(){
+  if [ "$1" == "" ];then
+    echo "please input the casename(dir name)"
+  else
+    dir=./tests/modtests/$1
+    goup mod clean -d $dir -i dev --configdir=$dir -w refdir
+  fi
+}
+
+
+
 mupdatex(){
   if [ "$1" == "" ];then
     echo "please input the casename(dir name)"

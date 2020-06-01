@@ -182,18 +182,18 @@ func Ptmpdebug(mark string, a ...interface{}) {
 	hiColor.Printf("------%s start-----\n%s\n------%s end-----\n\n", mark, spewMsgState.Sdump(a...), mark)
 }
 
+func PdebugN(mark int, a ...interface{}) {
+	Pdebug(mark, a)
+}
+
 func Pdebug(a ...interface{}) {
-
-	//hiColor := color.New(color.FgHiWhite, color.BgRed)
 	hiColor := color.New(FgColorMap[RandomColorName()], BgColorMap[RandomColorName()])
-
 	pc := make([]uintptr, 15)
 	n := runtime.Callers(2, pc)
 	frames := runtime.CallersFrames(pc[:n])
 	frame, _ := frames.Next()
 	loc := fmt.Sprintf("  %s:%d %s", frame.File, frame.Line, frame.Function)
 	hiColor.Printf("------start-----\n[%s]\n\n%s\n------end-----\n\n", loc, spewMsgState.Sdump(a...))
-
 }
 
 func PdebugStack(a ...interface{}) {

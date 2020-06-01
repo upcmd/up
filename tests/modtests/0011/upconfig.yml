@@ -1,0 +1,31 @@
+
+version: 1.0.0
+Verbose: vvv
+MaxCallLayers: 8
+RefDir: .
+TaskFile: up.yml
+ConfigDir: .
+ConfigFile: upconfig.yml
+
+Modules:
+
+  - #if there is no repo, then it will use the dir as module and incorporate as module
+    dir: hello-module/
+    alias: hello-module
+
+  - repo: https://github.com/upcmd/hello-module.git
+    alias: hello
+    #v2 is a branch
+    version: v2
+    pullpolicy: skip
+
+  - repo: https://github.com/upcmd/hello-module.git
+    alias: hello-dummy1
+    version: master
+    pullpolicy: always
+
+  - repo: https://github.com/upcmd/hello-module.git
+    alias: hello-dummy2
+    #    version: e8e9dc5
+    version: 25456bbcd17db524d1148e42bdcc3bb36ce90042
+    pullpolicy: always

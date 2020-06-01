@@ -8,6 +8,7 @@
 package tests
 
 import (
+	"github.com/stephencheng/up/biz/impl"
 	u "github.com/stephencheng/up/utils"
 	"os"
 )
@@ -15,11 +16,14 @@ import (
 //mock required settings
 func SetupMx(dirpath string) *u.UpConfig {
 	cfg := u.NewUpConfig(dirpath, "").InitConfig()
-	u.Pln("work dir:", cfg.GetWorkdir())
 	cfg.Secure = &u.SecureSetting{Type: "default_aes", Key: "enc_key"}
 	cfg.RefDir = dirpath
 	cfg.WorkDir = "refdir"
-	os.Chdir(cfg.GetWorkdir())
+	u.MainConfig = cfg
+	wkdir := cfg.GetWorkdir()
+	u.Pln("work dir:", wkdir)
+	impl.SetBaseDir(wkdir)
+	os.Chdir(wkdir)
 	cfg.ShowCoreConfig("moduletest")
 	u.Ppmsgvvvvhint("core config", cfg)
 	u.Pln(" :test task file:", cfg.TaskFile)

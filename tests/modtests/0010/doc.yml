@@ -10,24 +10,21 @@ vars:
 
     Many programming language has the issue of dependency hell. It will break simply becuase of different version of different modules
 
-    UP cmd support two approaches to manage the dependencies, in this case, we introduce the basic one, manage the dependency statically under its own module path
+    UP cmd support two approaches to manage the dependencies, the first one s to manage the dependency statically under a local directory, either it is a relative direectory to your work directory, or abosolute path in your system; the second one is to manage multiple versions of same module in its version directories
 
   sections:
-    - title: How does it work?
+    - title: Use local directory as module code base
       content: |
         Simply saying, you will define all required modules and versions in that module's configuration upconfig.yml file. It's like a jailed execution for that module to pull all required modules and defined versions
 
         ```
         myproject
-        ├── doc.yml
         ├── hello-module
-        │   ├── hi-module
-        │   │   └── up.yml
         │   ├── up.yml
         │   └── upconfig.yml
+        ├── hi-module
+        │   └── up.yml
         ├── world-module
-        │   ├── hi-module
-        │   │   └── up.yml
         │   ├── up.yml
         │   └── upconfig.yml
         ├── up.yml
@@ -52,13 +49,16 @@ vars:
 
         pros:
         * the callee module is statically linked
-        * the callee module could be different version, so there is no compatibility issue at all, hence there won't be problems like below:
+        * the callee module could be different version, so there is no compatibility issue at all, hence it will utterly avoid problems like below:
           * the time you upgrade is the time start failing
           * demanding one version fitting all
-          * demanding you will have to upgrade all components' version so that it could work
+          * demanding you must upgrade all components' version so that the code could work
 
         con:
-        * not too much, the only down side is the possible duplication of same version of module sitting in multiple places, but these codes will be gitignored if the module is a git repo, hence you will not be too disturbed at all
+        * none
+
+        When your code is maturer enough, you might want to publish your own local module directory under your project code base. You wrap up code into an exported task, check in your module directory as a git repo. You can start sharing module with different teams and after that you can use the second way to refer to the module using your repo url and remove your local directory from your project code base.
+
 
 
     - title: config file - upconfig.yml

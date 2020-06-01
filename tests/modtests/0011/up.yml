@@ -1,0 +1,25 @@
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: call
+        do: hello-module.Say_hello
+
+      -
+        func: call
+        do: hello.Say_hello
+
+      -
+        func: call
+        do: hello.Say_hello
+
+      -
+        func: call
+        do: hello-dummy1.Say_world
+
+      -
+        func: call
+        do: hello-dummy2.Say_hello
+

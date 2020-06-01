@@ -19,7 +19,6 @@ import (
 	"github.com/stephencheng/up/model/stack"
 	u "github.com/stephencheng/up/utils"
 	"github.com/xlab/treeprint"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"path"
@@ -336,7 +335,7 @@ func (t *Tasker) LockModules() {
 	if mlist != nil {
 		for _, m := range mlist {
 			m.Normalize()
-			m.Details()
+			m.ShowDetails()
 			rev := u.GetHeadRev(m.Dir)
 			lockMap[m.Alias] = rev
 		}
@@ -345,18 +344,19 @@ func (t *Tasker) LockModules() {
 	u.Pln("versions:")
 	u.Ppmsg(lockMap)
 	lockYml := core.ObjToYaml(lockMap)
-	//lockYml := core.ObjToYaml(revList)
 	ioutil.WriteFile("./modlock.yml", []byte(lockYml), 0644)
 	u.Pf("Please check in: [%s] into code repo", "modlock.yml")
 }
 
-func loadModuleLockRevs() *u.ModuleLockMap {
-	yml, err := ioutil.ReadFile("./modlock.yml")
-	u.LogErrorAndExit("load locked file", err, "read file problem, please fix it")
-	revs := u.ModuleLockMap{}
-	err = yaml.Unmarshal(yml, &revs)
-	u.LogErrorAndExit("load locked revs", err, "the lock file has got configuration problem, please fix it")
-	return &revs
+func (t *Tasker) CleanModules() {
+
+	if !t.ValidateAllModules() {
+		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
+	}
+	u.Pln("-clean repos:")
+	u.Pdebug(u.MainConfig.GetWorkdir(), u.GetDefaultModuleDir())
+	u.Pdebug(t.Config.GetWorkdir(), u.GetDefaultModuleDir())
+
 }
 
 func (t *Tasker) PullAllModules() {
@@ -367,11 +367,13 @@ func (t *Tasker) PullAllModules() {
 	u.Pln("-pull repos:")
 
 	mlist := (*ConfigRuntime()).Modules
-	lockMap := loadModuleLockRevs()
+	lockMap := u.LoadModuleLockRevs()
 	if mlist != nil {
 		for _, m := range mlist {
 			m.Normalize()
-			m.PullRepo(lockMap, t.Config.ModuleLock)
+			if m.Repo != "" {
+				m.PullRepo(lockMap, t.Config.ModuleLock)
+			}
 		}
 	}
 }
@@ -608,6 +610,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 							modpath = path.Clean(path.Join(BaseDir, mod.Dir))
 						}
 						os.Chdir(modpath)
+						u.Pdebug(modpath)
 						u.Pdebugvvvvvv(modpath)
 						if _, err := os.Stat(modpath); !os.IsNotExist(err) {
 							/*
@@ -635,7 +638,6 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 							//TODO: put the reasoning into the doco: not to auto update to avoid evil code injection problem
 							u.InvalidAndExit(u.Spf("module dir: [%s] does not exist under: [%s]\n", mod.Dir, cwd), "double check if you have change your module configuration, then you will probably need to update module again")
 						}
-						//}
 					}()
 				} else {
 					u.LogWarn("locating module name failed", u.Spf("module name: [%s] does not exist", modname))
@@ -757,6 +759,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 	if !found {
 		u.Pferror("Task %s is not defined!", taskname)
 		t.ListTasks()
+		u.InvalidAndExit("Task call failed", "Task does not exist")
 	}
 }
 

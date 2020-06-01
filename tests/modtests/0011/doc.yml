@@ -1,0 +1,150 @@
+vars:
+  folder: module
+  title: module vesioning
+  weight: 2151
+  log: yes
+  head: |
+    Showcase how to manage multiple versions of same module in its version directories
+  sections:
+    - title: Use version git repo as module directory
+      content: |
+
+        If the module is code in git repo, the other way to organize the module and version is to checkout each version of that module and put it into a module directory - .modules, like below:
+
+        ```
+        myproject
+        ├── hello-module
+        │   ├── up.yml
+        │   └── upconfig.yml
+        │   └── upconfig.yml
+        ├── .modules
+        │      ├── hi-module@release_1.2.3
+        │      └── up.yml
+        │      ├── hi-module@feature_branch
+        │      └── up.yml
+        │      ├── hi-module@e8e9dc5dc913e211fdaa3bf1bd8a6618e602e8ff
+        │      └── up.yml
+        │      ├── hi-module@e8e9dc5
+        │      └── up.yml
+        ├───── world-module
+        │      ├── up.yml
+        │      └── upconfig.yml
+        ├───── up.yml
+        └───── upconfig.yml
+        ```
+
+    - title: module update
+      content: |
+        Ξ ▶ mod update -d ./tests/modtests/0011 -i dev --configdir=$./tests/modtests/ -w refdir
+        loading [Config]:  ./tests/modtests/0011/upconfig.yml
+        Main config:
+          Version -> 1.0.0
+          RefDir -> ./tests/modtests/0011
+          WorkDir -> refdir
+          TaskFile -> up.yml
+          Verbose -> vvv
+          ModuleName -> reverent_archimedes3
+          MaxCallLayers -> 8
+        work dir: ./tests/modtests/0011
+        loading [Task]:  ./up.yml
+        module: [reverent_archimedes3] instance id: [dev]
+        -validate all modules:
+        -pull repos:
+          +------------+-------------------------------------------+
+          |  PROPERTY  |                   VALUE                   |
+          +------------+-------------------------------------------+
+          | alias      | hello                                     |
+          | dir        | .upmodules/hello@v2                       |
+          | repo       | https://github.com/upcmd/hello-module.git |
+          | version    | v2                                        |
+          | pullpolicy | skip                                      |
+          | instanceid | nonamed                                   |
+          | subdir     |                                           |
+          +------------+-------------------------------------------+
+        WARN: [module repo exist: skipped] - [repo: [.upmodules/hello@v2]]
+          checkout version
+        checkout version: v2 ...
+          git checkout v2
+          Already on 'v2'
+          Your branch is up to date with 'origin/v2'.
+          +------------+-------------------------------------------+
+          |  PROPERTY  |                   VALUE                   |
+          +------------+-------------------------------------------+
+          | alias      | hello-dummy1                              |
+          | dir        | .upmodules/hello-dummy1@master            |
+          | repo       | https://github.com/upcmd/hello-module.git |
+          | version    | master                                    |
+          | pullpolicy | always                                    |
+          | instanceid | nonamed                                   |
+          | subdir     |                                           |
+          +------------+-------------------------------------------+
+        removing .upmodules/hello-dummy1@master ...Enumerating objects: 9, done.
+        Counting objects: 100% (9/9), done.
+        Compressing objects: 100% (4/4), done.
+          Total 9 (delta 2), reused 9 (delta 2), pack-reused 0
+          checkout version
+        checkout version: master ...
+          git checkout master
+          Already on 'master'
+          Your branch is up to date with 'origin/master'.
+          +------------+------------------------------------------------------------------+
+          |  PROPERTY  |                              VALUE                               |
+          +------------+------------------------------------------------------------------+
+          | alias      | hello-dummy2                                                     |
+          | dir        | .upmodules/hello-dummy2@25456bbcd17db524d1148e42bdcc3bb36ce90042 |
+          | repo       | https://github.com/upcmd/hello-module.git                        |
+          | version    | 25456bbcd17db524d1148e42bdcc3bb36ce90042                         |
+          | pullpolicy | always                                                           |
+          | instanceid | nonamed                                                          |
+          | subdir     |                                                                  |
+          +------------+------------------------------------------------------------------+
+        removing .upmodules/hello-dummy2@25456bbcd17db524d1148e42bdcc3bb36ce90042 ...Enumerating objects: 9, done.
+        Counting objects: 100% (9/9), done.
+        Compressing objects: 100% (4/4), done.
+          Total 9 (delta 2), reused 9 (delta 2), pack-reused 0
+          checkout version
+        checkout version: 25456bbcd17db524d1148e42bdcc3bb36ce90042 ...
+          git checkout 25456bbcd17db524d1148e42bdcc3bb36ce90042
+        Note: switching to '25456bbcd17db524d1148e42bdcc3bb36ce90042'.
+
+    - title: module list
+      content: |
+        Ξ ▶  mod list -d ./tests/modtests/0011 -i dev --configdir=./tests/modtests/0011 -w refdir
+        loading [Config]:  ./tests/modtests/0011/upconfig.yml
+        Main config:
+          Version -> 1.0.0
+          RefDir -> ./tests/modtests/0011
+          WorkDir -> refdir
+          TaskFile -> up.yml
+          Verbose -> vvv
+          ModuleName -> elated_payne9
+          MaxCallLayers -> 8
+        work dir: ./tests/modtests/0011
+        loading [Task]:  ./up.yml
+        module: [elated_payne9] instance id: [dev]
+        -list all modules:
+          +-----+--------------+------------------------------------------------------------------+-------------------------------------------+------------------------------------------+------------+------------+--------+
+          | IDX |    ALIAS     |                               DIR                                |                   REPO                    |                 VERSION                  | PULLPOLICY | INSTANCEID | SUBDIR |
+          +-----+--------------+------------------------------------------------------------------+-------------------------------------------+------------------------------------------+------------+------------+--------+
+          |   1 | hello-module | hello-module/                                                    |                                           |                                          |            | nonamed    |        |
+          |   2 | hello        | .upmodules/hello@v2                                              | https://github.com/upcmd/hello-module.git | v2                                       | skip       | nonamed    |        |
+          |   3 | hello-dummy1 | .upmodules/hello-dummy1@master                                   | https://github.com/upcmd/hello-module.git | master                                   | always     | nonamed    |        |
+          |   4 | hello-dummy2 | .upmodules/hello-dummy2@25456bbcd17db524d1148e42bdcc3bb36ce90042 | https://github.com/upcmd/hello-module.git | 25456bbcd17db524d1148e42bdcc3bb36ce90042 | always     | nonamed    |        |
+          +-----+--------------+------------------------------------------------------------------+-------------------------------------------+------------------------------------------+------------+------------+--------+
+        -validate all modules:
+
+
+    - title: config file - upconfig.yml
+      filelookup: upconfig.yml
+
+    - title: up task - up.yml
+      filelookup: up.yml
+
+    - title: up module task - up.yml
+      filelookup: hello-module/up.yml
+
+    - title: up module config - upconfig.yml
+      filelookup: hello-module/upconfig.yml
+
+    - title: hi module task - up.yml
+      filelookup: hello-module/hi-module/up.yml

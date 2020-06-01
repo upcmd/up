@@ -1,0 +1,8 @@
+RefDir: .
+TaskFile: up.yml
+
+Modules:
+  -
+    dir: hi-module/
+    alias: hi-module
+
