@@ -53,10 +53,10 @@ func main() {
 		cfg.ShowCoreConfig("Main")
 		u.Pfvvvv(" :release version:  %s", u.MainConfig.Version)
 		u.Pfvvvv(" :verbose level:  %s", u.MainConfig.Verbose)
-		wkdir := cfg.GetWorkdir()
-		u.Pln("work dir:", wkdir)
-		impl.SetBaseDir(wkdir)
-		os.Chdir(cfg.GetWorkdir())
+		//wkdir := cfg.SetAbsWorkdir()
+		u.Pln("work dir:", cfg.AbsWorkDir)
+		impl.SetBaseDir(cfg.AbsWorkDir)
+		os.Chdir(cfg.AbsWorkDir)
 		return cfg
 	}()
 

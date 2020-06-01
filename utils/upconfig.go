@@ -43,6 +43,7 @@ type UpConfig struct {
 	//choice of cwd | refdir
 	//default to be cwd
 	WorkDir       string
+	AbsWorkDir    string
 	TaskFile      string
 	Verbose       string
 	ModuleName    string
@@ -234,7 +235,7 @@ func (cfg *UpConfig) SetRefdir(refdir string) {
 func (cfg *UpConfig) GetWorkdirOld() (wkdir string) {
 	cwd, err := os.Getwd()
 	if err != nil {
-		LogErrorAndExit("GetWorkdir", err, "working directory error")
+		LogErrorAndExit("SetAbsWorkdir", err, "working directory error")
 	}
 
 	if cfg.WorkDir == "cwd" {
@@ -250,16 +251,19 @@ func (cfg *UpConfig) GetWorkdirOld() (wkdir string) {
 			}
 		}
 	} else {
-		InvalidAndExit("GetWorkdir", "Work dir setup is not proper")
+		InvalidAndExit("SetAbsWorkdir", "Work dir setup is not proper")
 	}
 	return
 }
 
 //return abs path
-func (cfg *UpConfig) GetWorkdir() (wkdir string) {
+//this must be called before tasker changing dir
+func (cfg *UpConfig) SetAbsWorkdir() {
+	Pdebug(cfg)
+	var wkdir string
 	cwd, err := os.Getwd()
 	if err != nil {
-		LogErrorAndExit("GetWorkdir", err, "working directory error")
+		LogErrorAndExit("SetAbsWorkdir", err, "working directory error")
 	}
 
 	if cfg.WorkDir == "cwd" {
@@ -277,10 +281,10 @@ func (cfg *UpConfig) GetWorkdir() (wkdir string) {
 			}
 		}
 	} else {
-		InvalidAndExit("GetWorkdir", "Work dir setup is not proper")
+		InvalidAndExit("SetAbsWorkdir", "Work dir setup is not proper")
 	}
 
-	return
+	cfg.AbsWorkDir = wkdir
 }
 
 func (cfg *UpConfig) SetWorkdir(workdir string) {

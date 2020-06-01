@@ -26,7 +26,7 @@ func TestC(t *testing.T) {
 
 	for _, x := range files {
 		u.Pln("testing:", x)
-		u.Pln("work dir:", cfg.GetWorkdir())
+		u.Pln("work dir:", cfg.AbsWorkDir)
 		tests.Setupx(x, cfg)
 		t := impl.NewTasker("dev", cfg)
 		t.ExecTask("task", nil, false)

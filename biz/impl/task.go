@@ -354,9 +354,7 @@ func (t *Tasker) CleanModules() {
 		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
 	}
 	u.Pln("-clean repos:")
-	u.Pdebug(u.MainConfig.GetWorkdir(), u.GetDefaultModuleDir())
-	u.Pdebug(t.Config.GetWorkdir(), u.GetDefaultModuleDir())
-
+	u.Pdebug(u.MainConfig.AbsWorkDir, u.GetDefaultModuleDir())
 }
 
 func (t *Tasker) PullAllModules() {

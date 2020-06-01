@@ -86,6 +86,7 @@ func (cfg *UpConfig) InitConfig() *UpConfig {
 		cfg.ModuleName = GetRandomName(1)
 	}
 
+	cfg.SetAbsWorkdir()
 	return cfg
 }
 
