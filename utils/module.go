@@ -34,12 +34,13 @@ type UpConfig struct {
 	RefDir  string
 	//choice of cwd | refdir
 	//default to be cwd
-	WorkDir       string
-	AbsWorkDir    string
-	TaskFile      string
-	Verbose       string
-	ModuleName    string
-	MaxCallLayers string
+	WorkDir             string
+	AbsWorkDir          string
+	TaskFile            string
+	Verbose             string
+	ModuleName          string
+	MaxCallLayers       string
+	MaxModuelCallLayers string
 	//TODO: get rid of pointer as it will result in nil pointer loading issue
 	Secure     *SecureSetting
 	Modules    []Module

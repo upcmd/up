@@ -608,7 +608,6 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 							modpath = path.Clean(path.Join(BaseDir, mod.Dir))
 						}
 						os.Chdir(modpath)
-						u.Pdebug(modpath)
 						u.Pdebugvvvvvv(modpath)
 						if _, err := os.Stat(modpath); !os.IsNotExist(err) {
 							/*
@@ -629,6 +628,20 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 							TaskerRuntime().TaskerCaller = taskerCaller
 							u.Pf("=>call module: [%s] task: [%s]\n", modname, taskname)
 							//u.Ptmpdebug("55", callerVars)
+
+							func() {
+								taskerLayer := TaskerStack.GetLen()
+								UpRunTimeVars.Put(UP_RUNTIME_TASKER_LAYER_NUMBER, taskerLayer)
+								u.Pvvvv("Executing tasker layer:", taskerLayer)
+								maxLayers, err := strconv.Atoi(u.MainConfig.MaxModuelCallLayers)
+								u.LogErrorAndExit("evaluate max tasker module call layer", err, "please setup max MaxModuelCallLayers properly for your case")
+
+								if maxLayers != 0 && taskerLayer > maxLayers {
+									u.LogError("Module call layer check:", u.Spf("Too many layers of recursive module executions, max allowed(%d), please fix your recursive call", maxLayers))
+									os.Exit(-1)
+								}
+							}()
+
 							mTasker.ExecTask(taskname, callerVars, true)
 							TaskerStack.Pop()
 							os.Chdir(cwd)
@@ -720,17 +733,19 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 				}
 
 				u.Pdebugvvvvvv(rtContext.ExecbaseVars)
-				UpRunTimeVars.Put(UP_RUNTIME_TASK_LAYER_NUMBER, TaskerRuntime().Tasker.TaskStack.GetLen())
 
-				TaskerRuntime().Tasker.TaskStack.Push(&rtContext)
-				u.Pvvvv("Executing task stack layer:", TaskerRuntime().Tasker.TaskStack.GetLen())
-				maxLayers, err := strconv.Atoi(ConfigRuntime().MaxCallLayers)
-				u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
+				func() {
+					UpRunTimeVars.Put(UP_RUNTIME_TASK_LAYER_NUMBER, TaskerRuntime().Tasker.TaskStack.GetLen())
+					TaskerRuntime().Tasker.TaskStack.Push(&rtContext)
+					u.Pvvvv("Executing task stack layer:", TaskerRuntime().Tasker.TaskStack.GetLen())
+					maxLayers, err := strconv.Atoi(ConfigRuntime().MaxCallLayers)
+					u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
 
-				if maxLayers != 0 && TaskerRuntime().Tasker.TaskStack.GetLen() > maxLayers {
-					u.LogError("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
-					os.Exit(-1)
-				}
+					if maxLayers != 0 && TaskerRuntime().Tasker.TaskStack.GetLen() > maxLayers {
+						u.LogError("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
+						os.Exit(-1)
+					}
+				}()
 
 				steps.Exec(false)
 

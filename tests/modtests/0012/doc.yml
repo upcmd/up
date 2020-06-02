@@ -1,6 +1,6 @@
 vars:
   folder: module
-  title: module multi vesioning
+  title: module vesioning
   weight: 2151
   log: yes
   head: |

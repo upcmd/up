@@ -74,4 +74,4 @@ vars:
       filelookup: hello-module/upconfig.yml
 
     - title: hi module task - up.yml
-      filelookup: hello-module/hi-module/up.yml
+      filelookup: hi-module/up.yml

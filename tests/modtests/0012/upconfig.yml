@@ -1,0 +1,25 @@
+
+version: 1.0.0
+Verbose: vvv
+MaxCallLayers: 8
+MaxModuelCallLayers: 8
+RefDir: .
+TaskFile: up.yml
+ConfigDir: .
+ConfigFile: upconfig.yml
+
+Modules:
+
+  - #if there is no repo, then it will use the dir as module and incorporate as module
+    dir: hello-module/
+    alias: hello-module
+
+  - repo: https://github.com/upcmd/hello-module.git
+    alias: crosstalk1
+    version: crosstalk1
+    pullpolicy: always
+
+  - repo: https://github.com/upcmd/hello-module.git
+    alias: crosstalk2
+    version: crosstalk2
+    pullpolicy: always
