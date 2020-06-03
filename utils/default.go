@@ -14,13 +14,14 @@ import (
 
 var (
 	defaults map[string]string = map[string]string{
-		"RefDir":        ".",
-		"WorkDir":       "cwd",
-		"TaskFile":      "up.yml",
-		"Verbose":       "v",
-		"MaxCallLayers": "256",
-		"ConfigDir":     ".",
-		"ConfigFile":    "upconfig.yml",
+		"RefDir":              ".",
+		"WorkDir":             "cwd",
+		"TaskFile":            "up.yml",
+		"Verbose":             "v",
+		"MaxCallLayers":       "256",
+		"MaxModuelCallLayers": "256",
+		"ConfigDir":           ".",
+		"ConfigFile":          "upconfig.yml",
 	}
 	vvvv_color_printf   = color.Magenta
 	verror_color_printf = color.Red
@@ -34,6 +35,7 @@ var (
 version: 1.0.0
 Verbose: v
 MaxCallLayers: 8
+MaxModuelCallLayers: 64
 RefDir: .
 WorkDir: cwd
 TaskFile: up.yml

@@ -1,0 +1,43 @@
+
+tasks:
+
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: shell
+        desc: main job
+        do:
+          - echo "hello "
+
+      -
+        func: call
+        do: Say_world
+
+
+  -
+    name: Say_world
+    task:
+      -
+        func: cmd
+        do:
+          -
+            name: print
+            cmd: " .... world from Say_world"
+
+
+  -
+    name: Cross_call1
+    task:
+      -
+        func: cmd
+        do:
+          -
+            name: print
+            cmd: " .... cross call 1"
+
+      -
+        func: call
+        do: crosstalk2.Cross_call2
+

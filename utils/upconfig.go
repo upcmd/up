@@ -75,7 +75,6 @@ func (cfg *UpConfig) SetAbsWorkdir() {
 		} else {
 			abspath := path.Clean(path.Join(cwd, cfg.RefDir))
 			if _, err := os.Stat(abspath); !os.IsNotExist(err) {
-				Pdebug(abspath)
 				wkdir = abspath
 			}
 		}

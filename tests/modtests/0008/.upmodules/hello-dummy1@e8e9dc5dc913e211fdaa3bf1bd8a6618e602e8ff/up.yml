@@ -1,0 +1,27 @@
+
+tasks:
+
+  -
+    name: Main
+    desc: main entry
+    task:
+      -
+        func: shell
+        desc: main job
+        do:
+          - echo "hello "
+
+      -
+        func: call
+        do: Say_world
+
+
+  -
+    name: Say_world
+    task:
+      -
+        func: cmd
+        do:
+          -
+            name: print
+            cmd: " .... world from Say_world"
