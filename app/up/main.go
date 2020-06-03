@@ -23,7 +23,7 @@ var (
 	list        = app.Command("list", "list tasks")
 	listName    = list.Arg("taskname|=", "task name to inspect").String()
 	mod         = app.Command("mod", "module cmd")
-	modCmd      = mod.Arg("cmd", "list | update | lock | clean").Required().String()
+	modCmd      = mod.Arg("cmd", "list | update | upall | lock | clean | probe ").Required().String()
 	//modList          = mod.Arg("list", "list module").Required().String()
 	//modUpdate        = mod.Arg("update", "update module").Required().String()
 	assist           = app.Command("assist", "assist: templatefunc|")
@@ -88,9 +88,15 @@ func main() {
 	case mod.FullCommand():
 		t := impl.NewTasker(*instanceName, initConfig)
 		if *modCmd == "list" {
-			t.ListAllModules()
+			t.ListModules()
+		}
+		if *modCmd == "probe" {
+			impl.ListAllModules()
 		}
 		if *modCmd == "update" {
+			t.PullModules()
+		}
+		if *modCmd == "upall" {
 			t.PullAllModules()
 		}
 		if *modCmd == "lock" {

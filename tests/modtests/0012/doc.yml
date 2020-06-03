@@ -30,5 +30,12 @@ vars:
     - title: up module config - upconfig.yml
       filelookup: hello-module/upconfig.yml
 
-    - title: hi module task - up.yml
-      filelookup: hi-module/up.yml
+    - title: crosstalk1 - up.yml
+      filelookup: .upmodules/crosstalk1@crosstalk1/up.yml
+    - title: crosstalk1 - upconfig.yml
+      filelookup: .upmodules/crosstalk1@crosstalk1/upconfig.yml
+
+    - title: crosstalk2 - up.yml
+      filelookup: .upmodules/crosstalk1@crosstalk1/up.yml
+    - title: crosstalk2 - upconfig.yml
+      filelookup: .upmodules/crosstalk1@crosstalk2/upconfig.yml

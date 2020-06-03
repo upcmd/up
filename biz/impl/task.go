@@ -357,7 +357,7 @@ func (t *Tasker) CleanModules() {
 	u.Pdebug(u.MainConfig.AbsWorkDir, u.GetDefaultModuleDir())
 }
 
-func (t *Tasker) PullAllModules() {
+func (t *Tasker) PullModules() {
 	if !t.ValidateAllModules() {
 		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
 	}
@@ -371,6 +371,40 @@ func (t *Tasker) PullAllModules() {
 			m.Normalize()
 			if m.Repo != "" {
 				m.PullRepo(lockMap, t.Config.ModuleLock)
+			} else {
+				u.Pf("module: [%s] uses directory: [%s]", m.Alias, m.Dir)
+			}
+		}
+	}
+}
+
+//all modules including indirect sub modules
+func (t *Tasker) PullAllModules() {
+	if !t.ValidateAllModules() {
+		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
+	}
+
+	u.Pln("-pull repos:")
+
+	mlist := (*ConfigRuntime()).Modules
+
+	trialmods := listModules("-trial modules:", "%s/trial-modules/*/%s")
+	submods := listModules("-indirect sub modules:", "%s/.upmodules/*/%s")
+
+	allmods := []u.Module{}
+	allmods = append(allmods, mlist...)
+	allmods = append(allmods, *trialmods...)
+	allmods = append(allmods, *submods...)
+
+	u.Pdebug(allmods)
+	lockMap := u.LoadModuleLockRevs()
+	if mlist != nil {
+		for _, m := range allmods {
+			m.Normalize()
+			if m.Repo != "" {
+				m.PullRepo(lockMap, t.Config.ModuleLock)
+			} else {
+				u.Pf("module: [%s] uses directory: [%s]\n", m.Alias, m.Dir)
 			}
 		}
 	}
@@ -411,7 +445,8 @@ func (t *Tasker) ValidateAllModules() bool {
 
 }
 
-func (t *Tasker) ListAllModules() {
+//list tasker modules
+func (t *Tasker) ListModules() {
 	u.Pln("-list all modules:")
 	mlist := (*ConfigRuntime()).Modules
 
@@ -435,6 +470,32 @@ func (t *Tasker) ListAllModules() {
 
 	}
 	t.ValidateAllModules()
+}
+
+func ListAllModules() {
+	u.Pln("-list all modules:")
+	listModules("-main direct modules:", "%s/*/%s")
+	listModules("-indirect sub modules:", "%s/.upmodules/*/%s")
+}
+
+func listModules(desc, pattern string) *u.Modules {
+	cfgname := "upconfig.yml"
+	filelist := []string{}
+	match := u.Spfv(pattern, u.MainConfig.AbsWorkDir, cfgname)
+	files, err := filepath.Glob(match)
+	u.LogError("list upconfig.yml", err)
+	filelist = append(filelist, files...)
+
+	modlist := u.Modules{}
+	for _, f := range filelist {
+		cfg := u.NewUpConfig(path.Dir(f), cfgname)
+		modlist = append(modlist, cfg.Modules...)
+	}
+	u.Pf("\n%s\n", desc)
+	yml := core.ObjToYaml(modlist)
+	u.Pln(yml)
+
+	return &modlist
 }
 
 func (tasker *Tasker) ListTask(taskname string) {
@@ -652,7 +713,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 					}()
 				} else {
 					u.LogWarn("locating module name failed", u.Spf("module name: [%s] does not exist", modname))
-					TaskerRuntime().Tasker.ListAllModules()
+					TaskerRuntime().Tasker.ListModules()
 				}
 
 			} else {
