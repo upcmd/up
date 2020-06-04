@@ -12,7 +12,6 @@ import (
 	"github.com/imdario/mergo"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/mohae/deepcopy"
-	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/viper"
 	"github.com/stephencheng/up/model"
 	"github.com/stephencheng/up/model/core"
@@ -364,50 +363,10 @@ func (t *Tasker) PullModules() {
 
 	u.Pln("-pull repos:")
 
-	mlist := (*ConfigRuntime()).Modules
-	lockMap := u.LoadModuleLockRevs()
-	if mlist != nil {
-		for _, m := range mlist {
-			m.Normalize()
-			if m.Repo != "" {
-				m.PullRepo(lockMap, t.Config.ModuleLock)
-			} else {
-				u.Pf("module: [%s] uses directory: [%s]", m.Alias, m.Dir)
-			}
-		}
-	}
-}
-
-//all modules including indirect sub modules
-func (t *Tasker) PullAllModules() {
-	if !t.ValidateAllModules() {
-		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
-	}
-
-	u.Pln("-pull repos:")
-
-	mlist := (*ConfigRuntime()).Modules
-
-	trialmods := listModules("-trial modules:", "%s/trial-modules/*/%s")
-	submods := listModules("-indirect sub modules:", "%s/.upmodules/*/%s")
-
-	allmods := []u.Module{}
-	allmods = append(allmods, mlist...)
-	allmods = append(allmods, *trialmods...)
-	allmods = append(allmods, *submods...)
-
-	u.Pdebug(allmods)
-	lockMap := u.LoadModuleLockRevs()
-	if mlist != nil {
-		for _, m := range allmods {
-			m.Normalize()
-			if m.Repo != "" {
-				m.PullRepo(lockMap, t.Config.ModuleLock)
-			} else {
-				u.Pf("module: [%s] uses directory: [%s]\n", m.Alias, m.Dir)
-			}
-		}
-	}
+	mainMods := listModules("-main direct modules:", "%s/*/%s")
+	clonedMainModNames := mainMods.PullMainModules()
+	clonedSubModNames := append(clonedMainModNames, []string{}...)
+	mainMods.PullCascadedModules(&clonedMainModNames, &clonedSubModNames)
 }
 
 func (t *Tasker) ValidateAllModules() bool {
@@ -446,36 +405,22 @@ func (t *Tasker) ValidateAllModules() bool {
 }
 
 //list tasker modules
-func (t *Tasker) ListModules() {
+func (t *Tasker) ListMainModules() {
 	u.Pln("-list all modules:")
-	mlist := (*ConfigRuntime()).Modules
-
-	if mlist != nil {
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"idx", "alias", "dir", "repo", "version", "pullpolicy", "instanceid", "subdir"})
-		for idx, m := range mlist {
-			m.Normalize()
-			table.Append([]string{
-				strconv.Itoa(idx + 1),
-				m.Alias,
-				m.Dir,
-				m.Repo,
-				m.Version,
-				m.PullPolicy,
-				m.Iid,
-				m.Subdir,
-			})
-		}
-		table.Render()
-
-	}
+	mlist := ConfigRuntime().Modules
+	mlist.ReportModules()
 	t.ValidateAllModules()
 }
 
 func ListAllModules() {
 	u.Pln("-list all modules:")
-	listModules("-main direct modules:", "%s/*/%s")
-	listModules("-indirect sub modules:", "%s/.upmodules/*/%s")
+	mods := listModules("-main direct modules:", "%s/*/%s")
+	u.Pln("- Insights:")
+	mods.ReportModules()
+	u.Pln("")
+	mods = listModules("-indirect sub modules:", "%s/.upmodules/*/%s")
+	u.Pln("- Insights:")
+	mods.ReportModules()
 }
 
 func listModules(desc, pattern string) *u.Modules {
@@ -654,7 +599,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 			mods := TaskerRuntime().Tasker.Config.Modules
 			//u.Pdebug(TaskerRuntime().Tasker.Config)
 			if mods != nil {
-				mod := u.Modules(TaskerRuntime().Tasker.Config.Modules).LocateModule(modname)
+				mod := TaskerRuntime().Tasker.Config.Modules.LocateModule(modname)
 				//u.Pdebug(cwd, mod)
 				//mdir := "hello-module/"
 				//iid := "dev"
@@ -713,7 +658,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 					}()
 				} else {
 					u.LogWarn("locating module name failed", u.Spf("module name: [%s] does not exist", modname))
-					TaskerRuntime().Tasker.ListModules()
+					TaskerRuntime().Tasker.ListMainModules()
 				}
 
 			} else {

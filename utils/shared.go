@@ -90,6 +90,19 @@ func Contains(a []string, x string) bool {
 	return false
 }
 
+func IndexOf(a []string, x string) int {
+	for idx, n := range a {
+		if x == n {
+			return idx
+		}
+	}
+	return -1
+}
+
+func RemoveIndex(s []string, index int) []string {
+	return append(s[:index], s[index+1:]...)
+}
+
 func StrIn(s string, aStrList ...string) int {
 	for idx, x := range aStrList {
 		if x == s {

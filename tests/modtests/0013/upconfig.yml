@@ -1,0 +1,15 @@
+
+version: 1.0.0
+Verbose: vvv
+MaxCallLayers: 8
+MaxModuelCallLayers: 8
+RefDir: .
+TaskFile: up.yml
+ConfigDir: .
+ConfigFile: upconfig.yml
+
+Modules:
+
+  -
+    dir: hello-module/
+    alias: hello-module

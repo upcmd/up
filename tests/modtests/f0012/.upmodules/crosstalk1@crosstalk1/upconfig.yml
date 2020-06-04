@@ -1,0 +1,9 @@
+RefDir: .
+TaskFile: up.yml
+
+Modules:
+
+  - repo: https://github.com/upcmd/hello-module.git
+    alias: crosstalk2
+    version: crosstalk2
+    pullpolicy: always

@@ -17,15 +17,13 @@ import (
 var (
 	app = kingpin.New("up", "UP: The Ultimate Provisioner")
 
-	ngo         = app.Command("ngo", "run a entry task")
-	ngoTaskName = ngo.Arg("taskname", "task name to run").Default("Main").String()
-	initDefault = app.Command("init", "create a default skeleton for a quick start")
-	list        = app.Command("list", "list tasks")
-	listName    = list.Arg("taskname|=", "task name to inspect").String()
-	mod         = app.Command("mod", "module cmd")
-	modCmd      = mod.Arg("cmd", "list | update | upall | lock | clean | probe ").Required().String()
-	//modList          = mod.Arg("list", "list module").Required().String()
-	//modUpdate        = mod.Arg("update", "update module").Required().String()
+	ngo              = app.Command("ngo", "run a entry task")
+	ngoTaskName      = ngo.Arg("taskname", "task name to run").Default("Main").String()
+	initDefault      = app.Command("init", "create a default skeleton for a quick start")
+	list             = app.Command("list", "list tasks")
+	listName         = list.Arg("taskname|=", "task name to inspect").String()
+	mod              = app.Command("mod", "module cmd")
+	modCmd           = mod.Arg("cmd", "list | pull | lock | clean | probe ").Required().String()
 	assist           = app.Command("assist", "assist: templatefunc|")
 	assistName       = assist.Arg("assistname", "what to assist").String()
 	validate         = app.Command("validate", "validate tasks and plays")
@@ -88,16 +86,13 @@ func main() {
 	case mod.FullCommand():
 		t := impl.NewTasker(*instanceName, initConfig)
 		if *modCmd == "list" {
-			t.ListModules()
+			t.ListMainModules()
 		}
 		if *modCmd == "probe" {
 			impl.ListAllModules()
 		}
-		if *modCmd == "update" {
+		if *modCmd == "pull" {
 			t.PullModules()
-		}
-		if *modCmd == "upall" {
-			t.PullAllModules()
 		}
 		if *modCmd == "lock" {
 			t.LockModules()

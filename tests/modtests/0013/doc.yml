@@ -1,0 +1,208 @@
+vars:
+  folder: module
+  title: manage indirect dependencies
+  weight: 2153
+  log: yes
+  head: |
+    Your code may reference to an external module repo, then that repo again references to the third module and this could go on and on. This shows how to detect those indirect module dependencies and how to automatically pull and update those dependencies into your local
+
+  sections:
+    - title: Pull all module dependencies including indirect one
+      content: |
+        Please notice that in this case, the only reference is a local module in directory hello-module which as a dependency on a git repo, then that git repo module has another dependency, so the direct dependenc is 1, but the indirect dependencies are 2
+
+        You can pull module dependencies including indirect one
+        ```
+        Ξ ▶ up mod pull -d ./tests/modtests/0013 -i dev --configdir=./tests/modtests/0013 -w refdir
+        loading [Config]:  ./tests/modtests/0013/upconfig.yml
+        Main config:
+          Version -> 1.0.0
+          RefDir -> ./tests/modtests/0013
+          WorkDir -> refdir
+          AbsWorkDir -> ./tests/modtests/0013
+          TaskFile -> up.yml
+          Verbose -> vvv
+          ModuleName -> drunk_nobel1
+          MaxCallLayers -> 8
+          MaxModuelCallLayers -> 8
+        work dir: ./tests/modtests/0013
+        loading [Task]:  ./up.yml
+        module: [drunk_nobel1] instance id: [dev]
+        -validate all modules:
+        -pull repos:
+        loading [Config]:  ./tests/modtests/0013/hello-module/upconfig.yml
+
+        -main direct modules:
+          - repo: https://github.com/upcmd/hello-module.git
+            tag: ""
+            version: crosstalk1
+            alias: crosstalk1
+            dir: ""
+            subdir: ""
+            iid: ""
+            pullpolicy: always
+
+          +------------+-------------------------------------------+
+          |  PROPERTY  |                   VALUE                   |
+          +------------+-------------------------------------------+
+          | alias      | crosstalk1                                |
+          | dir        | .upmodules/crosstalk1@crosstalk1          |
+          | repo       | https://github.com/upcmd/hello-module.git |
+          | version    | crosstalk1                                |
+          | pullpolicy | always                                    |
+          | instanceid | nonamed                                   |
+          | subdir     |                                           |
+          +------------+-------------------------------------------+
+        Enumerating objects: 30, done.
+        Counting objects: 100% (30/30), done.
+        Compressing objects: 100% (19/19), done.
+          Total 30 (delta 9), reused 26 (delta 5), pack-reused 0
+          checkout version
+        checkout version: crosstalk1 ...
+          git checkout crosstalk1
+          Branch 'crosstalk1' set up to track remote branch 'crosstalk1' from 'origin'.
+          Switched to a new branch 'crosstalk1'
+        loading [Config]:  .upmodules/crosstalk1@crosstalk1/upconfig.yml
+          +------------+-------------------------------------------+
+          |  PROPERTY  |                   VALUE                   |
+          +------------+-------------------------------------------+
+          | alias      | crosstalk2                                |
+          | dir        | .upmodules/crosstalk2@crosstalk2          |
+          | repo       | https://github.com/upcmd/hello-module.git |
+          | version    | crosstalk2                                |
+          | pullpolicy | always                                    |
+          | instanceid | nonamed                                   |
+          | subdir     |                                           |
+          +------------+-------------------------------------------+
+        Enumerating objects: 30, done.
+        Counting objects: 100% (30/30), done.
+        Compressing objects: 100% (19/19), done.
+          Total 30 (delta 9), reused 26 (delta 5), pack-reused 0
+          checkout version
+        checkout version: crosstalk2 ...
+          git checkout crosstalk2
+          Branch 'crosstalk2' set up to track remote branch 'crosstalk2' from 'origin'.
+          Switched to a new branch 'crosstalk2'
+        loading [Config]:  .upmodules/crosstalk2@crosstalk2/upconfig.yml
+        ```
+
+    - title: Priority to override the required indirect module version
+      content: |
+        In case there is a indirect module used by one of the modules you use
+
+
+        ```
+        module declaration in one of the upconfig.yml
+
+        - repo: https://github.com/upcmd/hello-module.git
+          alias: crosstalk1
+          version: crosstalk1
+          pullpolicy: always
+        ```
+
+
+        Normally you don't need to declare a indirect module, when you use up mod pull, the above module will be cloned to your local .modules directory. But if you do, shown as below, that means you explicitly demand to use the same repo(you can use another repo too) but different branch instead. This will take priority and above versioning code base will not be used.
+
+        Note this will impact the behavior of your sub modules, you must be clear what you are doing when you use this technic
+
+        ```
+        module declaration in the main upconfig.yml
+
+        - repo: https://github.com/upcmd/hello-module.git
+          alias: crosstalk1
+          version: feature
+          pullpolicy: always
+        ```
+
+
+    - title: Probe all dependant modules details
+      content: |
+
+        ```
+        ▶ up mod probe -d ./tests/modtests/0013 -i dev --configdir=./tests/modtests/0013 -w refdir
+        loading [Config]:  ./tests/modtests/0013/upconfig.yml
+        Main config:
+          Version -> 1.0.0
+          RefDir -> ./tests/modtests/0013
+          WorkDir -> refdir
+          AbsWorkDir -> ./tests/modtests/0013
+          TaskFile -> up.yml
+          Verbose -> vvv
+          ModuleName -> drunk_ritchie8
+          MaxCallLayers -> 8
+          MaxModuelCallLayers -> 8
+        work dir: ./tests/modtests/0013
+        loading [Task]:  ./up.yml
+        module: [drunk_ritchie8] instance id: [dev]
+        -list all modules:
+        loading [Config]:  ./tests/modtests/0013/hello-module/upconfig.yml
+
+        -main direct modules:
+          - repo: https://github.com/upcmd/hello-module.git
+            tag: ""
+            version: crosstalk1
+            alias: crosstalk1
+            dir: ""
+            subdir: ""
+            iid: ""
+            pullpolicy: always
+
+          - Insights:
+          +-----+------------+----------------------------------+-------------------------------------------+------------+------------+------------+--------+
+          | IDX |   ALIAS    |               DIR                |                   REPO                    |  VERSION   | PULLPOLICY | INSTANCEID | SUBDIR |
+          +-----+------------+----------------------------------+-------------------------------------------+------------+------------+------------+--------+
+          |   1 | crosstalk1 | .upmodules/crosstalk1@crosstalk1 | https://github.com/upcmd/hello-module.git | crosstalk1 | always     | nonamed    |        |
+          +-----+------------+----------------------------------+-------------------------------------------+------------+------------+------------+--------+
+
+        loading [Config]:  ./tests/modtests/0013/.upmodules/crosstalk1@crosstalk1/upconfig.yml
+        loading [Config]:  ./tests/modtests/0013/.upmodules/crosstalk2@crosstalk2/upconfig.yml
+
+        -indirect sub modules:
+          - repo: https://github.com/upcmd/hello-module.git
+            tag: ""
+            version: crosstalk2
+            alias: crosstalk2
+            dir: ""
+            subdir: ""
+            iid: ""
+            pullpolicy: always
+          - repo: https://github.com/upcmd/hello-module.git
+            tag: ""
+            version: crosstalk1
+            alias: crosstalk1
+            dir: ""
+            subdir: ""
+            iid: ""
+            pullpolicy: always
+
+          - Insights:
+          +-----+------------+----------------------------------+-------------------------------------------+------------+------------+------------+--------+
+          | IDX |   ALIAS    |               DIR                |                   REPO                    |  VERSION   | PULLPOLICY | INSTANCEID | SUBDIR |
+          +-----+------------+----------------------------------+-------------------------------------------+------------+------------+------------+--------+
+          |   1 | crosstalk2 | .upmodules/crosstalk2@crosstalk2 | https://github.com/upcmd/hello-module.git | crosstalk2 | always     | nonamed    |        |
+          |   2 | crosstalk1 | .upmodules/crosstalk1@crosstalk1 | https://github.com/upcmd/hello-module.git | crosstalk1 | always     | nonamed    |        |
+          +-----+------------+----------------------------------+-------------------------------------------+------------+------------+------------+--------+
+        ```
+
+
+    - title: config file - upconfig.yml
+      filelookup: upconfig.yml
+
+    - title: up task - up.yml
+      filelookup: up.yml
+
+    - title: up module task - up.yml
+      filelookup: hello-module/up.yml
+
+    - title: up module config - upconfig.yml
+      filelookup: hello-module/upconfig.yml
+
+    - title: crosstalk1 - up.yml
+      filelookup: .upmodules/crosstalk1@crosstalk1/up.yml
+    - title: crosstalk1 - upconfig.yml
+      filelookup: .upmodules/crosstalk1@crosstalk1/upconfig.yml
+
+    - title: crosstalk2 - up.yml
+      filelookup: .upmodules/crosstalk1@crosstalk1/up.yml
+    - title: crosstalk2 - upconfig.yml
+      filelookup: .upmodules/crosstalk2@crosstalk2/upconfig.yml

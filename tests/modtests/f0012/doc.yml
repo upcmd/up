@@ -38,4 +38,4 @@ vars:
     - title: crosstalk2 - up.yml
       filelookup: .upmodules/crosstalk1@crosstalk1/up.yml
     - title: crosstalk2 - upconfig.yml
-      filelookup: .upmodules/crosstalk1@crosstalk2/upconfig.yml
+      filelookup: .upmodules/crosstalk2@crosstalk2/upconfig.yml

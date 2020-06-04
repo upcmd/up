@@ -15,6 +15,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 )
 
@@ -43,7 +44,7 @@ type UpConfig struct {
 	MaxModuelCallLayers string
 	//TODO: get rid of pointer as it will result in nil pointer loading issue
 	Secure     *SecureSetting
-	Modules    []Module
+	Modules    Modules
 	ModuleLock bool
 }
 
@@ -74,6 +75,99 @@ func (ms Modules) LocateModule(modname string) *Module {
 		}
 	}
 	return nil
+}
+
+func (ms *Modules) PullModules() {
+
+	lockMap := LoadModuleLockRevs()
+	if ms != nil {
+		for _, m := range *ms {
+			m.Normalize()
+			if m.Repo != "" {
+				m.PullRepo(lockMap, MainConfig.ModuleLock)
+			} else {
+				Pf("module: [%s] uses directory: [%s]\n", m.Alias, m.Dir)
+			}
+		}
+	}
+
+}
+
+func (ms *Modules) ReportModules() {
+	if ms != nil && len(*ms) != 0 {
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"idx", "alias", "dir", "repo", "version", "pullpolicy", "instanceid", "subdir"})
+		for idx, m := range *ms {
+			m.Normalize()
+			table.Append([]string{
+				strconv.Itoa(idx + 1),
+				m.Alias,
+				m.Dir,
+				m.Repo,
+				m.Version,
+				m.PullPolicy,
+				m.Iid,
+				m.Subdir,
+			})
+		}
+		table.Render()
+	}
+}
+
+func (ms *Modules) PullCascadedModules(clonedMainModList *[]string, clonedSubModList *[]string) {
+
+	lockMap := LoadModuleLockRevs()
+	if ms != nil {
+		for _, m := range *ms {
+			m.Normalize()
+
+			if m.Repo != "" {
+				if idx := IndexOf(*clonedMainModList, m.Alias); idx != -1 {
+					if _, err := os.Stat(m.Dir); !os.IsNotExist(err) {
+						cfg := NewUpConfig(m.Dir, "upconfig.yml")
+						submods := &cfg.Modules
+						*clonedMainModList = RemoveIndex(*clonedMainModList, idx)
+						submods.PullCascadedModules(clonedMainModList, clonedSubModList)
+					}
+				}
+
+				if !Contains(*clonedSubModList, m.Alias) {
+					m.PullRepo(lockMap, MainConfig.ModuleLock)
+					*clonedSubModList = append(*clonedSubModList, m.Alias)
+					if _, err := os.Stat(m.Dir); !os.IsNotExist(err) {
+						cfg := NewUpConfig(m.Dir, "upconfig.yml")
+						submods := &cfg.Modules
+						submods.PullCascadedModules(clonedMainModList, clonedSubModList)
+					}
+				}
+			} else {
+				Pf("module: [%s] uses directory: [%s]\n", m.Alias, m.Dir)
+			}
+		}
+	}
+
+}
+
+func (ms *Modules) PullMainModules() (clonedList []string) {
+	clonedList = []string{}
+
+	lockMap := LoadModuleLockRevs()
+	if ms != nil {
+		for _, m := range *ms {
+			m.Normalize()
+			if m.Repo != "" {
+				if !Contains(clonedList, m.Alias) {
+					m.PullRepo(lockMap, MainConfig.ModuleLock)
+					clonedList = append(clonedList, m.Alias)
+				}
+			} else {
+				Pf("module: [%s] uses directory: [%s]\n", m.Alias, m.Dir)
+			}
+		}
+	}
+
+	return
+
 }
 
 func (m *Module) getVersionAndPath() (string, string) {

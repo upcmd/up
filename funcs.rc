@@ -66,6 +66,16 @@ mtestx(){
 }
 
 
+mtmptestx(){
+  if [ "$1" == "" ];then
+    echo "please input the casename(dir name)"
+  else
+    dir=./tests/modtests/$1
+    goup mod test -d $dir -i dev --configdir=$dir -w refdir
+  fi
+}
+
+
 mlistx(){
   if [ "$1" == "" ];then
     echo "please input the casename(dir name)"
@@ -93,24 +103,12 @@ mcleanx(){
   fi
 }
 
-
-
-mupdatex(){
+mpullx(){
   if [ "$1" == "" ];then
     echo "please input the casename(dir name)"
   else
     dir=./tests/modtests/$1
-    goup mod update -d $dir -i dev --configdir=$dir -w refdir
-  fi
-}
-
-
-mupdateallx(){
-  if [ "$1" == "" ];then
-    echo "please input the casename(dir name)"
-  else
-    dir=./tests/modtests/$1
-    goup mod upall -d $dir -i dev --configdir=$dir -w refdir
+    goup mod pull -d $dir -i dev --configdir=$dir -w refdir
   fi
 }
 

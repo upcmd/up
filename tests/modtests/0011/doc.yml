@@ -33,10 +33,10 @@ vars:
         └───── upconfig.yml
         ```
 
-    - title: module update
+    - title: module pull
       content: |
         ```
-        Ξ ▶ mod update -d ./tests/modtests/0011 -i dev --configdir=$./tests/modtests/ -w refdir
+        Ξ ▶ mod pull -d ./tests/modtests/0011 -i dev --configdir=$./tests/modtests/ -w refdir
         loading [Config]:  ./tests/modtests/0011/upconfig.yml
         Main config:
           Version -> 1.0.0
