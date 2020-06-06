@@ -427,10 +427,9 @@ tasks:
               - name: writefile
                 cmd:
                   content: "{{.licensed_code}}"
-                  filename: test.go
-                  dir: /tmp
+                  filename: '{{.filepath}}'
               -
-                name: exit
+                namex: exit
             if: '{{ not (regexMatch "MPL/2.0" .content) }}'
 
           -
