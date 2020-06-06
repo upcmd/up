@@ -44,12 +44,6 @@ func FuncMapInit() {
 		"toSlash": func(path string) string {
 			return filepath.ToSlash(path)
 		},
-		"exeExt": func() string {
-			if runtime.GOOS == "windows" {
-				return ".exe"
-			}
-			return ""
-		},
 		//--------------------------------------------------------
 		"now": func() string {
 			t := time.Now()
@@ -118,12 +112,6 @@ func Render(tstr string, obj interface{}) string {
 
 	return result.String()
 }
-
-//func init() {
-//	FuncMapInit()
-//	ListAllFuncs()
-//	os.Exit(0)
-//}
 
 func ListAllFuncs() {
 

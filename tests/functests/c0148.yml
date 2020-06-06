@@ -1,0 +1,71 @@
+doc_meta: |
+  folder: vars
+  title: taskscope vars in block
+  head: |
+    This is a test case to show that the taskscope var used in block func could be accessed accross the whole block and the entire task
+
+  sections:
+    - title: Demo
+      log: yes
+
+vars:
+  tom: this is tom
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: block
+        do:
+          -
+            func: cmd
+            dvars:
+              - name: jerry
+                value: this is jerry in task scope
+                flags:
+                  - taskscope
+
+          -
+            func: cmd
+            do:
+              - name: print
+                desc: this should print out the dvar value of jerry
+                cmd: '{{.jerry}}'
+
+      -
+        func: cmd
+        do:
+          - name: print
+            desc: this should print out the dvar value of jerry
+            cmd: '{{.jerry}}'
+
+      -
+        func: call
+        do:
+          - subtask1
+
+  -
+    name: subtask1
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            desc: this should print out the dvar value of jerry as it is declared jerry is in taskscope
+            cmd: '{{.jerry}}'
+          - name: trace
+            cmd: ===>
+
+      -
+        func: cmd
+        vars:
+          jerry: jerry is overriden in local scope
+        do:
+          - name: print
+            desc: |
+              remember that the caller's vars should override callee's vars
+              so jerry's value should the one from caller instead this local value
+            cmd: '{{.jerry}}'
+          - name: trace
+            cmd: <===

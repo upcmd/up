@@ -2,6 +2,10 @@ version: 1.0.0
 
 vars:
   ver_yq: v3.3.1
+  license_header: |
+    /* This Source Code Form is subject to the terms of the Mozilla Public
+     * License, v. 2.0. If a copy of the MPL was not distributed with this
+     * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 tasks:
   -
@@ -353,3 +357,94 @@ tasks:
         do:
           - 'docker load --input="{{.last_result.Output}}"'
           - docker images |grep cmgolang
+
+  -
+    name: Add_MPL2_License
+    desc: Add license notice to all golang file as a notice header
+    task:
+      -
+        func: shell
+        name: getcases
+        do:
+          - find ./ -name "*.go"
+        reg: cases
+
+      -
+        func: cmd
+        dvars:
+          - name: void
+            value: '{{ .cases.Output | splitLines |reg "caselist" }}'
+            flags: [vvv]
+
+      -
+        func: cmd
+        dox:
+          -
+            name: inspect
+            cmd:
+              - exec_vars
+              - exec_base_vars
+
+      -
+        func: cmd
+        do:
+          - name: printobj
+            cmd: caselist
+          -
+            namex: exit
+
+      -
+        func: block
+        desc: apply the license
+        do:
+          -
+            func: cmd
+            dvars:
+              - name: filepath
+                value: '{{.loopitem}}'
+                flags:
+                  - taskscope
+            do:
+              - name: readfile
+                cmd:
+                  filename: '{{.filepath}}'
+                  reg: content
+              - name: print
+                cmdx: '{{.content}}'
+
+          -
+            func: cmd
+            desc: apply the license
+            dvars:
+              - name: licensed_code
+                value: |
+                  {{.license_header}}
+                  {{.content}}
+            do:
+              - name: print
+                cmd: 'processing {{.filepath}}'
+
+              - name: writefile
+                cmd:
+                  content: "{{.licensed_code}}"
+                  filename: test.go
+                  dir: /tmp
+              -
+                name: exit
+            if: '{{ not (regexMatch "MPL/2.0" .content) }}'
+
+          -
+            func: cmd
+            dox:
+              - name: print
+                cmd: '{{.filepath}}'
+              -
+                name: exit
+
+              -
+                name: inspect
+                cmd:
+                  - exec_vars
+                  - exec_base_vars
+
+        loop: caselist
