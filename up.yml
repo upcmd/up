@@ -377,23 +377,6 @@ tasks:
             flags: [vvv]
 
       -
-        func: cmd
-        dox:
-          -
-            name: inspect
-            cmd:
-              - exec_vars
-              - exec_base_vars
-
-      -
-        func: cmd
-        do:
-          - name: printobj
-            cmd: caselist
-          -
-            namex: exit
-
-      -
         func: block
         desc: apply the license
         do:
@@ -414,7 +397,7 @@ tasks:
 
           -
             func: cmd
-            desc: apply the license
+            desc: apply the license if the license header has not been applied
             dvars:
               - name: licensed_code
                 value: |
@@ -431,19 +414,5 @@ tasks:
               -
                 namex: exit
             if: '{{ not (regexMatch "MPL/2.0" .content) }}'
-
-          -
-            func: cmd
-            dox:
-              - name: print
-                cmd: '{{.filepath}}'
-              -
-                name: exit
-
-              -
-                name: inspect
-                cmd:
-                  - exec_vars
-                  - exec_base_vars
 
         loop: caselist

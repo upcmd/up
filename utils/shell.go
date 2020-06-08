@@ -60,10 +60,6 @@ func RunShellCmd(dir string, command string) error {
 	}
 	os.Chdir(cwd)
 
-	//if e, ok := interp.IsExitStatus(err); ok {
-	//	LogErrorAndContinue("shell exec failed", e, "please exam the error and fix the problem and retry again")
-	//}
-
 	if err != nil {
 		LogErrorAndContinue("shell exec failed", err, "please exam the error and fix the problem and retry again")
 	}
@@ -139,4 +135,3 @@ func runInteractive(r *interp.Runner, stdin io.Reader, stdout, stderr io.Writer)
 	}
 	return runErr
 }
-

@@ -33,7 +33,6 @@ func runCmd(f *ShellFuncAction, cmd string) {
 		result.Code = 0
 		result.Output = strings.TrimSpace("dryrun result")
 	} else {
-
 		cmdOutput, err := cmdExec.CombinedOutput()
 		if err != nil {
 			if exitError, ok := err.(*exec.ExitError); ok {
@@ -44,7 +43,6 @@ func runCmd(f *ShellFuncAction, cmd string) {
 			result.Code = 0
 			result.Output = strings.TrimSpace(string(cmdOutput))
 		}
-
 		f.Result = result
 		u.LogError("exec error:", err)
 	}
@@ -96,4 +94,3 @@ func (f *ShellFuncAction) Exec() {
 	StepRuntime().Result = &f.Result
 
 }
-
