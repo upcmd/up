@@ -10,9 +10,9 @@ package impl
 import (
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
-	"github.com/stephencheng/up/model/core"
-	u "github.com/stephencheng/up/utils"
-	yq "github.com/stephencheng/yq/v3/cmd"
+	"github.com/upcmd/up/model/core"
+	u "github.com/upcmd/up/utils"
+	yq "github.com/upcmd/yq/v3/cmd"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"path"
@@ -707,5 +707,3 @@ func (f *CmdFuncAction) Exec() {
 
 	}
 }
-
-

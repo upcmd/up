@@ -13,10 +13,10 @@ import (
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/mohae/deepcopy"
 	"github.com/spf13/viper"
-	"github.com/stephencheng/up/model"
-	"github.com/stephencheng/up/model/core"
-	"github.com/stephencheng/up/model/stack"
-	u "github.com/stephencheng/up/utils"
+	"github.com/upcmd/up/model"
+	"github.com/upcmd/up/model/core"
+	"github.com/upcmd/up/model/stack"
+	u "github.com/upcmd/up/utils"
 	"github.com/xlab/treeprint"
 	"io/ioutil"
 	"os"
@@ -884,5 +884,3 @@ func (t *Tasker) loadRuntimeDvars() {
 	//dvars.ValidateAndLoading()
 	t.RuntimeGlobalDvars = &dvars
 }
-
-

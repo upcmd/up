@@ -8,7 +8,7 @@
 package core
 
 import (
-	u "github.com/stephencheng/up/utils"
+	u "github.com/upcmd/up/utils"
 	"testing"
 )
 
@@ -43,5 +43,3 @@ func TestCache(t *testing.T) {
 	c.List()
 
 }
-
-

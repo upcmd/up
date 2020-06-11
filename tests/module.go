@@ -8,8 +8,8 @@
 package tests
 
 import (
-	"github.com/stephencheng/up/biz/impl"
-	u "github.com/stephencheng/up/utils"
+	"github.com/upcmd/up/biz/impl"
+	u "github.com/upcmd/up/utils"
 	"os"
 )
 
@@ -32,5 +32,3 @@ func SetupMx(dirpath string) *u.UpConfig {
 	u.Pln(" :verbose level:", cfg.Verbose)
 	return cfg
 }
-
-

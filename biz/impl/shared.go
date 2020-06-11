@@ -10,9 +10,9 @@ package impl
 import (
 	"bufio"
 	"github.com/fatih/color"
-	"github.com/stephencheng/up/model/core"
-	u "github.com/stephencheng/up/utils"
-	ee "github.com/stephencheng/up/utils/error"
+	"github.com/upcmd/up/model/core"
+	u "github.com/upcmd/up/utils"
+	ee "github.com/upcmd/up/utils/error"
 	"os"
 )
 
@@ -104,5 +104,3 @@ func IsAtRootTaskLevel() (called bool) {
 	}
 	return
 }
-
-

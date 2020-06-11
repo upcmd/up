@@ -10,8 +10,8 @@ package impl
 import (
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
-	"github.com/stephencheng/up/model/core"
-	u "github.com/stephencheng/up/utils"
+	"github.com/upcmd/up/model/core"
+	u "github.com/upcmd/up/utils"
 	"os"
 	"os/exec"
 	"strings"
@@ -97,4 +97,3 @@ func (f *ShellFuncAction) Exec() {
 	StepRuntime().Result = &f.Result
 
 }
-

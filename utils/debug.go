@@ -10,7 +10,7 @@ package utils
 import (
 	"fmt"
 	"github.com/fatih/color"
-	"github.com/stephencheng/go-spew/spew"
+	"github.com/upcmd/go-spew/spew"
 	"os"
 	"runtime"
 	"runtime/debug"
@@ -353,5 +353,3 @@ func Fail(mark string, hint string) {
 	hiColor.Printf("  Failed: %s [%s]\n", mark, hint)
 	os.Exit(-255)
 }
-
-

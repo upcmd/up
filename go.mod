@@ -1,4 +1,4 @@
-module github.com/stephencheng/up
+module github.com/upcmd/up
 
 go 1.13
 
@@ -17,8 +17,8 @@ require (
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.6.2
-	github.com/stephencheng/go-spew v1.2.0
-	github.com/stephencheng/yq/v3 v3.3.1
+	github.com/upcmd/go-spew v1.2.0
+	github.com/upcmd/yq/v3 v3.3.2
 	github.com/xlab/treeprint v1.0.0
 	golang.org/x/term v0.0.0-20191110171634-ad39bd3f0407
 	gopkg.in/ini.v1 v1.51.1 // indirect

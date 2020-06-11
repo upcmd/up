@@ -12,8 +12,8 @@ import (
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/mohae/deepcopy"
 	"github.com/spf13/viper"
-	"github.com/stephencheng/up/model/core"
-	u "github.com/stephencheng/up/utils"
+	"github.com/upcmd/up/model/core"
+	u "github.com/upcmd/up/utils"
 	"io/ioutil"
 )
 
@@ -104,5 +104,3 @@ func (ss *Scopes) GetInstanceVars(instanceName string) *core.Cache {
 
 	return nil
 }
-
-

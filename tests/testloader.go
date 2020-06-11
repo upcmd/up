@@ -10,7 +10,7 @@ package tests
 import (
 	"fmt"
 	"github.com/spf13/viper"
-	//"github.com/stephencheng/up/model"
+	//"github.com/upcmd/up/model"
 	"os"
 	"path"
 	"runtime"
@@ -60,5 +60,3 @@ func MockLoadYml(path, filename string) *viper.Viper {
 //	}
 //	return step
 //}
-
-

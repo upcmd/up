@@ -8,9 +8,9 @@
 package functests
 
 import (
-	"github.com/stephencheng/up/biz/impl"
-	"github.com/stephencheng/up/tests"
-	u "github.com/stephencheng/up/utils"
+	"github.com/upcmd/up/biz/impl"
+	"github.com/upcmd/up/tests"
+	u "github.com/upcmd/up/utils"
 	"path"
 	"testing"
 )
@@ -26,5 +26,3 @@ func TestC(t *testing.T) {
 		t.Unset()
 	}
 }
-
-

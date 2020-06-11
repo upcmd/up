@@ -9,8 +9,8 @@ package main
 
 import (
 	"github.com/alecthomas/kingpin"
-	"github.com/stephencheng/up/biz/impl"
-	u "github.com/stephencheng/up/utils"
+	"github.com/upcmd/up/biz/impl"
+	u "github.com/upcmd/up/utils"
 	"os"
 )
 
@@ -121,4 +121,3 @@ templatefunc
 		t.ValidateTask(taskname)
 	}
 }
-

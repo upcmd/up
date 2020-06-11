@@ -9,8 +9,8 @@ package impl
 
 import (
 	ms "github.com/mitchellh/mapstructure"
-	"github.com/stephencheng/up/model/core"
-	u "github.com/stephencheng/up/utils"
+	"github.com/upcmd/up/model/core"
+	u "github.com/upcmd/up/utils"
 )
 
 func runTask(f *CallFuncAction, taskname string) {
@@ -51,5 +51,3 @@ func (f *CallFuncAction) Exec() {
 		runTask(f, taskname)
 	}
 }
-
-

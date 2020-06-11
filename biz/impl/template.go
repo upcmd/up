@@ -10,7 +10,7 @@ package impl
 import (
 	"bytes"
 	"github.com/Masterminds/sprig/v3"
-	u "github.com/stephencheng/up/utils"
+	u "github.com/upcmd/up/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -147,5 +147,3 @@ func ListAllFuncs() {
 	}
 
 }
-
-

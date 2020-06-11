@@ -10,8 +10,8 @@ package impl
 import (
 	"bufio"
 	"github.com/mohae/deepcopy"
-	"github.com/stephencheng/up/model/core"
-	u "github.com/stephencheng/up/utils"
+	"github.com/upcmd/up/model/core"
+	u "github.com/upcmd/up/utils"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"

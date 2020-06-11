@@ -8,8 +8,8 @@
 package tests
 
 import (
-	"github.com/stephencheng/up/biz/impl"
-	u "github.com/stephencheng/up/utils"
+	"github.com/upcmd/up/biz/impl"
+	u "github.com/upcmd/up/utils"
 	"os/exec"
 	"path"
 	"path/filepath"
@@ -97,5 +97,3 @@ func GetModuleTestCollection() []string {
 
 	return files
 }
-
-

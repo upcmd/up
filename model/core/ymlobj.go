@@ -8,8 +8,8 @@
 package core
 
 import (
-	u "github.com/stephencheng/up/utils"
-	yq "github.com/stephencheng/yq/v3/cmd"
+	u "github.com/upcmd/up/utils"
+	yq "github.com/upcmd/yq/v3/cmd"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"strings"
@@ -93,5 +93,3 @@ func GetSubYmlFromCache(cache *Cache, path string, collect bool, verboseLevel st
 	u.LogErrorAndContinue("parse sub element in yml", err, u.Spf("please ensure correct yml query path: %s", yqpath))
 	return yqresult
 }
-
-

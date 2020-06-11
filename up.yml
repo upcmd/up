@@ -18,8 +18,8 @@ tasks:
       -
         func: shell
         do:
-          - go list -m -versions github.com/stephencheng/yq/v3
-          - 'go get github.com/stephencheng/yq/v3@{{.ver_yq}}'
+          - go list -m -versions github.com/upcmd/yq/v3
+          - 'go get github.com/upcmd/yq/v3@{{.ver_yq}}'
   -
     name: build
     desc: build binary

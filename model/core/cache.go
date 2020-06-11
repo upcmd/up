@@ -8,7 +8,7 @@
 package core
 
 import (
-	u "github.com/stephencheng/up/utils"
+	u "github.com/upcmd/up/utils"
 	"strings"
 	"sync"
 )
@@ -114,5 +114,3 @@ func (c *Cache) Obsolete(key string) {
 		c.Put(key+"_new?", true)
 	}
 }
-
-

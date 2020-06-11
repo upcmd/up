@@ -8,10 +8,10 @@
 package impl
 
 import (
-	"github.com/stephencheng/up/model/core"
-	"github.com/stephencheng/up/model/stack"
-	"github.com/stephencheng/up/utils"
-	u "github.com/stephencheng/up/utils"
+	"github.com/upcmd/up/model/core"
+	"github.com/upcmd/up/model/stack"
+	"github.com/upcmd/up/utils"
+	u "github.com/upcmd/up/utils"
 )
 
 var (
@@ -84,5 +84,3 @@ func BlockStack() *stack.ExecStack {
 func ConfigRuntime() *utils.UpConfig {
 	return TaskerRuntime().Tasker.Config
 }
-
-
