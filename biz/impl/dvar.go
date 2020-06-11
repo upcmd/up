@@ -210,8 +210,10 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 					}())
 					reader := bufio.NewReader(os.Stdin)
 					dvarInputValue, _ := reader.ReadString('\n')
-					(*mergeTarget).Put(dvar.Name, dvarInputValue)
-					(*expandedVars).Put(dvar.Name, dvarInputValue)
+					saneValue := u.RemoveCr(dvarInputValue)
+					(*mergeTarget).Put(dvar.Name, saneValue)
+					(*expandedVars).Put(dvar.Name, saneValue)
+					dvar.Rendered = saneValue
 				}
 
 				if u.Contains(dvar.Flags, "taskscope") {
@@ -232,5 +234,3 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 
 	return expandedVars
 }
-
-

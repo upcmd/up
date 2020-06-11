@@ -1,0 +1,33 @@
+
+notes:
+  - bug fix that the taskscope should work for promopt dvar value
+  - fix prompt value contains CR
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        desc: ask about the faketime for this commit, eg [167 days ago 10:30 pm]
+        dvars:
+          - name: fist_name
+            flags:
+              - prompt
+              - taskscope
+
+          - name: last_name
+            value: hanks
+            flags:
+              - taskscope
+        do:
+          - |
+            echo """my name is: {{.fist_name}} {{.last_name}}"""
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: 'my name is: {{.fist_name}} {{.last_name}}'
+

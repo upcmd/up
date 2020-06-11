@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"path"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -74,6 +75,11 @@ var (
 func random(min, max int) int {
 	rand.Seed(time.Now().UTC().UnixNano())
 	return rand.Intn(max-min+1) + min
+}
+
+func RemoveCr(str string) string {
+	re := regexp.MustCompile(`\r?\n`)
+	return re.ReplaceAllString(str, "")
 }
 
 func RandomColorName() string {
@@ -150,5 +156,3 @@ func GetGitRepoName(url string) string {
 	repoName := strings.Split(repoWithGit, ".")[0]
 	return repoName
 }
-
-
