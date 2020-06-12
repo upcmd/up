@@ -22,6 +22,12 @@ var (
 		"MaxModuelCallLayers": "256",
 		"ConfigDir":           ".",
 		"ConfigFile":          "upconfig.yml",
+		"ShellType":           "GOSH",
+		//TODO: 1. test config file entry
+		//2. see if exec dir could be set in task file
+		//3. /bin/GOSH could be an external bin exec option: document this
+
+		//"ShellType":           "/bin/sh",
 	}
 	vvvv_color_printf   = color.Magenta
 	verror_color_printf = color.Red
@@ -70,5 +76,3 @@ path format:
 func GetDefaultModuleDir() string {
 	return path.Join("./", UpModuleDir)
 }
-
-

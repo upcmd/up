@@ -54,15 +54,9 @@ func GetBaseModuleName() string {
 	return u.MainConfig.ModuleName
 }
 
-type ExecResult struct {
-	Code   int
-	Output string
-	ErrMsg string
-}
-
 type StepRuntimeContext struct {
 	Stepname string
-	Result   *ExecResult
+	Result   *u.ExecResult
 }
 
 func StepRuntime() *StepRuntimeContext {

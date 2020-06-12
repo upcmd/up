@@ -8,60 +8,110 @@
 package utils
 
 import (
+	"bytes"
 	"context"
-	"flag"
 	"fmt"
-	"golang.org/x/term"
 	"io"
+	"mvdan.cc/sh/v3/expand"
 	"mvdan.cc/sh/v3/interp"
 	"mvdan.cc/sh/v3/syntax"
 	"os"
 	"strings"
 )
 
-var command = flag.String("c", "", "command to be executed")
-
-//var command = flag.String("c", "echo hello", "command to be executed")
-
-func main_test() {
-	//Run(".", "ls")
-	//Run(".", "git status")
-	//Run("/tmp", "ls -lartG")
-	//Run("", "echo PATH=$PATH")
+type ExecResult struct {
+	Code   int
+	Output string
+	ErrMsg string
 }
 
-func main_run_args() {
-	os.Chdir("/tmp")
-	flag.Parse()
-	err := runAll()
-	if e, ok := interp.IsExitStatus(err); ok {
-		os.Exit(int(e))
+type CmdOpts struct {
+	Command string
+	Dir     string
+	Env     []string
+	Stdin   io.Reader
+	Stdout  io.Writer
+	Stderr  io.Writer
+}
+
+func getEnvs(envs *map[string]string) []string {
+	environ := os.Environ()
+	for k, v := range *envs {
+		environ = append(environ, fmt.Sprintf("%s=%s", k, v))
 	}
+	return environ
+}
+
+func RunCmd(cmd string, dir string, envs *map[string]string) ExecResult {
+	stdOut := bytes.NewBufferString("")
+	stdErr := bytes.NewBufferString("")
+	stdin := os.Stdin
+
+	err := runCmdWithOps(&CmdOpts{
+		Command: cmd,
+		Dir:     dir,
+		Env:     getEnvs(envs),
+		Stdin:   stdin,
+		Stdout:  stdOut,
+		Stderr:  stdErr,
+	})
+	var result ExecResult
+	var errored bool = false
+	if statusCode, ok := interp.IsExitStatus(err); ok {
+		errored = true
+		result.Code = int(statusCode)
+		result.ErrMsg = stdErr.String()
+	}
+
+	if !errored {
+		result.Code = 0
+		result.Output = stdOut.String()
+	}
+
+	return result
+}
+
+func runCmdWithOps(opts *CmdOpts) error {
+	p, err := syntax.NewParser().Parse(strings.NewReader(opts.Command), "")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return err
 	}
+
+	environ := opts.Env
+	if len(environ) == 0 {
+		environ = os.Environ()
+	}
+
+	r, err := interp.New(
+		interp.Dir(opts.Dir),
+		interp.Env(expand.ListEnviron(environ...)),
+		interp.StdIO(opts.Stdin, opts.Stdout, opts.Stderr),
+	)
+	if err != nil {
+		return err
+	}
+	return r.Run(context.Background(), p)
 }
 
-func RunShellCmd(dir string, command string) error {
-	cwd, err := os.Getwd()
+func RunSimpleCmd(dir string, command string) error {
 	if dir != "" {
 		if _, err := os.Stat(dir); !os.IsNotExist(err) {
-			os.Chdir(dir)
 		} else {
 			LogErrorAndExit("check dir existence", err, "exec path does not exist")
 		}
 	}
 
-	r, err := interp.New(interp.StdIO(os.Stdin, os.Stdout, os.Stderr))
+	r, err := interp.New(
+		interp.StdIO(os.Stdin, os.Stdout, os.Stderr),
+		interp.Dir(dir),
+	)
 	if err != nil {
 		fmt.Println("error: init terminal errored", err)
 	}
 
 	if command != "" {
-		err = run(r, strings.NewReader(command), "")
+		err = runSimple(r, strings.NewReader(command), "")
 	}
-	os.Chdir(cwd)
 
 	if err != nil {
 		LogErrorAndContinue("shell exec failed", err, "please exam the error and fix the problem and retry again")
@@ -71,31 +121,7 @@ func RunShellCmd(dir string, command string) error {
 
 }
 
-func runAll() error {
-	r, err := interp.New(interp.StdIO(os.Stdin, os.Stdout, os.Stderr))
-	if err != nil {
-		return err
-	}
-
-	if *command != "" {
-		return run(r, strings.NewReader(*command), "")
-	}
-	if flag.NArg() == 0 {
-		if term.IsTerminal(int(os.Stdin.Fd())) {
-			return runInteractive(r, os.Stdin, os.Stdout, os.Stderr)
-		}
-		return run(r, os.Stdin, "")
-	}
-	for _, path := range flag.Args() {
-		fmt.Println(44, path)
-		if err := runPath(r, path); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func run(r *interp.Runner, reader io.Reader, name string) error {
+func runSimple(r *interp.Runner, reader io.Reader, name string) error {
 	prog, err := syntax.NewParser().Parse(reader, name)
 	if err != nil {
 		return err
@@ -104,38 +130,3 @@ func run(r *interp.Runner, reader io.Reader, name string) error {
 	ctx := context.Background()
 	return r.Run(ctx, prog)
 }
-
-func runPath(r *interp.Runner, path string) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	return run(r, f, path)
-}
-
-func runInteractive(r *interp.Runner, stdin io.Reader, stdout, stderr io.Writer) error {
-	parser := syntax.NewParser()
-	fmt.Fprintf(stdout, "$ ")
-	var runErr error
-	fn := func(stmts []*syntax.Stmt) bool {
-		if parser.Incomplete() {
-			fmt.Fprintf(stdout, "> ")
-			return true
-		}
-		ctx := context.Background()
-		for _, stmt := range stmts {
-			runErr = r.Run(ctx, stmt)
-			if r.Exited() {
-				return false
-			}
-		}
-		fmt.Fprintf(stdout, "$ ")
-		return true
-	}
-	if err := parser.Interactive(stdin, fn); err != nil {
-		return err
-	}
-	return runErr
-}
-

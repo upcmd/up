@@ -35,11 +35,13 @@ type UpConfig struct {
 	RefDir  string
 	//choice of cwd | refdir
 	//default to be cwd
-	WorkDir             string
-	AbsWorkDir          string
-	TaskFile            string
-	Verbose             string
-	ModuleName          string
+	WorkDir    string
+	AbsWorkDir string
+	TaskFile   string
+	Verbose    string
+	ModuleName string
+	//default: /bin/sh, or the path given: /usr/local/bin/bash, or simply: GOSH
+	ShellType           string
 	MaxCallLayers       string
 	MaxModuelCallLayers string
 	//TODO: get rid of pointer as it will result in nil pointer loading issue
@@ -236,7 +238,7 @@ func (m *Module) PullRepo(revMap *ModuleLockMap, uselock bool) {
 		cmd := Spf("git checkout %s", versionDecided)
 		Pf("checkout version: %s ...\n", versionDecided)
 		Pln(cmd)
-		err := RunShellCmd(clonePath, cmd)
+		err := RunSimpleCmd(clonePath, cmd)
 		if err != nil {
 			LogWarn("checkout version", `
 You may want to re-pull the repo again to ensure it is up to date to avoid missing branch, commit or tag
@@ -306,5 +308,3 @@ func (m *Module) Normalize() {
 
 	}
 }
-
-

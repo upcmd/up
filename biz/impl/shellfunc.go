@@ -18,36 +18,54 @@ import (
 )
 
 func runCmd(f *ShellFuncAction, cmd string) {
-	cmdExec := exec.Command("/bin/sh", "-c", cmd)
-
-	func() {
-		//inject the envvars
-		cmdExec.Env = os.Environ()
-		envvarObjMap := f.Vars.GetPrefixMatched("envvar_")
-		for k, v := range *envvarObjMap {
-			cmdExec.Env = append(cmdExec.Env, u.Spf("%s=%s", k, v.(string)))
-		}
-	}()
-
-	var result ExecResult
+	var result u.ExecResult
 
 	if TaskerRuntime().Tasker.Dryrun {
 		u.Pdryrun("in dryrun mode and skipping the actual commands")
 		result.Code = 0
 		result.Output = strings.TrimSpace("dryrun result")
 	} else {
-		cmdOutput, err := cmdExec.CombinedOutput()
-		if err != nil {
-			if exitError, ok := err.(*exec.ExitError); ok {
-				result.Code = exitError.ExitCode()
-				result.ErrMsg = string(cmdOutput)
+		switch u.MainConfig.ShellType {
+		case "GOSH":
+			envvarObjMap := f.Vars.GetPrefixMatched("envvar_")
+			envVars := map[string]string{}
+			for k, v := range *envvarObjMap {
+				envVars[k] = v.(string)
 			}
-		} else {
-			result.Code = 0
-			result.Output = strings.TrimSpace(string(cmdOutput))
+
+			result = u.RunCmd(cmd,
+				"",
+				&envVars,
+			)
+
+			u.Pln("GOSH exec:", result)
+		default:
+			cmdExec := exec.Command(u.MainConfig.ShellType, "-c", cmd)
+
+			func() {
+				//inject the envvars
+				cmdExec.Env = os.Environ()
+				envvarObjMap := f.Vars.GetPrefixMatched("envvar_")
+				for k, v := range *envvarObjMap {
+					cmdExec.Env = append(cmdExec.Env, u.Spf("%s=%s", k, v.(string)))
+				}
+			}()
+
+			cmdOutput, err := cmdExec.CombinedOutput()
+			if err != nil {
+				if exitError, ok := err.(*exec.ExitError); ok {
+					result.Code = exitError.ExitCode()
+					result.ErrMsg = string(cmdOutput)
+				}
+			} else {
+				result.Code = 0
+				result.Output = strings.TrimSpace(string(cmdOutput))
+			}
+			f.Result = result
+			u.LogError("exec error:", err)
+
 		}
-		f.Result = result
-		u.LogError("exec error:", err)
+
 	}
 }
 
@@ -55,7 +73,7 @@ type ShellFuncAction struct {
 	Do     interface{}
 	Vars   *core.Cache
 	Cmds   []string
-	Result ExecResult
+	Result u.ExecResult
 }
 
 //adapt the abstract step.Do to concrete ShellFuncAction Cmds
