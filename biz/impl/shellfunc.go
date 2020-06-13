@@ -19,7 +19,6 @@ import (
 
 func runCmd(f *ShellFuncAction, cmd string) {
 	var result u.ExecResult
-
 	if TaskerRuntime().Tasker.Dryrun {
 		u.Pdryrun("in dryrun mode and skipping the actual commands")
 		result.Code = 0
@@ -37,8 +36,6 @@ func runCmd(f *ShellFuncAction, cmd string) {
 				"",
 				&envVars,
 			)
-
-			u.Pln("GOSH exec:", result)
 		default:
 			cmdExec := exec.Command(u.MainConfig.ShellType, "-c", cmd)
 

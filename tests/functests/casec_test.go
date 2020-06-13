@@ -21,6 +21,7 @@ func init() {
 
 func TestC(t *testing.T) {
 	cfg := u.NewUpConfig("", "").InitConfig()
+	u.MainConfig = cfg
 	files := tests.GetUnitTestCollection()
 	impl.FuncMapInit()
 
