@@ -1,6 +1,6 @@
 module github.com/upcmd/up
 
-go 1.13
+go 1.14
 
 require (
 	github.com/Masterminds/sprig/v3 v3.0.2
@@ -20,7 +20,6 @@ require (
 	github.com/upcmd/go-spew v1.2.0
 	github.com/upcmd/yq/v3 v3.3.2
 	github.com/xlab/treeprint v1.0.0
-	golang.org/x/term v0.0.0-20191110171634-ad39bd3f0407
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/yaml.v2 v2.2.8
 	mvdan.cc/sh/v3 v3.1.1
