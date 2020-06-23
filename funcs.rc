@@ -7,7 +7,7 @@ wiptest(){
 }
 
 wipfunctest(){
-    gotest ./tests/functests/wip_test.go -v
+    go test ./tests/functests/wip_test.go -v
 }
 
 wiptestvvvv(){
@@ -52,7 +52,7 @@ fi
 
 
 mregression(){
-  GOTEST=true gotest ./tests/modtests/mcasec_test.go -v
+  GOTEST=true go test ./tests/modtests/mcasec_test.go -v
 }
 
 
@@ -173,7 +173,7 @@ uptestf(){
 }
 
 upregression(){
-  GOTEST=true gotest ./tests/functests/casec_test.go -v
+  GOTEST=true go test ./tests/functests/casec_test.go -v
 }
 
 man_funclist(){

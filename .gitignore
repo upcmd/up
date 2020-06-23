@@ -5,3 +5,4 @@ result
 functests-mock
 *_TODO*
 nix-container/
+vendor
