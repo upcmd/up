@@ -203,10 +203,11 @@ func PdebugStack(a ...interface{}) {
 	Pln("<==")
 }
 
-func Pdebugvvvvvv(a ...interface{}) {
-	if permitted("vvvvv") {
+func Pdebugvvvvvvv(a ...interface{}) {
+	if permitted("vvvvvv") {
 		Pln("==>")
 		Pdebug(a)
+		Pln("-----trace for reference-----")
 		debug.PrintStack()
 		Pln("<==")
 	}
@@ -323,6 +324,7 @@ func LogErrorAndExit(mark string, err interface{}, hint string) {
 func LogError(mark string, err interface{}) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
+		Pln("-----trace for reference-----")
 		PStackTrace()
 	}
 }
@@ -332,6 +334,7 @@ func LogErrorAndContinue(mark string, err interface{}, hint string) {
 		color.Red("      %s -> %s", mark, err)
 		hiColor := color.New(color.FgHiYellow, color.BgHiMagenta)
 		hiColor.Printf("WARN:\n%s\n", hint)
+		Pln("-----trace for reference-----")
 		PStackTrace()
 	}
 }

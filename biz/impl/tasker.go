@@ -614,7 +614,6 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 							modpath = path.Clean(path.Join(BaseDir, mod.Dir))
 						}
 						os.Chdir(modpath)
-						u.Pdebugvvvvvv(modpath)
 						if _, err := os.Stat(modpath); !os.IsNotExist(err) {
 							/*
 								in module loading, since you can not pass in the cli options, so:
@@ -719,7 +718,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 					IsCalledExternally: isExternalCall,
 				}
 
-				u.Pdebugvvvvvv(callerVars)
+				u.Pdebugvvvvvvv(callerVars)
 				if isExternalCall {
 					var passinvars core.Cache
 					passinvars = deepcopy.Copy(*t.RuntimeVarsAndDvarsMerged).(core.Cache)
@@ -738,7 +737,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 					}
 				}
 
-				u.Pdebugvvvvvv(rtContext.ExecbaseVars)
+				u.Pdebugvvvvvvv(rtContext.ExecbaseVars)
 
 				func() {
 					UpRunTimeVars.Put(UP_RUNTIME_TASK_LAYER_NUMBER, TaskerRuntime().Tasker.TaskStack.GetLen())

@@ -59,7 +59,7 @@ tasks:
       -
         func: call
         vars:
-          hugo_doc_log_dir: /updocs/reflogs
+          hugo_doc_log_dir: /up_project/updocs/reflogs
           upcmd: ./build/linux/up
         do:
           - log_gen_impl
@@ -102,7 +102,7 @@ tasks:
         do: log_gen_module
       -
         func: call
-        dox: log_gen_impl
+        do: log_gen_impl
         loop:
           - c????
           - f????
@@ -169,8 +169,6 @@ tasks:
           - vvv
           - vvvv
           - vvvvv
-          - vvvvvv
-          - vvvvvvv
         flags:
           - ignore_error
 
@@ -189,7 +187,7 @@ tasks:
         func: cmd
         dvars:
           - name: void
-            value: '{{ print .cases | splitLines |reg "caselist"}}'
+            value: '{{ .cases.Output | splitLines |reg "caselist" }}'
             flags: [vvv]
 
       -
@@ -229,8 +227,6 @@ tasks:
           - vvv
           - vvvv
           - vvvvv
-          - vvvvvv
-          - vvvvvvv
         flags:
           - ignore_error
 
