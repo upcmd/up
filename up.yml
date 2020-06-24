@@ -50,7 +50,7 @@ tasks:
       -
         func: shell
         do:
-          - gotest ./tests/functests/casec_test.go -v
+          - go test ./tests/functests/casec_test.go -v
 
   -
     name: log_gen_in_dev
@@ -302,7 +302,7 @@ tasks:
       -
         func: shell
         do:
-          - gotest ./tests/functests/casex_test.go -v
+          - go test ./tests/functests/casex_test.go -v
 
   -
     name: testwip
@@ -311,7 +311,7 @@ tasks:
       -
         func: shell
         do:
-          - gotest ./tests/functests/wip_test.go -v
+          - go test ./tests/functests/wip_test.go -v
 
 
   -

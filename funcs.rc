@@ -196,4 +196,14 @@ inspect_task_example(){
   goup list task -d ./tests/functests -t wip.yml -i dev --configdir=./tests/functests
 }
 
+up_test_stack_trace_mac(){
+ build/mac/up ngo -d ./tests/modtests/0001 -i dev --configdir=./tests/modtests/0001 -w refdir -v vvvvvv
+}
 
+up_test_stack_trace_linux(){
+ build/linux/up ngo -d ./tests/modtests/0001 -i dev --configdir=./tests/modtests/0001 -w refdir -v vvvvvv
+}
+
+goup_test_stack_trace(){
+ goup ngo -d ./tests/modtests/0001 -i dev --configdir=./tests/modtests/0001 -w refdir -v vvvvvv
+}
