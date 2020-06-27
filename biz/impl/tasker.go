@@ -335,8 +335,11 @@ func (t *Tasker) LockModules() {
 		for _, m := range mlist {
 			m.Normalize()
 			m.ShowDetails()
-			rev := u.GetHeadRev(m.Dir)
-			lockMap[m.Alias] = rev
+			gitdir := path.Join(m.Dir, ".git")
+			if _, err := os.Stat(gitdir); !os.IsNotExist(err) {
+				rev := u.GetHeadRev(m.Dir)
+				lockMap[m.Alias] = rev
+			}
 		}
 	}
 
@@ -353,7 +356,8 @@ func (t *Tasker) CleanModules() {
 		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
 	}
 	u.Pln("-clean repos:")
-	u.Pdebug(u.MainConfig.AbsWorkDir, u.GetDefaultModuleDir())
+	//u.Pdebug(u.MainConfig.AbsWorkDir, u.GetDefaultModuleDir())
+	//TODO
 }
 
 func (t *Tasker) PullModules() {
@@ -363,7 +367,7 @@ func (t *Tasker) PullModules() {
 
 	u.Pln("-pull repos:")
 
-	mainMods := listModules("-main direct modules:", "%s/*/%s")
+	mainMods := listModules("-main direct modules:", "%s/%s")
 	clonedMainModNames := mainMods.PullMainModules()
 	clonedSubModNames := append(clonedMainModNames, []string{}...)
 	mainMods.PullCascadedModules(&clonedMainModNames, &clonedSubModNames)
@@ -414,7 +418,7 @@ func (t *Tasker) ListMainModules() {
 
 func ListAllModules() {
 	u.Pln("-list all modules:")
-	mods := listModules("-main direct modules:", "%s/*/%s")
+	mods := listModules("-main direct modules:", "%s/%s")
 	u.Pln("- Insights:")
 	mods.ReportModules()
 	u.Pln("")
@@ -757,18 +761,28 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 				returnVars := TaskRuntime().ReturnVars
 
 				TaskerRuntime().Tasker.TaskStack.Pop()
-				if isExternalCall {
+
+				func() {
+					//this will ensure the local caller vars are synced with return values, typically useful for chained tasks in call func
 					if returnVars != nil {
-						callerExecBaseVars := TaskerRuntime().TaskerCaller.TaskStack.GetTop().(*TaskRuntimeContext).ExecbaseVars
-						mergo.Merge(callerExecBaseVars, returnVars, mergo.WithOverride)
+						mergo.Merge(callerVars, returnVars, mergo.WithOverride)
 					}
-				} else {
-					if !IsAtRootTaskLevel() && returnVars != nil {
-						mergo.Merge(TaskRuntime().ExecbaseVars, returnVars, mergo.WithOverride)
-					} else if IsAtRootTaskLevel() && returnVars != nil {
-						mergo.Merge(t.RuntimeVarsAndDvarsMerged, returnVars, mergo.WithOverride)
+
+					if isExternalCall {
+						if returnVars != nil {
+							callerExecBaseVars := TaskerRuntime().TaskerCaller.TaskStack.GetTop().(*TaskRuntimeContext).ExecbaseVars
+							mergo.Merge(callerExecBaseVars, returnVars, mergo.WithOverride)
+						}
+					} else {
+						if !IsAtRootTaskLevel() && returnVars != nil {
+							mergo.Merge(TaskRuntime().ExecbaseVars, returnVars, mergo.WithOverride)
+						} else if IsAtRootTaskLevel() && returnVars != nil {
+							mergo.Merge(t.RuntimeVarsAndDvarsMerged, returnVars, mergo.WithOverride)
+						}
 					}
-				}
+
+				}()
+
 			}()
 
 		}

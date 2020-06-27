@@ -22,7 +22,7 @@ var (
 	initDefault      = app.Command("init", "create a default skeleton for a quick start")
 	list             = app.Command("list", "list tasks")
 	listName         = list.Arg("taskname|=", "task name to inspect").String()
-	mod              = app.Command("mod", "module cmd")
+	mod              = app.Command("mod", "module cmd: list | pull | lock | clean | probe")
 	modCmd           = mod.Arg("cmd", "list | pull | lock | clean | probe ").Required().String()
 	assist           = app.Command("assist", "assist: templatefunc|")
 	assistName       = assist.Arg("assistname", "what to assist").String()

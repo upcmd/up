@@ -47,7 +47,6 @@ func (f *CallFuncAction) Adapt() {
 func (f *CallFuncAction) Exec() {
 	for _, tmptaskname := range f.Tasknames {
 		taskname := Render(tmptaskname, f.Vars)
-		//u.Ptmpdebug("77", taskname)
 		runTask(f, taskname)
 	}
 }

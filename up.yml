@@ -1,7 +1,7 @@
 version: 1.0.0
 
 vars:
-  ver_yq: v3.3.1
+  ver_yq: v3.3.2
   license_header: |
     // Ultimate Provisioner: UP cmd
     // Copyright (c) 2019 Stephen Cheng and contributors
@@ -21,6 +21,30 @@ tasks:
           - go list -m -versions github.com/upcmd/yq/v3
           - 'go get github.com/upcmd/yq/v3@{{.ver_yq}}'
   -
+    name: facts
+    desc: gather facts
+    task:
+      -
+        func: shell
+        do:
+          - uname
+        reg: result
+
+      - func: cmd
+        desc: get os  - [Darwin | Linux]
+        dvars:
+          - name: os
+            value: '{{ .result.Output }}'
+            flags:
+              - v
+        do:
+          - name: print
+            cmd: 'OS: {{.os}}'
+          - name: return
+            cmd:
+              - os
+
+  -
     name: build
     desc: build binary
     task:
@@ -38,10 +62,22 @@ tasks:
     desc: release it to local path
     task:
       - func: call
-        do: build
+        do:
+          - facts
+          - build
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: 'OS is: {{.os}}'
 
       - func: shell
         do: cp -f build/mac/up /usr/local/bin/
+        if: '{{ eq .os "Darwin" }}'
+
+      - func: shell
+        do: cp -f build/linux/up /bin/
+        if: '{{ eq .os "Linux" }}'
 
   -
     name: testc
@@ -53,20 +89,32 @@ tasks:
           - go test ./tests/functests/casec_test.go -v
 
   -
-    name: log_gen_in_dev
-    desc: generate all logs for the docs
+    name: Log_gen
+    desc: generate all logs for the docs in build pipeline
     task:
+      -
+        func: shell
+        dvars:
+          - name: hugo_doc_log_dir
+            value: /up_project/updocs/reflogs
+            flags:
+              - taskscope
+        do:
+          - 'echo "log will be generated at {{.hugo_doc_log_dir}}"'
+          - 'rm -rf {{.hugo_doc_log_dir}}'
+          - 'mkdir -p {{.hugo_doc_log_dir}}'
+
       -
         func: call
         vars:
-          hugo_doc_log_dir: /up_project/updocs/reflogs
           upcmd: ./build/linux/up
         do:
-          - log_gen_impl
+          - build
+          - log_gen_main
 
   -
-    name: Log_gen_in_mac
-    desc: generate all logs for the docs
+    name: Log_gen_test
+    desc: generate all logs for the docs and test in Mac
     task:
       -
         func: cmd
@@ -100,6 +148,10 @@ tasks:
       -
         func: call
         do: log_gen_module
+        loop:
+          - ????
+          - f????
+
       -
         func: call
         do: log_gen_impl
@@ -123,7 +175,7 @@ tasks:
           ./0001
           ......
         do:
-          - 'cd {{.moduletests_dir}}; find . -name "????" -maxdepth 1 -mindepth 1 -type d|sort|cut -d\/ -f2'
+          - 'cd {{.moduletests_dir}}; find . -name "{{.loopitem}}" -maxdepth 1 -mindepth 1 -type d|sort|cut -d\/ -f2'
         reg: cases
 
       - func: cmd

@@ -1,0 +1,71 @@
+doc_meta: |
+  folder: call-func
+  title: chained calls and return values
+  head: |
+    Showcase that the return value will be used correctly in the chained call
+
+  sections:
+    - title: Demo
+      content: |
+        In this case, the first called sub task - facts will gather the var value of .os and then return its value to caller, then the subsequent call to testingWarning task should print correct os value
+      log: yes
+
+notes: |
+  bug fix the chained callee tasks should have the correct return values from previous steps
+
+tasks:
+
+  -
+    name: facts
+    desc: gather facts
+    task:
+      -
+        func: shell
+        do:
+          - uname
+        reg: result
+
+      - func: cmd
+        desc: get os  - [Darwin | Linux]
+        dvars:
+          - name: os
+            value: '{{ .result.Output }}'
+            flags:
+              - v
+        do:
+          - name: print
+            cmd: 'facts OS: {{.os}}'
+          - name: return
+            cmd:
+              - os
+
+  -
+    name: testingWarning
+    desc: it should warn if the build task is for testing only
+    task:
+      - func: block
+        do:
+          - func: cmd
+            do:
+              - name: print
+                cmd: 'in sub task - building OS: {{.os}}'
+              - name: colorprint
+                cmd:
+                  msg: ?? WARN - This is a build for testing purpose only
+                  fg: red
+        if: '{{ eq .os "Darwin" }}'
+
+  -
+    name: task
+    desc: build the showcases automatically
+    task:
+
+      - func: call
+        do:
+          - facts
+          - testingWarning
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: 'in main task - building OS: {{.os}}'

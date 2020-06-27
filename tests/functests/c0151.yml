@@ -1,0 +1,104 @@
+doc_meta: |
+  folder: quick-start
+  title: a little taste of UPcmd
+  head: |
+    This is a demo case of UPcmd for the home page
+
+  sections:
+    - title: Demo
+      log: yes
+
+Vars:
+  greet_to: Tom
+  weather: sunny
+
+tasks:
+  -
+    name: task
+    desc: main task of hello world demo of UPcmd
+    task:
+      -
+        func: call
+        desc: greet to Tom
+        do:
+          - greet
+
+      -
+        func: call
+        desc: greet to Grace
+        vars:
+          greet_to: Grace
+        do:
+          - greet
+
+
+      -
+        func: cmd
+        desc: do  you get the idea?
+        do:
+          - name: print
+            cmd: |
+              Have you got a little taste of using the UPcmd?
+
+      -
+        func: call
+        desc: greet to a team
+        vars:
+          team:
+            - Jason
+            - Connie
+          weather: stormy
+        loop: team
+        do:
+          - sayhi
+
+  -
+    name: greet
+    desc: greet to some one
+    task:
+      -
+        func: shell
+        desc: say hello
+        do:
+          - echo "Hello, {{.greet_to}}"
+
+      -
+        func: cmd
+        desc: talk about weather
+        do:
+          - name: print
+            cmd: 'It is {{.weather}}'
+
+      -
+        func: cmd
+        desc: ice break
+        do:
+          - name: print
+            cmd: 'What a great day!'
+        if: '{{eq .weather "sunny"}}'
+        else:
+          -
+            func: cmd
+            do:
+              - name: print
+                cmd: 'What a bad day!!'
+
+  -
+    name: sayhi
+    desc: say hi to some one
+    task:
+      -
+        func: cmd
+        desc: say hi to someone
+        do:
+          - name: print
+            cmd: 'Hi {{.loopitem}}, how are you?'
+
+      -
+        func: call
+        desc: greet to the team member
+        dvars:
+          - name: greet_to
+            value: '{{.loopitem}}'
+        do:
+          - greet
