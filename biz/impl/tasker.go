@@ -416,6 +416,7 @@ func (t *Tasker) ListMainModules() {
 	t.ValidateAllModules()
 }
 
+//probing modules list all modules, including the main direct modules and the all indirect modules
 func ListAllModules() {
 	u.Pln("-list all modules:")
 	mods := listModules("-main direct modules:", "%s/%s")
