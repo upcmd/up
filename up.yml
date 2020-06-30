@@ -58,6 +58,57 @@ tasks:
           - GOOS=darwin GOARCH=amd64 go build -o build/mac/up app/up/*.go
           - GOOS=linux GOARCH=amd64 go build -o build/linux/up app/up/*.go
 
+  -
+    name: buildDistro
+    desc: build distro
+    task:
+      -
+        func: shell
+        desc: build the binary to build directory
+        do:
+          - rm -rf ./build
+          - mkdir -p ./build/linux
+          - mkdir -p ./build/mac
+      -
+        func: shell
+        desc: build distro
+        vars:
+          ver: master
+        loop:
+          - goos: darwin
+            goarch: amd64
+          - goos: linux
+            goarch: amd64
+        do:
+          - 'echo "build version - {{.ver}}" for release'
+          - GOOS={{.loopitem.goos}} GOARCH={{.loopitem.goarch}} go build -o build/up_{{.loopitem.goos}}_{{.loopitem.goarch}}_{{.ver}} app/up/*.go
+          - ls -l build/
+
+  - name: publish
+    desc: publish for github tagged version
+    task:
+      -
+        func: shell
+        do:
+          - git describe --exact-match --tags $(git log -n1 --pretty='%h')
+        reg: result
+
+      - func: cmd
+        desc: get the tag/release version
+        dvars:
+          - name: ver
+            value: '{{ .result.Output }}'
+            flags:
+              - v
+              - taskscope
+        do:
+          - name: print
+            cmd: 'version: {{.ver}}'
+
+      - func: call
+        do:
+          - buildDistro
+
   - name: release_local
     desc: release it to local path
     task:
