@@ -2,7 +2,7 @@
 
 The Ultimate Provisioner: the modern configuration management, build and automation tool
 
-## [UPcmd  - The Ultimate Provisioner](https://upcmd.netlify.app/)
+## [UPcmd  - The Ultimate Provisioner](https://upcmd.netlify.app/usage/cli_usage/)
 
 UP is designed and implemented to address some of the common problems of:
 
