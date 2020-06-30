@@ -22,6 +22,16 @@ tasks:
           - echo "hello, world"
 ```
 
+### A little taste of UPcmd
+
+Below shows a simple greeting example, also shows list, inspect and execution of the task
+
+![A little taste](https://raw.githubusercontent.com/upcmd/updocs/master/static/a_little_taste.png)
+
+### Demo
+
+![demo](https://raw.githubusercontent.com/upcmd/up-demo/master/intro.gif)
+
 ###  Why yet another build tool
 
 * Make was initially designed and used for building C program, even though it could be adopted for other purpose, some of the hard to learn trivials often cause problems than the benefits added to the team, and it is burning the brain. It is hard to make automation task extended to a more advanced level, readbility degrades rapidly and it is risky to implement critical logic using Make. Make is just a little old for modern business requirements. (Sorry, maybe this is just from some one not good at using Makefile)
@@ -103,18 +113,6 @@ There are around 200~ test cases tested, [source](https://github.com/upcmd/up/tr
 * [module usage examples](https://github.com/upcmd/up/tree/master/tests/modtests)
 
 These test cases are not only about the tests, they are the usage examples with documentation self explaned
-
-
-### A little taste of UPcmd
-
-Below shows a simple greeting example, also shows list, inspect and execution of the task
-
-![A little taste](https://raw.githubusercontent.com/upcmd/updocs/master/static/a_little_taste.png)
-
-
-### Demo
-
-![demo](https://raw.githubusercontent.com/upcmd/up-demo/master/intro.gif)
 
 ### License
 
