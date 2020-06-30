@@ -84,31 +84,23 @@ Allow empty skeleton to be laid for testing driving process or guide as seudo co
 
 Both UPcmd project build and the docs entire site build use the UPcmd itself
 
-#### Project Build
+#### Project Build [source](https://github.com/upcmd/up/blob/master/up.yml)
 
-[source](https://github.com/upcmd/up/blob/master/up.yml)
+#### Documentation [doc site](https://upcmd.netlify.app/)
 
-
-#### Documentation
-
-[upcmd documentation](https://upcmd.netlify.app/)
-
-* build of the doc site using build task:
+build of the entire doc site using one build task: [source](https://github.com/upcmd/updocs/blob/master/up.yml)
 
 ```
 up ngo build
 
 ```
 
-[source](https://github.com/upcmd/updocs/blob/master/up.yml)
-
-
 ### Testing
 
 There are around 200~ test cases tested, [source](https://github.com/upcmd/up/tree/master/tests)
 
-[common examples](https://github.com/upcmd/up/tree/master/tests/functests)
-[module usage examples](https://github.com/upcmd/up/tree/master/tests/modtests)
+* [common examples](https://github.com/upcmd/up/tree/master/tests/functests)
+* [module usage examples](https://github.com/upcmd/up/tree/master/tests/modtests)
 
 These test cases are not only about the tests, they are the usage examples with documentation self explaned
 
