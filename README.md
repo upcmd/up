@@ -4,13 +4,28 @@ The Ultimate Provisioner: the modern configuration management, build and automat
 
 ## [UPcmd  - The Ultimate Provisioner](https://upcmd.netlify.app/usage/cli_usage/)
 
-UP is designed and implemented to address some of the common problems of:
+UP is designed and implemented to shine as a modern tool for below:
 
-  * configuration management
-  * build, continuously delivery, integration with ci/cd
-  * comprehensive workflow orchestration
+  * Configuration management
+  * Build, continuously delivery, integration with ci/cd
+  * Comprehensive workflow orchestration: full support of almost all type of condition, loop(recursive), break
+  * Flexible configuration organisation
+  * No dependency hell issue
+  * Precise modeling, data is object, object is the data
+  * Design of composition, separate func type, data and implementation
+  * Use inteface(call func) for abstraction of intention, data input and implementation
+  * Many builtin dry run, assert, debugging features for the insights, developer friendly
+  * ... many more for you to discover, check out the docs
 
 It is a build tool like Ansible, Make, Rake, Ant, Gradle, Puppet, Taskfile etc, but it is a little smarter to try to make things a easier
+
+The goal of UP is to provide a quick (I'd say the quickest) solution to enable continuously integration and continuously deployment (CI/CD). It is simple to use and yet powerful to achieve many common challenges nowadays devops face in the Cloud environment
+
+It is designed with mindful consideration of collaboration with automation in Kubernetes, helm charts, api call
+
+It is also put best practice of integration with common CI/CD tools, such as GOCD, Jenkins, Drone, Gitlab CI and so on and be a good company of all different types of CLI tools
+
+It is bringing a fun DSL programming, a way of modeling and engineering into CLI and enable OO design and fast test driven development and delivery cycle
 
 ```
 tasks:
@@ -25,17 +40,41 @@ tasks:
 
 ### Quick install
 
+#### Install the binary
+
+There are 32 different distro for different combination of OS and Arch type, check them out: [release](https://github.com/upcmd/up/releases)
+
+Below are common one:
+
 * Install for Mac OSX:
 
 ```
-curl -s https://api.github.com/repos/upcmd/up/releases |grep amd64|grep download|awk '{print $2}' |grep darwin |xargs -I % curl -L % -o up && chmod +x up
+curl -s https://api.github.com/repos/upcmd/up/releases |grep darwin_amd64|grep download|head -n 1|awk '{print $2}' |xargs -I % curl -L % -o up && chmod +x up
 ```
 
 * Install for Linux:
 
 ```
-curl -s https://api.github.com/repos/upcmd/up/releases |grep amd64|grep download|awk '{print $2}' |grep linux |xargs -I % curl -L % -o up && chmod +x up
+curl -s https://api.github.com/repos/upcmd/up/releases |grep linux_amd64|grep download|head -n 1|awk '{print $2}' |xargs -I % curl -L % -o up && chmod
 ```
+
+* Install for Windows:
+
+```
+curl -s https://api.github.com/repos/upcmd/up/releases |grep windows_amd64|grep download|head -n 1|awk '{print $2}' |xargs -I % curl -L % -o up && chmod
+```
+
+Move the downloaded UP command executable to an execuatble path, eg. /usr/local/bin, so you can use it system wide
+
+#### Install from source
+
+Ensure you use go 1.14 (prefered)
+
+```
+go install github.com/upcmd/up/app/up
+```
+
+The up CLI command will be installed to: $HOME/go/bin, make sure you have this in your PATH
 
 #### Usage: followup the detailed documentation site: [https://upcmd.netlify.app/](https://upcmd.netlify.app/usage/cli_usage/)
 
@@ -64,17 +103,6 @@ Below shows a simple greeting example, also shows list, inspect and execution of
   A common usage of Ansible for many teams is to use the local ssh execution with group/host vars for templating and workflow automation, which is simply not right. Also the way the vars being managed is not fine grained. The ansible role as a reusable module is not flexible to implement more complicated tasks.
 
 * Inspired by https://taskfile.dev/,  it is tiny tool making build and automation easier and elegant, however it lacks some of the features in a practical cloud environment for CI/CD, devops automation, hence this project is born for that purpose
-
-
-### Goal
-
-The goal of UP is to provide a quick (I'd say the quickest) solution to enable continuously integration and continuously deployment (CI/CD). It is simple to use and yet powerful to achieve many common challenges nowadays devops face in the Cloud environment
-
-It is designed with mindful consideration of collaboration with automation in Kubernetes, helm charts, api call
-
-It is also put best practice of integration with common CI/CD tools, such as GOCD, Jenkins, Drone, Gitlab CI and so on
-
-It is bringing a DSL programming into CLI and enable OO design and fast test driven development and delivery cycle
 
 ### Features
 
