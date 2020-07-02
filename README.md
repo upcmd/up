@@ -8,6 +8,7 @@ UP is designed and implemented to address some of the common problems of:
 
   * configuration management
   * build, continuously delivery, integration with ci/cd
+  * comprehensive workflow orchestration
 
 It is a build tool like Ansible, Make, Rake, Ant, Gradle, Puppet, Taskfile etc, but it is a little smarter to try to make things a easier
 
@@ -20,6 +21,26 @@ tasks:
         func: shell
         do:
           - echo "hello, world"
+```
+
+### Quick install
+
+* Install for Mac OSX:
+
+```
+curl -s https://api.github.com/repos/upcmd/up/releases |grep amd64|grep download|awk '{print $2}' |grep darwin |xargs -I % curl -L % -o up && chmod +x up
+```
+
+* Install for Linux:
+
+```
+curl -s https://api.github.com/repos/upcmd/up/releases |grep amd64|grep download|awk '{print $2}' |grep linux |xargs -I % curl -L % -o up && chmod +x up
+```
+
+#### Usage: followup the detailed documentation site: [https://upcmd.netlify.app/](https://upcmd.netlify.app/usage/cli_usage/)
+
+```bash
+./up
 ```
 
 ### A little taste of UPcmd

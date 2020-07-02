@@ -67,22 +67,42 @@ tasks:
         desc: build the binary to build directory
         do:
           - rm -rf ./build
-          - mkdir -p ./build/linux
-          - mkdir -p ./build/mac
+
       -
         func: shell
-        desc: build distro
+        do: go tool dist list
+
+      -
+        func: cmd
+        dvars:
+          - name: void
+            value: '{{ .last_result.Output |splitLines |reg "distlist" }}'
+
+      - func: block
+        loop: distlist
         vars:
           ver: master
-        loop:
-          - goos: darwin
-            goarch: amd64
-          - goos: linux
-            goarch: amd64
         do:
-          - 'echo "build version - {{.ver}}" for release'
-          - GOOS={{.loopitem.goos}} GOARCH={{.loopitem.goarch}} go build -o build/up_{{.loopitem.goos}}_{{.loopitem.goarch}}_{{.ver}} app/up/*.go
-          - ls -l build/
+          - func: cmd
+            dvars:
+              - name: void
+                value: '{{.loopitem |split "/" |reg "dist"}}'
+
+          - func: shell
+            dvars:
+              - name: os
+                value: '{{.dist._0}}'
+              - name: arch
+                value: '{{.dist._1}}'
+            do:
+              - 'echo "build release version - {{.ver}} > [ os = {{.os}}, arch = {{.arch}} ]"'
+              - GOOS={{.os}} GOARCH={{.arch}} go build -o build/up_{{.os}}_{{.arch}}_{{.ver}} app/up/*.go
+            flags:
+              - ignore_error
+
+      -
+        func: shell
+        do: ls -l build/
 
   - name: publish
     desc: publish for github tagged version
