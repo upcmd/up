@@ -49,19 +49,37 @@ Below are common one:
 * Install for Mac OSX:
 
 ```
-curl -s https://api.github.com/repos/upcmd/up/releases |grep darwin_amd64|grep download|head -n 1|awk '{print $2}' |xargs -I % curl -L % -o up && chmod +x up
+curl -s https://api.github.com/repos/upcmd/up/releases \
+    |grep darwin_amd64 \
+    |grep download \
+    |head -n 1 \
+    |awk '{print $2}' \
+    |xargs -I % curl -L % -o up \
+    && chmod +x up
 ```
 
 * Install for Linux:
 
 ```
-curl -s https://api.github.com/repos/upcmd/up/releases |grep linux_amd64|grep download|head -n 1|awk '{print $2}' |xargs -I % curl -L % -o up && chmod
+curl -s https://api.github.com/repos/upcmd/up/releases \
+    |grep linux_amd64 \
+    |grep download \
+    |head -n 1 \
+    |awk '{print $2}' \
+    |xargs -I % curl -L % -o up \
+    && chmod +x up
 ```
 
 * Install for Windows:
 
 ```
-curl -s https://api.github.com/repos/upcmd/up/releases |grep windows_amd64|grep download|head -n 1|awk '{print $2}' |xargs -I % curl -L % -o up && chmod
+curl -s https://api.github.com/repos/upcmd/up/releases \
+    |grep windows_amd64 \
+    |grep download \
+    |head -n 1 \
+    |awk '{print $2}' \
+    |xargs -I % curl -L % -o up \
+    && chmod +x up
 ```
 
 Move the downloaded UP command executable to an execuatble path, eg. /usr/local/bin, so you can use it system wide
@@ -77,10 +95,6 @@ go install github.com/upcmd/up/app/up
 The up CLI command will be installed to: $HOME/go/bin, make sure you have this in your PATH
 
 #### Usage: followup the detailed documentation site: [https://upcmd.netlify.app/](https://upcmd.netlify.app/usage/cli_usage/)
-
-```bash
-./up
-```
 
 ### A little taste of UPcmd
 
