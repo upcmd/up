@@ -27,6 +27,8 @@ It is also put best practice of integration with common CI/CD tools, such as GOC
 
 It is bringing a fun DSL programming, a way of modeling and engineering into CLI and enable OO design and fast test driven development and delivery cycle
 
+* Hello, world
+
 ```
 tasks:
   -
@@ -38,13 +40,114 @@ tasks:
           - echo "hello, world"
 ```
 
+* Appetizers
+
+Below shows:
+
+* It is a simple deployment of a web application, it has a prior step of database deployment
+* The database deployment will depend on the db configuration base on per environment
+* the non prod envs: staging and dev share the same database configurations using a shared database 
+* the non prod envs: staging and dev each individually will use different database host name though
+* a dvar db_password using aes to manage the password   
+
+To deploy, simply specify a instanceid to be associated with an environment, eg: dev, staging or prod
+
+```
+up ngo -i staging
+```  
+
+The config: 
+``` 
+
+scopes:
+- name: global
+  vars:
+    db_driver: postgres
+    port: 5432
+
+- name: nonprod
+  members:
+  - dev
+  - staging
+  vars:
+    db_host: nonpord_database.test.host
+    db_user: test_db_user
+    db_password: could_be_encrypted_using_upcmd_too
+  dvars:
+    - name: db_password
+      value: '6HmsmiJIW1PfIXcF4WwOKOMDiL7PstgfKs2aRFajrwY='
+
+- name: prod
+  members: [prod]
+  vars:
+    host_alias: prod
+
+- name: dev
+  vars:
+    host_alias: dev
+
+- name: staging
+  vars:
+    host_alias: staging
+
+- name: prod
+  vars:
+    host_alias: prod
+    db_host: pord_database.proddb.host
+    db_user: prod_db_user
+  dvars:
+    - name: db_password
+      value: 'encrypte_aes'
+
+dvars:
+  db_hostname: '{{.host_alias}}.myapp.com'
+  db_url: 'jdbc:{{.db_driver}}://{{.db_hostname}}:{{.db_port}}/test?user={{.db_user}}&password={{.db_password}}&ssl=true'
+
+tasks:
+  -
+    name: Main
+    desc: deploy my web app stack
+    task:
+      -
+        func: call
+        do:
+          - deploy_database
+          - deploy_web
+
+      -
+        func: shell
+        do:
+          - systemctl start my_database 
+          - systemctl start my_web_server
+
+  -
+    name: deploy_web
+    task:
+      -
+        func: shell
+        do:
+          - deploy myweb_server
+
+  -
+    name: deploy_database
+    task:
+      -
+        func: shell
+        do:
+          - deploy mydatabase
+
+```
+
+With the evolving of the up.yml file, you could externalize the configuration to individual files or make them as module to be reused or shared. Please check out the doc for more details.
+
+
 ### Quick install
 
 #### Install the binary
 
 There are 32 different distro for different combination of OS and Arch type, check them out: [release](https://github.com/upcmd/up/releases)
 
-Below are common one:
+Below are common one for latest tagged stable release:
 
 * Install for Mac OSX:
 
@@ -99,6 +202,116 @@ The up CLI command will be installed to: $HOME/go/bin, make sure you have this i
 ### A little taste of UPcmd
 
 Below shows a simple greeting example, also shows list, inspect and execution of the task
+
+* With some smarts: logic and loop etc
+
+[doc](https://upcmd.netlify.app/quick-start/c0151/)
+[source](https://github.com/upcmd/up/blob/master/tests/functests/c0151.yml)
+
+This shows:
+* the greet task is an implementation, by default it was called with default global var greet_to value, but with supply of local var of "Grace", it changes the behaviour [see concept of interface](https://upcmd.netlify.app/call-func/c0020/)
+* loop through
+* if/else logic 
+* chain through tasks
+
+```
+
+Vars:
+  greet_to: Tom
+  weather: sunny
+
+tasks:
+  -
+    name: task
+    desc: main task of hello world demo of UPcmd
+    task:
+      -
+        func: call
+        desc: greet to Tom
+        do:
+          - greet
+
+      -
+        func: call
+        desc: greet to Grace
+        vars:
+          greet_to: Grace
+        do:
+          - greet
+
+
+      -
+        func: cmd
+        desc: do  you get the idea?
+        do:
+          - name: print
+            cmd: |
+              Have you got a little taste of using the UPcmd?
+
+      -
+        func: call
+        desc: greet to a team
+        vars:
+          team:
+            - Jason
+            - Connie
+          weather: stormy
+        loop: team
+        do:
+          - sayhi
+
+  -
+    name: greet
+    desc: greet to some one
+    task:
+      -
+        func: shell
+        desc: say hello
+        do:
+          - echo "Hello, {{.greet_to}}"
+
+      -
+        func: cmd
+        desc: talk about weather
+        do:
+          - name: print
+            cmd: 'It is {{.weather}}'
+
+      -
+        func: cmd
+        desc: ice break
+        do:
+          - name: print
+            cmd: 'What a great day!'
+        if: '{{eq .weather "sunny"}}'
+        else:
+          -
+            func: cmd
+            do:
+              - name: print
+                cmd: 'What a bad day!!'
+
+  -
+    name: sayhi
+    desc: say hi to some one
+    task:
+      -
+        func: cmd
+        desc: say hi to someone
+        do:
+          - name: print
+            cmd: 'Hi {{.loopitem}}, how are you?'
+
+      -
+        func: call
+        desc: greet to the team member
+        dvars:
+          - name: greet_to
+            value: '{{.loopitem}}'
+        do:
+          - greet
+
+```
 
 ![A little taste](https://raw.githubusercontent.com/upcmd/updocs/master/static/a_little_taste.png)
 
@@ -157,20 +370,22 @@ Allow empty skeleton to be laid for testing driving process or guide as seudo co
 
 Both UPcmd project build and the docs entire site build use the UPcmd itself
 
-#### Project Build [source](https://github.com/upcmd/up/blob/master/up.yml)
+#### Project release for UPcmd [source](https://github.com/upcmd/up/blob/master/up.yml)
+```
+up ngo publish
+```
 
 #### Documentation [doc site](https://upcmd.netlify.app/)
 
-build of the entire doc site using one build task: [source](https://github.com/upcmd/updocs/blob/master/up.yml)
+build of the entire doc site using one build task: 
+[source](https://github.com/upcmd/updocs/blob/master/up.yml)
+[details](https://upcmd.netlify.app/advanced-cases/upcmd-doc-gen/)
 
-```
-up ngo build
-
-```
+#### A web scripting example [how?](https://upcmd.netlify.app/advanced-cases/web-scraping/)
 
 ### Testing
 
-There are around 200~ test cases tested, [source](https://github.com/upcmd/up/tree/master/tests)
+There are over 200~ test cases, every release come with a full passed regression test of all cases defined, [source](https://github.com/upcmd/up/tree/master/tests)
 
 * [common examples](https://github.com/upcmd/up/tree/master/tests/functests)
 * [module usage examples](https://github.com/upcmd/up/tree/master/tests/modtests)
