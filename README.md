@@ -17,7 +17,7 @@ UP is designed and implemented to shine as a modern tool for below:
   * Many builtin dry run, assert, debugging features for the insights, developer friendly
   * ... many more for you to discover, check out the docs
 
-It is a build tool like Ansible, Make, Rake, Ant, Gradle, Puppet, Taskfile etc, but it is a little smarter to try to make things a easier
+It is a build tool like Ansible, Make, Rake, Ant, Gradle, Puppet, Taskfile etc, but it is a little smarter to try to make things a little easier
 
 The goal of UP is to provide a quick (I'd say the quickest) solution to enable continuously integration and continuously deployment (CI/CD). It is simple to use and yet powerful to achieve many common challenges nowadays devops face in the Cloud environment
 
@@ -142,6 +142,31 @@ tasks:
 
 With the evolving of the up.yml file, you could externalize the configuration to individual files or make them as module to be reused or shared. Please check out the doc for more details.
 
+### High level design
+
+In high level, UPcmd is processing like below:
+
+* The process engine process the scope vars and merge them with global vars, then in the run time it will merge with local vars again
+* For the callee task, the local vars will be overriden by the vars passed from caller task
+    
+![high level design](https://raw.githubusercontent.com/upcmd/updocs/master/static/up_high_level.png)
+
+### Possible applications
+
+UPcmd is a generic automation tool, as long as your automation works in SHEL. You do not need SHELL executable though, as it has default GOSH builtin just in case you will need one to fall back to.
+
+There could be application as below, but not limit to: 
+* Build, package, publish, test, deploy for all different types of applications in your local machine, or integrate with CI/CD tools/pipeliens
+* UPcmd could be used as tool/platform/pipelien agnostic abstration layer, leave the most configuration to UPcmd to manage as an execution profile, expose only the profileid to be linked with the tool, eg: jenkins/gitlab ci, so that all your automation is portable. In case you need to switch from on to another, you don't need to rewrite all the automation. In this case, UPcmd's configured tasks could be regarded as pipeline as code.  
+* A collection of util like (tool box) for local machine automation, for example, 
+    1. bootstrap the whole Macbook with all upgraded packages, setup all your dotfiles
+    2. bootstrap the whole Linux box/virtual VM/vagrant box/docker container
+* Create CLI program, prompt with user input, encrypt/decrypt secrets
+* Web service/rest api call and message transformation
+* Cloud service provisioning, eg drive complicated workflow to manage to create full application stack in AWS or k8s cluster, utilise and integrate with other CLI commands, such as packer, aws cli, kubectl, helm, terraform
+* Reuse/consume or share modules to deal with a particular use case. 
+* Resolve the dependencies issue by simply invoking different version of the relevant CLI/docker run
+* The orchestration of UPcmd task itself could be seen as prototyping tool and design tool, or use the defined workflow as skeleton to guide the implementation from different part        
 
 ### Quick install
 
@@ -187,7 +212,7 @@ curl -s https://api.github.com/repos/upcmd/up/releases \
     && chmod +x up
 ```
 
-Move the downloaded UP command executable to an execuatble path, eg. /usr/local/bin, so you can use it system wide
+Move the downloaded UP command executable to an executable path, eg. /usr/local/bin, so you can use it system wide
 
 #### Install from source
 
@@ -344,24 +369,24 @@ Check it out yourself: [source](https://github.com/upcmd/up-demo/blob/master/dem
 2. Implemented in golang, so no dependency hell, no maintenance of runtime and ensure the version consistency across multiple/many execution contexts
 3. Use scopes to manage group of execution context, the variables associated with the scope. Fine grained scoping model to support variable auto overriding/merging. Similar to Ansible global/group vars, host vars, but more powerful to support leaf level objects auto merging
 4. Use dvar - dynamic var, a special design to achieve many incredible features, for example:
-  * manage security: encrypt/decrypt, like ansible-vault, builtin
-  * dynamics on dynamics: it allows you to specify how many layers of expansion you'd like to dynamically render a variable
-  * builtin templating capability
-  * use golang template, supporting all(220+) (builtin|sprig|gtf) funcs/pipeline so that your configuration could be well controlled in template using objects
-  * auto message transformation between yaml|json result to object used internally
-  * conform the hierarchical scoping model for var merging to leaf level
-  * manage setup/read env vars in the same scoping model so that you could have seamless integration with minimal exposed demanding ENV vars from CD/CI tool
-  * auto validation for mandatory vars
+    * manage security: encrypt/decrypt, like ansible-vault, builtin
+    * dynamics on dynamics: it allows you to specify how many layers of expansion you'd like to dynamically render a variable
+    * builtin templating capability
+    * use golang template, supporting all(220+) (builtin|sprig|gtf) funcs/pipeline so that your configuration could be well controlled in template using objects
+    * auto message transformation between yaml|json result to object used internally
+    * conform the hierarchical scoping model for var merging to leaf level
+    * manage setup/read env vars in the same scoping model so that you could have seamless integration with minimal exposed demanding ENV vars from CD/CI tool
+    * auto validation for mandatory vars
 5. Color print and adjustable verbose level
 6. Flexible programming model to allow you to separate implementation with interface so that common code could be reused via task_ref
 Allow empty skeleton to be laid for testing driving process or guide as seudo code, but fill in the details and implementation gradually
 7. Flow control:
-  * ignore_error
-  * dry run
-  * if condition support
-  * loop support to iterate through a list of items
-  * mult-layered loop and break
-  * block and embedded block of code for execution
+      * ignore_error
+      * dry run
+      * if condition support
+      * loop support to iterate through a list of items
+      * mult-layered loop and break
+      * block and embedded block of code for execution
 8. Flexible configuration style to load dvar, scope, flow from external yaml so that the programming code will be a little cleaner and organised. Your code could evolve starting from simple, then externalize detailed implementation to files.
 9. Support the unlimited yml object, so yml config in var is text and it is also object.It could be merged in scopes automatically, it could be processed using go template
 10. Battery included for common builtin commands: print, reg, dereg, template, readfile, writefile
@@ -377,18 +402,18 @@ Allow empty skeleton to be laid for testing driving process or guide as seudo co
 
 Both UPcmd project build and the docs entire site build use the UPcmd itself
 
-#### Project release for UPcmd [source](https://github.com/upcmd/up/blob/master/up.yml)
+##### Project release for UPcmd [source](https://github.com/upcmd/up/blob/master/up.yml)
 ```
 up ngo publish
 ```
 
-#### Documentation [doc site](https://upcmd.netlify.app/)
+##### Documentation [doc site](https://upcmd.netlify.app/)
 
 build of the entire doc site using one build task: 
-[source](https://github.com/upcmd/updocs/blob/master/up.yml)
-[details](https://upcmd.netlify.app/advanced-cases/upcmd-doc-gen/)
+* [source](https://github.com/upcmd/updocs/blob/master/up.yml)
+* [details](https://upcmd.netlify.app/advanced-cases/upcmd-doc-gen/)
 
-#### A web scripting example [how?](https://upcmd.netlify.app/advanced-cases/web-scraping/)
+##### A web scripting example [how?](https://upcmd.netlify.app/advanced-cases/web-scraping/)
 
 ### Testing
 
