@@ -203,10 +203,7 @@ The up CLI command will be installed to: $HOME/go/bin, make sure you have this i
 
 Below shows a simple greeting example, also shows list, inspect and execution of the task
 
-* With some smarts: logic and loop etc
-
-[doc](https://upcmd.netlify.app/quick-start/c0151/)
-[source](https://github.com/upcmd/up/blob/master/tests/functests/c0151.yml)
+* With some smarts: logic and loop etc [doc](https://upcmd.netlify.app/quick-start/c0151/) | [source](https://github.com/upcmd/up/blob/master/tests/functests/c0151.yml)
 
 This shows:
 * the greet task is an implementation, by default it was called with default global var greet_to value, but with supply of local var of "Grace", it changes the behaviour [see concept of interface](https://upcmd.netlify.app/call-func/c0020/)
@@ -316,6 +313,14 @@ tasks:
 ![A little taste](https://raw.githubusercontent.com/upcmd/updocs/master/static/a_little_taste.png)
 
 ### Demo
+
+It demos:
+* create upcmd task skeleton using init command
+* show the intro demo code and execution
+* use module
+* test driven, assert and color print
+
+Check it out yourself: [source](https://github.com/upcmd/up-demo/blob/master/demo.sh) and try to have fun to run though the examples by yourself
 
 ![demo](https://raw.githubusercontent.com/upcmd/up-demo/master/intro.gif)
 
