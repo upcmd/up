@@ -97,11 +97,13 @@ scopes:
     db_user: prod_db_user
   dvars:
     - name: db_password
-      value: 'encrypte_aes'
+      value: 'prod_encrypte_aes'
 
 dvars:
-  db_hostname: '{{.host_alias}}.myapp.com'
-  db_url: 'jdbc:{{.db_driver}}://{{.db_hostname}}:{{.db_port}}/test?user={{.db_user}}&password={{.db_password}}&ssl=true'
+  - name: db_hostname
+    value: '{{.host_alias}}.myapp.com'
+  - name: db_url
+    value: 'jdbc:{{.db_driver}}://{{.db_hostname}}:{{.db_port}}/test?user={{.db_user}}&password={{.db_password}}&ssl=true'
 
 tasks:
   -
