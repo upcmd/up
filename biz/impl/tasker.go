@@ -729,10 +729,8 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 					passinvars = deepcopy.Copy(*t.RuntimeVarsAndDvarsMerged).(core.Cache)
 					mergo.Merge(&passinvars, callerVars, mergo.WithOverride)
 					rtContext.ExecbaseVars = &passinvars
-					//u.Ptmpdebug("55", rtContext.ExecbaseVars)
 					rtContext.TasknameLayered = u.Spf("%s/%s", "TODO: Main Caller Taskname", taskname)
 				} else {
-					//u.Ptmpdebug("66", rtContext.ExecbaseVars)
 					if IsAtRootTaskLevel() {
 						rtContext.ExecbaseVars = t.RuntimeVarsAndDvarsMerged
 						rtContext.TasknameLayered = taskname

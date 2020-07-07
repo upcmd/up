@@ -35,6 +35,10 @@ vars:
     - tom
     - jason
     - alice
+  fieldnames:
+    name-with-dash: |
+      this_is_a_field_with_dash: you will have to use index func to access the field
+      note: direct access this field will trigger template rendering error
 
 dvars:
   - name: instance_full_name
@@ -105,6 +109,10 @@ dvars:
 
   - name: var_slice_index
     value: "{{ index .admins 1 }}"
+    flags: [vvvv,]
+
+  - name: out_of_normal_field_name
+    value: '{{ index .fieldnames "name-with-dash" }}'
     flags: [vvvv,]
 
   - name: var_slice

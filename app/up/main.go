@@ -69,6 +69,7 @@ func main() {
 		if *ngoTaskName != "" {
 			u.Pln("-exec task:", *ngoTaskName)
 			t := impl.NewTasker(*instanceName, initConfig)
+			impl.Pipein()
 			t.ExecTask(*ngoTaskName, nil, false)
 			//u.Ptmpdebug("88", impl.ConfigRuntime())
 		}

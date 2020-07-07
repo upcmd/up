@@ -156,8 +156,8 @@ In high level, UPcmd is processing like below:
 UPcmd is a generic automation tool, as long as your automation works in SHEL. You do not need SHELL executable though, as it has default GOSH builtin just in case you will need one to fall back to.
 
 There could be application as below, but not limit to: 
-* Build, package, publish, test, deploy for all different types of applications in your local machine, or integrate with CI/CD tools/pipeliens
-* UPcmd could be used as tool/platform/pipelien agnostic abstration layer, leave the most configuration to UPcmd to manage as an execution profile, expose only the profileid to be linked with the tool, eg: jenkins/gitlab ci, so that all your automation is portable. In case you need to switch from on to another, you don't need to rewrite all the automation. In this case, UPcmd's configured tasks could be regarded as pipeline as code.  
+* Build, package, publish, test, deploy for all different types of applications in your local machine, or integrate with CI/CD tools/pipelines
+* UPcmd could be used as tool/platform/pipeline agnostic abstraction layer, leave the most configuration to UPcmd to manage as an execution profile, expose only the profileid to be linked with the tool, eg: jenkins/gitlab ci, so that all your automation is portable. In case you need to switch from one to another, you don't need to rewrite all the automation. In this case, UPcmd's configured tasks could be regarded as pipeline as code.  
 * A collection of util like (tool box) for local machine automation, for example, 
     1. bootstrap the whole Macbook with all upgraded packages, setup all your dotfiles
     2. bootstrap the whole Linux box/virtual VM/vagrant box/docker container

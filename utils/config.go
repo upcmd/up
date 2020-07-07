@@ -83,11 +83,9 @@ func (cfg *UpConfig) InitConfig() *UpConfig {
 	}
 
 	if cfg.ModuleName == "" {
-		cfg.ModuleName = GetRandomName(1)
+		cfg.ModuleName = "self"
 	}
 
 	cfg.SetAbsWorkdir()
 	return cfg
 }
-
-

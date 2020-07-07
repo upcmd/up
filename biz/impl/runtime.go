@@ -21,8 +21,9 @@ var (
 )
 
 const (
-	UP_RUNTIME_TASK_LAYER_NUMBER   = "up_runtime_task_layer_number"
-	UP_RUNTIME_TASKER_LAYER_NUMBER = "up_runtime_tasker_layer_number"
+	UP_RUNTIME_TASK_LAYER_NUMBER    = "up_runtime_task_layer_number"
+	UP_RUNTIME_TASKER_LAYER_NUMBER  = "up_runtime_tasker_layer_number"
+	UP_RUNTIME_TASK_PIPE_IN_CONTENT = "up_runtime_task_pipe_in_content"
 )
 
 type TaskRuntimeContext struct {

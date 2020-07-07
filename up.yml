@@ -2,6 +2,7 @@ version: 1.0.0
 
 vars:
   ver_yq: v3.3.2
+  release_api_ep: https://api.github.com/repos/upcmd/up/releases
   license_header: |
     // Ultimate Provisioner: UP cmd
     // Copyright (c) 2019 Stephen Cheng and contributors
@@ -43,6 +44,47 @@ tasks:
           - name: return
             cmd:
               - os
+
+  -
+    name: test
+#    name: Publish_edge_release
+    desc: build the latest unstable release
+    task:
+      -
+        func: call
+        dox: build
+
+      - func: shell
+        dox:
+          - curl https://api.github.com/repos/upcmd/up/releases/tags/edge
+        reg: result
+
+      - func: shell
+        do: |
+          curl -d '
+          {
+            "tag_name": "latest",
+            "target_commitish": "master",
+            "name": "latest",
+            "body": "latest bleeding-edge release from master",
+            "draft": false,
+            "prerelease": false
+          }
+          ' -H "Content-Type: application/json" -X POST {{.release_api_ep}}
+
+#      - func: cmd
+#        desc: get the tag/release version
+#        dvars:
+#          - name: ver
+#            value: '{{ .result.Output }}'
+#            flags:
+#              - v
+#              - taskscope
+#        do:
+#          - name: print
+#            cmd: 'version: {{.ver}}'
+#
+
 
   -
     name: build
