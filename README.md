@@ -7,7 +7,7 @@ The Ultimate Provisioner: the modern configuration management, build and automat
 UP is designed and implemented to shine as a modern tool for below:
 
   * Configuration management
-  * Build, continuously delivery, integration with ci/cd
+  * Build, continuous delivery, integration with CI/CD
   * Comprehensive workflow orchestration: full support of almost all type of condition, loop(recursive), break
   * Flexible configuration organisation
   * No dependency hell issue
@@ -17,15 +17,15 @@ UP is designed and implemented to shine as a modern tool for below:
   * Many builtin dry run, assert, debugging features for the insights, developer friendly
   * ... many more for you to discover, check out the docs
 
-It is a build tool like Ansible, Make, Rake, Ant, Gradle, Puppet, Taskfile etc, but it is a little smarter to try to make things a little easier
+It is a build tool like Ansible, Make, Rake, Ant, Gradle, Puppet, Taskfile etc, but it is a little smarter to try to make things a little easier.
 
-The goal of UP is to provide a quick (I'd say the quickest) solution to enable continuously integration and continuously deployment (CI/CD). It is simple to use and yet powerful to achieve many common challenges nowadays devops face in the Cloud environment
+The goal of UP is to provide a quick (I'd say the quickest) solution to enable continuous integration and continuous deployment (CI/CD). It is simple to use and yet powerful to address many common challenges nowadays devop teams facing in the Cloud environment.
 
-It is designed with mindful consideration of collaboration with automation in Kubernetes, helm charts, api call
+It is designed with mindful consideration of collaboration with automation in Kubernetes, helm charts, api call.
 
-It is also put best practice of integration with common CI/CD tools, such as GOCD, Jenkins, Drone, Gitlab CI and so on and be a good company of all different types of CLI tools
+It follows best practices integrating with common CI/CD tools, such as GOCD, Jenkins, Drone, Gitlab CI and so on and is a good company of all types of CLI tools.
 
-It is bringing a fun DSL programming, a way of modeling and engineering into CLI and enable OO design and fast test driven development and delivery cycle
+It brings a fun DSL programming interface, a way of modeling and engineering into CLI. It enables OO design and rapid Test Driven Development (TDD) and shorter software delivery cycle.
 
 * Hello, world
 
@@ -144,7 +144,7 @@ With the evolving of the up.yml file, you could externalize the configuration to
 
 ### High level design
 
-In high level, UPcmd is processing like below:
+At high level, UPcmd process flows like below:
 
 * The process engine process the scope vars and merge them with global vars, then in the run time it will merge with local vars again
 * For the callee task, the local vars will be overriden by the vars passed from caller task
@@ -153,7 +153,7 @@ In high level, UPcmd is processing like below:
 
 ### Possible applications
 
-UPcmd is a generic automation tool, as long as your automation works in SHEL. You do not need SHELL executable though, as it has default GOSH builtin just in case you will need one to fall back to.
+UPcmd is a generic automation tool, given your automation solution being backed by Unix Shell. You do not need Shell executable though, as it has default GOSH builtin just in case you will need one to fall back to.
 
 There could be application as below, but not limit to: 
 * Build, package, publish, test, deploy for all different types of applications in your local machine, or integrate with CI/CD tools/pipelines
@@ -228,7 +228,7 @@ The up CLI command will be installed to: $HOME/go/bin, make sure you have this i
 
 ### A little taste of UPcmd
 
-Below shows a simple greeting example, also shows list, inspect and execution of the task
+Below is a simple greeting example, and a list, inspect and execution view of the task.
 
 * With some smarts: logic and loop etc [doc](https://upcmd.netlify.app/quick-start/c0151/) | [source](https://github.com/upcmd/up/blob/master/tests/functests/c0151.yml)
 
