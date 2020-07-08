@@ -113,6 +113,27 @@ func Render(tstr string, obj interface{}) string {
 	return result.String()
 }
 
+func ElementValid(path string, obj interface{}) bool {
+
+	t, err := template.New("validator").Funcs(templateFuncs).Parse(path)
+
+	u.LogErrorAndContinue("template element validating", err, "Please fix the template issue and try again")
+
+	var result bytes.Buffer
+	err = t.Execute(&result, obj)
+	u.LogErrorAndContinue("element validating problem", err, u.PrintContentWithLineNuber(path))
+
+	u.Pdebug("path is", path, result.String())
+
+	if err != nil {
+		return false
+	} else if result.String() == "<no value>" {
+		return false
+	} else {
+		return true
+	}
+}
+
 func ListAllFuncs() {
 
 	var builtins = map[string]string{

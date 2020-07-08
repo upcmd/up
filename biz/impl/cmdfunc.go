@@ -616,6 +616,25 @@ func (f *CmdFuncAction) Exec() {
 			u.Ppmsgvvvvvhint("after reg the var - contextual global:", TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 
+		case "path_existed":
+			cmd := cmdItem.Cmd.(map[interface{}]interface{})
+			var raw, path, pathtstr, reg string
+			for k, v := range cmd {
+				switch k.(string) {
+				case "path":
+					raw = v.(string)
+					path = Render(raw, f.Vars)
+					pathtstr = u.Spf("{{.%s}}", path)
+				case "reg":
+					raw = v.(string)
+					reg = Render(raw, f.Vars)
+				}
+			}
+
+			result := ElementValid(pathtstr, f.Vars)
+			TaskRuntime().ExecbaseVars.Put(reg, result)
+			f.Vars.Put(reg, result)
+
 		case "return":
 			cmdItem.runCmd("array", func() {
 				retNames := cmdItem.Cmd.([]interface{})

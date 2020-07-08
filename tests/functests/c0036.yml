@@ -127,6 +127,10 @@ dvars:
     value: "{{ ne .ns .pod_name }}"
     flags: [vvvv,]
 
+  - name: var_not_equal_another_way
+    value: "{{ not (eq .ns .pod_name) }}"
+    flags: [vvvv,]
+
   - name: var_greater
     value: "{{ gt .ns .pod_name }}"
     flags: [vvvv,]

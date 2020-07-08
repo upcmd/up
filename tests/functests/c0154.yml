@@ -1,0 +1,85 @@
+doc_meta: |
+  folder: vars
+  title: probe exisitence of path
+  head: |
+    When you render a template value based on a path of the var in the register, sometimes you will get <no value> as that element does not exist yet. This will appear as a warning error and ignored. However it is critial if this value will be used in workflow condition, then this might cause problem. So it is better to know if this element exist before accessing
+
+  sections:
+    - title: Demo
+      log: yes
+
+    - title: Explain
+      content: |
+        Below shows how to use cmd path_existed to get a boolean result and saved to a register value, then you can use it in your workflow to decide to go ahead to access the value of the var
+
+notes:
+  - test how to detect if a var exist or not
+
+vars:
+  a: aaa
+  b: bbb
+  sydney_grammar:
+    address: sydney
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        desc: |
+          access a non-exist var will not cause error or panic while you render it
+          however if you access a non exist child element, then it will result in a error
+        do:
+          - name: print
+            cmd: '{{.c}}'
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.b.not_exist}}'
+
+      -
+        func: cmd
+        do:
+          - name: query
+            desc: |
+              if the sub element does not exist, eg school_name does not exit, then the query result will give the result of the closed element result, in this caes the parent value "aaa" will be return
+            cmd:
+              path: a.school_name
+              reg: myschool
+
+          - name: query
+            cmd:
+              path: sydney_grammar.address
+              reg: school_address
+
+          - name: path_existed
+            cmd:
+              path: sydney_grammar.address
+              reg: address_existed
+
+          - name: path_existed
+            desc: |
+              the state will be rendered as <no value>, this will be treated as not exist
+            cmd:
+              path: sydney_grammar.state
+              reg: state_existed
+
+          - name: path_existed
+            cmd:
+              path: b.not_exist
+              reg: varb_sub_element_existed
+
+          - name: print
+            cmd: |
+              sydney_grammar.address exist: {{.address_existed}}
+              sydney_grammar.state exist: {{.state_existed}}
+              varb_sub_element_existed exist: {{.varb_sub_element_existed}}
+
+      -
+        func: cmd
+        do:
+          - name: inspect
+            cmd:
+              - exec_vars

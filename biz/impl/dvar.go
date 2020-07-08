@@ -157,7 +157,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 
 					obj := new(interface{})
 					err := yaml.Unmarshal([]byte(rawyml), obj)
-					u.LogErrorAndExit("dvar conversion to object:", err, "please validate the ymal content")
+					u.LogErrorAndExit("dvar conversion to object:", err, u.PrintContentWithLineNuber(rawyml))
 
 					dvarObjName := u.Spf("%s_%s", dvar.Name, "object")
 					if dvar.Name != "void" {
