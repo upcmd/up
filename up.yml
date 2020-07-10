@@ -3,6 +3,16 @@ version: 1.0.0
 vars:
   ver_yq: v3.3.2
   release_api_ep: https://api.github.com/repos/upcmd/up/releases
+  release_upload_ep: https://uploads.github.com/repos/upcmd/up/releases
+  dists_for_latest:
+    - os: darwin
+      arch: amd64
+    - os: linux
+      arch: amd64
+    - os: windows
+      arch: amd64
+
+
   license_header: |
     // Ultimate Provisioner: UP cmd
     // Copyright (c) 2019 Stephen Cheng and contributors
@@ -46,22 +56,51 @@ tasks:
               - os
 
   -
-    name: test
-#    name: Publish_edge_release
+    name: Publish_latest
     desc: build the latest unstable release
     task:
       -
         func: call
-        dox: build
+        dvars:
+          - name: distlist
+            value: |
+              {{ range $idx, $dist := .dists_for_latest -}}
+              {{- with $dist }}
+              - {{ .os}}/{{.arch -}}
+              {{end}}
+              {{end}}
+            flags:
+              - to_object
+              - v
+        do: buildDistro
+
+      - func: cmd
+        do:
+          - name: exit
 
       - func: shell
-        dox:
-          - curl https://api.github.com/repos/upcmd/up/releases/tags/edge
+        do:
+          - curl -s https://api.github.com/repos/upcmd/up/releases/tags/latest
         reg: result
 
       - func: shell
+        desc: delete the latest release remotely if it exists
+        dvars:
+          - name: release
+            value: '{{.result.Output}}'
+            flags:
+              - to_object
+          - name: releaseid
+            value: '{{.release_object.id}}'
+        do:
+          - echo "releaseid - {{.releaseid}}"
+          - curl -X DELETE {{.release_api_ep}}/{{.releaseid}}
+        if: '{{not (eq .releaseid "<no value>")}}'
+
+      - func: shell
+        desc: create the latest master release
         do: |
-          curl -d '
+          curl -s -d '
           {
             "tag_name": "latest",
             "target_commitish": "master",
@@ -70,21 +109,40 @@ tasks:
             "draft": false,
             "prerelease": false
           }
-          ' -H "Content-Type: application/json" -X POST {{.release_api_ep}}
+          ' \
+          -X POST \
+          -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
+          -H "Content-Type: application/json" \
+          {{.release_api_ep}}
+        reg: result
 
-#      - func: cmd
-#        desc: get the tag/release version
-#        dvars:
-#          - name: ver
-#            value: '{{ .result.Output }}'
-#            flags:
-#              - v
-#              - taskscope
-#        do:
-#          - name: print
-#            cmd: 'version: {{.ver}}'
-#
+      - func: cmd
+        desc: get the release info
+        dvars:
+          - name: release
+            value: '{{.result.Output}}'
+            flags:
+              - to_object
+          - name: releaseid
+            value: '{{.release_object.id}}'
+            flags:
+              - taskscope
 
+      - func: block
+        loop: dists_for_latest
+        do:
+          - func: shell
+            desc: upload the most used distros only
+            do:
+              - echo "upload for latest release - {{.releaseid}} for {{.loopitem.os}}-{{.loopitem.arch}}"
+              - |
+                curl -s \
+                -X POST \
+                --data-binary '@build/up_{{.os}}_{{.arch}}_latest' \
+                -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
+                -H "Content-Type: application/json" \
+                {{.release_upload_ep}}/{{.releaseid}}/assets?name=up_{{.os}}_{{.arch}}_latest
+        if: '{{not (eq .releaseid "<no value>")}}'
 
   -
     name: build
@@ -111,14 +169,39 @@ tasks:
           - rm -rf ./build
 
       -
-        func: shell
-        do: go tool dist list
+        func: block
+        desc: |
+          default to build all types of distros supported
+          if instructed the dist=common, then only build: linux, darwin and windows
+        do:
+          -
+            func: shell
+            desc: |
+              this gives a list of supported os/arch types, eg:
+                android/arm64
+                darwin/amd64
+                darwin/arm64
+                freebsd/amd64
+                illumos/amd64
+                linux/amd64
+                linux/ppc64
+                netbsd/arm64
+                windows/amd64
+                ..... more ...
+            do: go tool dist list
 
-      -
-        func: cmd
-        dvars:
-          - name: void
-            value: '{{ .last_result.Output |splitLines |reg "distlist" }}'
+          -
+            func: cmd
+            dvars:
+              - name: void
+                value: '{{ .last_result.Output |splitLines |reg "distlist" }}'
+        if: '{{eq .distlist "<no value>"}}'
+        else:
+          - func: cmd
+            desc: build the supplied list of dist types
+            do:
+              - name: print
+                cmd: 'building {{.distlist}}'
 
       - func: block
         loop: distlist

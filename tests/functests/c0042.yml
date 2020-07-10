@@ -1,5 +1,5 @@
 doc_meta: |
-  folder: template
+  folder: object-oriented
   title: reg/dereg/void
   head: |
     You can use template func reg to register a value to global runtime or dereg to remove it from runtime
