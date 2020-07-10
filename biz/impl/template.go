@@ -10,6 +10,7 @@ package impl
 import (
 	"bytes"
 	"github.com/Masterminds/sprig/v3"
+	"github.com/upcmd/up/model/core"
 	u "github.com/upcmd/up/utils"
 	"io/ioutil"
 	"os"
@@ -53,14 +54,29 @@ func FuncMapInit() {
 			u.Ppmsg(obj)
 			return u.Sppmsg(obj)
 		},
+		"obj_to_yml": func(obj interface{}) string {
+			yml := core.ObjToYaml(obj)
+			u.Ppmsgvvvvv("obj_to_yml", yml)
+			return yml
+		},
+		"yml_to_obj": func(yml string) interface{} {
+			obj := core.YamlToObj(yml)
+			u.Ppmsgvvvvv("yml_to_obj", obj)
+			return obj
+		},
 		//reg do not return any value, so do not expect the dvar value will be something other than empty
 		"reg": func(varname string, object interface{}) string {
 			TaskRuntime().ExecbaseVars.Put(varname, object)
-			return ""
+			StepRuntime().ContextVars.Put(varname, object)
+			return core.ObjToYaml(object)
 		},
 		"dereg": func(varname string) string {
 			TaskRuntime().ExecbaseVars.Delete(varname)
 			return ""
+		},
+		"path_existed": func(path string) bool {
+			pathtstr := u.Spf("{{.%s}}", path)
+			return ElementValid(pathtstr, StepRuntime().ContextVars)
 		},
 		"filecontent": func(filepath string) string {
 			if _, err := os.Stat(filepath); os.IsNotExist(err) {
@@ -122,8 +138,6 @@ func ElementValid(path string, obj interface{}) bool {
 	var result bytes.Buffer
 	err = t.Execute(&result, obj)
 	u.LogErrorAndContinue("element validating problem", err, u.PrintContentWithLineNuber(path))
-
-	u.Pdebug("path is", path, result.String())
 
 	if err != nil {
 		return false

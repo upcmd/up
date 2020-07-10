@@ -29,12 +29,13 @@ tasks:
         func: cmd
         desc: |
           access a non-exist var will not cause error or panic while you render it
-          however if you access a non exist child element, then it will result in a error
         do:
           - name: print
             cmd: '{{.c}}'
       -
         func: cmd
+        desc: |
+          however if you access a non exist child element, then it will result in a warning error
         do:
           - name: print
             cmd: '{{.b.not_exist}}'
@@ -44,7 +45,7 @@ tasks:
         do:
           - name: query
             desc: |
-              if the sub element does not exist, eg school_name does not exit, then the query result will give the result of the closed element result, in this caes the parent value "aaa" will be return
+              if the sub element does not exist, eg school_name does not exit, then the query result will give the result of the closest element result, in this caes the parent value "aaa" will be return
             cmd:
               path: a.school_name
               reg: myschool
@@ -79,7 +80,26 @@ tasks:
 
       -
         func: cmd
+        desc: test path_existed in templating
+        do:
+          - name: print
+            cmd: |
+              sydney_grammar.address exist: {{ path_existed "sydney_grammar.address" }}
+              sydney_grammar.state exist: {{ path_existed "sydney_grammar.state"}}
+              varb_sub_element_existed exist: {{ path_existed "b.not_exist"}}
+              {{ if path_existed "b.not_exist"}}
+              I am happy
+              {{ else }}
+              I am sad
+              {{ end }}
+
+      -
+        func: cmd
         do:
           - name: inspect
             cmd:
               - exec_vars
+
+          - name: assert
+            cmd:
+              - '{{path_existed "sydney_grammar.address" }}'

@@ -1,0 +1,50 @@
+notes:
+  - test only to add support to make registered var immediatelly available in current step
+  - it must be availabe in scope of var/dvar preprocessing before do action
+
+vars:
+  school: |
+    sg:
+      name: sydney grammar
+      state: nsw
+      address: sydney
+      postcode: 2000
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: cmd
+        dvars:
+          - name: aa
+            value: '{{.school |yml_to_obj|reg "aa_obj"}}'
+            flags:
+              - v
+          - name: bb
+            value: '{{.school |yml_to_obj|reg "bb_obj"}}'
+            flags:
+              - v
+        do:
+          - name: print
+            cmd: |
+              {{.aa}}
+              {{.aa_obj}}
+          - name: print
+            cmd: |
+              {{.bb}}
+              {{.bb_obj |reg "cc"}}
+
+          - name: path_existed
+            cmd:
+              path: sydney_grammar.address
+              reg: address_existed
+
+          - name: assert
+            cmd:
+              - '{{path_existed "aa" }}'
+              - '{{path_existed "aa_obj" }}'
+              - '{{path_existed "bb" }}'
+              - '{{path_existed "bb_obj" }}'
+

@@ -31,7 +31,7 @@ doc_meta: |
       content: query details
       refs:
         - title: query object
-          link: ../../query-object/c0100
+          link: ../../object-oriented/c0100
 
     - title: Demo
       log: yes

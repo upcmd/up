@@ -13,7 +13,7 @@ doc_meta: |
       content: to_object in dvar
       refs:
         - title: to_object in dvar
-          link: ../../query-object/c0074
+          link: ../../object-oriented/c0074
 
     - title: Demo
       log: yes

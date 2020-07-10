@@ -1,0 +1,121 @@
+doc_meta: |
+  folder: object-oriented
+  title: reg/set a object
+  head: |
+    To utilize the best of UPcmd, you always want to access the data conviently
+
+    Let's talk about how we can prepare the data object
+
+  sections:
+    - title: Demo
+      log: yes
+
+    - title: Where are the data object from?
+      content: |
+        The data objects come from a few sources:
+
+        1. scopes: you can define vars and dvars in scope group
+        2. global vars/dvars
+        3. vars/dvars in func
+        4. vars registered from with templating using reg template func
+        5. vars registered using reg cmd
+        6. dvar flag: to_object will also register the object to that local exec vars context
+
+        This examples shows you the point 4,5 and 6, three ways to set the vars
+
+        You can make use of vars in following cases:
+        1. if condition
+        2. any templating rendering
+        3. yml operation using cmd: query, yml_write, yml_delete
+
+notes:
+  - show new way to register object from template
+  -
+
+vars:
+  school: |
+    sg:
+      name: sydney grammar
+      state: nsw
+      address: sydney
+      postcode: 2000
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        desc: |
+          1st solution: register object in any template rending
+        do:
+          - name: print
+            desc: |
+              Use a actual cmd to register a variable does not make sense, but it is doable.
+              It is not advised to do it this way
+            cmd: '{{.school |reg "myschool"}}'
+          - name: print
+            desc: |
+              please note that myschool is only a string, but not an object
+            cmd: '{{.myschool}}'
+          - name: print
+            desc: |
+              please note that below result is only a string representation of the object
+              any golang template result can only be string, but not a object
+            cmd: '{{.myschool | yml_to_obj |obj_to_yml}}'
+
+          - name: print
+            desc: |
+              now register the object to a named var myschool_object
+            cmd: '{{.myschool | yml_to_obj |reg "myschool_object"}}'
+
+          - name: print
+            desc: |
+              same as above, this will only print the string reprentation of the object
+            cmd: '{{.myschool_object}}'
+
+          - name: printobj
+            desc: |
+              same as above, this will only print the string reprentation of the object
+            cmd: '{{.myschool_object}}'
+
+          - name: printobj
+            desc: |
+              * IMPORTANT
+              use the object var name to refer to the object in register
+            cmd: myschool_object
+
+      -
+        func: cmd
+        desc: |
+          2nd solution:
+          use dvar auto coversion
+        dvars:
+          - name: myschool2
+            value: '{{.school }}'
+            flags:
+              - to_object
+              - v
+        do:
+          - name: print
+            cmd: |
+              {{.myschool2}}
+              {{.myschool2_object}}
+          - name: printobj
+            cmd: myschool2_object
+
+      -
+        func: cmd
+        desc: |
+          3rd solution:
+          use to_object cmd
+          details: https://upcmd.netlify.app/cmd-func/c0095/
+        do:
+          - name: to_object
+            cmd:
+              fromkey: school
+              reg: myschool3_object
+
+          - name: printobj
+            cmd: myschool3_object
+

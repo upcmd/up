@@ -1,6 +1,6 @@
 doc_meta: |
   folder: loop
-  title: loop basics
+  title: loop usage guide
   weight: 1400
   head: |
     Showcase use loop in UP cmd cli

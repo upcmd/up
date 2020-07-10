@@ -611,7 +611,6 @@ func (f *CmdFuncAction) Exec() {
 					TaskRuntime().ExecbaseVars.Put(varname, varvalue)
 					f.Vars.Put(varname, varvalue)
 				}
-
 			})
 			u.Ppmsgvvvvvhint("after reg the var - contextual global:", TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
@@ -630,7 +629,6 @@ func (f *CmdFuncAction) Exec() {
 					reg = Render(raw, f.Vars)
 				}
 			}
-
 			result := ElementValid(pathtstr, f.Vars)
 			TaskRuntime().ExecbaseVars.Put(reg, result)
 			f.Vars.Put(reg, result)

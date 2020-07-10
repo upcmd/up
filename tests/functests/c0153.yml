@@ -1,0 +1,76 @@
+doc_meta: |
+  folder: user-interaction
+  title: chained pipein from stdin
+  head: |
+    You can use UPcmd to chain the command output as input and choose a task to handle the data processing
+
+  sections:
+    - title: Demo
+      log: yes
+
+
+    - title: how does it work
+      content: |
+
+notes:
+  - add feature of execution profile
+
+scopes:
+  - name: global
+    vars:
+      db_driver: postgres
+      port: 5432
+
+  - name: nonprod
+    members:
+      - dev
+      - staging
+    vars:
+      db_host: nonpord_database.test.host
+      db_user: test_db_user
+      db_password: could_be_encrypted_using_upcmd_too
+    dvars:
+      - name: db_password
+        value: '6HmsmiJIW1PfIXcF4WwOKOMDiL7PstgfKs2aRFajrwY='
+
+  - name: prod
+    members: [prod]
+    vars:
+      host_alias: prod
+
+  - name: dev
+    vars:
+      host_alias: dev
+
+  - name: staging
+    vars:
+      host_alias: staging
+
+  - name: prod
+    vars:
+      host_alias: prod
+      db_host: pord_database.proddb.host
+      db_user: prod_db_user
+    dvars:
+      - name: db_password
+        value: 'prod_encrypte_aes'
+
+
+
+dvars:
+  - name: db_hostname
+    value: '{{.host_alias}}.myapp.com'
+  - name: db_url
+    value: 'jdbc:{{.db_driver}}://{{.db_hostname}}:{{.db_port}}/test?user={{.db_user}}&password={{.db_password}}&ssl=true'
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: cmd
+        do:
+          - name: inspect
+            cmd:
+              - exec_vars

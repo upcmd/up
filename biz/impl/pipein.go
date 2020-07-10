@@ -9,7 +9,6 @@ package impl
 
 import (
 	"bufio"
-	"fmt"
 	u "github.com/upcmd/up/utils"
 	"io"
 	"os"
@@ -22,8 +21,6 @@ func Pipein() {
 	}
 
 	if info.Mode()&os.ModeCharDevice != 0 || info.Size() <= 0 {
-		fmt.Println("The command is intended to work with pipes.")
-		fmt.Println("Usage: fortune | gocowsay")
 		return
 	}
 
@@ -39,6 +36,5 @@ func Pipein() {
 	}
 
 	pipeinstr := string(pipeinchars)
-	u.Pln("pipein:", pipeinstr)
 	UpRunTimeVars.Put(UP_RUNTIME_TASK_PIPE_IN_CONTENT, pipeinstr)
 }
