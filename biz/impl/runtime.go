@@ -56,13 +56,19 @@ func GetBaseModuleName() string {
 }
 
 type StepRuntimeContext struct {
-	Stepname    string
-	Result      *u.ExecResult
-	ContextVars *core.Cache
+	Stepname     string
+	Result       *u.ExecResult
+	ContextVars  *core.Cache
+	DataSyncFunc TransientSyncFunc
 }
 
 func StepRuntime() *StepRuntimeContext {
-	return TaskerRuntime().Tasker.StepStack.GetTop().(*StepRuntimeContext)
+	stack := StepStack()
+	if stack.GetLen() > 0 {
+		return stack.GetTop().(*StepRuntimeContext)
+	} else {
+		return nil
+	}
 }
 
 func StepStack() *stack.ExecStack {

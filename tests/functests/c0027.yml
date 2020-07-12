@@ -10,6 +10,8 @@ doc_meta: |
         * you can reference to plain dvar with the string|untemplated value
         * you can reference to hiera structure of a object once it is converted
         * the new name of the dvar object will be: dvar_object
+        * the flag keep_name makes the dvar keep its original name as is instead of creating dvar_object
+        * keep_name only used and pair to to_object
 
     - title: Demo
       log: yes
@@ -50,6 +52,8 @@ dvars:
 #    expand: 2
 
   - name: school_address
+    desc: |
+      it can reference to the dvar object a_smart_guy_object has been registered from last step
     value: |
       address:
         suburb:
@@ -57,7 +61,20 @@ dvars:
           postcode: 2000
           CBD: yes
         school: {{.student.address.school}}
+        tom:
+          name: {{.a_smart_guy_object.name}}
     flags: [to_object,]
+
+  - name: tom
+    desc: |
+      in this case, we use keep_name flag to make the dvar name the same name we give. So instead we have regitered tom (yml string) and tom_object (object), we now only have tom as registered object
+    value: |
+      name: {{.a_smart_guy_object.name}}
+      gender: Male
+      school: Sydney Grammar
+    flags:
+      - to_object
+      - keep_name
 
 tasks:
 

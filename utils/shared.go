@@ -135,7 +135,7 @@ func Sleep(mscnt int) {
 	Pln()
 }
 
-func PrintContentWithLineNuber(content string) string {
+func ContentWithLineNumber(content string) string {
 	withLineNuber := ""
 	for idx, line := range strings.Split(content, "\n") {
 		withLineNuber += fmt.Sprintf("%5d:%s\n", idx+1, line)
@@ -143,11 +143,20 @@ func PrintContentWithLineNuber(content string) string {
 	return withLineNuber
 }
 
+func LineCount(content string) int {
+	cnt := 0
+	for idx, line := range strings.Split(content, "\n") {
+		Pln(idx, line)
+		cnt += 1
+	}
+	return cnt
+}
+
 func DebugYmlContent(dir, filename string) {
 	filepath := path.Join(dir, filename)
 	content, err := ioutil.ReadFile(filepath)
 	LogErrorAndContinue(Spf("loading raw content: %s", filepath), err, "please fix file path and name issues")
-	LogWarn("Check validity of yml content\n", PrintContentWithLineNuber(string(content)))
+	LogWarn("Check validity of yml content\n", ContentWithLineNumber(string(content)))
 }
 
 func GetGitRepoName(url string) string {
@@ -155,4 +164,13 @@ func GetGitRepoName(url string) string {
 	repoWithGit := s[len(s)-1]
 	repoName := strings.Split(repoWithGit, ".")[0]
 	return repoName
+}
+
+func RemoveEmptyLines(s string) string {
+	regex, err := regexp.Compile("\n\n")
+	if err != nil {
+		return s
+	}
+	s = regex.ReplaceAllString(s, "\n")
+	return s
 }

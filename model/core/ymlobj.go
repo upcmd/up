@@ -18,7 +18,13 @@ import (
 func ObjToYaml(obj interface{}) string {
 	ymlbytes, err := yaml.Marshal(&obj)
 	u.LogErrorAndExit("obj to yaml converstion", err, "yml convesion failed")
-	return string(ymlbytes)
+	yml := string(ymlbytes)
+	//TODO: revist for the extra \n at the end of string
+	cleaned := u.RemoveEmptyLines(yml)
+	if u.LineCount(cleaned) == 1 {
+		yml = strings.TrimSuffix(cleaned, "\n")
+	}
+	return yml
 }
 
 func LoadObjectFromFile(filepath string) interface{} {
@@ -33,7 +39,7 @@ func YamlToObj(srcyml string) interface{} {
 	}
 	obj := new(interface{})
 	err := yaml.Unmarshal([]byte(srcyml), obj)
-	u.LogErrorAndContinue("yml to object:", err, u.Spf("please validate the ymal content\n---\n%s\n---\n", u.PrintContentWithLineNuber(srcyml)))
+	u.LogErrorAndContinue("yml to object:", err, u.Spf("please validate the ymal content\n---\n%s\n---\n", u.ContentWithLineNumber(srcyml)))
 	return obj
 }
 

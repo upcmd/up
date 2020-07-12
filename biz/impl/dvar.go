@@ -76,6 +76,8 @@ func (dvars *Dvars) ValidateAndLoading(contextVars *core.Cache) {
 
 }
 
+type TransientSyncFunc func(key string, val interface{})
+
 //given a dvars with the vars context, it expands with rendered result
 func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 
@@ -89,6 +91,19 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 	var tmpVars core.Cache = deepcopy.Copy(*contextVars).(core.Cache)
 	var tmpDvars Dvars
 	tmpDvars = deepcopy.Copy(*dvars).(Dvars)
+
+	//this is to ensure data consistency of the one way return and overriding from dvar expand to step vars(and context vars)
+	transientSync := func(key string, val interface{}) {
+		//ensure all template reg change is carried over
+		tmpVars.Put(key, val)
+		expandedVars.Put(key, val)
+	}
+	transientSyncVoid := func(key string, val interface{}) {}
+
+	stepRuntime := StepRuntime()
+	if stepRuntime != nil {
+		stepRuntime.DataSyncFunc = transientSync
+	}
 
 	var datasource interface{}
 
@@ -157,9 +172,17 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 
 					obj := new(interface{})
 					err := yaml.Unmarshal([]byte(rawyml), obj)
-					u.LogErrorAndExit("dvar conversion to object:", err, u.PrintContentWithLineNuber(rawyml))
+					u.LogErrorAndExit("dvar conversion to object:", err, u.ContentWithLineNumber(rawyml))
 
-					dvarObjName := u.Spf("%s_%s", dvar.Name, "object")
+					dvarObjName := func() (dvarname string) {
+						if u.Contains(dvar.Flags, "keep_name") {
+							dvarname = dvar.Name
+						} else {
+							dvarname = u.Spf("%s_%s", dvar.Name, "object")
+						}
+						return
+					}()
+
 					if dvar.Name != "void" {
 						(*mergeTarget).Put(dvarObjName, *obj)
 						(*expandedVars).Put(dvarObjName, *obj)
@@ -231,6 +254,10 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 	}
 
 	u.Pfvvvvv("[%s] dvar expanded result:\n%s\n", mark, u.Sppmsg(*expandedVars))
+
+	if stepRuntime != nil {
+		stepRuntime.DataSyncFunc = transientSyncVoid
+	}
 
 	return expandedVars
 }

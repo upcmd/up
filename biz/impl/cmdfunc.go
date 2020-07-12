@@ -570,7 +570,7 @@ func (f *CmdFuncAction) Exec() {
 					modified, err = yq.UpWriteNodeFromStrForComplexValueFromYmlStr(ymlstr, yqpath, nodevalue, verbose)
 				}
 
-				u.LogErrorAndContinue("write node in yml", err, u.Spf("please ensure correct yml query path: %s\nand check yml content validity:\n%s\n", yqpath, u.PrintContentWithLineNuber(ymlstr)))
+				u.LogErrorAndContinue("write node in yml", err, u.Spf("please ensure correct yml query path: %s\nand check yml content validity:\n%s\n", yqpath, u.ContentWithLineNumber(ymlstr)))
 
 				u.Ppmsgvvvvvhint("yml modified:", modified)
 
