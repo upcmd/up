@@ -21,6 +21,8 @@ const (
 	FUNC_CALL  = "call"
 	FUNC_BLOCK = "block"
 	FUNC_CMD   = "cmd"
+
+	NONE_VALUE = "None"
 )
 
 type MustConditionToContinueFunc func() bool

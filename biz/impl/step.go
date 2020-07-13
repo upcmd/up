@@ -317,9 +317,9 @@ func (step *Step) Exec(fromBlock bool) {
 	}
 
 	func() {
-		if step.If != "" {
+		if step.If != NONE_VALUE && step.If != "" {
 			IfEval := Render(step.If, stepExecVars)
-			if IfEval != "<no value>" {
+			if IfEval != NONE_VALUE {
 				goahead, err := strconv.ParseBool(IfEval)
 				u.LogErrorAndExit("evaluate condition", err, u.Spf("please fix if condition evaluation: [%s]", IfEval))
 				if goahead {

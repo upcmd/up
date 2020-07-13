@@ -48,7 +48,7 @@ notes:
       Male
     cmd( 2):
       echo "{{.usage_of_template}}"
-      <no value>
+      None
     cmd( 3):
       echo "{{.template_def_consume}}"
       show example of how you can define reusable template

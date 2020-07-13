@@ -135,8 +135,9 @@ func Render(tstr string, obj interface{}) string {
 
 	val := result.String()
 	if "<no value>" == val {
-		val = "None"
+		val = NONE_VALUE
 	}
+
 	return val
 }
 

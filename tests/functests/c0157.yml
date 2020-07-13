@@ -1,0 +1,53 @@
+doc_meta: |
+  folder: flow-controll
+  title: None value
+  head: |
+    None value will be presented if there variable is not be to be rendered
+
+    Most of the case, this is due to the non-exist variable of given path
+
+  sections:
+    - title: Demo
+      log: yes
+
+    - title: How to user the None value properly
+      content: |
+        * Note that if you intend to evaluate the var's value directly, in case of the var path does not exist, the variable part will be  replace by golang internal <no value> instead of None
+        * You should always use a var to store the direct var by given a variable path, eg. person.name
+
+vars:
+  person:
+    name: tom
+
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        desc: |
+          the commented if statement will cause a template rendering issue since person.school is not able to be determined
+        do:
+          - name: print
+            cmd: "hello: {{.person.name}}"
+#        if: '{{eq .person.school "None"}}'
+
+      -
+        func: cmd
+        desc: |
+          correct way is to try to get the school value and save it to a dvar
+          then it is deterministic of the school value
+        dvars:
+          - name: school
+            value: '{{.person.school}}'
+        do:
+          - name: print
+            cmd: "hello: {{.person.name}}"
+        if: '{{eq .school "None"}}'
+        else:
+          - func: cmd
+            desc: now it is safe to access school from person object
+            do:
+              - name: print
+                cmd: "hello: {{.person.name}} from {{.person.school}}"

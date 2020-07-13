@@ -57,7 +57,21 @@ tasks:
       -
         func: cmd
         desc: add support if the element does not exist, then if condition should be false by default
+        dvars:
+          - name: student_age
+            value: '.student.age'
         do:
+          - name: assert
+            desc: |
+              this cmd will not evaluated as it will not reach here
+              the below evaluate will cause issue, as age does not exist
+              always map to a dvar first
+            cmd: '{{eq .student.age "None"}}'
+
           - name: print
-            cmd: you will not see this message
-        if: '{{.student.age}}'
+            cmd: '{{.student.age}}'
+
+          - name: print
+            cmd: |
+              you will not see this message
+        if: '{{eq .student_age "None"}}'
