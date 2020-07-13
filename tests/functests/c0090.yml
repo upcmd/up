@@ -8,6 +8,12 @@ doc_meta: |
     - title: Demo
       log: yes
 
+    - title: Note
+      content: |
+        As self explained in the wrong_usage desc, you can't access loopitem in current stack. There are two ways you will have to access loopitem in dvar processing:
+        1. shown as correct_usage, use call to delegate loop process to a callee task
+        2. use block func, so the dvar in any func in actually in the callee stack
+
 notes:
   goal:
     - make loop item and index parsablele in dvar
@@ -18,7 +24,28 @@ tasks:
     name: task
     task:
 
+      - func: cmd
+        name: wrong_usage
+        desc: |
+          note that you can't access loopitem in dvar processing in curent func
+          you can only access loopitem in dvar processing when it is called as callee, as corret_usage shows
+          however you can access loopitem in do action
+        dvars:
+          - name: person
+            value: '{{.loopitem}}'
+            flags:
+              - v
+        loop:
+          - tom
+          - peter
+          - james
+        do:
+          - name: print
+            cmd: |
+              loopitme could be accessed here: {{.loopitem}}
+
       - func: call
+        name: corret_usage
         vars:
           taskvar: taskvar
         do:

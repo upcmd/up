@@ -113,7 +113,8 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 	//so far the execvars includes: scope vars + scope dvars + global runtime vars + task vars
 	varsWithDvars := VarsMergedWithDvars("local", resultVars, &step.Dvars, resultVars)
 
-	//the processed varsWithDvars must merge with result vars as resultVars is used during dvar rendering, so resultVars is enriched with more registered vars
+	//the processed varsWithDvars must merge with result vars: from varsWithDvars to resultVars
+	//care taken to register new vars to dvar processing phase
 	mergo.Merge(resultVars, varsWithDvars, mergo.WithOverride)
 
 	//so far the resultVars includes: the local vars + dvars rendered using execvars

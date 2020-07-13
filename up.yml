@@ -1,3 +1,4 @@
+
 version: 1.0.0
 
 vars:
@@ -71,20 +72,16 @@ tasks:
               {{end}}
             flags:
               - to_object
+              - keep_name
               - v
-        do: buildDistro
-
-      - func: cmd
-        do:
-          - name: exit
+        dox: buildDistro
 
       - func: shell
         do:
           - curl -s https://api.github.com/repos/upcmd/up/releases/tags/latest
         reg: result
 
-      - func: shell
-        desc: delete the latest release remotely if it exists
+      - func: cmd
         dvars:
           - name: release
             value: '{{.result.Output}}'
@@ -92,10 +89,20 @@ tasks:
               - to_object
           - name: releaseid
             value: '{{.release_object.id}}'
+            flags:
+              - v
+
+      - func: shell
+        desc: delete the latest release remotely if it exists
         do:
           - echo "releaseid - {{.releaseid}}"
           - curl -X DELETE {{.release_api_ep}}/{{.releaseid}}
-        if: '{{not (eq .releaseid "<no value>")}}'
+        if: '{{ne .releaseid "None" }}'
+        else:
+          - func: cmd
+            do:
+              - name: print
+                cmd: "no latest release in remote, ignore"
 
       - func: shell
         desc: create the latest master release
@@ -142,7 +149,7 @@ tasks:
                 -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
                 -H "Content-Type: application/json" \
                 {{.release_upload_ep}}/{{.releaseid}}/assets?name=up_{{.os}}_{{.arch}}_latest
-        if: '{{not (eq .releaseid "<no value>")}}'
+        if: '{{not (path_existed "releaseid") }}'
 
   -
     name: build
@@ -167,12 +174,14 @@ tasks:
         desc: build the binary to build directory
         do:
           - rm -rf ./build
+          - mkdir -p ./build
 
       -
         func: block
         desc: |
           default to build all types of distros supported
           if instructed the dist=common, then only build: linux, darwin and windows
+        if: '{{not (path_existed "distlist") }}'
         do:
           -
             func: shell
@@ -195,26 +204,26 @@ tasks:
             dvars:
               - name: void
                 value: '{{ .last_result.Output |splitLines |reg "distlist" }}'
-        if: '{{eq .distlist "<no value>"}}'
         else:
           - func: cmd
             desc: build the supplied list of dist types
             do:
               - name: print
                 cmd: 'building {{.distlist}}'
+              - name: printobj
+                cmd: 'distlist'
 
       - func: block
         loop: distlist
-        vars:
-          ver: master
         do:
-          - func: cmd
+          - func: shell
+            vars:
+              ver: latest
             dvars:
               - name: void
                 value: '{{.loopitem |split "/" |reg "dist"}}'
-
-          - func: shell
-            dvars:
+                flags:
+                  - v
               - name: os
                 value: '{{.dist._0}}'
               - name: arch

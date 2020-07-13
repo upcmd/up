@@ -66,8 +66,15 @@ func FuncMapInit() {
 		},
 		//reg do not return any value, so do not expect the dvar value will be something other than empty
 		"reg": func(varname string, object interface{}) string {
+			u.Pln(varname, "----->", object)
+			//if this is in dvar processing:
+			//need to one way sync the var to the returning var
 			TaskRuntime().ExecbaseVars.Put(varname, object)
-			StepRuntime().ContextVars.Put(varname, object)
+
+			//remove this as it will cause dirty data due to dvar processing
+			//StepRuntime().ContextVars.Put(varname, object)
+			//instead we do a callback to save it to dvar processing scope
+			StepRuntime().DataSyncFunc(varname, object)
 			return core.ObjToYaml(object)
 		},
 		"dereg": func(varname string) string {
@@ -124,9 +131,13 @@ func Render(tstr string, obj interface{}) string {
 
 	var result bytes.Buffer
 	err = t.Execute(&result, obj)
-	u.LogErrorAndContinue("template rendering problem", err, u.PrintContentWithLineNuber(tstr))
+	u.LogErrorAndContinue("template rendering problem", err, u.ContentWithLineNumber(tstr))
 
-	return result.String()
+	val := result.String()
+	if "<no value>" == val {
+		val = "None"
+	}
+	return val
 }
 
 func ElementValid(path string, obj interface{}) bool {
@@ -137,7 +148,7 @@ func ElementValid(path string, obj interface{}) bool {
 
 	var result bytes.Buffer
 	err = t.Execute(&result, obj)
-	u.LogErrorAndContinue("element validating problem", err, u.PrintContentWithLineNuber(path))
+	u.LogErrorAndContinue("element validating problem", err, u.ContentWithLineNumber(path))
 
 	if err != nil {
 		return false

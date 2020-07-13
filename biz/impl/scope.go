@@ -80,8 +80,6 @@ func VarsMergedWithDvars(mark string, baseVars *core.Cache, dvars *Dvars, contex
 
 	u.Pfvvvvv("scope[%s] merged: %s", mark, u.Sppmsg(mergedVars))
 
-	//procDvarsNew(dvars, &mergedVars)
-
 	return &mergedVars
 }
 
