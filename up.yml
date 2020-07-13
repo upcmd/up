@@ -5,6 +5,7 @@ vars:
   ver_yq: v3.3.2
   release_api_ep: https://api.github.com/repos/upcmd/up/releases
   release_upload_ep: https://uploads.github.com/repos/upcmd/up/releases
+
   dists_for_latest:
     - os: darwin
       arch: amd64
@@ -12,7 +13,6 @@ vars:
       arch: amd64
     - os: windows
       arch: amd64
-
 
   license_header: |
     // Ultimate Provisioner: UP cmd
@@ -62,6 +62,7 @@ tasks:
     task:
       -
         func: call
+        desc: build only the common distros
         dvars:
           - name: distlist
             value: |
@@ -74,14 +75,16 @@ tasks:
               - to_object
               - keep_name
               - v
-        dox: buildDistro
+        do: buildDistro
 
       - func: shell
+        desc: enquire the latest release
         do:
           - curl -s https://api.github.com/repos/upcmd/up/releases/tags/latest
         reg: result
 
-      - func: cmd
+      - func: shell
+        desc: delete the latest release remotely if it exists
         dvars:
           - name: release
             value: '{{.result.Output}}'
@@ -90,14 +93,17 @@ tasks:
           - name: releaseid
             value: '{{.release_object.id}}'
             flags:
+              - taskscope
               - v
-
-      - func: shell
-        desc: delete the latest release remotely if it exists
         do:
-          - echo "releaseid - {{.releaseid}}"
-          - curl -X DELETE {{.release_api_ep}}/{{.releaseid}}
-        if: '{{ne .releaseid "None" }}'
+          - echo "deleting release - {{.releaseid}}"
+          - echo """curl -sX DELETE {{.release_api_ep}}/{{.releaseid}}"""
+          - |
+            curl -s \
+            -X DELETE \
+            -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
+            {{.release_api_ep}}/{{.releaseid}}
+        if: '{{ne (printf "%s" .releaseid)  "None" }}'
         else:
           - func: cmd
             do:
@@ -123,8 +129,8 @@ tasks:
           {{.release_api_ep}}
         reg: result
 
-      - func: cmd
-        desc: get the release info
+      - func: block
+        loop: dists_for_latest
         dvars:
           - name: release
             value: '{{.result.Output}}'
@@ -133,15 +139,17 @@ tasks:
           - name: releaseid
             value: '{{.release_object.id}}'
             flags:
-              - taskscope
-
-      - func: block
-        loop: dists_for_latest
+              - v
         do:
           - func: shell
             desc: upload the most used distros only
+            dvars:
+              - name: os
+                value: '{{.loopitem.os}}'
+              - name: arch
+                value: '{{.loopitem.arch}}'
             do:
-              - echo "upload for latest release - {{.releaseid}} for {{.loopitem.os}}-{{.loopitem.arch}}"
+              - echo "upload for latest release - {{.releaseid}} for {{.os}}-{{.arch}}"
               - |
                 curl -s \
                 -X POST \
@@ -149,7 +157,7 @@ tasks:
                 -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
                 -H "Content-Type: application/json" \
                 {{.release_upload_ep}}/{{.releaseid}}/assets?name=up_{{.os}}_{{.arch}}_latest
-        if: '{{not (path_existed "releaseid") }}'
+        if: '{{ne (printf "%s" .releaseid)  "None" }}'
 
   -
     name: build

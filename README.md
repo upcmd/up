@@ -180,7 +180,7 @@ Below are common one for latest tagged stable release:
 
 ```
 curl -s https://api.github.com/repos/upcmd/up/releases \
-    |grep darwin_amd64 \
+    |grep darwin_amd64_v \
     |grep download \
     |head -n 1 \
     |awk '{print $2}' \
@@ -192,7 +192,7 @@ curl -s https://api.github.com/repos/upcmd/up/releases \
 
 ```
 curl -s https://api.github.com/repos/upcmd/up/releases \
-    |grep linux_amd64 \
+    |grep linux_amd64_v \
     |grep download \
     |head -n 1 \
     |awk '{print $2}' \
@@ -204,7 +204,45 @@ curl -s https://api.github.com/repos/upcmd/up/releases \
 
 ```
 curl -s https://api.github.com/repos/upcmd/up/releases \
-    |grep windows_amd64 \
+    |grep windows_amd64_v \
+    |grep download \
+    |head -n 1 \
+    |awk '{print $2}' \
+    |xargs -I % curl -L % -o up \
+    && chmod +x up
+```
+
+Below are for latest bleeding-edge release from master branch:
+
+* Install for Mac OSX:
+
+```
+curl -s https://api.github.com/repos/upcmd/up/releases \
+    |grep darwin_amd64_latest \
+    |grep download \
+    |head -n 1 \
+    |awk '{print $2}' \
+    |xargs -I % curl -L % -o up \
+    && chmod +x up
+```
+
+* Install for Linux:
+
+```
+curl -s https://api.github.com/repos/upcmd/up/releases \
+    |grep linux_amd64_latest \
+    |grep download \
+    |head -n 1 \
+    |awk '{print $2}' \
+    |xargs -I % curl -L % -o up \
+    && chmod +x up
+```
+
+* Install for Windows:
+
+```
+curl -s https://api.github.com/repos/upcmd/up/releases \
+    |grep windows_amd64_latest \
     |grep download \
     |head -n 1 \
     |awk '{print $2}' \
