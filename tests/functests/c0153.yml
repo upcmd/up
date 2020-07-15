@@ -8,9 +8,58 @@ doc_meta: |
     - title: Demo
       log: yes
 
-
-    - title: how does it work
+    - title: concept
       content: |
+        So far, we can use an instanceid as context id to select what set of configuration we want to use, nomally they are categorized by global configuration, environment group configuration and individual context instance, for example as below:
+
+        ```
+        global\_
+                |_nonprod
+                    |_dev
+                    |_staging
+                |_prod
+                    |_prod
+        ```
+
+        You could use [ up ngo mytask -i dev ] to do deployment work aginst dev environment
+
+        However these configuration are more like server (backend) configuration. Most of time, we will have some other configurations, they are related to pipeline user input, for example:
+
+        * username
+        * password(secured)
+        * flags for build/deployment/workflow to behave differently, eg,
+            * create db everytime or skip
+            * a resource id (ec2-instanceid/iam-profile-id/database name etc) as data injection for the workflow
+        * temporary config entry for manual test
+
+        All these settings are more like a user execution profile rather static and stable server environment configuration
+
+        In this case we could classify them all together into an execution profile, for example
+
+        ```
+        global\_
+                |_nonprod
+                    |_dev
+                         \_dev1_test
+                              ...
+                         \_dev2_test:
+                              ...
+                         \_dev1_use_memcache:
+                              |_ ENV var1
+                              |_ ENV var2
+                              |_ ENV var3
+                              |_ vars:
+                              |_ dvars:
+                         \_dev2_no_db_recreat
+                              ....
+                    |_staging
+                |_prod
+                    |_prod
+        ```
+
+        By using such a execution profile, the CI/CD tools does not need to handle the multiple environment variable entries and secure variable entries, all these could be handled by UPcmd. To trigger the pipeline, a code push is all needed.
+
+        This turns the audit to a precise git commit history so it is tracable to understand whose code has actually cause the problem, as the most of current CI/CD tools in the market, they are lack(weak) of this type of tracability
 
 notes:
   - add feature of execution profile
@@ -27,6 +76,7 @@ scopes:
       - staging
     vars:
       db_host: nonpord_database.test.host
+      db_port: 8354
       db_user: test_db_user
       db_password: could_be_encrypted_using_upcmd_too
     dvars:
@@ -55,13 +105,22 @@ scopes:
       - name: db_password
         value: 'prod_encrypte_aes'
 
-
-
 dvars:
   - name: db_hostname
     value: '{{.host_alias}}.myapp.com'
   - name: db_url
     value: 'jdbc:{{.db_driver}}://{{.db_hostname}}:{{.db_port}}/test?user={{.db_user}}&password={{.db_password}}&ssl=true'
+
+eprofiles:
+  - name: dev1_use_memcache
+    instance: dev
+    vars:
+      db_host: memcache.local.host
+    dvars:
+      - name: deploy_user
+        value: tomhanks
+      - name: skip_create_rds
+        value: '{{ env "SKIP_CREATE_RDS" |default "True" }}'
 
 tasks:
   -

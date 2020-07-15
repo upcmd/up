@@ -66,7 +66,6 @@ func FuncMapInit() {
 		},
 		//reg do not return any value, so do not expect the dvar value will be something other than empty
 		"reg": func(varname string, object interface{}) string {
-			u.Pln(varname, "----->", object)
 			//if this is in dvar processing:
 			//need to one way sync the var to the returning var
 			TaskRuntime().ExecbaseVars.Put(varname, object)

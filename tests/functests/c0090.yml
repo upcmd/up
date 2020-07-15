@@ -10,7 +10,7 @@ doc_meta: |
 
     - title: Note
       content: |
-        As self explained in the wrong_usage desc, you can't access loopitem in current stack. There are two ways you will have to access loopitem in dvar processing:
+        As self explained in the wrong_usage desc, you can't access loopitem in dvars in current stack. There are two ways you will have to access loopitem in dvar processing:
         1. shown as correct_usage, use call to delegate loop process to a callee task
         2. use block func, so the dvar in any func in actually in the callee stack
 
@@ -69,16 +69,8 @@ tasks:
       - func: cmd
         dvars:
           - name: person
-            desc: |
-              loopitem is not availab yet when dvar is expanded
-              due to the design that caller's var will override
-              the callee's var, the loopitem should not be availabe
-              in dvar and this is not a bug
             value: '{{.loopitem}}'
-            flags: [vvvv]
-          - name: greet
-            value: 'hello'
-            flags: [vvvv]
+            flags: [v]
         do:
           -
             name: print

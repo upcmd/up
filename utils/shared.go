@@ -145,10 +145,10 @@ func ContentWithLineNumber(content string) string {
 
 func LineCount(content string) int {
 	cnt := 0
-	for idx, line := range strings.Split(content, "\n") {
-		Pln(idx, line)
-		cnt += 1
+	for idx, _ := range strings.Split(content, "\n") {
+		cnt = idx
 	}
+	cnt += 1
 	return cnt
 }
 

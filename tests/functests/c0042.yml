@@ -7,14 +7,19 @@ doc_meta: |
   sections:
     - title: Important note
       content: |
-        Please note that the reg will register the value into global runtime, however this value will be only availble in the next func call
+        reg will register the value into global runtime
 
-        Actually if you use a dvar value to register a value, the dvar actually does not do its core job to render value, so to make your runtime vars list clean, it better to use void as the dvar name, it will not create a new var and put into global runtime
+        If you do not need to use the dvar value instead of the register object, then use void as the dvar name, it will not create a new var and put into global runtime
 
         You can always use void as the name of a dvar, so that the dvar is used more like action method to do things rather than rendering value
 
     - title: Demo
       log: yes
+
+  related:
+    refs:
+      - title: convert dvar
+        link: ../../dvars/c0027/
 
 notes:
   goal:
@@ -37,14 +42,15 @@ tasks:
         func: shell
         desc: |
           the last result of hanks will be registered as varname: hellomsg
-          however this will be availabe at the next step
-          as when it enters this step, it has already got a copied immutable var stack
         dvars:
           - name: reg_hello
             value: |
-              hello: {{.last_result.Output |reg "hellomsg" }}
+              hello: {{.last_result.Output|reg "hellomsg" }}
+            flags:
+              - v
         do:
-          - echo "{{.hellomsg}}"
+          - echo "hellomsg  - {{.hellomsg}}"
+          - echo "reg_hello - {{.reg_hello}}"
 
       -
         func: shell
