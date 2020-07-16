@@ -48,7 +48,7 @@ func Setup(prefix string, t *testing.T) *u.UpConfig {
 
 func TestT(prefix string, t *testing.T) {
 	cfg := Setup(prefix, t)
-	tasker := impl.NewTasker("dev", cfg)
+	tasker := impl.NewTasker("dev", "", cfg)
 	tasker.ListTasks()
 	tasker.ExecTask("task", nil, false)
 }

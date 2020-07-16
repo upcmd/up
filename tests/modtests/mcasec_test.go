@@ -21,7 +21,7 @@ func TestC(t *testing.T) {
 	for _, x := range dirs {
 		u.Pln("==testing:", x, "==")
 		cfg := tests.SetupMx(path.Join(x))
-		t := impl.NewTasker("dev", cfg)
+		t := impl.NewTasker("dev", "", cfg)
 		t.ExecTask("Main", nil, false)
 		t.Unset()
 	}

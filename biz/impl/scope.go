@@ -28,6 +28,17 @@ type Scope struct {
 
 type Scopes []Scope
 
+type ExecProfile struct {
+	Name string
+	//Ref      string
+	//RefDir   string
+	Instance string
+	Vars     core.Cache
+	Dvars    Dvars
+}
+
+type ExecProfiles []ExecProfile
+
 func DecryptAndRegister(securetag *u.SecureSetting, dvar *Dvar, contextVars *core.Cache, mergeTarget *core.Cache) {
 	s := securetag
 
