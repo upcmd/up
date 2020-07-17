@@ -121,9 +121,8 @@ func (t *Tasker) loadInstancesContext() {
 	for idx, s := range *ss {
 
 		if s.Ref != "" && s.Vars != nil {
-			u.LogError("verify scope ref and member coexistence", "ref and members can not both exist")
 			u.Dvvvvv(s)
-			os.Exit(-1)
+			u.InvalidAndExit("verify scope ref and member coexistence", "ref and members can not both exist")
 		}
 		refdir := ConfigRuntime().RefDir
 		if s.Ref != "" {
@@ -147,8 +146,7 @@ func (t *Tasker) loadInstancesContext() {
 	for idx, s := range *ss {
 		if s.Name == "global" {
 			if s.Members != nil {
-				u.LogError("scope expand", "global scope should not contains members")
-				os.Exit(-1)
+				u.InvalidAndExit("scope expand", "global scope should not contains members")
 			}
 			globalScope = &(*ss)[idx]
 		}
@@ -166,8 +164,7 @@ func (t *Tasker) loadInstancesContext() {
 		if s.Members != nil {
 			for _, m := range s.Members {
 				if u.Contains(t.GroupMembersList, m) {
-					u.LogError("scope expand", u.Spfv("duplicated member: %s\n", m))
-					os.Exit(-1)
+					u.InvalidAndExit("scope expand", u.Spfv("duplicated member: %s\n", m))
 				}
 				t.GroupMembersList = append(t.GroupMembersList, m)
 				t.MemberGroupMap[m] = s.Name
@@ -212,12 +209,35 @@ func (t *Tasker) MergeRuntimeGlobalDvars() {
 
 func (t *Tasker) loadExecProfileEnvVars() {
 	var envVars *core.Cache = core.NewCache()
-
+	var evars *EnvVars
 	if p := t.getExecProfile(t.ExecProfilename); p != nil {
-		for _, v := range p.Evars {
-			envvarName := u.Spf("%s_%s", "envvar", v.Name)
-			envVars.Put(envvarName, v.Value)
-			os.Setenv(v.Name, v.Value)
+
+		if p.Ref != "" && p.Evars != nil {
+			u.InvalidAndExit("exec proile validation", "You can only setup either ref file to load the env vars or use evars tag to config env vars, but not both")
+		}
+
+		refdir := ConfigRuntime().RefDir
+
+		if p.Ref != "" {
+			if p.RefDir != "" {
+				refdir = p.RefDir
+			}
+			yamlevarsroot := u.YamlLoader("ref evars", refdir, p.Ref)
+			evars = loadRefEvars(yamlevarsroot)
+			u.Pvvvv("loading vars from:", p.Ref)
+			u.Ppmsgvvvv(evars)
+		}
+
+		if p.Evars != nil {
+			evars = &p.Evars
+		}
+
+		if evars != nil {
+			for _, v := range *evars {
+				envvarName := u.Spf("%s_%s", "envvar", v.Name)
+				envVars.Put(envvarName, v.Value)
+				os.Setenv(v.Name, v.Value)
+			}
 		}
 	}
 
@@ -675,8 +695,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 								u.LogErrorAndExit("evaluate max tasker module call layer", err, "please setup max MaxModuelCallLayers properly for your case")
 
 								if maxLayers != 0 && taskerLayer > maxLayers {
-									u.LogError("Module call layer check:", u.Spf("Too many layers of recursive module executions, max allowed(%d), please fix your recursive call", maxLayers))
-									os.Exit(-1)
+									u.InvalidAndExit("Module call layer check:", u.Spf("Too many layers of recursive module executions, max allowed(%d), please fix your recursive call", maxLayers))
 								}
 							}()
 
@@ -778,8 +797,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 					u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
 
 					if maxLayers != 0 && TaskerRuntime().Tasker.TaskStack.GetLen() > maxLayers {
-						u.LogError("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
-						os.Exit(-1)
+						u.InvalidAndExit("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
 					}
 				}()
 
@@ -910,6 +928,7 @@ func (t *Tasker) loadExecProfiles() {
 	var eprofiles ExecProfiles
 	err := ms.Decode(eprofileData, &eprofiles)
 	t.ExecProfiles = &eprofiles
+
 	u.LogErrorAndExit("load exec profiles", err, "please assess your exec profiles configuration carefully")
 }
 

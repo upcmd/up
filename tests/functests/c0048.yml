@@ -10,6 +10,12 @@ doc_meta: |
     - title: Demo
       log: yes
 
+    - title: Relavant
+      content: exec profile
+      refs:
+        - title: set env var
+          link: ../../user-interaction/c0153/
+
 notes:
   goal:
     - test the shell env vars context and manage env vars in each session

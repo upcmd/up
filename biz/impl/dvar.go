@@ -76,8 +76,7 @@ func (dvars *Dvars) ValidateAndLoading(contextVars *core.Cache) {
 	}
 
 	if identified {
-		u.LogError("dvar validate", "the dvar name identified above should be fixed before continue")
-		os.Exit(-1)
+		u.InvalidAndExit("dvar validate", "the dvar name identified above should be fixed before continue")
 	}
 
 }

@@ -1,0 +1,7 @@
+evars:
+  - name: DEPLOY_USER
+    value: tomhanks
+  - name: SKIP_CREATE_RDS
+    value: "yes"
+  - name: DB_HOST
+    value: devtest_database.mycompany.local

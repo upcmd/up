@@ -147,8 +147,7 @@ func validation(vars *core.Cache) {
 	}
 
 	if identified {
-		u.LogError("vars validation", "please fix all validation before continue")
-		os.Exit(-1)
+		u.InvalidAndExit("vars validation", "please fix all validation before continue")
 	}
 
 }

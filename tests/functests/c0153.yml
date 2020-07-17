@@ -1,6 +1,6 @@
 doc_meta: |
   folder: user-interaction
-  title: chained pipein from stdin
+  title: profile with env vars
   head: |
     You can use UPcmd to chain the command output as input and choose a task to handle the data processing
 
@@ -137,6 +137,14 @@ doc_meta: |
         })
 
         ```
+
+    - title: Relavant
+      content: environment variables
+      refs:
+        - title: set env var
+          link: ../../env-vars/c0048/
+        - title: get env var
+          link: ../../env-vars/c0046/
 
 notes:
   - add feature of execution profile
