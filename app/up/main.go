@@ -33,7 +33,7 @@ var (
 	workdir          = app.Flag("workdir", "working directory: cwd | refdir").Short('w').String()
 	taskfile         = app.Flag("taskfile", "task file to load (without yml extension)").Short('t').String()
 	instanceName     = app.Flag("instance", "instance name for execution").Short('i').String()
-	execprofile      = app.Flag("execprofile", "profile name for execution").Short('p').String()
+	execprofile      = app.Flag("execprofile", "profile name for execution to setup a group environment variables").Short('p').String()
 	configDir        = app.Flag("configdir", "config file directory to load from|default .").String()
 	configFile       = app.Flag("configfile", "config file name to load without yml extension|default config").String()
 )

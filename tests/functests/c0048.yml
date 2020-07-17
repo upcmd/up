@@ -20,9 +20,24 @@ tasks:
     name: task
     task:
       - func: shell
+        desc: |
+          The envvar flag makes the dvar name STUDENT_NAME is accessible as environment vars
         dvars:
           - name: STUDENT_NAME
             value: Tom Hanks
             flags: [envvar]
         do:
           - env |grep STUDENT_NAME
+
+      - func: shell
+        desc: |
+          STUDENT_NAME is also accessible in dvar processing
+        dvars:
+          - name: STUDENT_NAME
+            value: Tom Hanks
+            flags: [envvar]
+          - name: student_name_re_map
+            value: '{{ env "STUDENT_NAME" |default "student_name_re_map" }}'
+        do:
+          - env |grep STUDENT_NAME
+          - echo "student_name_re_map is [{{.student_name_re_map}}]"

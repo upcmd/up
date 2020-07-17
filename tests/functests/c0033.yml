@@ -5,6 +5,25 @@ doc_meta: |
     Demo dvars merge in local scope in execution time
 
   sections:
+    - title: Merging sequence
+      content: |
+
+        The merging rule follows the same chain from top down in sequence of:
+
+          0. exec profile: env vars setup
+          1. global group vars
+          2. global group dvars
+          3. group vars
+          4. group dvars
+          5. instance vars
+          6. instance dvars
+          7. runtime global vard
+          8. runtime global dvard
+          9. func local vars
+          10. func local dvars
+          11. callee func local vars ... | module stack (1 - 12)
+          12. callee func local dvars ...| module stack (1 - 12)
+
     - title: Demo
       log: yes
 

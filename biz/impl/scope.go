@@ -33,8 +33,7 @@ type ExecProfile struct {
 	//Ref      string
 	//RefDir   string
 	Instance string
-	Vars     core.Cache
-	Dvars    Dvars
+	Evars    EnvVars
 }
 
 type ExecProfiles []ExecProfile

@@ -51,7 +51,8 @@ type Tasker struct {
 	ScopeProfiles   *Scopes
 	ExecProfiles    *ExecProfiles
 	//this is the merged vars from within scope: global, groups level (if there is), instance varss, then global runtime vars
-	RuntimeVarsMerged *core.Cache
+	RuntimeVarsMerged  *core.Cache
+	ExecProfileEnvVars *core.Cache
 	//this is the merged vars and dvars to a vars cache from within scope: global, groups level (if there is), instance varss, then global runtime vars
 	//this vars should be used instead of RuntimeVarsMerged as it include both runtime vars and dvars except the local vars and dvars
 	RuntimeVarsAndDvarsMerged *core.Cache
@@ -98,9 +99,9 @@ func NewTasker(instanceId string, eprofiename string, cfg *u.UpConfig) *Tasker {
 	tasker.loadInstancesContext()
 	tasker.loadRuntimeGlobalVars()
 	tasker.loadRuntimeGlobalDvars()
+	tasker.loadExecProfileEnvVars()
 	tasker.MergeUptoRuntimeGlobalVars()
 	tasker.MergeRuntimeGlobalDvars()
-	tasker.MergeExecProfile()
 	tasker.loadTasks()
 
 	return tasker
@@ -209,32 +210,19 @@ func (t *Tasker) MergeRuntimeGlobalDvars() {
 	u.Ppmsgvvvvhint("-------runtime global final merged with dvars-------", mergedVars)
 }
 
-func (t *Tasker) MergeExecProfile() {
-	var mergedVars core.Cache
-	var expandedVars *core.Cache
-	mergedVars = deepcopy.Copy(*t.RuntimeVarsAndDvarsMerged).(core.Cache)
+func (t *Tasker) loadExecProfileEnvVars() {
+	var envVars *core.Cache = core.NewCache()
 
-	changeCnt := 0
 	if p := t.getExecProfile(t.ExecProfilename); p != nil {
-		if p.Vars != nil {
-			mergo.Merge(&mergedVars, p.Vars, mergo.WithOverride)
-			changeCnt += 1
-		}
-
-		if p.Dvars != nil {
-			expandedVars = p.Dvars.Expand("exec profile", &mergedVars)
-			changeCnt += 1
-		}
-
-		if expandedVars != nil {
-			mergo.Merge(&mergedVars, expandedVars, mergo.WithOverride)
-		}
-
-		if changeCnt > 0 {
-			t.RuntimeVarsAndDvarsMerged = &mergedVars
-			u.Ppmsgvvvvhint("-------Merged With Exec Profile-------", mergedVars)
+		for _, v := range p.Evars {
+			envvarName := u.Spf("%s_%s", "envvar", v.Name)
+			envVars.Put(envvarName, v.Value)
+			os.Setenv(v.Name, v.Value)
 		}
 	}
+
+	t.ExecProfileEnvVars = envVars
+	u.Ppmsgvvvhint(u.Spf("profile - %s envvars:", t.ExecProfilename), envVars)
 }
 
 //clear up everything in scope and cache
