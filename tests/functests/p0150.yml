@@ -1,6 +1,6 @@
 
 notes:
-  - bug fix that the taskscope should work for promopt dvar value
+  - bug fix that the taskScope should work for promopt dvar value
   - fix prompt value contains CR
 
 tasks:
@@ -15,12 +15,12 @@ tasks:
           - name: fist_name
             flags:
               - prompt
-              - taskscope
+              - taskScope
 
           - name: last_name
             value: hanks
             flags:
-              - taskscope
+              - taskScope
         do:
           - |
             echo """my name is: {{.fist_name}} {{.last_name}}"""

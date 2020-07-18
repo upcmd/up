@@ -1,8 +1,8 @@
 doc_meta: |
   folder: object-oriented
-  title: reg/dereg/void
+  title: reg/deReg/void
   head: |
-    You can use template func reg to register a value to global runtime or dereg to remove it from runtime
+    You can use template func reg to register a value to global runtime or deReg to remove it from runtime
 
   sections:
     - title: Important note
@@ -60,7 +60,7 @@ tasks:
         dvars:
           - name: reg_hello
             value: |
-              {{dereg "hellomsg" }}
+              {{deReg "hellomsg" }}
         do:
           - echo "{{.hellomsg}}"
 

@@ -56,7 +56,7 @@ tasks:
                   - '{{eq .c "global_ccc" }}'
                   - '{{eq .da "local_da_callee_task1" }}'
                   - '{{eq .db "callee_db_callee_task2" }}'
-                flags: [failfast,]
+                flags: [failFast,]
 
   - name: callee_task1
     task:

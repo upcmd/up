@@ -7,14 +7,14 @@ doc_meta: |
   sections:
     - title: How to use
       content: |
-        Simply use dvar ref to load the content and also flag it to be converted to_object
+        Simply use dvar ref to load the content and also flag it to be converted toObj
 
         The print cmd shows how to use the object and reference in golang template to iterate through the elements
 
     - title: Relavant
-      content: to_object cmd
+      content: toObj cmd
       refs:
-        - title: to_object cmd
+        - title: toObj cmd
           link: ../../cmd-func/c0095
 
     - title: Demo
@@ -35,7 +35,7 @@ docs:
 dvars:
   - name: usecase
     ref: c0074.yml
-    flags: [to_object,]
+    flags: [toObj,]
 
 tasks:
   -

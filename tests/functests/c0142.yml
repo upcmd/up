@@ -20,45 +20,45 @@ tasks:
             age: 18
           objectname: person
         do:
-          - name: colorprint
+          - name: colorPrint
             cmd:
               msg: hello, world
               bg: blue
               fg: white
 
-          - name: colorprint
+          - name: colorPrint
             cmd:
               msg: hello, world
               bg: yellow
 
-          - name: colorprint
+          - name: colorPrint
             cmd:
               msg: hello, world
               fg: white
 
-          - name: colorprint
+          - name: colorPrint
             cmd:
               msg: hello, world
 
-          - name: colorprint
+          - name: colorPrint
             cmd:
               msg: '{{.person.name}}: {{.person.age}}'
               fg: blue
               bg: red
 
-          - name: colorprint
+          - name: colorPrint
             cmd:
               object: 'person'
               fg: blue
               bg: black
 
-          - name: colorprint
+          - name: colorPrint
             cmd:
               object: '{{.objectname}}'
               fg: blue
               bg: green
 
-          - name: colorprint
+          - name: colorPrint
             cmd:
               object: 'person'
               msg: 'person'

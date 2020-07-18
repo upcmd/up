@@ -93,7 +93,7 @@ scopes:
               postcode: 2000
               CBD: yes
             school: {{.student.address.school}}
-        flags: [to_object]
+        flags: [toObj]
 
   -
     name: dev
@@ -110,7 +110,7 @@ scopes:
               CBD: no
             school: {{.student.address.school}}
           principal: Mr Peter
-        flags: [to_object]
+        flags: [toObj]
 
 
 tasks:
@@ -135,7 +135,7 @@ tasks:
                   CBD: LOCAL
                 school: {{.student.address.school}}
               principal: Mr Right
-            flags: [to_object]
+            flags: [toObj]
 
         do:
           - echo """1.school -> {{.school}}"""

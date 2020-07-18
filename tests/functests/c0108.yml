@@ -2,7 +2,7 @@ doc_meta: |
   folder: vars
   title: task scope
   head: |
-    So far, we have scoped vars and eventually they will be living in global runtime or local scope in a func, when you need to access the var across funcs, then you will have to define it in global runtime vars, or grouped vars scope, or register a var to glbale runtime. In this demo, we show that you can use taskscope flag to mark a dvar to be in task scope, so that you can easily access this task scope var accross different funcs
+    So far, we have scoped vars and eventually they will be living in global runtime or local scope in a func, when you need to access the var across funcs, then you will have to define it in global runtime vars, or grouped vars scope, or register a var to glbale runtime. In this demo, we show that you can use taskScope flag to mark a dvar to be in task scope, so that you can easily access this task scope var accross different funcs
 
   sections:
     - title: Demo
@@ -42,7 +42,7 @@ tasks:
           - name: jerry
             value: this is jerry in task scope
             flags:
-              - taskscope
+              - taskScope
         do:
           - name: print
             desc: this should print out the dvar value of jerry
@@ -52,7 +52,7 @@ tasks:
         func: cmd
         do:
           - name: print
-            desc: this should print out the dvar value of jerry as it is declared jerry is in taskscope
+            desc: this should print out the dvar value of jerry as it is declared jerry is in taskScope
             cmd: '{{.jerry}}'
 
       -

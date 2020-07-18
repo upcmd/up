@@ -90,4 +90,4 @@ tasks:
               person:
                 name: tom
                 age: "18"
-            flags: [vvv, reg, to_object]
+            flags: [vvv, reg, toObj]

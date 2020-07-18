@@ -65,7 +65,7 @@ tasks:
           ymlkey: ymldoc
           path: student.age.
           reg: studentage
-        flags: [ymlonly]
+        flags: [ymlOnly]
 
       -
         func: cmd

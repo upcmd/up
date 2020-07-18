@@ -1,8 +1,8 @@
 doc_meta: |
   folder: test-debug
-  title: failfast
+  title: failFast
   head: |
-    Showcase to use failfast flag when use assert cmd
+    Showcase to use failFast flag when use assert cmd
 
     It will report all assert results but stop there
 
@@ -64,7 +64,7 @@ tasks:
                   - '{{eq .c "global_ccc" }}'
                   - '{{eq .da "local_da" }}'
                   - '{{eq .db "local_db_layer1" }}'
-                flags: [failfast,]
+                flags: [failFast,]
 
           - func: shell
             do:
@@ -105,7 +105,7 @@ tasks:
                       - '{{eq .c "global_ccc" }}'
                       - '{{eq .da "local_da_layer2" }}'
                       - '{{eq .db "local_db_layer2" }}'
-                    flags: [failfast,]
+                    flags: [failFast,]
 
           - func: shell
             do:

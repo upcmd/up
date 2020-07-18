@@ -3,7 +3,7 @@ notes:
   goal:
     - internal test
     - do not include into docs
-    - check that writefile command do not append
+    - check that writeFile command do not append
 
 tasks:
   -
@@ -14,16 +14,16 @@ tasks:
         func: cmd
         do:
           -
-            name: writefile
+            name: writeFile
             cmd:
               content: "hello "
-              filename: writefile_test
+              filename: writeFile_test
               dir: /tmp
 
           -
-            name: readfile
+            name: readFile
             cmd:
-              filename: writefile_test
+              filename: writeFile_test
               dir: /tmp
               reg: hellofile
           -

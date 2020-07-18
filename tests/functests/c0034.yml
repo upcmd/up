@@ -87,7 +87,7 @@ scopes:
               postcode: 2000
               CBD: yes
             school: {{.student.address.school}}
-        flags: [to_object]
+        flags: [toObj]
 
   -
     name: dev
@@ -115,7 +115,7 @@ tasks:
                   CBD: LOCAL
                 school: {{.student.address.school}}
               principal: Mr Right
-            flags: [to_object]
+            flags: [toObj]
 
         do:
           - show_school_details
@@ -142,7 +142,7 @@ tasks:
                 school: {{.student.address.school}}
               principal: Mr Peter
               something: ref task does not have this field
-            flags: [to_object]
+            flags: [toObj]
 
         do:
           - echo """1.school -> {{.school}}"""
@@ -151,4 +151,4 @@ tasks:
           - echo """4.school object-> {{.school_object.principal}}"""
           - echo """5.a {{.a}}"""
           - echo """6.b {{.b}}"""
-          - echo """7.school object-> {{.school_object|printobj}}"""
+          - echo """7.school object-> {{.school_object|printObj}}"""

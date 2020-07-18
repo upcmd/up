@@ -2,7 +2,7 @@ doc_meta: |
   folder: cmd-func
   title: print message
   head: |
-    cmd func is a core func to wrap up some actions, for example, query yml string/object, register/deregister a var, exit the task, template etc. It focus on core functionalities implementation provided by UP cmd cli internals
+    cmd func is a core func to wrap up some actions, for example, query yml string/object, register/deRegister a var, exit the task, template etc. It focus on core functionalities implementation provided by UP cmd cli internals
 
   sections:
     - title: print cmd

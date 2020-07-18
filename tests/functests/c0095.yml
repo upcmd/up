@@ -1,18 +1,18 @@
 doc_meta: |
   folder: cmd-func
-  title: to_object
+  title: toObj
   head: |
-    to_object is a cmd to convert yml string to a a registered variable. By default it will register the var to global runtime scope, you can use flag localonly to indicate that this var will be only registered to local scope
+    toObj is a cmd to convert yml string to a a registered variable. By default it will register the var to global runtime scope, you can use flag localOnly to indicate that this var will be only registered to local scope
 
   sections:
-    - title: Difference from to_object in dvar
+    - title: Difference from toObj in dvar
       content: |
-        to_object in dvar is limited and can not inherit the loopitem unless you register the loopitem to another var
+        toObj in dvar is limited and can not inherit the loopitem unless you register the loopitem to another var
 
     - title: Relavant
-      content: to_object in dvar
+      content: toObj in dvar
       refs:
-        - title: to_object in dvar
+        - title: toObj in dvar
           link: ../../object-oriented/c0074
 
     - title: Demo
@@ -22,9 +22,9 @@ notes:
   goal:
     - add a cmd to convert yml to object
     - |
-      to_object in dvar is limited and can not inherit
+      toObj in dvar is limited and can not inherit
       the loopitem unless you register the loopitem to another var
-    - it does not need load to implment load from file, use readfile instead
+    - it does not need load to implment load from file, use readFile instead
 
 tasks:
 
@@ -42,28 +42,28 @@ tasks:
           person: jason
 
         do:
-          - name: to_object
+          - name: toObj
             desc: |
               the key is pointing to a var name and use its content as yml content
             cmd:
               fromkey: person_yml
               reg: person_object
 
-          - name: printobj
+          - name: printObj
             cmd: person_object
 
           - name: print
             cmd: 'my name is: {{.person_object.person.name}}'
 
-          - name: to_object
+          - name: toObj
             cmd:
               fromkey: '{{.name_to_convert}}'
               reg: '{{.name_to_reg}}'
 
-          - name: printobj
+          - name: printObj
             cmd: '{{.name_to_reg}}'
 
-          - name: to_object
+          - name: toObj
             desc:
               use src content directly
             cmd:
@@ -73,6 +73,6 @@ tasks:
                   age: 53
               reg: '{{.name_to_reg}}'
 
-          - name: printobj
+          - name: printObj
             cmd: '{{.name_to_reg}}'
 

@@ -39,7 +39,7 @@ flow:
 
       - func: cmd
         do:
-          - name: readfile
+          - name: readFile
             desc: read content of a file and register it to a var
             cmd:
               filename: myschool.txt

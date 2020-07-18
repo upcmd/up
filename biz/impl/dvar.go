@@ -27,7 +27,7 @@ type Dvar struct {
 	Value        string
 	Desc         string
 	Expand       int
-	Flags        []string //supported: vvvv, to_object,envvar,
+	Flags        []string //supported: vvvv, toObj,envVar,
 	Rendered     string
 	Secure       *u.SecureSetting
 	Ref          string
@@ -172,7 +172,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 					}
 				}
 
-				if u.Contains(dvar.Flags, "to_object") {
+				if u.Contains(dvar.Flags, "toObj") {
 					rawyml := dvar.Rendered
 
 					obj := new(interface{})
@@ -180,7 +180,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 					u.LogErrorAndExit("dvar conversion to object:", err, u.ContentWithLineNumber(rawyml))
 
 					dvarObjName := func() (dvarname string) {
-						if u.Contains(dvar.Flags, "keep_name") {
+						if u.Contains(dvar.Flags, "keepName") {
 							dvarname = dvar.Name
 						} else {
 							dvarname = u.Spf("%s_%s", dvar.Name, "object")
@@ -210,8 +210,8 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 					}
 				}
 
-				if u.Contains(dvar.Flags, "envvar") {
-					envvarName := u.Spf("%s_%s", "envvar", dvar.Name)
+				if u.Contains(dvar.Flags, "envVar") {
+					envvarName := u.Spf("%s_%s", "envVar", dvar.Name)
 					(*mergeTarget).Put(envvarName, dvar.Rendered)
 					(*expandedVars).Put(envvarName, dvar.Rendered)
 					os.Setenv(dvar.Name, dvar.Rendered)
@@ -245,7 +245,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 					dvar.Rendered = saneValue
 				}
 
-				if u.Contains(dvar.Flags, "taskscope") {
+				if u.Contains(dvar.Flags, "taskScope") {
 					TaskRuntime().TaskVars.Put(dvar.Name, dvar.Rendered)
 				}
 

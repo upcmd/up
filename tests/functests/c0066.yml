@@ -1,8 +1,8 @@
 doc_meta: |
   folder: cmd-func
-  title: reg and dereg
+  title: reg and deReg
   head: |
-    reg and dereg cmd is used to register a variable or remove a variable
+    reg and deReg cmd is used to register a variable or remove a variable
 
   sections:
     - title: reg cmd spec
@@ -15,27 +15,27 @@ doc_meta: |
               name: this is varname it will register to
               value: this is the value, or dvar to be assigned to the varname
             flags:
-              - localonly
+              - localOnly
 
         ```
 
-    - title: dereg cmd spec
+    - title: deReg cmd spec
       content: |
         reg will automatically register it to global runtime vars map
         ```
           -
-            name: dereg
-            desc: demo of dereg command
+            name: deReg
+            desc: demo of deReg command
             cmd: this_will_be_the_var_name_to_be_removed
         ```
 
-    - title: localonly flag
+    - title: localOnly flag
       content: |
         Indicating if this var only availbe in the local scope within one func call by default, it register the var to global scope
 
     - title: note
       content: |
-        Compare to the template pipeline reg/dereg command, the difference of these two command here reg and dereg the vars immediately in the current func step, rather than the next func step. Check it out the demo step
+        Compare to the template pipeline reg/deReg command, the difference of these two command here reg and deReg the vars immediately in the current func step, rather than the next func step. Check it out the demo step
 
     - title: Demo
       log: yes
@@ -89,7 +89,7 @@ tasks:
               name: greetlocal
               value: "hello, {{.student.school}}. registered to local func only"
             flags:
-              - localonly
+              - localOnly
 
           -
             name: print
@@ -116,8 +116,8 @@ tasks:
       - func: cmd
         do:
           -
-            name: dereg
-            desc: demo of dereg command
+            name: deReg
+            desc: demo of deReg command
             cmd: greet
 
       - func: shell

@@ -10,7 +10,7 @@ doc_meta: |
 
     - title: Explain
       content: |
-        Below shows how to use cmd path_existed to get a boolean result and saved to a register value, then you can use it in your workflow to decide to go ahead to access the value of the var
+        Below shows how to use cmd pathExisted to get a boolean result and saved to a register value, then you can use it in your workflow to decide to go ahead to access the value of the var
 
 notes:
   - test how to detect if a var exist or not
@@ -55,19 +55,19 @@ tasks:
               path: sydney_grammar.address
               reg: school_address
 
-          - name: path_existed
+          - name: pathExisted
             cmd:
               path: sydney_grammar.address
               reg: address_existed
 
-          - name: path_existed
+          - name: pathExisted
             desc: |
               the state will be rendered as <no value>, this will be treated as not exist
             cmd:
               path: sydney_grammar.state
               reg: state_existed
 
-          - name: path_existed
+          - name: pathExisted
             cmd:
               path: b.not_exist
               reg: varb_sub_element_existed
@@ -80,14 +80,14 @@ tasks:
 
       -
         func: cmd
-        desc: test path_existed in templating
+        desc: test pathExisted in templating
         do:
           - name: print
             cmd: |
-              sydney_grammar.address exist: {{ path_existed "sydney_grammar.address" }}
-              sydney_grammar.state exist: {{ path_existed "sydney_grammar.state"}}
-              varb_sub_element_existed exist: {{ path_existed "b.not_exist"}}
-              {{ if path_existed "b.not_exist"}}
+              sydney_grammar.address exist: {{ pathExisted "sydney_grammar.address" }}
+              sydney_grammar.state exist: {{ pathExisted "sydney_grammar.state"}}
+              varb_sub_element_existed exist: {{ pathExisted "b.not_exist"}}
+              {{ if pathExisted "b.not_exist"}}
               I am happy
               {{ else }}
               I am sad
@@ -102,4 +102,4 @@ tasks:
 
           - name: assert
             cmd:
-              - '{{path_existed "sydney_grammar.address" }}'
+              - '{{pathExisted "sydney_grammar.address" }}'

@@ -123,7 +123,7 @@ func (f *CmdFuncAction) Exec() {
 				u.Pfv("%s\n", color.HiGreenString("%s", cmdRendered))
 			})
 
-		case "colorprint":
+		case "colorPrint":
 
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
@@ -170,7 +170,7 @@ func (f *CmdFuncAction) Exec() {
 				u.Pln(color.FgWhite, color.BgBlue)
 
 				if msg != "" && object != "" {
-					u.LogWarn("colorprint", "msg and object can not coexist")
+					u.LogWarn("colorPrint", "msg and object can not coexist")
 				} else {
 					if msg != "" {
 						c.Printf("%s\n", msg)
@@ -189,7 +189,7 @@ func (f *CmdFuncAction) Exec() {
 				u.Ptrace("Trace:", cmdRendered)
 			})
 
-		case "printobj":
+		case "printObj":
 			u.Dvvvv(cmdItem.Cmd)
 			cmdItem.runCmd("string", func() {
 				objname := Render(cmdItem.Cmd.(string), f.Vars)
@@ -197,10 +197,10 @@ func (f *CmdFuncAction) Exec() {
 				u.Ppfmsg(u.Spf("object:\n %s", objname), obj)
 			})
 
-		case "dereg":
+		case "deReg":
 			cmdItem.runCmd("string", func() {
 				varname := Render(cmdItem.Cmd.(string), f.Vars)
-				u.Pfv("deregister var: %s\n", color.HiGreenString("%s", varname))
+				u.Pfv("deRegister var: %s\n", color.HiGreenString("%s", varname))
 				TaskRuntime().ExecbaseVars.Delete(varname)
 				f.Vars.Delete(varname)
 			})
@@ -245,14 +245,16 @@ func (f *CmdFuncAction) Exec() {
 				}
 
 				if failed {
-					doFlag("failfast", func() {
-						u.InvalidAndExit("Assert Failed", "Failfast and STOPS here!!!")
+					doFlag("failFast", func() {
+						u.InvalidAndExit("Assert Failed", "failFast and STOPS here!!!")
 					})
 				}
 
 			})
 
 		case "inspect":
+			//TODO: add evar inspection support
+			//TODO: add environment variable inspection support
 			cmdItem.runCmd("array", func() {
 				whats := cmdItem.Cmd.([]interface{})
 
@@ -269,11 +271,11 @@ func (f *CmdFuncAction) Exec() {
 				}
 			})
 
-		case "readfile":
+		case "readFile":
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
 				var varname, filename, dir, raw string
-				var localonly bool
+				var localOnly bool
 				for k, v := range cmd {
 					switch k.(string) {
 					case "reg":
@@ -288,16 +290,16 @@ func (f *CmdFuncAction) Exec() {
 					}
 				}
 
-				doFlag("localonly", func() {
-					localonly = true
+				doFlag("localOnly", func() {
+					localOnly = true
 				})
 
 				filepath := path.Join(dir, filename)
 
 				content, err := ioutil.ReadFile(filepath)
-				u.LogErrorAndExit("cmd readfile", err, "please fix file path and name issues")
+				u.LogErrorAndExit("cmd readFile", err, "please fix file path and name issues")
 
-				if localonly {
+				if localOnly {
 					f.Vars.Put(varname, string(content))
 				} else {
 					TaskRuntime().ExecbaseVars.Put(varname, string(content))
@@ -309,7 +311,7 @@ func (f *CmdFuncAction) Exec() {
 			u.Ppmsgvvvvvhint("after reg the var - contextual global:", TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 
-		case "writefile":
+		case "writeFile":
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
 				var content, filename, dir, raw string
@@ -391,7 +393,7 @@ func (f *CmdFuncAction) Exec() {
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
 				var raw, reg, ymlkey, ymlfile, yqpath string
-				var collect, localonly, ymlonly bool
+				var collect, localOnly, ymlOnly bool
 				refdir := ConfigRuntime().RefDir
 				var data interface{}
 				for k, v := range cmd {
@@ -417,11 +419,11 @@ func (f *CmdFuncAction) Exec() {
 					}
 				}
 
-				doFlag("localonly", func() {
-					localonly = true
+				doFlag("localOnly", func() {
+					localOnly = true
 				})
-				doFlag("ymlonly", func() {
-					ymlonly = true
+				doFlag("ymlOnly", func() {
+					ymlOnly = true
 				})
 				doFlag("collect", func() {
 					collect = true
@@ -437,28 +439,28 @@ func (f *CmdFuncAction) Exec() {
 						u.InvalidAndExit("data validation", "ymlkey does not exist, please fix it")
 					}
 					ymlstr := tmpymlstr.(string)
-					if ymlonly {
+					if ymlOnly {
 						data = core.GetSubYmlFromYml(ymlstr, yqpath, collect, ConfigRuntime().Verbose)
 					} else {
 						data = core.GetSubObjectFromYml(ymlstr, yqpath, collect, ConfigRuntime().Verbose)
 					}
 				} else if ymlfile != "" {
 					filepath := path.Join(refdir, ymlfile)
-					if ymlonly {
+					if ymlOnly {
 						data = core.GetSubYmlFromFile(filepath, yqpath, collect, ConfigRuntime().Verbose)
 					} else {
 						data = core.GetSubObjectFromFile(filepath, yqpath, collect, ConfigRuntime().Verbose)
 					}
 				} else if yqpath != "" {
 					//means to retrieve from cache
-					if ymlonly {
+					if ymlOnly {
 						data = core.GetSubYmlFromCache(f.Vars, yqpath, collect, ConfigRuntime().Verbose)
 					} else {
 						data = core.GetSubObjectFromCache(f.Vars, yqpath, collect, ConfigRuntime().Verbose)
 					}
 				}
 
-				if localonly {
+				if localOnly {
 					f.Vars.Put(reg, data)
 				} else {
 					TaskRuntime().ExecbaseVars.Put(reg, data)
@@ -467,14 +469,14 @@ func (f *CmdFuncAction) Exec() {
 
 			})
 
-		case "yml_delete":
+		case "ymlDelete":
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
 				var raw, ymlfile, yqpath, reg string
 
 				refdir := ConfigRuntime().RefDir
 				verbose := ConfigRuntime().Verbose
-				var inplace, localonly bool
+				var inplace, localOnly bool
 				for k, v := range cmd {
 					switch k.(string) {
 					case "ymlfile":
@@ -494,8 +496,8 @@ func (f *CmdFuncAction) Exec() {
 					}
 				}
 
-				doFlag("localonly", func() {
-					localonly = true
+				doFlag("localOnly", func() {
+					localOnly = true
 				})
 				doFlag("inplace", func() {
 					inplace = true
@@ -506,7 +508,7 @@ func (f *CmdFuncAction) Exec() {
 				}
 
 				if inplace == true && reg != "" {
-					u.InvalidAndExit("yml_delete criteria validation", "inplace and reg are mutual exclusive")
+					u.InvalidAndExit("ymlDelete criteria validation", "inplace and reg are mutual exclusive")
 				}
 
 				modified, err := yq.UpDeletePathFromFile(path.Join(refdir, ymlfile), yqpath, inplace, verbose)
@@ -514,7 +516,7 @@ func (f *CmdFuncAction) Exec() {
 				u.Ppmsgvvvvvhint("yml modified:", modified)
 
 				if inplace != true && reg != "" {
-					if localonly {
+					if localOnly {
 						f.Vars.Put(reg, modified)
 					} else {
 						TaskRuntime().ExecbaseVars.Put(reg, modified)
@@ -523,14 +525,14 @@ func (f *CmdFuncAction) Exec() {
 				}
 			})
 
-		case "yml_write":
+		case "ymlWrite":
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
 				var raw, yqpath, ymlstr, reg, value, nodevalue, modified string
 				var err error
 
 				verbose := ConfigRuntime().Verbose
-				var localonly bool
+				var localOnly bool
 				for k, v := range cmd {
 					switch k.(string) {
 					case "ymlstr":
@@ -552,8 +554,8 @@ func (f *CmdFuncAction) Exec() {
 						reg = Render(raw, f.Vars)
 					}
 				}
-				doFlag("localonly", func() {
-					localonly = true
+				doFlag("localOnly", func() {
+					localOnly = true
 				})
 
 				if ymlstr == "" || yqpath == "" || reg == "" {
@@ -574,7 +576,7 @@ func (f *CmdFuncAction) Exec() {
 
 				u.Ppmsgvvvvvhint("yml modified:", modified)
 
-				if localonly {
+				if localOnly {
 					f.Vars.Put(reg, modified)
 				} else {
 					TaskRuntime().ExecbaseVars.Put(reg, modified)
@@ -587,7 +589,7 @@ func (f *CmdFuncAction) Exec() {
 			cmdItem.runCmd("map", func() {
 				regCmd := cmdItem.Cmd.(map[interface{}]interface{})
 				var varname, varvalue string
-				var localonly bool
+				var localOnly bool
 				for k, v := range regCmd {
 					if k.(string) == "name" {
 						varname = v.(string)
@@ -598,14 +600,14 @@ func (f *CmdFuncAction) Exec() {
 					}
 				}
 
-				doFlag("localonly", func() {
-					localonly = true
+				doFlag("localOnly", func() {
+					localOnly = true
 				})
 
 				if varname == "" {
 					u.InvalidAndExit("validate varname", "the reg varname must not be empty")
 				}
-				if localonly {
+				if localOnly {
 					f.Vars.Put(varname, varvalue)
 				} else {
 					TaskRuntime().ExecbaseVars.Put(varname, varvalue)
@@ -615,7 +617,7 @@ func (f *CmdFuncAction) Exec() {
 			u.Ppmsgvvvvvhint("after reg the var - contextual global:", TaskRuntime().ExecbaseVars)
 			u.Ppmsgvvvvvhint("after reg the var - local:", f.Vars)
 
-		case "path_existed":
+		case "pathExisted":
 			cmd := cmdItem.Cmd.(map[interface{}]interface{})
 			var raw, path, pathtstr, reg string
 			for k, v := range cmd {
@@ -656,14 +658,14 @@ func (f *CmdFuncAction) Exec() {
 			})
 			u.Ppmsgvvvvvhint("contextual return vars:", TaskRuntime().ReturnVars)
 
-		case "to_object":
+		case "toObj":
 			//src: a var name to get the yml content from
 			//reg: a registered name to cache the variable
-			//localonly: if set, then the variable will not be saved to global space
+			//localOnly: if set, then the variable will not be saved to global space
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
 				var fromkey, src, reg string
-				var localonly bool
+				var localOnly bool
 				for k, v := range cmd {
 					if k.(string) == "fromkey" {
 						keyRaw := v.(string)
@@ -678,8 +680,8 @@ func (f *CmdFuncAction) Exec() {
 						reg = Render(regRaw, f.Vars)
 					}
 				}
-				doFlag("localonly", func() {
-					localonly = true
+				doFlag("localOnly", func() {
+					localOnly = true
 				})
 
 				srcyml := func() string {
@@ -702,9 +704,9 @@ func (f *CmdFuncAction) Exec() {
 				}()
 				obj := new(interface{})
 				err := yaml.Unmarshal([]byte(srcyml), obj)
-				u.LogErrorAndExit("cmd to_object:", err, "please validate the ymal content")
+				u.LogErrorAndExit("cmd toObj:", err, "please validate the ymal content")
 
-				if localonly {
+				if localOnly {
 					(*f.Vars).Put(reg, *obj)
 				} else {
 					TaskRuntime().ExecbaseVars.Put(src, reg)

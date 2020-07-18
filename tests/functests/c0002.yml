@@ -10,11 +10,11 @@ doc_meta: |
 
         We will call the step in the array of steps shell func as sub step to just avoid confusion, each func implementation in a task is called a step
 
-    - title: ignore_error flag
+    - title: ignoreError flag
       content: |
         A flag in flag list attaching to a func dictates some behavior, in such a way it provides additional feature to the execution, workflow etc
 
-        Normally a successful shell execution returns exit code 0, ignore_error is to allow the executio to contiue to next or end without a return code of 0
+        Normally a successful shell execution returns exit code 0, ignoreError is to allow the executio to contiue to next or end without a return code of 0
 
         In this demo, it reports the sub step has failed with its own return code, but it continue to complete all execution
 
@@ -44,7 +44,7 @@ tasks:
         func: shell
         desc: do step2 in shell func
         flags:
-          - ignore_error
+          - ignoreError
         do:
           - echo "hello"
           - echo "I got exception"|grep non-exist

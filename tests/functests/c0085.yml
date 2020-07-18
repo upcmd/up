@@ -49,7 +49,7 @@ tasks:
         func: shell
         dvars:
           - name: linelist
-            value: '{{ .lines | splitLines | printobj }}'
+            value: '{{ .lines | splitLines | printObj }}'
             flags: [vvv]
 
         do:

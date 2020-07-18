@@ -54,7 +54,7 @@ tasks:
           - name: sgp_address_dyna_dir
             ref: d0030_school.yml
             refdir: '{{.dynadir}}'
-            flags: [to_object, vvvv]
+            flags: [toObj, vvvv]
 
         do:
           - echo """1.address -> \n{{.sgp_address_dyna_dir}}"""

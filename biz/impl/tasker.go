@@ -234,7 +234,7 @@ func (t *Tasker) loadExecProfileEnvVars() {
 
 		if evars != nil {
 			for _, v := range *evars {
-				envvarName := u.Spf("%s_%s", "envvar", v.Name)
+				envvarName := u.Spf("%s_%s", "envVar", v.Name)
 				envVars.Put(envvarName, v.Value)
 				os.Setenv(v.Name, v.Value)
 			}
@@ -242,7 +242,7 @@ func (t *Tasker) loadExecProfileEnvVars() {
 	}
 
 	t.ExecProfileEnvVars = envVars
-	u.Ppmsgvvvhint(u.Spf("profile - %s envvars:", t.ExecProfilename), envVars)
+	u.Ppmsgvvvhint(u.Spf("profile - %s envVars:", t.ExecProfilename), envVars)
 }
 
 //clear up everything in scope and cache

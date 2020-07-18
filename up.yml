@@ -72,8 +72,8 @@ tasks:
               {{end}}
               {{end}}
             flags:
-              - to_object
-              - keep_name
+              - toObj
+              - keepName
               - v
         do: buildDistro
 
@@ -89,11 +89,11 @@ tasks:
           - name: release
             value: '{{.result.Output}}'
             flags:
-              - to_object
+              - toObj
           - name: releaseid
             value: '{{.release_object.id}}'
             flags:
-              - taskscope
+              - taskScope
               - v
         do:
           - echo "deleting release - {{.releaseid}}"
@@ -135,7 +135,7 @@ tasks:
           - name: release
             value: '{{.result.Output}}'
             flags:
-              - to_object
+              - toObj
           - name: releaseid
             value: '{{.release_object.id}}'
             flags:
@@ -189,7 +189,7 @@ tasks:
         desc: |
           default to build all types of distros supported
           if instructed the dist=common, then only build: linux, darwin and windows
-        if: '{{not (path_existed "distlist") }}'
+        if: '{{not (pathExisted "distlist") }}'
         do:
           -
             func: shell
@@ -218,7 +218,7 @@ tasks:
             do:
               - name: print
                 cmd: 'building {{.distlist}}'
-              - name: printobj
+              - name: printObj
                 cmd: 'distlist'
 
       - func: block
@@ -240,7 +240,7 @@ tasks:
               - 'echo "build release version - {{.ver}} > [ os = {{.os}}, arch = {{.arch}} ]"'
               - GOOS={{.os}} GOARCH={{.arch}} go build -o build/up_{{.os}}_{{.arch}}_{{.ver}} app/up/*.go
             flags:
-              - ignore_error
+              - ignoreError
 
       -
         func: shell
@@ -262,7 +262,7 @@ tasks:
             value: '{{ .result.Output }}'
             flags:
               - v
-              - taskscope
+              - taskScope
         do:
           - name: print
             cmd: 'version: {{.ver}}'
@@ -311,7 +311,7 @@ tasks:
           - name: hugo_doc_log_dir
             value: /up_project/updocs/reflogs
             flags:
-              - taskscope
+              - taskScope
         do:
           - 'echo "log will be generated at {{.hugo_doc_log_dir}}"'
           - 'rm -rf {{.hugo_doc_log_dir}}'
@@ -382,7 +382,7 @@ tasks:
           - name: moduletests_dir
             value: ./tests/modtests
             flags:
-              - taskscope
+              - taskScope
         desc: |
           get mod tests dirs
           ./0001
@@ -435,7 +435,7 @@ tasks:
           - vvvv
           - vvvvv
         flags:
-          - ignore_error
+          - ignoreError
 
   -
     name: log_gen_impl
@@ -493,7 +493,7 @@ tasks:
           - vvvv
           - vvvvv
         flags:
-          - ignore_error
+          - ignoreError
 
   -
     name: testf
@@ -650,9 +650,9 @@ tasks:
               - name: filepath
                 value: '{{.loopitem}}'
                 flags:
-                  - taskscope
+                  - taskScope
             do:
-              - name: readfile
+              - name: readFile
                 cmd:
                   filename: '{{.filepath}}'
                   reg: content
@@ -671,7 +671,7 @@ tasks:
               - name: print
                 cmd: 'processing {{.filepath}}'
 
-              - name: writefile
+              - name: writeFile
                 cmd:
                   content: "{{.licensed_code}}"
                   filename: '{{.filepath}}'

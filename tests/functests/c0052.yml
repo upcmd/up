@@ -2,7 +2,7 @@ doc_meta: |
   folder: shell-func
   title: ignore error
   head: |
-    Showcase you can use ignore_error flag to ignore the failed step and continue
+    Showcase you can use ignoreError flag to ignore the failed step and continue
 
   sections:
     - title: Demo
@@ -27,7 +27,7 @@ tasks:
     task:
       - func: shell
         flags:
-          - ignore_error
+          - ignoreError
         do:
           - echo "step1"
           - echo "step2" |grep notexist
@@ -35,7 +35,7 @@ tasks:
 
       - func: shell
         flags:
-          - ignore_error
+          - ignoreError
         do:
           - echo "step4"
           - echo "step5" |grep notexist

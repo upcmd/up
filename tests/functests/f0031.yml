@@ -29,7 +29,7 @@ scopes:
               postcode: 2000
               CBD: yes
             school: {{.student.address.school}}
-        flags: [to_object]
+        flags: [toObj]
 
   -
     name: nonprod
@@ -51,7 +51,7 @@ scopes:
               CBD: no
             school: {{.student.address.school}}
           principal: Mr Peter
-        flags: [to_object]
+        flags: [toObj]
 
   -
     name: dev
@@ -64,7 +64,7 @@ dvars:
   - name: sgp_address
     ref: d0030_school.yml
     refdir: ./tests
-    flags: [to_object]
+    flags: [toObj]
 
 tasks:
 

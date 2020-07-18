@@ -41,7 +41,7 @@ scopes:
       - name: A_GLOBAL_ENV_VAR
         value: a_global_env_var
         flags:
-          - envvar
+          - envVar
 
   - name: nonprod
     members:

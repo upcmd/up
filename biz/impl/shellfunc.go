@@ -26,7 +26,7 @@ func runCmd(f *ShellFuncAction, cmd string) {
 	} else {
 		switch u.MainConfig.ShellType {
 		case "GOSH":
-			envvarObjMap := f.Vars.GetPrefixMatched("envvar_")
+			envvarObjMap := f.Vars.GetPrefixMatched("envVar_")
 			envVars := map[string]string{}
 			for k, v := range *envvarObjMap {
 				envVars[k] = v.(string)
@@ -42,7 +42,7 @@ func runCmd(f *ShellFuncAction, cmd string) {
 			func() {
 				//inject the envvars
 				cmdExec.Env = os.Environ()
-				envvarObjMap := f.Vars.GetPrefixMatched("envvar_")
+				envvarObjMap := f.Vars.GetPrefixMatched("envVar_")
 				for k, v := range *envvarObjMap {
 					cmdExec.Env = append(cmdExec.Env, u.Spf("%s=%s", k, v.(string)))
 				}

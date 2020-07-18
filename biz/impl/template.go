@@ -50,18 +50,18 @@ func FuncMapInit() {
 			t := time.Now()
 			return t.Format("2006-01-02T15:04:05+11:00")
 		},
-		"printobj": func(obj interface{}) string {
+		"printObj": func(obj interface{}) string {
 			u.Ppmsg(obj)
 			return u.Sppmsg(obj)
 		},
-		"obj_to_yml": func(obj interface{}) string {
+		"objToYml": func(obj interface{}) string {
 			yml := core.ObjToYaml(obj)
-			u.Ppmsgvvvvv("obj_to_yml", yml)
+			u.Ppmsgvvvvv("objToYml", yml)
 			return yml
 		},
-		"yml_to_obj": func(yml string) interface{} {
+		"ymlToObj": func(yml string) interface{} {
 			obj := core.YamlToObj(yml)
-			u.Ppmsgvvvvv("yml_to_obj", obj)
+			u.Ppmsgvvvvv("ymlToObj", obj)
 			return obj
 		},
 		//reg do not return any value, so do not expect the dvar value will be something other than empty
@@ -76,22 +76,22 @@ func FuncMapInit() {
 			StepRuntime().DataSyncFunc(varname, object)
 			return core.ObjToYaml(object)
 		},
-		"dereg": func(varname string) string {
+		"deReg": func(varname string) string {
 			TaskRuntime().ExecbaseVars.Delete(varname)
 			return ""
 		},
-		"path_existed": func(path string) bool {
+		"pathExisted": func(path string) bool {
 			pathtstr := u.Spf("{{.%s}}", path)
 			return ElementValid(pathtstr, StepRuntime().ContextVars)
 		},
-		"filecontent": func(filepath string) string {
+		"fileContent": func(filepath string) string {
 			if _, err := os.Stat(filepath); os.IsNotExist(err) {
-				u.LogWarn("filecontent readfile", u.Spf("please fix file path: %s", filepath))
+				u.LogWarn("fileContent readFile", u.Spf("please fix file path: %s", filepath))
 				return ""
 			} else {
 				content, err := ioutil.ReadFile(filepath)
 				if err != nil {
-					u.LogWarn("filecontent readfile", u.Spf("please fix file read error, path: %s", filepath))
+					u.LogWarn("fileContent readFile", u.Spf("please fix file read error, path: %s", filepath))
 				}
 				return string(content)
 			}

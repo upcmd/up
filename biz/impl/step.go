@@ -423,7 +423,7 @@ func (steps *Steps) Exec(fromBlock bool) {
 					u.LogOk(".")
 				}
 
-				if !u.Contains(step.Flags, "ignore_error") {
+				if !u.Contains(step.Flags, "ignoreError") {
 					if result != nil && result.Code != 0 {
 						u.InvalidAndExit("Failed And Not Ignored!", "You may want to continue and ignore the error")
 					}

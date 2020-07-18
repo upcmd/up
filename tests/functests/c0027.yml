@@ -2,7 +2,7 @@ doc_meta: |
   folder: dvars
   title: convert dvar
   head: |
-    A dvar value is normally a string, which could be a formated yml content, then be converted to an object. This demo shows that you can use a flag: to_object to notate this dvar will be transformed to an object and registered to global runtime
+    A dvar value is normally a string, which could be a formated yml content, then be converted to an object. This demo shows that you can use a flag: toObj to notate this dvar will be transformed to an object and registered to global runtime
 
   sections:
     - title: Rules
@@ -10,8 +10,8 @@ doc_meta: |
         * you can reference to plain dvar with the string|untemplated value
         * you can reference to hiera structure of a object once it is converted
         * the new name of the dvar object will be: dvar_object
-        * the flag keep_name makes the dvar keep its original name as is instead of creating dvar_object
-        * keep_name only used and pair to to_object
+        * the flag keepName makes the dvar keep its original name as is instead of creating dvar_object
+        * keepName only used and pair to toObj
 
     - title: Demo
       log: yes
@@ -28,7 +28,7 @@ notes:
     - you can reference to plain dvar with the string|untemplated value
     - you can reference to hiera structure of a object in static vars
     - you can reference to a dynamic converted dvar with new name -> a_smart_guy_object
-    - fail if expand > 1 and to_object both exist
+    - fail if expand > 1 and toObj both exist
 
 vars:
   student:
@@ -48,7 +48,7 @@ dvars:
       name: Tom
       gender: Male
       school: Sydney Grammar
-    flags: [to_object,]
+    flags: [toObj,]
 #    expand: 2
 
   - name: school_address
@@ -63,18 +63,18 @@ dvars:
         school: {{.student.address.school}}
         tom:
           name: {{.a_smart_guy_object.name}}
-    flags: [to_object,]
+    flags: [toObj,]
 
   - name: tom
     desc: |
-      in this case, we use keep_name flag to make the dvar name the same name we give. So instead we have regitered tom (yml string) and tom_object (object), we now only have tom as registered object
+      in this case, we use keepName flag to make the dvar name the same name we give. So instead we have regitered tom (yml string) and tom_object (object), we now only have tom as registered object
     value: |
       name: {{.a_smart_guy_object.name}}
       gender: Male
       school: Sydney Grammar
     flags:
-      - to_object
-      - keep_name
+      - toObj
+      - keepName
 
 tasks:
 
