@@ -28,6 +28,16 @@ type Scope struct {
 
 type Scopes []Scope
 
+type ExecProfile struct {
+	Name     string
+	Ref      string
+	RefDir   string
+	Instance string
+	Evars    EnvVars
+}
+
+type ExecProfiles []ExecProfile
+
 func DecryptAndRegister(securetag *u.SecureSetting, dvar *Dvar, contextVars *core.Cache, mergeTarget *core.Cache) {
 	s := securetag
 
@@ -87,6 +97,15 @@ func loadRefVars(yamlroot *viper.Viper) *core.Cache {
 	scopesData := yamlroot.Get("vars")
 	vars := core.Cache{}
 	err := ms.Decode(scopesData, &vars)
+	u.Dvvvvv(vars)
+	u.LogError("load ref vars", err)
+	return &vars
+}
+
+func loadRefEvars(yamlroot *viper.Viper) *EnvVars {
+	evarsData := yamlroot.Get("evars")
+	vars := EnvVars{}
+	err := ms.Decode(evarsData, &vars)
 	u.Dvvvvv(vars)
 	u.LogError("load ref vars", err)
 	return &vars

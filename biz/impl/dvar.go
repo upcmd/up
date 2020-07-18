@@ -20,6 +20,7 @@ import (
 )
 
 type Dvars []Dvar
+type EnvVars []EnvVar
 
 type Dvar struct {
 	Name         string
@@ -34,6 +35,11 @@ type Dvar struct {
 	DataKey      string
 	DataPath     string
 	DataTemplate string
+}
+
+type EnvVar struct {
+	Name  string
+	Value string
 }
 
 func (dvars *Dvars) ValidateAndLoading(contextVars *core.Cache) {
@@ -70,8 +76,7 @@ func (dvars *Dvars) ValidateAndLoading(contextVars *core.Cache) {
 	}
 
 	if identified {
-		u.LogError("dvar validate", "the dvar name identified above should be fixed before continue")
-		os.Exit(-1)
+		u.InvalidAndExit("dvar validate", "the dvar name identified above should be fixed before continue")
 	}
 
 }
@@ -209,6 +214,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 					envvarName := u.Spf("%s_%s", "envvar", dvar.Name)
 					(*mergeTarget).Put(envvarName, dvar.Rendered)
 					(*expandedVars).Put(envvarName, dvar.Rendered)
+					os.Setenv(dvar.Name, dvar.Rendered)
 				}
 
 				if TaskerRuntime().Tasker.TaskStack.GetLen() > 0 {

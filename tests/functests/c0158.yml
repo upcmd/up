@@ -1,0 +1,109 @@
+doc_meta: |
+  folder: user-interaction
+  title: externise exec profile
+  head: |
+    This shows how to externlise the exec profile
+
+  sections:
+    - title: How does it work
+      content: |
+        You can use ref and redir to redirect the detailed env var key value pairs to another individual file if it turns out there are too many entries to be living in up.yml
+
+        * ref
+          ref is the tag for refrencing to the file name to load
+
+        * refdir
+          refdir is the tag for refrencing to the directory which the ref file is located.By default this would be the global refdir and you can leave it empty if the file is living in the same directory
+
+    - title: Relavant
+      content: environment variables
+      refs:
+        - title: set env var
+          link: ../../env-vars/c0048/
+        - title: get env var
+          link: ../../env-vars/c0046/
+
+notes:
+  - add feature of execution profile
+
+eprofiles:
+  - name: dev1_use_memcache
+    instance: dev
+    ref: d0158_eprofile_dev.yml
+#    refdir: ./tests/functests
+
+scopes:
+  - name: global
+    vars:
+      db_driver: postgres
+      port: 5432
+    dvars:
+      - name: A_GLOBAL_ENV_VAR
+        value: a_global_env_var
+        flags:
+          - envvar
+
+  - name: nonprod
+    members:
+      - dev
+      - staging
+    vars:
+      db_host: nonpord_database.test.host
+      db_port: 8354
+      db_user: test_db_user
+      db_password: could_be_encrypted_using_upcmd_too
+    dvars:
+      - name: db_password
+        value: '6HmsmiJIW1PfIXcF4WwOKOMDiL7PstgfKs2aRFajrwY='
+
+  - name: prod
+    members: [prod]
+    vars:
+      host_alias: prod
+
+  - name: dev
+    vars:
+      host_alias: dev
+    dvars:
+      - name: db_host
+        value: '{{ env "DB_HOST" |default "nonpord_database.test.host" }}'
+      - name: A_DEV_ENV_VAR
+        value: '{{ env "A_GLOBAL_ENV_VAR" |default "A_GLOBAL_ENV_VAR_NOT_LOCATED" }}'
+
+  - name: staging
+    vars:
+      host_alias: staging
+
+  - name: prod
+    vars:
+      host_alias: prod
+      db_host: pord_database.proddb.host
+      db_user: prod_db_user
+    dvars:
+      - name: db_password
+        value: 'prod_encrypte_aes'
+
+dvars:
+  - name: db_hostname
+    value: '{{.host_alias}}.myapp.com'
+  - name: db_url
+    value: 'jdbc:{{.db_driver}}://{{.db_hostname}}:{{.db_port}}/test?user={{.db_user}}&password={{.db_password}}&ssl=true'
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: cmd
+        do:
+          - name: inspect
+            cmd:
+              - exec_vars
+          -
+            name: assert
+            cmd:
+              - '{{eq .A_GLOBAL_ENV_VAR "a_global_env_var"}}'
+              - '{{eq .A_DEV_ENV_VAR "a_global_env_var"}}'
+              - '{{eq .db_host "devtest_database.mycompany.local"}}'
+              - '{{eq .db_url "jdbc:postgres://dev.myapp.com:8354/test?user=test_db_user&password=6HmsmiJIW1PfIXcF4WwOKOMDiL7PstgfKs2aRFajrwY=&ssl=true"}}'

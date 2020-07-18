@@ -33,6 +33,7 @@ var (
 	workdir          = app.Flag("workdir", "working directory: cwd | refdir").Short('w').String()
 	taskfile         = app.Flag("taskfile", "task file to load (without yml extension)").Short('t').String()
 	instanceName     = app.Flag("instance", "instance name for execution").Short('i').String()
+	execprofile      = app.Flag("execprofile", "profile name for execution to setup a group environment variables").Short('p').String()
 	configDir        = app.Flag("configdir", "config file directory to load from|default .").String()
 	configFile       = app.Flag("configfile", "config file name to load without yml extension|default config").String()
 )
@@ -68,14 +69,17 @@ func main() {
 	case ngo.FullCommand():
 		if *ngoTaskName != "" {
 			u.Pln("-exec task:", *ngoTaskName)
-			t := impl.NewTasker(*instanceName, initConfig)
+			if *instanceName != "" && *execprofile != "" {
+				u.InvalidAndExit("parameter validation", "instanceid (-i) and execprofile (-p) can not coexist, please only use one of them")
+			}
+			t := impl.NewTasker(*instanceName, *execprofile, initConfig)
 			impl.Pipein()
 			t.ExecTask(*ngoTaskName, nil, false)
 			//u.Ptmpdebug("88", impl.ConfigRuntime())
 		}
 
 	case list.FullCommand():
-		t := impl.NewTasker(*instanceName, initConfig)
+		t := impl.NewTasker(*instanceName, *execprofile, initConfig)
 		if *listName == "=" {
 			t.ListAllTasks()
 		} else if *listName != "" {
@@ -85,7 +89,7 @@ func main() {
 		}
 
 	case mod.FullCommand():
-		t := impl.NewTasker(*instanceName, initConfig)
+		t := impl.NewTasker(*instanceName, *execprofile, initConfig)
 		if *modCmd == "list" {
 			t.ListMainModules()
 		}
@@ -116,7 +120,7 @@ templatefunc
 		}
 
 	case validate.FullCommand():
-		t := impl.NewTasker(*instanceName, initConfig)
+		t := impl.NewTasker(*instanceName, *execprofile, initConfig)
 		taskname := *validateTaskName
 		u.Pf("validate task: %s\n")
 		t.ValidateTask(taskname)

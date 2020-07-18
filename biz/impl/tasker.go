@@ -37,6 +37,7 @@ type Tasker struct {
 	TaskYmlRoot      *viper.Viper
 	Tasks            *model.Tasks
 	InstanceName     string
+	ExecProfilename  string
 	Dryrun           bool
 	TaskStack        *stack.ExecStack
 	StepStack        *stack.ExecStack
@@ -48,8 +49,10 @@ type Tasker struct {
 	//expanded context only contains group and global scope, but not each instance vars
 	ExpandedContext ScopeContext
 	ScopeProfiles   *Scopes
+	ExecProfiles    *ExecProfiles
 	//this is the merged vars from within scope: global, groups level (if there is), instance varss, then global runtime vars
-	RuntimeVarsMerged *core.Cache
+	RuntimeVarsMerged  *core.Cache
+	ExecProfileEnvVars *core.Cache
 	//this is the merged vars and dvars to a vars cache from within scope: global, groups level (if there is), instance varss, then global runtime vars
 	//this vars should be used instead of RuntimeVarsMerged as it include both runtime vars and dvars except the local vars and dvars
 	RuntimeVarsAndDvarsMerged *core.Cache
@@ -67,7 +70,7 @@ type TaskerRuntimeContext struct {
 	//ReturnVars      *Cache
 }
 
-func NewTasker(instanceId string, cfg *u.UpConfig) *Tasker {
+func NewTasker(instanceId string, eprofiename string, cfg *u.UpConfig) *Tasker {
 	priorityLoadingTaskFile := filepath.Join(".", cfg.TaskFile)
 	refDir := "."
 	if _, err := os.Stat(priorityLoadingTaskFile); err != nil {
@@ -90,13 +93,15 @@ func NewTasker(instanceId string, cfg *u.UpConfig) *Tasker {
 
 	TaskerStack.Push(&taskerContext)
 
-	tasker.setInstanceName(instanceId)
+	tasker.loadExecProfiles()
+	tasker.setInstanceName(instanceId, eprofiename)
 	tasker.loadScopes()
-	tasker.InitContextInstances(tasker.ScopeProfiles)
+	tasker.loadInstancesContext()
 	tasker.loadRuntimeGlobalVars()
-	tasker.loadRuntimeDvars()
-	tasker.SetRuntimeVarsMerged(tasker.InstanceName)
-	tasker.SetRuntimeGlobalMergedWithDvars()
+	tasker.loadRuntimeGlobalDvars()
+	tasker.loadExecProfileEnvVars()
+	tasker.MergeUptoRuntimeGlobalVars()
+	tasker.MergeRuntimeGlobalDvars()
 	tasker.loadTasks()
 
 	return tasker
@@ -110,15 +115,14 @@ Validate the scopes
 3. for the scope with no members and name is not global, it is a final instance
 */
 
-func (t *Tasker) InitContextInstances(ss *Scopes) {
-
+func (t *Tasker) loadInstancesContext() {
+	ss := t.ScopeProfiles
 	//validation
 	for idx, s := range *ss {
 
 		if s.Ref != "" && s.Vars != nil {
-			u.LogError("verify scope ref and member coexistence", "ref and members can not both exist")
 			u.Dvvvvv(s)
-			os.Exit(-1)
+			u.InvalidAndExit("verify scope ref and member coexistence", "ref and members can not both exist")
 		}
 		refdir := ConfigRuntime().RefDir
 		if s.Ref != "" {
@@ -142,8 +146,7 @@ func (t *Tasker) InitContextInstances(ss *Scopes) {
 	for idx, s := range *ss {
 		if s.Name == "global" {
 			if s.Members != nil {
-				u.LogError("scope expand", "global scope should not contains members")
-				os.Exit(-1)
+				u.InvalidAndExit("scope expand", "global scope should not contains members")
 			}
 			globalScope = &(*ss)[idx]
 		}
@@ -161,8 +164,7 @@ func (t *Tasker) InitContextInstances(ss *Scopes) {
 		if s.Members != nil {
 			for _, m := range s.Members {
 				if u.Contains(t.GroupMembersList, m) {
-					u.LogError("scope expand", u.Spfv("duplicated member: %s\n", m))
-					os.Exit(-1)
+					u.InvalidAndExit("scope expand", u.Spfv("duplicated member: %s\n", m))
 				}
 				t.GroupMembersList = append(t.GroupMembersList, m)
 				t.MemberGroupMap[m] = s.Name
@@ -191,7 +193,7 @@ func (t *Tasker) InitContextInstances(ss *Scopes) {
 
 }
 
-func (t *Tasker) SetRuntimeGlobalMergedWithDvars() {
+func (t *Tasker) MergeRuntimeGlobalDvars() {
 	var mergedVars core.Cache
 	mergedVars = deepcopy.Copy(*t.RuntimeVarsMerged).(core.Cache)
 
@@ -203,6 +205,44 @@ func (t *Tasker) SetRuntimeGlobalMergedWithDvars() {
 
 	t.RuntimeVarsAndDvarsMerged = &mergedVars
 	u.Ppmsgvvvvhint("-------runtime global final merged with dvars-------", mergedVars)
+}
+
+func (t *Tasker) loadExecProfileEnvVars() {
+	var envVars *core.Cache = core.NewCache()
+	var evars *EnvVars
+	if p := t.getExecProfile(t.ExecProfilename); p != nil {
+
+		if p.Ref != "" && p.Evars != nil {
+			u.InvalidAndExit("exec proile validation", "You can only setup either ref file to load the env vars or use evars tag to config env vars, but not both")
+		}
+
+		refdir := ConfigRuntime().RefDir
+
+		if p.Ref != "" {
+			if p.RefDir != "" {
+				refdir = p.RefDir
+			}
+			yamlevarsroot := u.YamlLoader("ref evars", refdir, p.Ref)
+			evars = loadRefEvars(yamlevarsroot)
+			u.Pvvvv("loading vars from:", p.Ref)
+			u.Ppmsgvvvv(evars)
+		}
+
+		if p.Evars != nil {
+			evars = &p.Evars
+		}
+
+		if evars != nil {
+			for _, v := range *evars {
+				envvarName := u.Spf("%s_%s", "envvar", v.Name)
+				envVars.Put(envvarName, v.Value)
+				os.Setenv(v.Name, v.Value)
+			}
+		}
+	}
+
+	t.ExecProfileEnvVars = envVars
+	u.Ppmsgvvvhint(u.Spf("profile - %s envvars:", t.ExecProfilename), envVars)
 }
 
 //clear up everything in scope and cache
@@ -232,26 +272,26 @@ then merge runtimevars to global varss,
 This has chained dvar expansion through global to group then to instance level
 and finally merge with global var, except the global dvars
 */
-func (t *Tasker) SetRuntimeVarsMerged(runtimeid string) {
-	u.Pf("module: [%s] instance id: [%s]\n", ConfigRuntime().ModuleName, runtimeid)
+func (t *Tasker) MergeUptoRuntimeGlobalVars() {
+	u.Pf("module: [%s] instance id: [%s]\n", ConfigRuntime().ModuleName, t.InstanceName)
 	var runtimevars core.Cache
 	runtimevars = deepcopy.Copy(*t.ExpandedContext["global"]).(core.Cache)
 
-	if u.Contains(t.GroupMembersList, runtimeid) {
-		groupname := t.MemberGroupMap[runtimeid]
+	if u.Contains(t.GroupMembersList, t.InstanceName) {
+		groupname := t.MemberGroupMap[t.InstanceName]
+		//TODO: t.ExpandedContext[groupname] should have already merge to global vars, double check to confirm
 		mergo.Merge(&runtimevars, *t.ExpandedContext[groupname], mergo.WithOverride)
-
-		instanceVars := t.ScopeProfiles.GetInstanceVars(runtimeid)
+		instanceVars := t.ScopeProfiles.GetInstanceVars(t.InstanceName)
 		if instanceVars != nil {
 			mergo.Merge(&runtimevars, instanceVars, mergo.WithOverride)
 		}
-
 	}
 
 	//merge dvars for the instance
+	//TODO: is this a duplication of: GetInstanceVars above?
 	var instanceScope *Scope
 	for idx, s := range *t.ScopeProfiles {
-		if s.Name == runtimeid {
+		if s.Name == t.InstanceName {
 			instanceScope = &(*t.ScopeProfiles)[idx]
 		}
 	}
@@ -266,19 +306,27 @@ func (t *Tasker) SetRuntimeVarsMerged(runtimeid string) {
 	//merge with global vars
 	mergo.Merge(&runtimevars, *t.RuntimeGlobalVars, mergo.WithOverride)
 
-	u.Pfvvvv("merged[ %s ] runtime vars:", runtimeid)
+	u.Pfvvvv("merged[ %s ] runtime vars:", t.InstanceName)
 	u.Ppmsgvvvv(runtimevars)
 	u.Dvvvvv(runtimevars)
 
 	t.RuntimeVarsMerged = &runtimevars
 }
 
-func (t *Tasker) setInstanceName(id string) {
+func (t *Tasker) setInstanceName(id, eprofilename string) {
+	t.ExecProfilename = eprofilename
+	instanceName := "nonamed"
 	if id != "" {
-		t.InstanceName = id
+		instanceName = id
 	} else {
-		t.InstanceName = "nonamed"
+		if p := t.getExecProfile(eprofilename); p != nil {
+			if p.Instance != "" {
+				instanceName = p.Instance
+			}
+		}
 	}
+
+	t.InstanceName = instanceName
 }
 
 func (t *Tasker) initRuntime() {
@@ -634,7 +682,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 							mcfg.SetModulename(modname)
 							mcfg.InitConfig()
 							taskerCaller := TaskerRuntime().Tasker
-							mTasker := NewTasker(mod.Iid, mcfg)
+							mTasker := NewTasker(mod.Iid, "", mcfg)
 							TaskerRuntime().TaskerCaller = taskerCaller
 							u.Pf("=>call module: [%s] task: [%s]\n", modname, taskname)
 							//u.Ptmpdebug("55", callerVars)
@@ -647,8 +695,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 								u.LogErrorAndExit("evaluate max tasker module call layer", err, "please setup max MaxModuelCallLayers properly for your case")
 
 								if maxLayers != 0 && taskerLayer > maxLayers {
-									u.LogError("Module call layer check:", u.Spf("Too many layers of recursive module executions, max allowed(%d), please fix your recursive call", maxLayers))
-									os.Exit(-1)
+									u.InvalidAndExit("Module call layer check:", u.Spf("Too many layers of recursive module executions, max allowed(%d), please fix your recursive call", maxLayers))
 								}
 							}()
 
@@ -750,8 +797,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 					u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
 
 					if maxLayers != 0 && TaskerRuntime().Tasker.TaskStack.GetLen() > maxLayers {
-						u.LogError("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
-						os.Exit(-1)
+						u.InvalidAndExit("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
 					}
 				}()
 
@@ -877,6 +923,28 @@ func (t *Tasker) loadScopes() {
 	u.LogErrorAndExit("load full scopes", err, "please assess your scope configuration carefully")
 }
 
+func (t *Tasker) loadExecProfiles() {
+	eprofileData := t.TaskYmlRoot.Get("eprofiles")
+	var eprofiles ExecProfiles
+	err := ms.Decode(eprofileData, &eprofiles)
+	t.ExecProfiles = &eprofiles
+
+	u.LogErrorAndExit("load exec profiles", err, "please assess your exec profiles configuration carefully")
+}
+
+func (t *Tasker) getExecProfile(pname string) *ExecProfile {
+	var ep *ExecProfile
+	if t.ExecProfiles != nil {
+		for _, p := range *t.ExecProfiles {
+			if p.Name == pname {
+				ep = &p
+				break
+			}
+		}
+	}
+	return ep
+}
+
 func (t *Tasker) loadRuntimeGlobalVars() {
 	varsData := t.TaskYmlRoot.Get("vars")
 	var vars core.Cache
@@ -885,11 +953,11 @@ func (t *Tasker) loadRuntimeGlobalVars() {
 	t.RuntimeGlobalVars = &vars
 }
 
-func (t *Tasker) loadRuntimeDvars() {
+func (t *Tasker) loadRuntimeGlobalDvars() {
 	dvarsData := t.TaskYmlRoot.Get("dvars")
 	var dvars Dvars
 	err := ms.Decode(dvarsData, &dvars)
-	u.LogErrorAndExit("loadRuntimeDvars",
+	u.LogErrorAndExit("loadRuntimeGlobalDvars",
 		err,
 		"You must fix the data type to be\n string for a dvar value and try again. possible problems:\nthe name can not be single character 'y' or 'n' ",
 	)
