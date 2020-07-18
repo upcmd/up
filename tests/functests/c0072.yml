@@ -78,7 +78,7 @@ tasks:
               dest: /tmp/mystory.txt
 
           -
-            name: readfile
+            name: readFile
             desc: read content of a file and register it to a var
             cmd:
               filename: mystory.txt
@@ -100,7 +100,7 @@ tasks:
               dest: '{{.save_to}}'
 
           -
-            name: readfile
+            name: readFile
             desc: read content of a file and register it to a var
             cmd:
               filename: '{{.read_file}}'

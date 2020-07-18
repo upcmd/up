@@ -86,11 +86,11 @@ doc_meta: |
         ```
         -exec task: task
         loading [Task]:  ./tests/functests/c0153
-          "profile - dev1_use_memcache envvars:"
+          "profile - dev1_use_memcache envVars:"
           (*core.Cache)({
-        "envvar_DEPLOY_USER": "tomhanks",
-        "envvar_SKIP_CREATE_RDS": "yes",
-        "envvar_DB_HOST": "devtest_database.mycompany.local"
+        "envVar_DEPLOY_USER": "tomhanks",
+        "envVar_SKIP_CREATE_RDS": "yes",
+        "envVar_DB_HOST": "devtest_database.mycompany.local"
         })
 
         module: [self] instance id: [dev]
@@ -106,7 +106,7 @@ doc_meta: |
             "db_url": "jdbc:postgres://dev.myapp.com:8354/test?user=test_db_user&password=6HmsmiJIW1PfIXcF4WwOKOMDiL7PstgfKs2aRFajrwY=&ssl=true",
             "port": 5432,
             "A_DEV_ENV_VAR": "a_global_env_var",
-            "envvar_A_GLOBAL_ENV_VAR": "a_global_env_var",
+            "envVar_A_GLOBAL_ENV_VAR": "a_global_env_var",
             "db_driver": "postgres",
             "db_port": 8354,
             "db_hostname": "dev.myapp.com"
@@ -169,7 +169,7 @@ scopes:
       - name: A_GLOBAL_ENV_VAR
         value: a_global_env_var
         flags:
-          - envvar
+          - envVar
 
   - name: nonprod
     members:

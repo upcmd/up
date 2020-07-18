@@ -49,7 +49,7 @@ tasks:
             do:
               - name: print
                 cmd: 'in sub task - building OS: {{.os}}'
-              - name: colorprint
+              - name: colorPrint
                 cmd:
                   msg: ?? WARN - This is a build for testing purpose only
                   fg: red

@@ -1,7 +1,7 @@
 docs:
   mddoc: |
     this is to show validation error:
-    var validation [multiple expand > 1 is not allowed when to_object is set]
+    var validation [multiple expand > 1 is not allowed when toObj is set]
 
 vars:
   complex_data_structure_template: |
@@ -19,7 +19,7 @@ tasks:
         func: cmd
         desc: |
           this is to show validation error:
-          var validation [multiple expand > 1 is not allowed when to_object is set]
+          var validation [multiple expand > 1 is not allowed when toObj is set]
         vars:
           school_name: sydney grammar
           school_address: 1 fox road, sydney, nsw 2000
@@ -33,7 +33,7 @@ tasks:
             desc: use dynamic expand == 2, so that the template will be rendered
             value: '{{.complex_data_structure_template}}'
             expand: 2
-            flags: [vvvv,to_object, ignore_error]
+            flags: [vvvv,toObj, ignoreError]
         do:
           - name: print
             cmd: '{{.school_yml}}'

@@ -1,8 +1,8 @@
 doc_meta: |
   folder: vars
-  title: taskscope vars in block
+  title: taskScope vars in block
   head: |
-    This is a test case to show that the taskscope var used in block func could be accessed accross the whole block and the entire task
+    This is a test case to show that the taskScope var used in block func could be accessed accross the whole block and the entire task
 
   sections:
     - title: Demo
@@ -24,7 +24,7 @@ tasks:
               - name: jerry
                 value: this is jerry in task scope
                 flags:
-                  - taskscope
+                  - taskScope
 
           -
             func: cmd
@@ -52,7 +52,7 @@ tasks:
         func: cmd
         do:
           - name: print
-            desc: this should print out the dvar value of jerry as it is declared jerry is in taskscope
+            desc: this should print out the dvar value of jerry as it is declared jerry is in taskScope
             cmd: '{{.jerry}}'
           - name: trace
             cmd: ===>

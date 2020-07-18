@@ -51,7 +51,7 @@ tasks:
           or put it to last step, this is not a bug
           this is a feature
         flags:
-          - ignore_error
+          - ignoreError
         do:
           - echo "step1"
           - echo "step2" |grep notexist
@@ -75,7 +75,7 @@ tasks:
 
       - func: shell
         flags:
-          - ignore_error
+          - ignoreError
         do:
           - echo "step1"
           - echo "step2" |grep notexist

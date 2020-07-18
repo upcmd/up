@@ -3,7 +3,7 @@ notes:
   goal:
     - not included into doco
     - bug fix
-    - if there is no ymlonly, it will cause a non possible detection of nil pointer problem
+    - if there is no ymlOnly, it will cause a non possible detection of nil pointer problem
     - fixed with telling if input of content yml string to be empty or not in YmlToObj
 
 vars:
@@ -64,9 +64,9 @@ tasks:
             cmd:
               path: nsw.
               reg: city2
-            flags: [ymlonly]
+            flags: [ymlOnly]
 
-          - name: printobj
+          - name: printObj
             cmd: 'city2'
           - name: print
             cmd: '{{.city2}}'
@@ -81,12 +81,12 @@ tasks:
               ymlkey: ymldoco
               path: nt.
               reg: city3
-#            flags: [ymlonly]
+#            flags: [ymlOnly]
 
           - name: trace
             cmd: <====
 
-          - name: printobj
+          - name: printObj
             cmd: 'city3'
           - name: print
             cmd: '{{.city3}}'

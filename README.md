@@ -419,7 +419,7 @@ Check it out yourself: [source](https://github.com/upcmd/up-demo/blob/master/dem
 6. Flexible programming model to allow you to separate implementation with interface so that common code could be reused via task_ref
 Allow empty skeleton to be laid for testing driving process or guide as seudo code, but fill in the details and implementation gradually
 7. Flow control:
-      * ignore_error
+      * ignoreError
       * dry run
       * if condition support
       * loop support to iterate through a list of items
@@ -427,7 +427,7 @@ Allow empty skeleton to be laid for testing driving process or guide as seudo co
       * block and embedded block of code for execution
 8. Flexible configuration style to load dvar, scope, flow from external yaml so that the programming code will be a little cleaner and organised. Your code could evolve starting from simple, then externalize detailed implementation to files.
 9. Support the unlimited yml object, so yml config in var is text and it is also object.It could be merged in scopes automatically, it could be processed using go template
-10. Battery included for common builtin commands: print, reg, dereg, template, readfile, writefile
+10. Battery included for common builtin commands: print, reg, deReg, template, readFile, writeFile
 11. Builtin yml liter and object query, modification
 12. Call func is really shining powerful design to be used:
     * Compose the sequential execution of block of code

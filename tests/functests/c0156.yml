@@ -19,14 +19,14 @@ doc_meta: |
         3. vars/dvars in func
         4. vars registered from with templating using reg template func
         5. vars registered using reg cmd
-        6. dvar flag: to_object will also register the object to that local exec vars context
+        6. dvar flag: toObj will also register the object to that local exec vars context
 
         This examples shows you the point 4,5 and 6, three ways to set the vars
 
         You can make use of vars in following cases:
         1. if condition
         2. any templating rendering
-        3. yml operation using cmd: query, yml_write, yml_delete
+        3. yml operation using cmd: query, ymlWrite, ymlDelete
 
 notes:
   - show new way to register object from template
@@ -62,24 +62,24 @@ tasks:
             desc: |
               please note that below result is only a string representation of the object
               any golang template result can only be string, but not a object
-            cmd: '{{.myschool | yml_to_obj |obj_to_yml}}'
+            cmd: '{{.myschool | ymlToObj |objToYml}}'
 
           - name: print
             desc: |
               now register the object to a named var myschool_object
-            cmd: '{{.myschool | yml_to_obj |reg "myschool_object"}}'
+            cmd: '{{.myschool | ymlToObj |reg "myschool_object"}}'
 
           - name: print
             desc: |
               same as above, this will only print the string reprentation of the object
             cmd: '{{.myschool_object}}'
 
-          - name: printobj
+          - name: printObj
             desc: |
               same as above, this will only print the string reprentation of the object
             cmd: '{{.myschool_object}}'
 
-          - name: printobj
+          - name: printObj
             desc: |
               * IMPORTANT
               use the object var name to refer to the object in register
@@ -94,28 +94,28 @@ tasks:
           - name: myschool2
             value: '{{.school }}'
             flags:
-              - to_object
+              - toObj
               - v
         do:
           - name: print
             cmd: |
               {{.myschool2}}
               {{.myschool2_object}}
-          - name: printobj
+          - name: printObj
             cmd: myschool2_object
 
       -
         func: cmd
         desc: |
           3rd solution:
-          use to_object cmd
+          use toObj cmd
           details: https://upcmd.netlify.app/cmd-func/c0095/
         do:
-          - name: to_object
+          - name: toObj
             cmd:
               fromkey: school
               reg: myschool3_object
 
-          - name: printobj
+          - name: printObj
             cmd: myschool3_object
 

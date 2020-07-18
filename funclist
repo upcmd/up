@@ -76,7 +76,7 @@
                          hello : (func() string)(0x14b9530)
                    mustPrepend : (func(interface {}, interface {}) ([]interface {}, error))(0x14b1cf0)
                         random : (func(interface {}) interface {})(0x14c4d10)
-                         dereg : (func(string) string)(0x14cc080)
+                         deReg : (func(string) string)(0x14cc080)
                        untitle : (func(string) string)(0x14b6f50)
                     mustToJson : (func(interface {}) (string, error))(0x14afc90)
                        compact : (func(interface {}) []interface {})(0x14b3670)

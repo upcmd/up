@@ -40,16 +40,16 @@ scopes:
     dvars:
       - name: SCHOOL
         value: James Rules
-        flags: [envvar]
+        flags: [envVar]
 
 dvars:
   - name: STUDENT_NAME
     value: James Bond
-    flags: [envvar]
+    flags: [envVar]
 
   - name: STUDENT_AGE
     value: "18"
-    flags: [envvar]
+    flags: [envVar]
 
 tasks:
 
@@ -60,15 +60,15 @@ tasks:
         dvars:
           - name: STUDENT_NAME
             value: Tom Hanks
-            flags: [envvar]
+            flags: [envVar]
         do:
           - env |grep STUDENT_NAME
           - env |grep STUDENT_AGE
 
       - func: shell
         desc: |
-          since there is no local envvar for STUDENT_NAME
-          it should use global envvar value 'james bond'
+          since there is no local envVar for STUDENT_NAME
+          it should use global envVar value 'james bond'
         do:
           - env |grep STUDENT_NAME
           - env |grep STUDENT_AGE

@@ -2,7 +2,7 @@ doc_meta: |
   folder: cmd-func
   title: read/write file
   head: |
-    Showcase how to use readfile and writefile cmd
+    Showcase how to use readFile and writeFile cmd
 
   sections:
     - title: my story text file reference
@@ -10,11 +10,11 @@ doc_meta: |
 
     - title: How to use?
       content: |
-        * writefile
+        * writeFile
           conent: the static or dynamic content
           filename: the filename to write to
           dir: directory of the file to save to
-        * readfile
+        * readFile
           filename: the filename to read from
           dir: directory of the file to read from
           reg: the register var name of the file content will be loaded to
@@ -25,7 +25,7 @@ doc_meta: |
 notes:
   goal:
     - use dvar ref to load common file only
-    - add cmd readfile and register to a named var
+    - add cmd readFile and register to a named var
     - add cmd write file to save to a file
 
 dvars:
@@ -44,7 +44,7 @@ tasks:
             cmd: "{{.mystory}}"
 
           -
-            name: writefile
+            name: writeFile
             desc: write content to a file
             cmd:
               content: "{{.mystory}}"
@@ -52,7 +52,7 @@ tasks:
               dir: /tmp
 
           -
-            name: readfile
+            name: readFile
             desc: read content of a file and register it to a var
             cmd:
               filename: mystory.txt

@@ -28,7 +28,7 @@ tasks:
           - name: api_response
             value: '{{.httpbin_get_result.Output}}'
             flags:
-              - to_object
+              - toObj
               - v
 
           - name: api_response_headers
@@ -54,7 +54,7 @@ tasks:
               - exec_vars
           - name: print
             cmd: '{{.api_response_object.headers.Host}}'
-          - name: printobj
+          - name: printObj
             cmd: api_response_headers
           - name: print
             desc: |

@@ -14,7 +14,7 @@ notes:
   goal:
     - to show that you can use empty do list
     - introduce a new funcname cmd to do var/dvar conversion
-    - in cmd, you can also do reg/dereg var in dvar evaluation
+    - in cmd, you can also do reg/deReg var in dvar evaluation
 
 tasks:
 
@@ -50,7 +50,7 @@ tasks:
       -
         func: cmd
         desc: |
-          in cmd, you can also do reg/dereg var in dvar evaluation
+          in cmd, you can also do reg/deReg var in dvar evaluation
           the cmd func name makes more sense then shell func
           if you really want to do var manipulation only
         vars:

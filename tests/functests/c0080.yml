@@ -88,15 +88,15 @@ tasks:
           - name: school_details
             desc: use dynamic expand == 2, so that the template will be rendered
             value: '{{.school_yml}}'
-            flags: [vvv, to_object, reg]
+            flags: [vvv, toObj, reg]
         do:
           - name: print
             cmd: '{{.school_yml}}'
-          - name: printobj
+          - name: printObj
             cmd: 'school_details'
           - name: print
             cmd: '{{.school_details}}'
-          - name: printobj
+          - name: printObj
             cmd: 'school_details_object'
 
 
@@ -143,7 +143,7 @@ tasks:
 
       - func: cmd
         do:
-          - name: readfile
+          - name: readFile
             desc: read content of a file and register it to a var
             cmd:
               filename: myschool.txt

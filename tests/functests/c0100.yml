@@ -23,7 +23,7 @@ doc_meta: |
 
     - title: flags
       content: |
-        * localonly: register the result to local func scope but not global runtime scope
+        * localOnly: register the result to local func scope but not global runtime scope
 
         * collect: register the result to be an yml array/list of values
 
@@ -56,10 +56,10 @@ notes:
     - path is the path refer to yml element, ref to the usage example
     - reg is the varname register to
     - |
-      localonly indicate it is registered to local func var scope only
+      localOnly indicate it is registered to local func var scope only
       otherwise it will be in global scope
     - collect is to indicate whether result will be put into array using yml format
-    - ymlonly will register a query result in yml string instead
+    - ymlOnly will register a query result in yml string instead
 
 vars:
   query_name: jason
@@ -152,7 +152,7 @@ tasks:
               ymlkey: ymlstr
               path: student.school
               reg: local_school_name
-            flags: [localonly]
+            flags: [localOnly]
       -
         func: cmd
         do:
@@ -183,7 +183,7 @@ tasks:
               path: nsw.sydney.**.student.school
               reg: school_name_list
             flags: [collect]
-          - name: printobj
+          - name: printObj
             cmd: '{{.school_name_list}}'
           - name: print
             cmd: '{{.school_name_list}}'
@@ -197,7 +197,7 @@ tasks:
               path: nsw.sydney
               reg: city
             flags: [collect]
-          - name: printobj
+          - name: printObj
             cmd: '{{.city}}'
           - name: print
             cmd: '{{.city}}'
@@ -210,7 +210,7 @@ tasks:
             cmd:
               path: nsw.sydney.[1]
               reg: city1
-          - name: printobj
+          - name: printObj
             cmd: '{{.city1}}'
           - name: print
             cmd: '{{.city1}}'
@@ -224,7 +224,7 @@ tasks:
             cmd:
               path: nsw.sydney.[*]
               reg: cityall
-          - name: printobj
+          - name: printObj
             cmd: '{{.cityall}}'
           - name: print
             cmd: '{{.cityall}}'
@@ -238,7 +238,7 @@ tasks:
             cmd:
               path: nsw.sydney.[*].*(name==Emily)
               reg: studentx
-          - name: printobj
+          - name: printObj
             cmd: '{{.studentx}}'
           - name: print
             cmd: '{{.studentx}}'
@@ -251,7 +251,7 @@ tasks:
             cmd:
               path: nsw.sydney.[1].*(name==Emily)
               reg: studenty
-          - name: printobj
+          - name: printObj
             cmd: '{{.studenty}}'
 
       -
@@ -262,7 +262,7 @@ tasks:
             cmd:
               path: nsw.sydney.**(name==Emily)
               reg: studentz
-          - name: printobj
+          - name: printObj
             cmd: '{{.studentz}}'
 
       -
@@ -273,7 +273,7 @@ tasks:
             cmd:
               path: nsw.sydney.[*].kings(name==Emily)
               reg: studentm
-          - name: printobj
+          - name: printObj
             cmd: '{{.studentm}}'
 
       -
@@ -284,7 +284,7 @@ tasks:
             cmd:
               path: nsw.sydney.[*].*(name==Grace)
               reg: studentn
-          - name: printobj
+          - name: printObj
             cmd: '{{.studentn}}'
 
       -
@@ -295,7 +295,7 @@ tasks:
             cmd:
               path: nsw.chatswood.[*]
               reg: studento
-          - name: printobj
+          - name: printObj
             cmd: '{{.studento}}'
 
 #--------------------------------------------------------------------
@@ -307,11 +307,11 @@ tasks:
             cmd:
               path: nsw.
               reg: city2
-            flags: [ymlonly]
+            flags: [ymlOnly]
 
           - name: trace
             cmd: ====>
-          - name: printobj
+          - name: printObj
             cmd: '{{.city2}}'
           - name: print
             cmd: '{{.city2}}'
@@ -330,7 +330,7 @@ tasks:
               refdir: ./tests/functests
               path: nsw.
               reg: city2
-            flags: [ymlonly]
+            flags: [ymlOnly]
 
           - name: print
             cmd: '{{.city2}}'
@@ -345,7 +345,7 @@ tasks:
               ymlfile: d0100.yml
               path: nsw.
               reg: city2
-            flags: [ymlonly]
+            flags: [ymlOnly]
 
 
           - name: print

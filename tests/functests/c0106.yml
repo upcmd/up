@@ -18,11 +18,11 @@ doc_meta: |
         - title: show the problem
           link: ../../test-debug/c0107
 
-    - title: taskscope
+    - title: taskScope
       content: |
-        use taskscope
+        use taskScope
       refs:
-        - title: taskscope
+        - title: taskScope
           link: ../../test-debug/c0108
 
 notes:
@@ -44,7 +44,7 @@ tasks:
         func: cmd
         desc: |
           check if hitom is available in global context
-          it should be <no value> as hitom in sub1 is marked localonly
+          it should be <no value> as hitom in sub1 is marked localOnly
         do:
           - name: print
             cmd: '{{.hitom}}'
@@ -75,7 +75,7 @@ tasks:
               name: hitom
               desc: by default hitom is registered in to global context
               value: 'hello, {{.tom}}'
-            flags: [localonly]
+            flags: [localOnly]
 
           - name: print
             cmd: '{{.hitom}}'
@@ -84,7 +84,7 @@ tasks:
         func: cmd
         do:
           - name: print
-            desc: should be <no value> since it is marked localonly
+            desc: should be <no value> since it is marked localOnly
             cmd: '{{.hitom}}'
 
   -

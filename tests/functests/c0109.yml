@@ -1,8 +1,8 @@
 doc_meta: |
   folder: vars
-  title: taskscope vars in callee
+  title: taskScope vars in callee
   head: |
-    This is a test case to show that the taskscope var could be passed to callee task and it will override what has been defined in callee if the var name is same
+    This is a test case to show that the taskScope var could be passed to callee task and it will override what has been defined in callee if the var name is same
 
   sections:
     - title: Demo
@@ -26,7 +26,7 @@ tasks:
           - name: jerry
             value: this is jerry in task scope
             flags:
-              - taskscope
+              - taskScope
         do:
           - name: print
             desc: this should print out the dvar value of jerry
@@ -44,7 +44,7 @@ tasks:
         func: cmd
         do:
           - name: print
-            desc: this should print out the dvar value of jerry as it is declared jerry is in taskscope
+            desc: this should print out the dvar value of jerry as it is declared jerry is in taskScope
             cmd: '{{.jerry}}'
           - name: trace
             cmd: ===>

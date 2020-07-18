@@ -12,10 +12,10 @@ doc_meta: |
         * path: path is the yq path
         * reg: the var name to register to
         * flags:
-          * localonly: to indicate that the registered var is in local func var scope
+          * localOnly: to indicate that the registered var is in local func var scope
           * inpace: the delete operation applied directly to file, otherwise the change will be made to the registered var only
 
-        Note that inplace and reg/localonly are mutual exclusive
+        Note that inplace and reg/localOnly are mutual exclusive
 
     - title: Demo
       log: yes
@@ -29,7 +29,7 @@ doc_meta: |
 notes:
   goal:
     - add feature to delete a node from yaml file
-    - inplace and reg/localonly are mutual exclusive
+    - inplace and reg/localOnly are mutual exclusive
     - refdir is optional, if empty then default to global configured
 
 vars:
@@ -56,7 +56,7 @@ tasks:
         func: cmd
         desc: inplace modification
         do:
-          - name: yml_delete
+          - name: ymlDelete
             cmd:
               ymlfile: mock_yml.yml
               refdir: /tmp
@@ -66,7 +66,7 @@ tasks:
               - inplace
 
 
-          - name: readfile
+          - name: readFile
             desc: check new file content
             cmd:
               filename: mock_yml.yml
@@ -81,14 +81,14 @@ tasks:
         func: cmd
         desc: modify in memory and register to cache
         do:
-          - name: yml_delete
+          - name: ymlDelete
             cmd:
               ymlfile: mock_yml.yml
               refdir: /tmp
               path: jason.sex
               verbose: vvvv
               reg: modified_yml
-            flags: [localonly]
+            flags: [localOnly]
 
           - name: print
             desc: show the modified yml content registered

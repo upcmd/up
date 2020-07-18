@@ -11,7 +11,7 @@ doc_meta: |
 notes:
   - need a new design of caller vars passing down to callee
   - the reg only regs the var to the protected stack vars, which is based from caller's vars
-  - in callee task, for vars, including taskscope vars, reg
+  - in callee task, for vars, including taskScope vars, reg
     vars or dvar, support a option to return the var value
     to be registered and merged to caller's vars
   - the callee task should not have any direct access to RuntimeVarsAndDvarsMerged

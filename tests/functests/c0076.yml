@@ -87,7 +87,7 @@ tasks:
             desc: get the object from register global space
             cmd: "{{.tom}}"
 
-          - name: printobj
+          - name: printObj
             desc: "dynamically reference to global_tom object registered"
             cmd: "{{.objname}}"
 

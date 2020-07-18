@@ -50,4 +50,4 @@ tasks:
           - |
             echo """my student: {{.info}}"""
         flags:
-          - ignore_error
+          - ignoreError

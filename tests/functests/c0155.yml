@@ -19,11 +19,11 @@ tasks:
         func: cmd
         dvars:
           - name: aa
-            value: '{{.school |yml_to_obj|reg "aa_obj"}}'
+            value: '{{.school |ymlToObj|reg "aa_obj"}}'
             flags:
               - v
           - name: bb
-            value: '{{.school |yml_to_obj|reg "bb_obj"}}'
+            value: '{{.school |ymlToObj|reg "bb_obj"}}'
             flags:
               - v
         do:
@@ -36,15 +36,15 @@ tasks:
               {{.bb}}
               {{.bb_obj |reg "cc"}}
 
-          - name: path_existed
+          - name: pathExisted
             cmd:
               path: sydney_grammar.address
               reg: address_existed
 
           - name: assert
             cmd:
-              - '{{path_existed "aa" }}'
-              - '{{path_existed "aa_obj" }}'
-              - '{{path_existed "bb" }}'
-              - '{{path_existed "bb_obj" }}'
+              - '{{pathExisted "aa" }}'
+              - '{{pathExisted "aa_obj" }}'
+              - '{{pathExisted "bb" }}'
+              - '{{pathExisted "bb_obj" }}'
 

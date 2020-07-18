@@ -69,7 +69,7 @@ vars:
     ##### ref: {{$ref.title}}
 
     ```
-    {{$ref.link |filecontent|indent 4}}
+    {{$ref.link |fileContent|indent 4}}
     ```
       {{- end}}
 
@@ -107,7 +107,7 @@ tasks:
           - name: doc_meta_yml
             expand: 2
             value: '{{.doc_meta}}'
-            flags: [reg, to_object]
+            flags: [reg, toObj]
         do:
           - name: print
             cmd: '{{.doc_meta_yml}}'
@@ -118,7 +118,7 @@ tasks:
           - name: print
             desc: shows that reg has set this var to global space
             cmd: '{{.doc_meta_yml}}'
-          - name: printobj
+          - name: printObj
             cmd: doc_meta_yml_object
 
   -
@@ -212,7 +212,7 @@ tasks:
 #            name: print
 #            cmd: "{{.doc_rendered}}"
           -
-            name: writefile
+            name: writeFile
             cmd:
               content: "{{.doc_rendered}}"
               filename: spike_doc.md
@@ -220,7 +220,7 @@ tasks:
               dir: /tmp
 
           -
-            name: readfile
+            name: readFile
             cmd:
               filename: spike_doc.md
               dir: /tmp

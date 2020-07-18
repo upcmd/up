@@ -113,7 +113,7 @@ tasks:
           - name: print
             cmd: 'processing {{.casefilename}}'
 
-          - name: readfile
+          - name: readFile
             desc: read yml file
             cmd:
               filename: '{{.casefilename}}'
@@ -130,7 +130,7 @@ tasks:
               ymlkey: caseyml
               path: doc_meta.
               reg: docyml
-            flags: [ymlonly]
+            flags: [ymlOnly]
 
       -
         func: call
@@ -141,21 +141,21 @@ tasks:
       -
         func: cmd
         do:
-          - name: yml_delete
+          - name: ymlDelete
             cmd:
               ymlfile: '{{.casefilename}}'
               refdir: '{{.ref_dir}}'
               path: doc_meta
               inplace: true
 
-          - name: yml_delete
+          - name: ymlDelete
             cmd:
               ymlfile: '{{.casefilename}}'
               refdir: '{{.ref_dir}}'
               path: notes
               inplace: true
 
-          - name: readfile
+          - name: readFile
             desc: review if the file content is correct
             cmd:
               filename: '{{.casefilename}}'
@@ -172,7 +172,7 @@ tasks:
           - name: casedoc
             value: '{{.docyml}}'
             expand: 2
-            flags: [to_object, reg]
+            flags: [toObj, reg]
 
       -
         func: call
@@ -186,37 +186,37 @@ tasks:
     task:
       - func: cmd
         do:
-          - name: yml_write
+          - name: ymlWrite
             cmd:
               ymlstr: '{{.docyml}}'
               path: casename
               value: '{{.casename}}'
               reg: docyml
-          - name: yml_write
+          - name: ymlWrite
             cmd:
               ymlstr: '{{.docyml}}'
               path: ref_dir
               value: '{{.ref_dir}}'
               reg: docyml
-          - name: yml_write
+          - name: ymlWrite
             cmd:
               ymlstr: '{{.docyml}}'
               path: main_yml_ref_file
               value: '{{.ref_dir}}/{{.casefilename}}'
               reg: docyml
-          - name: yml_write
+          - name: ymlWrite
             cmd:
               ymlstr: '{{.docyml}}'
               path: main_log_ref_file
               value: '{{.log_dir}}/{{.casename}}_v.log'
               reg: docyml
-#          - name: yml_write
+#          - name: ymlWrite
 #            cmd:
 #              ymlstr: '{{.docyml}}'
 #              path: page_weight
 #              value: '{{ .casename |replace "c" "" |atoi}}'
 #              reg: docyml
-#          - name: yml_write
+#          - name: ymlWrite
 #            cmd:
 #              ymlstr: '{{.docyml}}'
 #              path: log_dir
@@ -263,7 +263,7 @@ tasks:
       -
         func: cmd
         do:
-          - name: printobj
+          - name: printObj
             cmd: casedoc_object
 
           - name: print
@@ -307,7 +307,7 @@ tasks:
               relatedlink: ../../{{.casedoc_object.folder}}/{{.casename}}
               log_ref_file: {{.log_dir}}/{{.casename}}_{{.loopitem}}.log
             flags:
-              - to_object
+              - toObj
 #              - vvv
         do:
           - name: print

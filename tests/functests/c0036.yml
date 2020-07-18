@@ -85,7 +85,7 @@ dvars:
 
   - name: var_with_not
     value: "{{if not .ha }}{{.ns}}-{{.pod_name}}{{else}}{{.ns}}-{{.pod_name}}{{end}}"
-    flags: [to_object,]
+    flags: [toObj,]
 
   - name: var_length
     value: "{{len .var_with_not}}"
@@ -99,7 +99,7 @@ dvars:
 
   - name: var_test_log_auto_print
     value: "{{print .ns .pod_name}}"
-    flags: [vvvv,to_object]
+    flags: [vvvv,toObj]
 
   - name: var_with_and
     desc: and x y behaves as if x then y else x

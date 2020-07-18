@@ -13,7 +13,7 @@ notes:
   not_a_bug:
     given:
       - the middel step fails
-      - no ignore_error present
+      - no ignoreError present
     expect:
       - it should fail and return the error code
       - it should not progress to the next step
