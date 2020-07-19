@@ -20,6 +20,7 @@ import (
 )
 
 type ExecResult struct {
+	Cmd    string
 	Code   int
 	Output string
 	ErrMsg string

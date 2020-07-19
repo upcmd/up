@@ -19,6 +19,7 @@ import (
 
 func runCmd(f *ShellFuncAction, cmd string) {
 	var result u.ExecResult
+	result.Cmd = cmd
 	if TaskerRuntime().Tasker.Dryrun {
 		u.Pdryrun("in dryrun mode and skipping the actual commands")
 		result.Code = 0
@@ -58,11 +59,10 @@ func runCmd(f *ShellFuncAction, cmd string) {
 				result.Code = 0
 				result.Output = strings.TrimSpace(string(cmdOutput))
 			}
+
 			f.Result = result
 			u.LogError("exec error:", err)
-
 		}
-
 	}
 }
 
@@ -98,13 +98,12 @@ func (f *ShellFuncAction) Exec() {
 		u.Pfv("cmd(%2d):\n", idx+1)
 		u.Pvv(tcmd)
 		cmd := Render(tcmd, f.Vars)
-		u.Pfvvvv(" \\_ %+v\n", color.HiBlueString("%s", cmd))
+		u.Pfvvvv("=cmd:\n%s<=", color.HiBlueString("%s", cmd))
 		runCmd(f, cmd)
 		u.Pfv("%s\n", color.HiGreenString("%s", f.Result.Output))
 		if f.Result.Code != 0 {
 			u.Pfv("      %s\n", color.RedString("%s", f.Result.ErrMsg))
 		}
-
 		u.SubStepStatus("..", f.Result.Code)
 		u.Dvvvvv(f.Result)
 	}

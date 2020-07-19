@@ -79,6 +79,10 @@ func Dvvvv(a ...interface{}) {
 	}
 }
 
+func PlnInfo(info string) {
+	msg_color_printf("%s\n", info)
+}
+
 func Pfdryrun(format string, a ...interface{}) {
 	dryrun_color_print(format, a...)
 }
@@ -89,6 +93,12 @@ func Pdryrun(a ...interface{}) {
 
 func Ppmsgvvvv(a ...interface{}) {
 	if permitted("vvvv") {
+		msg_color_printf("%s", spewMsgState.Sdump(a...))
+	}
+}
+
+func Ppmsgvvvvv(a ...interface{}) {
+	if permitted("vvvvv") {
 		msg_color_printf("%s", spewMsgState.Sdump(a...))
 	}
 }
@@ -145,7 +155,7 @@ func Ppromptvvvvv(valueName, hint string) {
 
 }
 
-func Ppmsgvvvvv(hint string, a ...interface{}) {
+func PpmsgvvvvvHigh(hint string, a ...interface{}) {
 	if permitted("vvvvv") {
 		PpmsgvvvvhintHigh(hint, a...)
 	}

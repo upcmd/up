@@ -382,7 +382,7 @@ func (steps *Steps) Exec(fromBlock bool) {
 
 		taskLayerCnt := TaskerRuntime().Tasker.TaskStack.GetLen()
 		u.LogDesc("step", idx+1, taskLayerCnt, step.Name, step.Desc)
-		u.Ppmsgvvvv(step)
+		u.Ppmsgvvvvv(step)
 
 		execStep := func() {
 			rtContext := StepRuntimeContext{

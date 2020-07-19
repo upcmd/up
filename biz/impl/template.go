@@ -56,12 +56,12 @@ func FuncMapInit() {
 		},
 		"objToYml": func(obj interface{}) string {
 			yml := core.ObjToYaml(obj)
-			u.Ppmsgvvvvv("objToYml", yml)
+			u.PpmsgvvvvvHigh("objToYml", yml)
 			return yml
 		},
 		"ymlToObj": func(yml string) interface{} {
 			obj := core.YamlToObj(yml)
-			u.Ppmsgvvvvv("ymlToObj", obj)
+			u.PpmsgvvvvvHigh("ymlToObj", obj)
 			return obj
 		},
 		//reg do not return any value, so do not expect the dvar value will be something other than empty
@@ -126,7 +126,7 @@ func Render(tstr string, obj interface{}) string {
 	tname := "."
 	t, err := template.New(tname).Funcs(templateFuncs).Parse(tstr)
 
-	u.LogErrorAndExit("template creating", err, "Please fix the template issue and try again")
+	u.LogErrorAndExit("template creating", err, u.ContentWithLineNumber(tstr))
 
 	var result bytes.Buffer
 	err = t.Execute(&result, obj)

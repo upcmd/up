@@ -360,7 +360,7 @@ func (f *CmdFuncAction) Exec() {
 						raw = v.(string)
 						datapath = Render(raw, f.Vars)
 						data = core.GetSubObjectFromCache(f.Vars, datapath, false, ConfigRuntime().Verbose)
-						u.Ppmsgvvvvv("sub object:", data)
+						u.PpmsgvvvvvHigh("sub object:", data)
 						dataCnt += 1
 					case "dest":
 						raw = v.(string)

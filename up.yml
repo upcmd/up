@@ -251,6 +251,7 @@ tasks:
     task:
       -
         func: shell
+        desc: get the tag version. eg. 0.9.0
         do:
           - git describe --exact-match --tags $(git log -n1 --pretty='%h')
         reg: result
@@ -263,13 +264,87 @@ tasks:
             flags:
               - v
               - taskScope
+          - name: release_note
+            value: '{{ printf "%s%s%s" "./release/tags/" .ver ".md" |fileContent}}'
+            flags:
+              - v
+              - taskScope
         do:
           - name: print
             cmd: 'version: {{.ver}}'
 
-      - func: call
+
+
+#      - func: call
+#        dox:
+#          - buildDistro
+
+      - func: shell
+        desc: get build binary file list
+        do: ls build
+
+      - func: cmd
+        desc: get binary list as object
+        dvars:
+          - name: void
+            value: '{{ .last_result.Output | splitLines |reg "distList" }}'
+            flags:
+              - v
+          - name: release_note_js_string
+            value: '{{ .release_note| replace "\n" "\\n"}}'
+            flags:
+              - v
+              - taskScope
         do:
-          - buildDistro
+          - name: print
+            cmd: 'distro list: {{.distList}}'
+
+
+      - func: shell
+        desc: create the tagged release
+        do:
+          - |
+            curl -s -d '
+            {
+              "tag_name": "{{.ver}}",
+              "target_commitish": "{{.ver}}",
+              "name": "{{.ver}}",
+              "body": "{{.release_note_js_string }}",
+              "draft": false,
+              "prerelease": false
+            }
+            ' \
+            -X POST \
+            -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
+            -H "Content-Type: application/json" \
+            {{.release_api_ep}}
+        reg: result
+
+      - func: block
+        desc: upload all build distro binary files
+        loop: distList
+        dvars:
+          - name: release
+            value: '{{.result.Output}}'
+            flags:
+              - toObj
+          - name: releaseid
+            value: '{{.release_object.id}}'
+            flags:
+              - v
+        do:
+          - func: shell
+            desc: upload the most used distros only
+            do:
+              - echo "upload for {{.ver}} release - {{.releaseid}} with file {{.loopitem}}"
+              - |
+                curl -s \
+                -X POST \
+                --data-binary '@build/{{.loopitem}}' \
+                -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
+                -H "Content-Type: application/json" \
+                {{.release_upload_ep}}/{{.releaseid}}/assets?name={{.loopitem}}
+        if: '{{ne (printf "%s" .releaseid)  "None" }}'
 
   - name: release_local
     desc: release it to local path
