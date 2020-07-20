@@ -24,7 +24,7 @@ var (
 	listName         = list.Arg("taskname|=", "task name to inspect").String()
 	mod              = app.Command("mod", "module cmd: list | pull | lock | clean | probe")
 	modCmd           = mod.Arg("cmd", "list | pull | lock | clean | probe ").Required().String()
-	assist           = app.Command("assist", "assist: templatefunc|")
+	assist           = app.Command("assist", "assist: templatefunc|version")
 	assistName       = assist.Arg("assistname", "what to assist").String()
 	validate         = app.Command("validate", "validate tasks and plays")
 	validateTaskName = validate.Arg("validatetaskname", "taskname").Required().String()

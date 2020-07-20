@@ -22,9 +22,20 @@ vars:
      * License, v. 2.0. If a copy of the MPL was not distributed with this
      * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-  version_gofile_template: |
+  version_gofile_origin: |
     package main
 
+    var version_info = `
+    version_info:
+      Type: bleeding-edge-rolling
+      Tag: master
+      Vesion: latest
+      Source: https://github.com/upcmd/up/commits/master
+      Note: daily build regular rolling release
+    `
+
+  version_gofile_template: |
+    package main
     var version_info = `{{.TRACEABLE_VERSION_MARKER}}`
 
   version_template: |
@@ -35,8 +46,8 @@ vars:
       Vesion: {{.releaseVersion}}
       SHA: {{.releaseSHA}}
       Source: https://github.com/upcmd/up/tree/{{.releaseSHA}}
-      Note: |
-        {{.releaseNote | indent 4}}
+      Changes: |
+    {{.releaseNote | indent 4}}
 
 tasks:
   -
@@ -301,7 +312,6 @@ tasks:
             cmd: |
               SHA: {{.releaseSHA}}
 
-
       -
         func: shell
         desc: get the tag version. eg. 0.9.0
@@ -332,31 +342,41 @@ tasks:
           - name: TRACEABLE_VERSION_MARKER
             value: '{{.version_template}}'
             expand: 2
+            flags:
+              - v
           - name: version_gofile_content
             value: '{{.version_gofile_template}}'
             expand: 2
+            flags:
+              - v
 
         do:
           - name: print
-            cmd: |
+            cmdx: |
               version: {{.ver}}
               SHA: {{.releaseSHA}}
           - name: print
-            cmd: |
-              {{.version_info}}
+            cmdx: |
+              {{.TRACEABLE_VERSION_MARKER}}
           - name: print
+            desc: go version file
             cmd: |
-              go version file:
               {{.version_gofile_content}}
+          - name: writeFile
+            desc: prepare the release info to be built into binary
+            cmd:
+              content: "{{.version_gofile_content}}"
+              filename: version.go
+              dir: ./app/up
 
           - namex: inspect
             cmd:
               - exec_vars
 
-          - name: pause
+          - namex: pause
             desc: double check release note
 
-          - name: exit
+          - namex: exit
 
       - func: call
         do:
@@ -382,6 +402,14 @@ tasks:
           - name: print
             cmd: 'distro list: {{.distList}}'
 
+          - name: writeFile
+            desc: restore original versioning file
+            cmd:
+              content: "{{.version_gofile_origin}}"
+              filename: version.go
+              dir: ./app/up
+
+          - namex: pause
 
       - func: shell
         desc: create the tagged release

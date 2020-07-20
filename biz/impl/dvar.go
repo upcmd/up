@@ -169,6 +169,8 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 				for _, vlevel := range vlevels {
 					if u.Contains(dvar.Flags, vlevel) {
 						u.PpmsgHintHighPermitted("v", "dvar> "+dvar.Name, dvar.Rendered)
+						u.Pln("-")
+						u.PlnInfo(dvar.Rendered)
 					}
 				}
 
