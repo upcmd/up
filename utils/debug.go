@@ -314,7 +314,7 @@ func SubStepStatus(mark string, statusCode int) {
 }
 
 func LogWarn(mark string, reason string) {
-	color.Red(" WARN: [%s] - [%s]", mark, reason)
+	color.Red(" WARN: [%s] - [\n%s]", mark, reason)
 }
 
 func LogErrorMsg(mark string, reason string) {

@@ -7,6 +7,12 @@ doc_meta: |
   sections:
     - title: How does it work
       content: |
+        execution profile extend dev instance:
+
+        ```
+        up ngo task -d ./tests/functests -t c0158 -p dev1_use_memcache --configdir=./tests/functests
+        ```
+
         You can use ref and redir to redirect the detailed env var key value pairs to another individual file if it turns out there are too many entries to be living in up.yml
 
         * ref

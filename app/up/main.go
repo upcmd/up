@@ -112,10 +112,13 @@ func main() {
 			u.Pln("=List of golang template funcs")
 			impl.FuncMapInit()
 			impl.ListAllFuncs()
+		} else if *assistName == "version" {
+			u.PlnInfo(version_info)
 		} else {
 			u.LogWarn("What kind of assist do you need?", "Please input a name:")
 			u.Pln(`#supported:
 templatefunc
+version
 `)
 		}
 

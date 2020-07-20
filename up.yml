@@ -22,6 +22,22 @@ vars:
      * License, v. 2.0. If a copy of the MPL was not distributed with this
      * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+  version_gofile_template: |
+    package main
+
+    var version_info = `{{.TRACEABLE_VERSION_MARKER}}`
+
+  version_template: |
+
+    version_info:
+      Type: {{.releaseType}}
+      Tag: {{.releaseTag}}
+      Vesion: {{.releaseVersion}}
+      SHA: {{.releaseSHA}}
+      Source: https://github.com/upcmd/up/tree/{{.releaseSHA}}
+      Note: |
+        {{.releaseNote | indent 4}}
+
 tasks:
   -
     name: deps
@@ -181,6 +197,7 @@ tasks:
         func: shell
         desc: build the binary to build directory
         do:
+          - echo "build version - {{.ver}}"
           - rm -rf ./build
           - mkdir -p ./build
 
@@ -225,8 +242,6 @@ tasks:
         loop: distlist
         do:
           - func: shell
-            vars:
-              ver: latest
             dvars:
               - name: void
                 value: '{{.loopitem |split "/" |reg "dist"}}'
@@ -246,38 +261,106 @@ tasks:
         func: shell
         do: ls -l build/
 
-  - name: publish
+  -
+    name: version_info
+    desc: prepare the version_info for release
+    task:
+      -
+        func: shell
+        do: git rev-parse --verify HEAD
+
+      -
+        func: cmd
+        dvars:
+          - name: releaseSHA
+            value: '{{ .last_result.Output }}'
+        #          - name: version_info
+        #            value: '{{.version_template}}'
+
+        do:
+          - name: print
+            cmd: '{{.releaseSHA}}'
+
+
+
+  - name: Publish
     desc: publish for github tagged version
     task:
       -
         func: shell
+        do: git rev-parse --verify HEAD
+
+      -
+        func: cmd
+        dvars:
+          - name: releaseSHA
+            value: '{{ .last_result.Output }}'
+            flags: [taskScope]
+        do:
+          - name: print
+            cmd: |
+              SHA: {{.releaseSHA}}
+
+
+      -
+        func: shell
         desc: get the tag version. eg. 0.9.0
         do:
+          - echo "sha - {{.releaseSHA}}"
           - git describe --exact-match --tags $(git log -n1 --pretty='%h')
         reg: result
 
       - func: cmd
         desc: get the tag/release version
+        vars:
+          releaseType: tagged-version
         dvars:
           - name: ver
             value: '{{ .result.Output }}'
             flags:
               - v
               - taskScope
-          - name: release_note
+          - name: releaseTag
+            value: '{{ .ver }}'
+          - name: releaseVersion
+            value: '{{ .ver }}'
+          - name: releaseNote
             value: '{{ printf "%s%s%s" "./release/tags/" .ver ".md" |fileContent}}'
             flags:
               - v
               - taskScope
+          - name: TRACEABLE_VERSION_MARKER
+            value: '{{.version_template}}'
+            expand: 2
+          - name: version_gofile_content
+            value: '{{.version_gofile_template}}'
+            expand: 2
+
         do:
           - name: print
-            cmd: 'version: {{.ver}}'
+            cmd: |
+              version: {{.ver}}
+              SHA: {{.releaseSHA}}
+          - name: print
+            cmd: |
+              {{.version_info}}
+          - name: print
+            cmd: |
+              go version file:
+              {{.version_gofile_content}}
 
+          - namex: inspect
+            cmd:
+              - exec_vars
 
+          - name: pause
+            desc: double check release note
 
-#      - func: call
-#        dox:
-#          - buildDistro
+          - name: exit
+
+      - func: call
+        do:
+          - buildDistro
 
       - func: shell
         desc: get build binary file list
@@ -291,7 +374,7 @@ tasks:
             flags:
               - v
           - name: release_note_js_string
-            value: '{{ .release_note| replace "\n" "\\n"}}'
+            value: '{{ .releaseNote| replace "\n" "\\n"}}'
             flags:
               - v
               - taskScope
@@ -307,7 +390,7 @@ tasks:
             curl -s -d '
             {
               "tag_name": "{{.ver}}",
-              "target_commitish": "{{.ver}}",
+              "target_commitish": "master",
               "name": "{{.ver}}",
               "body": "{{.release_note_js_string }}",
               "draft": false,
@@ -391,13 +474,13 @@ tasks:
           - 'echo "log will be generated at {{.hugo_doc_log_dir}}"'
           - 'rm -rf {{.hugo_doc_log_dir}}'
           - 'mkdir -p {{.hugo_doc_log_dir}}'
+          - cp ./build/linux/up /bin/
 
       -
         func: call
         vars:
           upcmd: ./build/linux/up
         do:
-          - build
           - log_gen_main
 
   -

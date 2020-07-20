@@ -416,7 +416,7 @@ Check it out yourself: [source](https://github.com/upcmd/up-demo/blob/master/dem
     * manage setup/read env vars in the same scoping model so that you could have seamless integration with minimal exposed demanding ENV vars from CD/CI tool
     * auto validation for mandatory vars
 5. Color print and adjustable verbose level
-6. Flexible programming model to allow you to separate implementation with interface so that common code could be reused via task_ref
+6. Flexible programming model to allow you to separate implementation with interface so that common code could be reused via call func
 Allow empty skeleton to be laid for testing driving process or guide as seudo code, but fill in the details and implementation gradually
 7. Flow control:
       * ignoreError
