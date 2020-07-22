@@ -17,7 +17,7 @@ import (
 var (
 	app = kingpin.New("up", "UP: The Ultimate Provisioner")
 
-	ngo              = app.Command("ngo", "run a entry task")
+	ngo              = app.Command("ngo", "run an entry task")
 	ngoTaskName      = ngo.Arg("taskname", "task name to run").Default("Main").String()
 	initDefault      = app.Command("init", "create a default skeleton for a quick start")
 	list             = app.Command("list", "list tasks")
@@ -26,7 +26,7 @@ var (
 	modCmd           = mod.Arg("cmd", "list | pull | lock | clean | probe ").Required().String()
 	assist           = app.Command("assist", "assist: templatefunc|version")
 	assistName       = assist.Arg("assistname", "what to assist").String()
-	validate         = app.Command("validate", "validate tasks and plays")
+	validate         = app.Command("validate", "dry run to validate tasks and plays")
 	validateTaskName = validate.Arg("validatetaskname", "taskname").Required().String()
 	verbose          = app.Flag("verbose", "verbose level: v-vvvvv").Short('v').String()
 	refdir           = app.Flag("refdir", "ref yml files directory").Short('d').String()

@@ -507,48 +507,7 @@ func (tasker *Tasker) ListTask(taskname string) {
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
 			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
-
-			for _, step := range steps {
-				desc := strings.Split(step.Desc, "\n")[0]
-				if step.Func == FUNC_CALL {
-					branch := tree.AddMetaBranch(func() string {
-						if step.Loop != "" {
-							return step.Name + color.HiYellowString("%s", " /call.")
-						} else {
-							return step.Name
-						}
-					}(), desc)
-					var callee string
-					switch t := step.Do.(type) {
-					case string:
-						callee = step.Do.(string)
-						if !tasker.InspectTask(callee, branch, &level) {
-							break
-						}
-						level -= 1
-						//branch.AddBranch("aa")
-					case []interface{}:
-						calleeTasknames := step.Do.([]interface{})
-						breakFlag := false
-						for _, x := range calleeTasknames {
-							callee = x.(string)
-							if !tasker.InspectTask(callee, branch, &level) {
-								breakFlag = true
-								break
-							}
-							level -= 1
-						}
-						if breakFlag {
-							break
-						}
-					default:
-						u.Pf("type: %T", t)
-					}
-
-				} else {
-					tree.AddNode(u.Spf("%s: %s", step.Name, desc))
-				}
-			}
+			steps.InspectSteps(tree, &level)
 		}
 	}
 	u.Pln(tree.String())
@@ -603,6 +562,31 @@ func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level 
 					default:
 						u.Pf("type: %T", t)
 					}
+				} else if step.Func == FUNC_BLOCK {
+					branch := branch.AddMetaBranch(func() string {
+						if step.Loop != "" {
+							return step.Name + color.HiYellowString("%s", " /block.")
+						} else {
+							return step.Name
+						}
+					}(), desc)
+
+					switch t := step.Do.(type) {
+					case string:
+						rawFlowname := step.Do.(string)
+						branch.AddNode(u.Spf("%s %s", color.HiYellowString("%s", " ..flow ->"), rawFlowname))
+
+					case []interface{}:
+						//detailed steps
+						var steps Steps
+						err := ms.Decode(step.Do, &steps)
+						u.LogErrorAndExit("load steps", err, "configuration problem, please fix it")
+						steps.InspectSteps(branch, level)
+
+					default:
+						u.Pf("type: %T", t)
+					}
+
 				} else {
 					br.AddNode(u.Spf("%s: %s", step.Name, desc))
 				}

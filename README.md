@@ -9,7 +9,7 @@ The Ultimate Provisioner: the modern configuration management, build and automat
 
 Try UPcmd - One For All! Built with Experience, Love and Soul! 
 
-No worries of replacing anything you already setup, UPcmd does not dictate and work exclusively with other tools, rather it incorporates and collaborate with others    
+No worries of replacing anything you already setup, UPcmd does not dictate and work exclusively with other tools, rather it incorporates and collaborates with others    
 
 ## Unix is sexy, however it is black and dull, how does it look like?
 
@@ -414,7 +414,7 @@ It demos:
 
 Check it out yourself: [source](https://github.com/upcmd/up-demo/blob/master/demo.sh) and try to have fun to run though the examples by yourself
 
-![demo](https://raw.githubusercontent.com/upcmd/up-demo/master/intro.gif)
+![demo](https://raw.githubusercontent.com/upcmd/up-demo/master/demos/intro.gif)
 
 ###  Why yet another build tool
 
@@ -482,7 +482,7 @@ build of the entire doc site using one build task:
 
 ### Testing
 
-There are over 200~ test cases, every release come with a full passed regression test of all cases defined, [source](https://github.com/upcmd/up/tree/master/tests)
+There are over 230+ test cases, every release come with a full passed regression test of all cases defined, [source](https://github.com/upcmd/up/tree/master/tests)
 
 * [common examples](https://github.com/upcmd/up/tree/master/tests/functests)
 * [module usage examples](https://github.com/upcmd/up/tree/master/tests/modtests)

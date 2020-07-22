@@ -85,10 +85,12 @@ tasks:
 
   -
     name: Publish_latest
-    desc: build the latest unstable release
+    desc: build the latest bleeding-edge release
     task:
       - func: shell
-        desc: delete the remote tag latest
+        desc: |
+          delete the remote tag latest
+          create latest release tag
         do:
           - git push --delete origin latest
           - git tag -d latest
@@ -96,12 +98,6 @@ tasks:
           - git push --tag
         flags:
           - ignoreError
-
-      -
-        func: cmd
-        do:
-          -
-            namex: exit
 
       -
         func: call
@@ -176,6 +172,7 @@ tasks:
 
       - func: block
         loop: dists_for_latest
+        desc: upload binary files
         dvars:
           - name: release
             value: '{{.result.Output}}'
@@ -224,7 +221,7 @@ tasks:
     task:
       -
         func: shell
-        desc: build the binary to build directory
+        desc: build the binary into build directory
         do:
           - echo "build version - {{.ver}}"
           - rm -rf ./build
@@ -233,6 +230,7 @@ tasks:
       -
         func: block
         desc: |
+          conditionally to take common distros for latest release or all distros
           default to build all types of distros supported
           if instructed the dist=common, then only build: linux, darwin and windows
         if: '{{not (pathExisted "distlist") }}'
@@ -240,7 +238,8 @@ tasks:
           -
             func: shell
             desc: |
-              this gives a list of supported os/arch types, eg:
+              this gives a list of supported os/arch types
+              eg:
                 android/arm64
                 darwin/amd64
                 darwin/arm64
@@ -255,6 +254,7 @@ tasks:
 
           -
             func: cmd
+            desc: obtain the full list of different type of distros
             dvars:
               - name: void
                 value: '{{ .last_result.Output |splitLines |reg "distlist" }}'
@@ -268,9 +268,11 @@ tasks:
                 cmd: 'distlist'
 
       - func: block
+        desc: build the instructed distribution binary
         loop: distlist
         do:
           - func: shell
+            desc: iterate and build all distros - go ahead if one platform is not supported
             dvars:
               - name: void
                 value: '{{.loopitem |split "/" |reg "dist"}}'
@@ -288,6 +290,7 @@ tasks:
 
       -
         func: shell
+        desc: list all built results
         do: ls -l build/
 
   -
