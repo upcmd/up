@@ -11,6 +11,14 @@ Try UPcmd - One For All! Built with Experience, Love and Soul!
 
 No worries of replacing anything you already setup, UPcmd does not dictate and work exclusively with other tools, rather it incorporates and collaborate with others    
 
+## Unix is sexy, however it is black and dull, how does it look like?
+
+All the project build, test, regression tests, the documentation site generation, publish the tagged release and latest rolling release are done using one Up task
+
+This is how the publish latest bleeding edge release look like when you run [UP task](https://github.com/upcmd/up/blob/master/up.yml)
+
+![up ngo Publish_latest](https://raw.githubusercontent.com/upcmd/up-demo/master/demos/publish_latest.gif) 
+
 ## [UPcmd  - The Ultimate Provisioner](https://upcmd.netlify.app/usage/cli_usage/)
 
 UP is designed and implemented to shine as a modern tool for below:
