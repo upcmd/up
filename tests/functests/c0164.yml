@@ -1,0 +1,79 @@
+doc_meta: |
+  folder: block-func
+  title: complicated test case 5
+  head: |
+    complicated test case for a combination of:
+    * dvar, dvar to object, keepName
+    * loop in block func in a callee func
+    * taskScope to pass loop item to callee
+
+  sections:
+    - title: Demo
+      log: yes
+
+notes:
+  - fix toObj and keepName not working in taskScope
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: cmd
+        dvars:
+          - name: aaa
+            value: var_a_from_task
+            flags:
+              - taskScope
+          - name: countries
+            value: |
+              - Austraila
+              - US
+              - China
+              - Japan
+            flags:
+              - toObj
+              - keepName
+              - taskScope
+              - v
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '{{.countries}}'
+          - name: typeOf
+            cmd:
+              - 'countries'
+
+      -
+        func: call
+        do:
+          - sub_task
+
+  -
+    name: sub_task
+    task:
+
+      -
+        func: block
+        loop: countries
+        vars:
+          aaa: var_a_from_sub_task
+        do:
+          -
+            func: cmd
+            desc: |
+              inspect if the correct parameter has been passed in correctly
+              with default value
+              in block func
+            do:
+              - name: assert
+                cmd:
+                  - '{{eq .aaa "var_a_from_task"}}'
+          -
+            func: shell
+            do:
+              - echo "{{.aaa}}"
+              - echo "{{.loopitem}}"

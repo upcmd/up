@@ -1,0 +1,63 @@
+doc_meta: |
+  folder: template
+  title: type compare
+  head: |
+    Showcase how to get the type of data object
+
+  sections:
+
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        vars:
+          my_friend: joe doe
+          who_is_trusted: my_friend
+          friends:
+            - tom
+            - jane
+            - hans
+            - coook
+
+        dvars:
+          - name: countries
+            value: |
+              - Austraila
+              - US
+              - China
+              - Japan
+            flag:
+              - toObj
+              - keepName
+              - v
+        do:
+          - name: print
+            cmd: '{{.countries}}'
+          - name: typeOf
+            cmd:
+              - 'countries'
+              - 'friends'
+              - my_friend
+              - '{{.who_is_trusted}}'
+
+          - name: print
+            cmd: |
+              type of countries: {{.countries | typeOf}}
+              type of friends: {{.friends | typeOf}}
+              type of my_friends: {{.my_friend | typeOf}}
+              who is trusted: {{.who_is_trusted |typeOf}}
+
+      -
+        func: cmd
+        vars:
+          my_friend: john
+        do:
+          - name: print
+            cmd: 'hello: {{.my_friend}}'
+        if: '{{.my_friend |typeIs "string"}}'
+

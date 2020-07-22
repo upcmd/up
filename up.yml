@@ -87,9 +87,27 @@ tasks:
     name: Publish_latest
     desc: build the latest unstable release
     task:
+      - func: shell
+        desc: delete the remote tag latest
+        do:
+          - git push --delete origin latest
+          - git tag -d latest
+          - git tag latest
+          - git push --tag
+        flags:
+          - ignoreError
+
+      -
+        func: cmd
+        do:
+          -
+            namex: exit
+
       -
         func: call
         desc: build only the common distros
+        vars:
+          ver: latest
         dvars:
           - name: distlist
             value: |

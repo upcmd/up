@@ -164,6 +164,9 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 			dvar := (*dvars)[idx]
 			mergeTarget := &tmpVars
 			vlevels := []string{"v", "vv", "vvv", "vvvv", "vvvvv", "vvvvv"}
+			var dvarObjName string
+			var dvarNameKept bool
+			var objConverted = new(interface{})
 			if dvar.Flags != nil && len(dvar.Flags) != 0 {
 
 				for _, vlevel := range vlevels {
@@ -177,13 +180,13 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 				if u.Contains(dvar.Flags, "toObj") {
 					rawyml := dvar.Rendered
 
-					obj := new(interface{})
-					err := yaml.Unmarshal([]byte(rawyml), obj)
+					err := yaml.Unmarshal([]byte(rawyml), objConverted)
 					u.LogErrorAndExit("dvar conversion to object:", err, u.ContentWithLineNumber(rawyml))
 
-					dvarObjName := func() (dvarname string) {
+					dvarObjName = func() (dvarname string) {
 						if u.Contains(dvar.Flags, "keepName") {
 							dvarname = dvar.Name
+							dvarNameKept = true
 						} else {
 							dvarname = u.Spf("%s_%s", dvar.Name, "object")
 						}
@@ -191,14 +194,14 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 					}()
 
 					if dvar.Name != "void" {
-						(*mergeTarget).Put(dvarObjName, *obj)
-						(*expandedVars).Put(dvarObjName, *obj)
+						(*mergeTarget).Put(dvarObjName, *objConverted)
+						(*expandedVars).Put(dvarObjName, *objConverted)
 					}
 
 					if TaskerRuntime().Tasker.TaskStack.GetLen() > 0 {
 						if u.Contains(dvar.Flags, "reg") {
 							if dvar.Name != "void" {
-								TaskRuntime().ExecbaseVars.Put(dvarObjName, *obj)
+								TaskRuntime().ExecbaseVars.Put(dvarObjName, *objConverted)
 							} else {
 								u.LogWarn("?reg a void", "you can't register a object with void name, use a proper name instead or split to multiple steps")
 							}
@@ -207,7 +210,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 
 					for _, vlevel := range vlevels {
 						if u.Contains(dvar.Flags, vlevel) {
-							u.PpmsgHintHighPermitted("v", "dvar> "+dvarObjName, *obj)
+							u.PpmsgHintHighPermitted("v", "dvar[object]> "+dvarObjName, *objConverted)
 						}
 					}
 				}
@@ -248,9 +251,12 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 				}
 
 				if u.Contains(dvar.Flags, "taskScope") {
-					TaskRuntime().TaskVars.Put(dvar.Name, dvar.Rendered)
+					if !(dvarObjName != "" && dvarNameKept) {
+						TaskRuntime().TaskVars.Put(dvar.Name, dvar.Rendered)
+					} else {
+						TaskRuntime().TaskVars.Put(dvarObjName, *objConverted)
+					}
 				}
-
 			}
 
 			if dvar.Secure != nil {

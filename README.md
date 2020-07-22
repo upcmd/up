@@ -2,6 +2,15 @@
 
 The Ultimate Provisioner: the modern configuration management, build and automation tool
 
+* Sick of using Makefile, Ansible, Ant, Gradle, Rake and different frameworks ... ?
+* Tired of a patching Shell scripts, gluing different tools together, elegantly?
+* Lacking of an overall simple solution of automation, nicely integrated in a Cloud environments?
+* Feeling the pains of your DevOps, Ci/CD best practice? 
+
+Try UPcmd - One For All! Built with Experience, Love and Soul! 
+
+No worries of replacing anything you already setup, UPcmd does not dictate and work exclusively with other tools, rather it incorporates and collaborate with others    
+
 ## [UPcmd  - The Ultimate Provisioner](https://upcmd.netlify.app/usage/cli_usage/)
 
 UP is designed and implemented to shine as a modern tool for below:
@@ -173,6 +182,16 @@ There could be application as below, but not limit to:
 #### Install the binary
 
 There are 32 different distro for different combination of OS and Arch type, check them out: [release](https://github.com/upcmd/up/releases)
+
+###### Generic Installation
+
+1. Download the binary for your platform from the 
+    * [latest stable tagged release](https://github.com/upcmd/up/releases/latest) or
+    * [latest bleeding edge release](https://github.com/upcmd/up/releases/latest) - Full regression tested
+2. Rename it to up, or up.exe in windows
+3. Move it to be under your one of your env PATH 
+
+###### Install from command line
 
 Below are common one for latest tagged stable release:
 
@@ -464,4 +483,4 @@ These test cases are not only about the tests, they are the usage examples with 
 
 ### License
 
-This project is under MPL-2.0 License
+This project is under [MPL-2.0 License](https://github.com/upcmd/up/blob/master/LICENSE)

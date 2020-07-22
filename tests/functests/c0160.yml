@@ -1,0 +1,79 @@
+doc_meta: |
+  folder: block-func
+  title: test case 2
+  head: |
+    Test the block-func being used in callee
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: call
+        desc: |
+          test var overriding in sub_task
+        dvars:
+          - name: aaa
+            value: var_a_from_task
+
+        do:
+          - sub_task
+
+  -
+    name: sub_task
+    task:
+      -
+        func: cmd
+        desc: |
+          inspect if the correct parameter has been passed in correctly
+          without default value
+        do:
+          - name: assert
+            cmd:
+              - '{{eq .aaa "var_a_from_task"}}'
+
+      -
+        func: block
+        do:
+          -
+            func: cmd
+            desc: |
+              inspect if the correct parameter has been passed in correctly
+              without default value
+              in block func
+            do:
+              - name: assert
+                cmd:
+                  - '{{eq .aaa "var_a_from_task"}}'
+
+      -
+        func: cmd
+        desc: |
+          inspect if the correct parameter has been passed in correctly
+          with default value
+        vars:
+          aaa: var_a_from_sub_task
+        do:
+          - name: assert
+            cmd:
+              - '{{eq .aaa "var_a_from_task"}}'
+
+      -
+        func: block
+        vars:
+          aaa: var_a_from_sub_task
+        do:
+          -
+            func: cmd
+            desc: |
+              inspect if the correct parameter has been passed in correctly
+              with default value
+              in block func
+            do:
+              - name: assert
+                cmd:
+                  - '{{eq .aaa "var_a_from_task"}}'

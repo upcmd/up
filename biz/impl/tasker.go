@@ -273,7 +273,7 @@ This has chained dvar expansion through global to group then to instance level
 and finally merge with global var, except the global dvars
 */
 func (t *Tasker) MergeUptoRuntimeGlobalVars() {
-	u.Pf("module: [%s] instance id: [%s]\n", ConfigRuntime().ModuleName, t.InstanceName)
+	u.Pf("module: [%s], instance id: [%s], exec profile: [%s]\n", ConfigRuntime().ModuleName, t.InstanceName, t.ExecProfilename)
 	var runtimevars core.Cache
 	runtimevars = deepcopy.Copy(*t.ExpandedContext["global"]).(core.Cache)
 

@@ -8,6 +8,7 @@
 package impl
 
 import (
+	"fmt"
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/upcmd/up/model/core"
@@ -268,6 +269,17 @@ func (f *CmdFuncAction) Exec() {
 						u.Ppmsg(f.Vars)
 					}
 
+				}
+			})
+
+		case "typeOf":
+			cmdItem.runCmd("array", func() {
+				whats := cmdItem.Cmd.([]interface{})
+				for idx, v := range whats {
+					raw := v.(string)
+					name := Render(raw, f.Vars)
+					value := f.Vars.Get(name)
+					u.Pf("%2d -  type of [%s] > [%s]\n", idx+1, name, fmt.Sprintf("%T", value))
 				}
 			})
 

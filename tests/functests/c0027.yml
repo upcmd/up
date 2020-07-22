@@ -89,8 +89,4 @@ tasks:
           - echo """this guy is in =>{{.a_smart_guy_object.school}} school"""
           - echo """school address object {{.school_address_object.suburb.name}}"""
           - echo """school address object -> {{.school_address_object.address.suburb.name}}"""
-
-      -
-        func: shell
-        do:
-          - echo hello
+          - echo """tom - {{.tom}}"""
