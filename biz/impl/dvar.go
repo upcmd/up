@@ -81,7 +81,8 @@ func (dvars *Dvars) ValidateAndLoading(contextVars *core.Cache) {
 
 }
 
-type TransientSyncFunc func(key string, val interface{})
+//return false means not in context of dvar scope
+type TransientSyncFunc func(key string, val interface{}) bool
 
 //given a dvars with the vars context, it expands with rendered result
 func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
@@ -98,16 +99,17 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 	tmpDvars = deepcopy.Copy(*dvars).(Dvars)
 
 	//this is to ensure data consistency of the one way return and overriding from dvar expand to step vars(and context vars)
-	transientSync := func(key string, val interface{}) {
+	transientSync := func(key string, val interface{}) bool {
 		//ensure all template reg change is carried over
 		tmpVars.Put(key, val)
 		expandedVars.Put(key, val)
+		return true
 	}
-	transientSyncVoid := func(key string, val interface{}) {}
+	transientSyncVoid := func(key string, val interface{}) bool { return false }
 
 	stepRuntime := StepRuntime()
 	if stepRuntime != nil {
-		stepRuntime.DataSyncFunc = transientSync
+		stepRuntime.DataSyncInDvarExpand = transientSync
 	}
 
 	var datasource interface{}
@@ -270,7 +272,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 	u.Pfvvvvv("[%s] dvar expanded result:\n%s\n", mark, u.Sppmsg(*expandedVars))
 
 	if stepRuntime != nil {
-		stepRuntime.DataSyncFunc = transientSyncVoid
+		stepRuntime.DataSyncInDvarExpand = transientSyncVoid
 	}
 
 	return expandedVars

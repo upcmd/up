@@ -24,7 +24,7 @@ var (
 	listName         = list.Arg("taskname|=", "task name to inspect").String()
 	mod              = app.Command("mod", "module cmd: list | pull | lock | clean | probe")
 	modCmd           = mod.Arg("cmd", "list | pull | lock | clean | probe ").Required().String()
-	assist           = app.Command("assist", "assist: templatefunc|version")
+	assist           = app.Command("assist", "assist: all_template_func|upcmd_template_func|version")
 	assistName       = assist.Arg("assistname", "what to assist").String()
 	validate         = app.Command("validate", "dry run to validate tasks and plays")
 	validateTaskName = validate.Arg("validatetaskname", "taskname").Required().String()
@@ -108,10 +108,14 @@ func main() {
 
 	case assist.FullCommand():
 		u.Pf("-assist: %s\n", *assistName)
-		if *assistName == "templatefunc" {
-			u.Pln("=List of golang template funcs")
+		if *assistName == "all_template_func" {
+			u.Pln("=List of all template funcs")
 			impl.FuncMapInit()
 			impl.ListAllFuncs()
+		} else if *assistName == "upcmd_template_func" {
+			u.Pln("=List of upcmd template funcs")
+			impl.FuncMapInit()
+			impl.ListUpcmdFuncs()
 		} else if *assistName == "version" {
 			u.PlnInfo(version_info)
 		} else {

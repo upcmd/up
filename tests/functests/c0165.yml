@@ -1,0 +1,73 @@
+doc_meta: |
+  folder: template
+  title: yml obj json conversion
+  head: |
+    demo how to mutually convert yml, json, object between each other
+
+  sections:
+    - title: How does it work
+      content: |
+        ```
+        yml --ymlToObj--> obj --objToYml--> yml
+        yml --ymlToObj--> obj --toJson--> json
+        ```
+
+    - title: Relavant
+      content: environment variables
+      refs:
+        - title: parse yml to object
+          link: ../../object-oriented/c0074/
+
+vars:
+  yml: |
+    address:
+      suburb:
+        name: sydney CBD
+        postcode: 2000
+      school: SG
+  obj:
+    address:
+      suburb:
+        name: sydney CBD
+        postcode: 2000
+      school: SG
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        dvars:
+          - name: void
+            desc: convert yml string to obj
+            value: '{{.yml | ymlToObj|reg "this_is_an_obj"}}'
+        do:
+          - name: print
+            cmd: '{{.yml}}'
+          - name: print
+            desc: print string representation of obj
+            cmd: '{{.yml | ymlToObj}}'
+          - name: printObj
+            desc: print object
+            cmd: this_is_an_obj
+          - name: print
+            desc: object to json text
+            cmd: '{{ .obj | toJson}}'
+          - name: print
+            desc: convert yml string to obj in print
+            cmd: '{{.yml | ymlToObj|reg "this_is_another_obj"}}'
+          - name: print
+            desc: print this_is_another_obj
+            cmd: '{{.this_is_another_obj}}'
+          - name: print
+            desc: |
+              object to json text then to obj using ymlToObj
+              yml is a superset of json, so ymlToObj works for json
+            cmd: '{{ .obj | toJson |ymlToObj}}'
+          - name: print
+            desc: |
+              object to json text
+              then to obj using ymlToObj
+              then to yml
+            cmd: '{{ .obj | toJson |ymlToObj|objToYml}}'

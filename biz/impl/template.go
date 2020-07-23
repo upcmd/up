@@ -25,10 +25,11 @@ import (
 
 var (
 	templateFuncs template.FuncMap
+	taskFuncs     template.FuncMap
 )
 
 func FuncMapInit() {
-	taskFuncs := template.FuncMap{
+	taskFuncs = template.FuncMap{
 		"OS":   func() string { return runtime.GOOS },
 		"ARCH": func() string { return runtime.GOARCH },
 		"catLines": func(s string) string {
@@ -73,7 +74,10 @@ func FuncMapInit() {
 			//remove this as it will cause dirty data due to dvar processing
 			//StepRuntime().ContextVars.Put(varname, object)
 			//instead we do a callback to save it to dvar processing scope
-			StepRuntime().DataSyncFunc(varname, object)
+			if !StepRuntime().DataSyncInDvarExpand(varname, object) {
+				StepRuntime().ContextVars.Put(varname, object)
+			}
+
 			return core.ObjToYaml(object)
 		},
 		"deReg": func(varname string) string {
@@ -189,6 +193,12 @@ func ListAllFuncs() {
 	}
 
 	for k, v := range templateFuncs {
+		u.Pf("%30s : %#v\n", k, v)
+	}
+
+}
+func ListUpcmdFuncs() {
+	for k, v := range taskFuncs {
 		u.Pf("%30s : %#v\n", k, v)
 	}
 

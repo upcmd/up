@@ -56,10 +56,10 @@ func GetBaseModuleName() string {
 }
 
 type StepRuntimeContext struct {
-	Stepname     string
-	Result       *u.ExecResult
-	ContextVars  *core.Cache
-	DataSyncFunc TransientSyncFunc
+	Stepname             string
+	Result               *u.ExecResult
+	ContextVars          *core.Cache
+	DataSyncInDvarExpand TransientSyncFunc
 }
 
 func StepRuntime() *StepRuntimeContext {
