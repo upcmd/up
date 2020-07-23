@@ -87,18 +87,6 @@ tasks:
     name: Publish_latest
     desc: build the latest bleeding-edge release
     task:
-      - func: shell
-        desc: |
-          delete the remote tag latest
-          create latest release tag
-        do:
-          - git push --delete origin latest
-          - git tag -d latest
-          - git tag latest
-          - git push --tag
-        flags:
-          - ignoreError
-
       -
         func: call
         desc: build only the common distros
@@ -136,6 +124,7 @@ tasks:
             flags:
               - taskScope
               - v
+        if: '{{ne (printf "%s" .releaseid)  "None" }}'
         do:
           - echo "deleting release - {{.releaseid}}"
           - echo """curl -sX DELETE {{.release_api_ep}}/{{.releaseid}}"""
@@ -144,12 +133,23 @@ tasks:
             -X DELETE \
             -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
             {{.release_api_ep}}/{{.releaseid}}
-        if: '{{ne (printf "%s" .releaseid)  "None" }}'
         else:
           - func: cmd
             do:
               - name: print
                 cmd: "no latest release in remote, ignore"
+
+      - func: shell
+        desc: |
+          delete the remote tag latest
+          create latest release tag
+        do:
+          - git push --delete origin latest
+          - git tag -d latest
+          - git tag latest
+          - git push origin refs/tags/latest
+        flags:
+          - ignoreError
 
       - func: shell
         desc: create the latest master release
