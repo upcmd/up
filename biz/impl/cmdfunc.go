@@ -261,12 +261,16 @@ func (f *CmdFuncAction) Exec() {
 
 				for idx, v := range whats {
 					what := v.(string)
-					u.Pf("%2d: inspect[%s]", idx+1, v)
+					u.Pf("%2d: inspect[%s]\n", idx+1, v)
 					switch what {
 					case "exec_base_vars":
 						u.Ppmsg(*TaskRuntime().ExecbaseVars)
 					case "exec_vars":
 						u.Ppmsg(f.Vars)
+					case "exec_base_env_vars_configured":
+						TaskerRuntime().Tasker.reportContextualEnvVars(TaskRuntime().ExecbaseVars)
+					case "exec_env_vars_configured":
+						TaskerRuntime().Tasker.reportContextualEnvVars(f.Vars)
 					}
 
 				}

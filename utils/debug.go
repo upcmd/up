@@ -83,6 +83,10 @@ func PlnInfo(info string) {
 	msg_color_printf("%s\n", info)
 }
 
+func PlnInfoHighlight(info string) {
+	hilight_color_printf("%s\n", info)
+}
+
 func Pfdryrun(format string, a ...interface{}) {
 	dryrun_color_print(format, a...)
 }

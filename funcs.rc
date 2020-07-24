@@ -6,6 +6,18 @@ wiptest(){
     goup ngo task -d ./tests/functests -t wip.yml -i dev --configdir=./tests/functests
 }
 
+wipeptest(){
+  profile=$1
+  goup ngo task -d ./tests/functests -t wip.yml -p $profile --configdir=./tests/functests
+}
+
+
+wipeptestvvv(){
+  profile=$1
+  goup ngo task -d ./tests/functests -t wip.yml -p $profile -v vvv --configdir=./tests/functests
+}
+
+
 wipfunctest(){
     go test ./tests/functests/wip_test.go -v
 }

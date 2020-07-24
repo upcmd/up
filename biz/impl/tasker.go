@@ -95,11 +95,11 @@ func NewTasker(instanceId string, eprofiename string, cfg *u.UpConfig) *Tasker {
 
 	tasker.loadExecProfiles()
 	tasker.setInstanceName(instanceId, eprofiename)
+	tasker.loadExecProfileEnvVars()
 	tasker.loadScopes()
 	tasker.loadInstancesContext()
 	tasker.loadRuntimeGlobalVars()
 	tasker.loadRuntimeGlobalDvars()
-	tasker.loadExecProfileEnvVars()
 	tasker.MergeUptoRuntimeGlobalVars()
 	tasker.MergeRuntimeGlobalDvars()
 	tasker.loadTasks()
@@ -273,7 +273,7 @@ This has chained dvar expansion through global to group then to instance level
 and finally merge with global var, except the global dvars
 */
 func (t *Tasker) MergeUptoRuntimeGlobalVars() {
-	u.Pf("module: [%s], instance id: [%s], exec profile: [%s]\n", ConfigRuntime().ModuleName, t.InstanceName, t.ExecProfilename)
+
 	var runtimevars core.Cache
 	runtimevars = deepcopy.Copy(*t.ExpandedContext["global"]).(core.Cache)
 
@@ -327,6 +327,7 @@ func (t *Tasker) setInstanceName(id, eprofilename string) {
 	}
 
 	t.InstanceName = instanceName
+	u.Pf("module: [%s], instance id: [%s], exec profile: [%s]\n", ConfigRuntime().ModuleName, t.InstanceName, t.ExecProfilename)
 }
 
 func (t *Tasker) initRuntime() {
@@ -927,6 +928,43 @@ func (t *Tasker) getExecProfile(pname string) *ExecProfile {
 		}
 	}
 	return ep
+}
+
+func (t *Tasker) reportContextualEnvVars(vars *core.Cache) {
+	var envs EnvVars = EnvVars{}
+	pname := TaskerRuntime().Tasker.ExecProfilename
+	eprofile := TaskerRuntime().Tasker.getExecProfile(pname)
+	if eprofile != nil {
+		evars := eprofile.Evars
+		for _, x := range evars {
+			envs = append(envs, EnvVar{
+				Name:  x.Name,
+				Value: x.Value,
+			})
+		}
+	}
+
+	for k, v := range *vars {
+		if strings.HasPrefix(k, "envVar_") {
+			envs = append(envs, EnvVar{
+				Name:  strings.TrimPrefix(k, "envVar_"),
+				Value: v.(string),
+			})
+		}
+	}
+
+	var maxlen int
+	for _, x := range envs {
+		if l := len(x.Name); l > maxlen {
+			maxlen = l
+		}
+	}
+
+	fs := `%3d: %` + strconv.Itoa(maxlen) + `s = %s`
+	for idx, x := range envs {
+		u.PlnInfoHighlight(u.Spf(fs, idx+1, x.Name, x.Value))
+	}
+
 }
 
 func (t *Tasker) loadRuntimeGlobalVars() {

@@ -25,13 +25,14 @@ var (
 		"ShellType":           "/bin/sh",
 	}
 
-	vvvv_color_printf   = color.Magenta
-	verror_color_printf = color.Red
-	msg_color_printf    = color.Yellow
-	himsg_color_printf  = color.HiWhite
-	msg_color_sprintf   = color.YellowString
-	dryrun_color_print  = color.Cyan
-	UpModuleDir         = ".upmodules"
+	vvvv_color_printf    = color.Magenta
+	verror_color_printf  = color.Red
+	msg_color_printf     = color.Yellow
+	hilight_color_printf = color.HiGreen
+	himsg_color_printf   = color.HiWhite
+	msg_color_sprintf    = color.YellowString
+	dryrun_color_print   = color.Cyan
+	UpModuleDir          = ".upmodules"
 
 	DEFAULT_CONFIG = `
 version: 1.0.0
