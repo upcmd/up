@@ -84,6 +84,22 @@ func FuncMapInit() {
 			TaskRuntime().ExecbaseVars.Delete(varname)
 			return ""
 		},
+		//keep envExport only in template func as to be carried to any type of func implementation
+		"envExport": func(expType, fileToSave string) string {
+			var expStr string
+			switch expType {
+			case "exec_base_env_vars_configured":
+				expStr = TaskerRuntime().Tasker.reportContextualEnvVars(TaskRuntime().ExecbaseVars)
+			case "exec_env_vars_configured":
+				expStr = TaskerRuntime().Tasker.reportContextualEnvVars(StepRuntime().ContextVars)
+			}
+
+			if fileToSave != "" {
+				ioutil.WriteFile(fileToSave, []byte(expStr), 0644)
+			}
+
+			return expStr
+		},
 		"pathExisted": func(path string) bool {
 			pathtstr := u.Spf("{{.%s}}", path)
 			return ElementValid(pathtstr, StepRuntime().ContextVars)

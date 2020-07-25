@@ -8,6 +8,7 @@
 package impl
 
 import (
+	"bytes"
 	"github.com/fatih/color"
 	"github.com/imdario/mergo"
 	ms "github.com/mitchellh/mapstructure"
@@ -930,7 +931,7 @@ func (t *Tasker) getExecProfile(pname string) *ExecProfile {
 	return ep
 }
 
-func (t *Tasker) reportContextualEnvVars(vars *core.Cache) {
+func (t *Tasker) reportContextualEnvVars(vars *core.Cache) string {
 	var envs EnvVars = EnvVars{}
 	pname := TaskerRuntime().Tasker.ExecProfilename
 	eprofile := TaskerRuntime().Tasker.getExecProfile(pname)
@@ -961,10 +962,13 @@ func (t *Tasker) reportContextualEnvVars(vars *core.Cache) {
 	}
 
 	fs := `%3d: %` + strconv.Itoa(maxlen) + `s = %s`
+	var expStr = bytes.NewBufferString("")
 	for idx, x := range envs {
 		u.PlnInfoHighlight(u.Spf(fs, idx+1, x.Name, x.Value))
+		expStr.WriteString(u.Spf("export %s=\"%s\"\n", x.Name, x.Value))
 	}
 
+	return expStr.String()
 }
 
 func (t *Tasker) loadRuntimeGlobalVars() {

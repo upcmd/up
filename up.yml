@@ -159,7 +159,7 @@ tasks:
             "tag_name": "latest",
             "target_commitish": "master",
             "name": "latest",
-            "body": "latest bleeding-edge release from master",
+            "body": "latest bleeding-edge release from master: full regression tested and stable",
             "draft": false,
             "prerelease": false
           }

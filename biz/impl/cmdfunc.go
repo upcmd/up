@@ -254,8 +254,6 @@ func (f *CmdFuncAction) Exec() {
 			})
 
 		case "inspect":
-			//TODO: add evar inspection support
-			//TODO: add environment variable inspection support
 			cmdItem.runCmd("array", func() {
 				whats := cmdItem.Cmd.([]interface{})
 
