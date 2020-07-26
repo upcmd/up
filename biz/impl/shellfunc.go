@@ -8,6 +8,7 @@
 package impl
 
 import (
+	"bytes"
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/upcmd/up/model/core"
@@ -37,6 +38,9 @@ func runCmd(f *ShellFuncAction, cmd string) {
 				"",
 				&envVars,
 			)
+
+			u.Pfv("%s\n", color.HiGreenString("%s", result.Output))
+
 		default:
 			cmdExec := exec.Command(u.MainConfig.ShellType, "-c", cmd)
 
@@ -49,15 +53,39 @@ func runCmd(f *ShellFuncAction, cmd string) {
 				}
 			}()
 
-			cmdOutput, err := cmdExec.CombinedOutput()
+			stdout, err := cmdExec.StdoutPipe()
+
+			if err != nil {
+				u.LogError("exec pipe", err)
+			}
+
+			if err = cmdExec.Start(); err != nil {
+				u.LogError("exec pipe started", err)
+			}
+
+			var outputResult *bytes.Buffer = bytes.NewBufferString("")
+			buff := make([]byte, 5120)
+			var n int
+			for err == nil {
+				n, err = stdout.Read(buff)
+				if n > 0 {
+					u.Pfv("%s", color.HiGreenString("%s", string(buff[:n])))
+					outputResult.Write(buff[:n])
+				}
+			}
+
+			if err = cmdExec.Wait(); err != nil {
+				u.LogError("exec wait", err)
+			}
+
 			if err != nil {
 				if exitError, ok := err.(*exec.ExitError); ok {
 					result.Code = exitError.ExitCode()
-					result.ErrMsg = string(cmdOutput)
+					result.ErrMsg = outputResult.String()
 				}
 			} else {
 				result.Code = 0
-				result.Output = strings.TrimSpace(string(cmdOutput))
+				result.Output = strings.TrimSpace(outputResult.String())
 			}
 
 			f.Result = result
@@ -100,7 +128,7 @@ func (f *ShellFuncAction) Exec() {
 		cmd := Render(tcmd, f.Vars)
 		u.Pfvvvv("cmd=>:\n%s<=\n", color.HiBlueString("%s", cmd))
 		runCmd(f, cmd)
-		u.Pfv("%s\n", color.HiGreenString("%s", f.Result.Output))
+		//u.Pfv("%s\n", color.HiGreenString("%s", f.Result.Output))
 		if f.Result.Code != 0 {
 			u.Pfv("      %s\n", color.RedString("%s", f.Result.ErrMsg))
 		}
