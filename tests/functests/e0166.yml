@@ -1,0 +1,199 @@
+notes:
+  - documented in docs
+
+scopes:
+  - name: global
+    vars:
+      my_docker_ep: gitlab/mydocker_repo/jenkins
+    dvars:
+      - name: ENV
+        value: dev1
+        flags:
+          - envVar
+
+      - name: JENKINS_NAME
+        value: '{{ env "JENKINS_NAME" |validateMandatoryFailIfNone "JENKINS_NAME" }}'
+
+      - name: JENKINS_MASTER_DOCKER_IMAGE_URL
+        value: '{{.my_docker_ep}}/master'
+        flags:
+          - envVar
+
+      - name: JENKINS_SLAVE_DOCKER_IMAGE_URL
+        value: '{{.my_docker_ep}}/slave'
+        flags:
+          - envVar
+
+      - name: JENKINS_EXPECTED_VERSION
+        value: 2.222.4
+        flags:
+          - envVar
+
+  - name: nonprod
+    members:
+      - dev
+      - staging
+    dvars:
+      - name: ASSUME_ROLE_ARN
+        value: arn:aws:iam::123456789012:role/my-nonn-prod-iam-role
+        flags:
+          - envVar
+      - name: JENKINS_PVT_USERNAME
+        value: svc_go
+        flags:
+          - envVar
+
+  - name: prod
+    members:
+      - dr
+      - prod
+    vars:
+      host_alias: prod
+    dvars:
+      - name: ENV
+        value: prod
+        flags:
+          - envVar
+      - name: ASSUME_ROLE_ARN
+        value: arn:aws:iam::998654321012:role/my-nonn-prod-iam-role
+        flags:
+          - envVar
+
+      - name: JENKINS_USERNAME
+        value: my_jenkins_prod_user
+        flags:
+          - envVar
+
+  - name: staging
+    dvars:
+      - name: ENV
+        value: staging
+        flags:
+          - envVar
+
+dvars:
+  - name: JENKINS_URL
+    desc: |
+      auto render to a specific valid url
+    value: '{{ printf "%s-%s.myjenkins.xyz" .JENKINS_NAME .ENV}}'
+    flags:
+      - envVar
+
+eprofiles:
+  - name: my-jenkins-local-test
+    desc: |
+      a test profile for test in local machine
+    instance: staging
+    evars:
+      - name: JENKINS_NAME
+        value: my-jenkins-test
+
+      - name: SKIP_EBS_BACKUP
+        value: "true"
+
+  - name: jenkins-prod-gocd
+    instance: prod
+    desc: |
+      a profile for jenkins prod stack creation in GoCD
+    evars:
+      - name: JENKINS_NAME
+        value: jenkins-prod
+
+      - name: SKIP_EBS_BACKUP
+        value: "false"
+
+  - name: jenkins-dev
+    instance: dev
+    desc: |
+      all other tests are running in jenkins slave
+    evars:
+      - name: JENKINS_NAME
+        value: dev-jenkins
+
+      - name: SKIP_EBS_BACKUP
+        value: "true"
+
+tasks:
+  -
+    name: task
+    desc: main entry
+    task:
+      - func: cmd
+        do:
+          - name: inspect
+            cmd:
+              - exec_vars
+              - exec_base_env_vars_configured
+
+          - name: assert
+            cmd:
+              - '{{eq .JENKINS_NAME "my-jenkins-test" }}'
+              - '{{eq .JENKINS_URL "my-jenkins-test-staging.myjenkins.xyz" }}'
+              - '{{eq .JENKINS_SLAVE_DOCKER_IMAGE_URL "gitlab/mydocker_repo/jenkins/slave" }}'
+
+      -
+        func: shell
+        dvars:
+          - name: env_export_test
+            value: '{{envExport "exec_env_vars_configured" ""}}'
+            flags:
+              - v
+        desc: main job
+        do:
+          - 'echo """{{.env_export_test}}"""'
+
+      -
+        func: shell
+        do:
+          - echo "demo conditionally quit"
+        if: '{{ne .ENV "prod"}}'
+        else:
+          - func: cmd
+            do:
+              - name: print
+                cmd: not allow to touch prod
+              - name: exit
+
+      - func: block
+        desc: |
+          conditionally exec in gocd / jenkins / local
+          obtain the env var from the build environment, it could be either GoCD agent, or a Jenkins slave
+          it does not matter if the agent is in a EC2 instance, or a docker, or inside of k8s pod, as long as the env var used as indication is right for your case, below is just for example
+        dvars:
+          - name: gocd_marker
+            value: '{{ env "GOCD_AGENT_VERSION" }}'
+            flags:
+              - taskScope
+              - v
+          - name: jenkins_marker
+            value: '{{ env "JENKINS_20_AGENT_SERVICE_PORT" }}'
+            flags:
+              - taskScope
+              - v
+        if: '{{or (ne .gocd_marker "None") (ne .jenkins_marker "None")}}'
+        do:
+          -
+            func: shell
+            desc: |
+              run in gocd if it detects there is a GoCD marker
+              also it runs the piped in comand as prior script before real provision step
+            do: |
+              #{{.up_runtime_task_pipe_in_content}}
+              echo "make my_jenkins_stack_creation"
+            if: '{{(ne .gocd_marker "None") }}'
+          -
+            func: shell
+            desc: |
+              run in jenkins
+              it use different prior step to assume role
+            do: |
+              echo "source ./assume_role.sh"
+              echo "make my_jenkins_stack_creation"
+            if: '{{(ne .jenkins_marker "None")}}'
+        else:
+          -
+            func: shell
+            do:
+              - echo "starting my real stack creation work"
+              - echo "this job is running in my local machine"
+              - echo "make my_jenkins_stack_creation"

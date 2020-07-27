@@ -143,6 +143,18 @@ dvars:
     value: "{{ if ge .old .age }}hello{{end}}"
     flags: [vvvv,]
 
+  - name: var_use_and_operator
+    value: '{{ and (eq .ns "prod") (ne .age 35)}}'
+    flags: [v,]
+
+  - name: var_use_or_operator
+    value: '{{ or (eq .ns "prod") (ne .age 35)}}'
+    flags: [v ,]
+
+  - name: var_concat_values
+    value: '{{ printf "%s: %d years old" .pod_name .age}}'
+    flags: [v ,]
+
 #extra: lt, le
   - name: template_def
     value: |

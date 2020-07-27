@@ -121,6 +121,7 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 
 	//so far the resultVars includes: the local vars + dvars rendered using execvars
 	u.Ppmsgvvvhint(u.Spf("%s: final context exec vars:", ConfigRuntime().ModuleName), resultVars)
+	//debugVars()
 	return resultVars
 }
 
