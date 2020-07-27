@@ -150,7 +150,7 @@ func Render(tstr string, obj interface{}) string {
 
 	var result bytes.Buffer
 	err = t.Execute(&result, obj)
-	u.LogErrorAndContinue("template rendering problem", err, u.ContentWithLineNumber(tstr))
+	u.LogErrorAndContinue("template rendering", err, u.ContentWithLineNumber(tstr))
 
 	val := result.String()
 	if "<no value>" == val {

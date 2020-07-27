@@ -155,6 +155,10 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 			rval = tmpDvars[idx].Value
 		}
 
+		if rval == "" {
+			rval = NONE_VALUE
+		}
+
 		tmpVars.Put(dvar.Name, rval)
 		(*dvars)[idx].Rendered = rval
 
@@ -199,7 +203,6 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 						(*mergeTarget).Put(dvarObjName, *objConverted)
 						(*expandedVars).Put(dvarObjName, *objConverted)
 					}
-
 					if TaskerRuntime().Tasker.TaskStack.GetLen() > 0 {
 						if u.Contains(dvar.Flags, "reg") {
 							if dvar.Name != "void" {
@@ -270,6 +273,8 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 	}
 
 	u.Pfvvvvv("[%s] dvar expanded result:\n%s\n", mark, u.Sppmsg(*expandedVars))
+
+	//debugVars()
 
 	if stepRuntime != nil {
 		stepRuntime.DataSyncInDvarExpand = transientSyncVoid

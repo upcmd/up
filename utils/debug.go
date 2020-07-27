@@ -348,6 +348,14 @@ func LogErrorAndContinue(mark string, err interface{}, hint string) {
 		color.Red("      %s -> %s", mark, err)
 		hiColor := color.New(color.FgHiYellow, color.BgHiMagenta)
 		hiColor.Printf("WARN:\n%s\n", hint)
+
+		switch mark {
+		case "template rendering":
+			PlnInfoHighlight(`trouble shooting tips:
+<incompatible types for comparison>: the variable might not be registered, use -v vvv to see the cache, or use inspect cmd to debug
+`)
+		}
+
 		Pln("-----trace for reference-----")
 		PStackTrace()
 	}

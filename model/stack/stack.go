@@ -41,12 +41,14 @@ func (s *ExecStack) Pop() interface{} {
 }
 
 func (s *ExecStack) GetTop() interface{} {
-	top := s.Stack.Front()
-	return top.Value
+	if s.GetLen() > 0 {
+		top := s.Stack.Front()
+		return top.Value
+	} else {
+		return nil
+	}
 }
 
 func (s *ExecStack) GetLen() int {
 	return s.Stack.Len()
 }
-
-

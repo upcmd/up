@@ -5,6 +5,7 @@ doc_meta: |
     This showcases:
       * How to use env variables and provide a default value if it is empty
       * An minimal entry task could be just a name
+      * The empty value is mapped to None value internnally
 
   sections:
     - title: Demo
@@ -50,3 +51,33 @@ tasks:
 
   -
     name: task
+
+      -
+        func: shell
+        desc: this show an example of the empty value is mapped to None
+        vars:
+          person: ""
+        dvars:
+          - name: someone
+            value: '{{ .person }}'
+
+          - name: i_am_empty
+            value: '{{ "" }}'
+
+          - name: empty_env_var
+            value: '{{ env "EMPTY_VAR" }}'
+
+
+        do: |
+          echo "{{.someone}}"
+          echo "{{.i_am_empty}}"
+          echo "{{.empty_env_var}}"
+
+      -
+        func: cmd
+        do:
+          -
+            name: inspect
+            cmd:
+              - exec_vars
+              - exec_base_vars

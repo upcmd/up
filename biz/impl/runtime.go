@@ -40,7 +40,13 @@ func TaskerRuntime() *TaskerRuntimeContext {
 }
 
 func TaskRuntime() *TaskRuntimeContext {
-	return TaskerRuntime().Tasker.TaskStack.GetTop().(*TaskRuntimeContext)
+	if taskStack := TaskerRuntime().Tasker.TaskStack; taskStack != nil {
+		top := taskStack.GetTop()
+		if top != nil {
+			return top.(*TaskRuntimeContext)
+		}
+	}
+	return nil
 }
 
 func SetDryrun() {
@@ -85,4 +91,14 @@ func BlockStack() *stack.ExecStack {
 
 func ConfigRuntime() *utils.UpConfig {
 	return TaskerRuntime().Tasker.Config
+}
+
+func debugVars() {
+	if taskRuntime := TaskRuntime(); taskRuntime != nil {
+		u.Ppmsg("ExecbaseVars", taskRuntime.ExecbaseVars)
+	}
+	if stepRuntime := StepRuntime(); stepRuntime != nil {
+		u.Ppmsg("ExecContextVars", stepRuntime.ContextVars)
+	}
+
 }
