@@ -20,7 +20,7 @@ func Pipein() {
 		u.LogErrorAndExit("Pipe in error", err, "please double check you CLI pipe in syntax")
 	}
 
-	if info.Mode()&os.ModeCharDevice != 0 || info.Size() <= 0 {
+	if info.Mode()&os.ModeCharDevice != 0 {
 		return
 	}
 
