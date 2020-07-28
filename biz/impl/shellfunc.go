@@ -9,13 +9,16 @@ package impl
 
 import (
 	"bytes"
+	"context"
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/upcmd/up/model/core"
 	u "github.com/upcmd/up/utils"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
+	"time"
 )
 
 func runCmd(f *ShellFuncAction, cmd string) {
@@ -42,7 +45,22 @@ func runCmd(f *ShellFuncAction, cmd string) {
 			u.Pfv("%s\n", color.HiGreenString("%s", result.Output))
 
 		default:
-			cmdExec := exec.Command(u.MainConfig.ShellType, "-c", cmd)
+			defaultTimeout, _ := strconv.Atoi(ConfigRuntime().Timeout)
+			timeout := func() time.Duration {
+				var t int
+				if f.Timeout == 0 {
+					t = defaultTimeout
+				} else {
+					t = f.Timeout
+					u.LogWarn("explicit timeout:", u.Spf("%d milli seconds", t))
+				}
+				return time.Duration(t)
+			}()
+
+			ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
+			defer cancel()
+
+			cmdExec := exec.CommandContext(ctx, u.MainConfig.ShellType, "-c", cmd)
 
 			func() {
 				//inject the envvars
@@ -78,10 +96,14 @@ func runCmd(f *ShellFuncAction, cmd string) {
 				u.LogError("exec wait", err)
 			}
 
+			if ctx.Err() == context.DeadlineExceeded {
+				u.LogWarn("timeout", "shell execution timed out")
+			}
+
 			if err != nil {
 				if exitError, ok := err.(*exec.ExitError); ok {
 					result.Code = exitError.ExitCode()
-					result.ErrMsg = outputResult.String()
+					result.ErrMsg = err.Error()
 				}
 			} else {
 				result.Code = 0
@@ -89,22 +111,23 @@ func runCmd(f *ShellFuncAction, cmd string) {
 			}
 
 			f.Result = result
-			u.LogError("exec error:", err)
 		}
 	}
 }
 
 type ShellFuncAction struct {
-	Do     interface{}
-	Vars   *core.Cache
-	Cmds   []string
-	Result u.ExecResult
+	Do      interface{}
+	Vars    *core.Cache
+	Cmds    []string
+	Result  u.ExecResult
+	Timeout int
 }
 
 //adapt the abstract step.Do to concrete ShellFuncAction Cmds
 func (f *ShellFuncAction) Adapt() {
 	var cmd string
 	var cmds []string
+	f.Timeout = StepRuntime().Timeout
 
 	switch f.Do.(type) {
 	case string:

@@ -21,6 +21,7 @@ var (
 		"MaxCallLayers":       "256",
 		"MaxModuelCallLayers": "256",
 		"ConfigDir":           ".",
+		"Timeout":             "3600000",
 		"ConfigFile":          "upconfig.yml",
 		"ShellType":           "/bin/sh",
 	}
@@ -43,6 +44,7 @@ RefDir: .
 TaskFile: up.yml
 ConfigDir: .
 ConfigFile: upconfig.yml
+Timeout: 3600000
 WorkDir: cwd
 ShellType: /bin/sh
 `

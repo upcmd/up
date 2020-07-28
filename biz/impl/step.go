@@ -40,6 +40,7 @@ type Step struct {
 	Until    string
 	RefDir   string
 	VarsFile string
+	Timeout  int //milli seconds, only for shell func
 }
 
 type Steps []Step
@@ -279,6 +280,24 @@ func (step *Step) Exec(fromBlock bool) {
 											}
 										}
 
+									case []int64:
+										for idx, item := range loopObj.([]int64) {
+											routeFuncType(&LoopItem{idx, idx + 1, item})
+											if rawUtil != "" {
+												untilEval := Render(rawUtil, stepExecVars)
+												toBreak, err := strconv.ParseBool(untilEval)
+												u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
+												if toBreak {
+													u.Pvvvv("loop util conditional break")
+													break
+												} else {
+													chainAction(&action)
+												}
+											} else {
+												chainAction(&action)
+											}
+										}
+
 									default:
 										u.LogWarn("loop item evaluation", "Loop item type is not supported yet!")
 									}
@@ -460,6 +479,7 @@ func (steps *Steps) Exec(fromBlock bool) {
 		execStep := func() {
 			rtContext := StepRuntimeContext{
 				Stepname: step.Name,
+				Timeout:  step.Timeout,
 			}
 			StepStack().Push(&rtContext)
 

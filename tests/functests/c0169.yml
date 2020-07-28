@@ -1,0 +1,108 @@
+doc_meta: |
+  folder: loop
+  title: loop and retry example
+  head: |
+    This showcases a working example how to use combination of: ignoreError, timeout, loopRange, block, sleep to make a retry solution
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do:
+          - ping goole.com
+        timeout: 500
+        flags:
+          - ignoreError
+
+      -
+        func: shell
+        do:
+          - echo "hello, world"
+          - ping goole.com
+          - echo "hello, world"
+        timeout: 500
+        flags:
+          - ignoreError
+
+      -
+        func: shell
+        desc: |
+          an example of retry
+          it tries to ping 4 times with a timeout of 2 seconds every time
+        loop:
+          - retry1
+          - retry2
+          - retry3
+          - retry4
+        do:
+          - ping goole.com
+        timeout: 500
+        flags:
+          - ignoreError
+
+      -
+        func: block
+        desc: |
+          an example of retry
+          it tries to ping 4 times with a timeout of 2 seconds every time
+          with every attemp it puts a delay of 2 seconds
+        loop:
+          - retry1
+          - retry2
+          - retry3
+          - retry4
+        do:
+          -
+            func: shell
+            do:
+              - ping goole.com
+            timeout: 500
+            flags:
+              - ignoreError
+
+          -
+            func: cmd
+            do:
+              - name: sleep
+                desc: delay 2 seconds in each attemp
+                cmd: 200
+
+      -
+        func: shell
+        desc: |
+          loop with customised range
+        loop: '{{loopRange 100 105 "myretry"}}'
+        do:
+          - ping goole.com
+        timeout: 500
+        flags:
+          - ignoreError
+
+      -
+        func: block
+        desc: |
+          an example of retry
+          it tries to ping 4 times with a timeout of 2 seconds every time
+          with every attemp it puts a delay of 2 seconds
+          it also uses dynamic loopRange instead of prepared list of value
+        loop: '{{loopRange 100 103 "myretry"}}'
+        do:
+          -
+            func: shell
+            do:
+              - ping goole.com
+            timeout: 500
+            flags:
+              - ignoreError
+          -
+            func: cmd
+            do:
+              - name: sleep
+                desc: delay 2 seconds in each attemp
+                cmd: 200

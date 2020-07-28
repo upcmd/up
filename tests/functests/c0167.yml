@@ -1,0 +1,39 @@
+doc_meta: |
+  folder: loop
+  title: loop with var name
+  head: |
+    This showcases you can use a var name to refer to a list to iterate through
+
+    Also, the ref var name could be dynamic
+
+  sections:
+    - title: Demo
+      log: yes
+
+vars:
+  items:
+    - item1
+    - item2
+    - item3
+  loopkey: items
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        desc: demo varname to ref to a loop item from var
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+        loop: items
+
+      -
+        func: cmd
+        desc: demo use dynamic key to ref to a loop item from var
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+        loop: '{{.loopkey}}'
+

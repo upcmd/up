@@ -51,7 +51,7 @@ tasks:
 
   -
     name: task
-
+    task:
       -
         func: shell
         desc: this show an example of the empty value is mapped to None
@@ -66,8 +66,6 @@ tasks:
 
           - name: empty_env_var
             value: '{{ env "EMPTY_VAR" }}'
-
-
         do: |
           echo "{{.someone}}"
           echo "{{.i_am_empty}}"

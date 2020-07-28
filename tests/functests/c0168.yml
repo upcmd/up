@@ -1,0 +1,39 @@
+doc_meta: |
+  folder: loop
+  title: loop with range iterator
+  head: |
+    This showcases how to use the loopRange to generate a range list to be used as iterator for loop
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        desc: |
+          loopRange func will generate a range list named myloop
+          myloop will be registered as local var
+          the loop will use myloop to iterate through
+        dvars:
+          - name: void
+            value: '{{ loopRange 1 5 "myloop"}}'
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+        loop: myloop
+
+
+      -
+        func: cmd
+        desc: |
+          same as above, it will register a range list named my range
+          myrange list's name is then returned from the func call in loopRange, then
+          the name myrange will be used to refer to that var registered already
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+        loop: '{{ loopRange 321 343 "myrange"}}'
