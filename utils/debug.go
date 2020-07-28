@@ -313,12 +313,12 @@ func SubStepStatus(mark string, statusCode int) {
 	if statusCode == 0 {
 		color.Green(" %s ok", mark)
 	} else {
-		color.Red(" %s failed(suppressed if not last step)", mark)
+		color.Red(" %s failed(suppressed if it is not the last step)", mark)
 	}
 }
 
 func LogWarn(mark string, reason string) {
-	color.Red(" WARN: [%s] - [\n%s]", mark, reason)
+	color.Red(" WARN: [%s] - [%s]", mark, reason)
 }
 
 func LogErrorMsg(mark string, reason string) {

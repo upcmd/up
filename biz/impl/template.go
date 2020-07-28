@@ -28,6 +28,21 @@ var (
 	taskFuncs     template.FuncMap
 )
 
+func safeReg(varname string, object interface{}) string {
+	//if this is in dvar processing:
+	//need to one way sync the var to the returning var
+	TaskRuntime().ExecbaseVars.Put(varname, object)
+
+	//remove this as it will cause dirty data due to dvar processing
+	//StepRuntime().ContextVars.Put(varname, object)
+	//instead we do a callback to save it to dvar processing scope
+	if !StepRuntime().DataSyncInDvarExpand(varname, object) {
+		StepRuntime().ContextVars.Put(varname, object)
+	}
+
+	return core.ObjToYaml(object)
+}
+
 func FuncMapInit() {
 	taskFuncs = template.FuncMap{
 		"OS":   func() string { return runtime.GOOS },
@@ -65,21 +80,16 @@ func FuncMapInit() {
 			u.PpmsgvvvvvHigh("ymlToObj", obj)
 			return obj
 		},
-		//reg do not return any value, so do not expect the dvar value will be something other than empty
-		"reg": func(varname string, object interface{}) string {
-			//if this is in dvar processing:
-			//need to one way sync the var to the returning var
-			TaskRuntime().ExecbaseVars.Put(varname, object)
-
-			//remove this as it will cause dirty data due to dvar processing
-			//StepRuntime().ContextVars.Put(varname, object)
-			//instead we do a callback to save it to dvar processing scope
-			if !StepRuntime().DataSyncInDvarExpand(varname, object) {
-				StepRuntime().ContextVars.Put(varname, object)
+		"loopRange": func(start, end int64, regname string) string {
+			var looplist []int64 = []int64{}
+			for i := start; i <= end; i++ {
+				looplist = append(looplist, i)
 			}
-
-			return core.ObjToYaml(object)
+			safeReg(regname, looplist)
+			return regname
 		},
+		//reg do not return any value, so do not expect the dvar value will be something other than empty
+		"reg": safeReg,
 		"deReg": func(varname string) string {
 			TaskRuntime().ExecbaseVars.Delete(varname)
 			return ""

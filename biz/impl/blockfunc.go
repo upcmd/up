@@ -76,6 +76,7 @@ func (flow *Steps) ExecFlow() {
 		execStep := func() {
 			rtContext := StepRuntimeContext{
 				Stepname: step.Name,
+				Timeout:  step.Timeout,
 			}
 			StepStack().Push(&rtContext)
 
@@ -235,6 +236,24 @@ func (step *Step) ExecTest() {
 
 									case []string:
 										for idx, item := range loopObj.([]string) {
+											routeFuncType(&LoopItem{idx, idx + 1, item})
+											if rawUtil != "" {
+												untilEval := Render(rawUtil, stepExecVars)
+												toBreak, err := strconv.ParseBool(untilEval)
+												u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
+												if toBreak {
+													u.Pvvvv("loop util conditional break")
+													break
+												} else {
+													chainAction(&action)
+												}
+											} else {
+												chainAction(&action)
+											}
+										}
+
+									case []int64:
+										for idx, item := range loopObj.([]int64) {
 											routeFuncType(&LoopItem{idx, idx + 1, item})
 											if rawUtil != "" {
 												untilEval := Render(rawUtil, stepExecVars)

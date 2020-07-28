@@ -43,6 +43,7 @@ type UpConfig struct {
 	//default: /bin/sh, or the path given: /usr/local/bin/bash, or simply: GOSH
 	ShellType           string
 	MaxCallLayers       string
+	Timeout             string
 	MaxModuelCallLayers string
 	//TODO: get rid of pointer as it will result in nil pointer loading issue
 	Secure     *SecureSetting
