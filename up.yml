@@ -46,8 +46,32 @@ vars:
       Vesion: {{.releaseVersion}}
       SHA: {{.releaseSHA}}
       Source: https://github.com/upcmd/up/tree/{{.releaseSHA}}
+      ReleaseDate: {{now|date "20060102"}}
       Changes: |
     {{.releaseNote | indent 4}}
+
+  rolling_version_template: |
+
+    version_info:
+      Type: bleeding-edge-rolling
+      Tag: master
+      Vesion: rolling-{{now|date "20060102"}}
+      SHA: {{.releaseSHA}}
+      Source: https://github.com/upcmd/up/tree/{{.releaseSHA}}
+      ReleaseDate: {{now|date "20060102"}}
+      Note: regular rolling release
+
+
+  latest_version_template: |
+
+    version_info:
+      Type: bleeding-edge-latest
+      Tag: master
+      Vesion: latest
+      SHA: {{.releaseSHA}}
+      Source: https://github.com/upcmd/up/tree/{{.releaseSHA}}
+      ReleaseDate: {{now|date "20060102"}}
+      Note: regular rolling release - latest
 
 tasks:
   -
@@ -87,6 +111,226 @@ tasks:
     name: Publish_latest
     desc: build the latest bleeding-edge release
     task:
+      -
+        func: shell
+        do: git rev-parse --verify HEAD
+
+      -
+        func: cmd
+        dvars:
+          - name: releaseSHA
+            value: '{{ .last_result.Output }}'
+            flags: [taskScope]
+        do:
+          - name: print
+            cmd: |
+              SHA: {{.releaseSHA}}
+
+      - func: cmd
+        desc: |
+          get the release version info
+        dvars:
+          - name: TRACEABLE_VERSION_MARKER
+            value: '{{.latest_version_template}}'
+            expand: 2
+            flags:
+              - v
+          - name: version_gofile_content
+            value: '{{.version_gofile_template}}'
+            expand: 2
+            flags:
+              - v
+
+        do:
+          - name: print
+            cmdx: |
+              version: {{.ver}}
+              SHA: {{.releaseSHA}}
+          - name: print
+            cmdx: |
+              {{.TRACEABLE_VERSION_MARKER}}
+          - name: print
+            desc: go version file
+            cmd: |
+              {{.version_gofile_content}}
+          - name: writeFile
+            desc: prepare the release info to be built into binary
+            cmd:
+              content: "{{.version_gofile_content}}"
+              filename: version.go
+              dir: ./app/up
+
+          - namex: inspect
+            cmd:
+              - exec_vars
+
+          - namex: pause
+            desc: double check release note
+
+          - namex: exit
+
+      -
+        func: call
+        desc: build only the common distros
+        vars:
+          ver: latest
+        dvars:
+          - name: distlist
+            value: |
+              {{ range $idx, $dist := .dists_for_latest -}}
+              {{- with $dist }}
+              - {{ .os}}/{{.arch -}}
+              {{end}}
+              {{end}}
+            flags:
+              - toObj
+              - keepName
+              - v
+        do: buildDistro
+
+      - func: shell
+        desc: enquire the latest release
+        do:
+          - curl -s https://api.github.com/repos/upcmd/up/releases/tags/latest
+        reg: result
+
+      - func: shell
+        desc: delete the latest release remotely if it exists
+        dvars:
+          - name: release
+            value: '{{.result.Output}}'
+            flags:
+              - toObj
+          - name: releaseid
+            value: '{{.release_object.id}}'
+            flags:
+              - taskScope
+              - v
+        if: '{{ne (printf "%s" .releaseid)  "None" }}'
+        do:
+          - echo "deleting release - {{.releaseid}}"
+          - echo """curl -sX DELETE {{.release_api_ep}}/{{.releaseid}}"""
+          - |
+            curl -s \
+            -X DELETE \
+            -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
+            {{.release_api_ep}}/{{.releaseid}}
+        else:
+          - func: cmd
+            do:
+              - name: print
+                cmd: "no latest release in remote, ignore"
+
+      - func: shell
+        desc: |
+          delete the remote tag latest
+          create latest release tag
+        do:
+          - git push --delete origin latest
+          - git tag -d latest
+          - git tag latest
+          - git push origin refs/tags/latest
+        flags:
+          - ignoreError
+
+      - func: shell
+        desc: create the latest master release
+        do: |
+          curl -s -d '
+          {
+            "tag_name": "latest",
+            "target_commitish": "master",
+            "name": "latest",
+            "body": "latest bleeding-edge release from master: full regression tested and stable",
+            "draft": false,
+            "prerelease": false
+          }
+          ' \
+          -X POST \
+          -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
+          -H "Content-Type: application/json" \
+          {{.release_api_ep}}
+        reg: result
+
+      - func: block
+        loop: dists_for_latest
+        desc: upload binary files
+        dvars:
+          - name: release
+            value: '{{.result.Output}}'
+            flags:
+              - toObj
+          - name: releaseid
+            value: '{{.release_object.id}}'
+            flags:
+              - v
+        do:
+          - func: shell
+            desc: upload the most used distros only
+            dvars:
+              - name: os
+                value: '{{.loopitem.os}}'
+              - name: arch
+                value: '{{.loopitem.arch}}'
+            do:
+              - echo "upload for latest release - {{.releaseid}} for {{.os}}-{{.arch}}"
+              - |
+                curl -s \
+                -X POST \
+                --data-binary '@build/up_{{.os}}_{{.arch}}_latest' \
+                -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
+                -H "Content-Type: application/json" \
+                {{.release_upload_ep}}/{{.releaseid}}/assets?name=up_{{.os}}_{{.arch}}_latest
+        if: '{{ne (printf "%s" .releaseid)  "None" }}'
+
+  -
+    name: Publish_rolling
+    desc: build the bleeding-edge rolling release
+    task:
+      -
+        func: shell
+        do: git rev-parse --verify HEAD
+
+      -
+        func: cmd
+        dvars:
+          - name: releaseSHA
+            value: '{{ .last_result.Output }}'
+            flags: [taskScope]
+        do:
+          - name: print
+            cmd: |
+              SHA: {{.releaseSHA}}
+
+      - func: cmd
+        desc: |
+          get the release version info
+        dvars:
+          - name: TRACEABLE_VERSION_MARKER
+            value: '{{.rolling_version_template}}'
+            expand: 2
+            flags:
+              - v
+          - name: version_gofile_content
+            value: '{{.version_gofile_template}}'
+            expand: 2
+            flags:
+              - v
+
+        do:
+          - name: print
+            desc: go version file
+            cmd: |
+              {{.version_gofile_content}}
+          - name: writeFile
+            desc: prepare the release info to be built into binary
+            cmd:
+              content: "{{.version_gofile_content}}"
+              filename: version.go
+              dir: ./app/up
+
+          - name: exit
+
       -
         func: call
         desc: build only the common distros
@@ -292,28 +536,6 @@ tasks:
         func: shell
         desc: list all built results
         do: ls -l build/
-
-  -
-    name: version_info
-    desc: prepare the version_info for release
-    task:
-      -
-        func: shell
-        do: git rev-parse --verify HEAD
-
-      -
-        func: cmd
-        dvars:
-          - name: releaseSHA
-            value: '{{ .last_result.Output }}'
-        #          - name: version_info
-        #            value: '{{.version_template}}'
-
-        do:
-          - name: print
-            cmd: '{{.releaseSHA}}'
-
-
 
   - name: Publish
     desc: publish for github tagged version

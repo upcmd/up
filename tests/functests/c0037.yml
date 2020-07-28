@@ -323,6 +323,11 @@ dvars:
     value: '{{ mul 4 5 3 }}'
     flags: [vvv,]
 
+  - name: sprig_date
+    desc: 20060102 is the format
+    value: '{{now|date "20060102"}}'
+    flags: [v,]
+
 tasks:
   -
     name: task

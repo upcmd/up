@@ -6,4 +6,4 @@ functests-mock
 *_TODO*
 nix-container/
 vendor
-app/up/version.go
+#app/up/version.go
