@@ -143,12 +143,6 @@ tasks:
 
         do:
           - name: print
-            cmdx: |
-              version: {{.ver}}
-              SHA: {{.releaseSHA}}
-          - name: print
-            cmdx: |
-              {{.TRACEABLE_VERSION_MARKER}}
           - name: print
             desc: go version file
             cmd: |
@@ -329,14 +323,14 @@ tasks:
               filename: version.go
               dir: ./app/up
 
-          - name: exit
+          - namex: exit
 
       -
         func: call
         desc: build only the common distros
-        vars:
-          ver: latest
         dvars:
+          - name: ver
+            value: 'rolling-{{now|date "20060102"}}'
           - name: distlist
             value: |
               {{ range $idx, $dist := .dists_for_latest -}}
@@ -350,60 +344,26 @@ tasks:
               - v
         do: buildDistro
 
-      - func: shell
-        desc: enquire the latest release
-        do:
-          - curl -s https://api.github.com/repos/upcmd/up/releases/tags/latest
-        reg: result
-
-      - func: shell
-        desc: delete the latest release remotely if it exists
-        dvars:
-          - name: release
-            value: '{{.result.Output}}'
-            flags:
-              - toObj
-          - name: releaseid
-            value: '{{.release_object.id}}'
-            flags:
-              - taskScope
-              - v
-        if: '{{ne (printf "%s" .releaseid)  "None" }}'
-        do:
-          - echo "deleting release - {{.releaseid}}"
-          - echo """curl -sX DELETE {{.release_api_ep}}/{{.releaseid}}"""
-          - |
-            curl -s \
-            -X DELETE \
-            -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
-            {{.release_api_ep}}/{{.releaseid}}
-        else:
-          - func: cmd
-            do:
-              - name: print
-                cmd: "no latest release in remote, ignore"
 
       - func: shell
         desc: |
           delete the remote tag latest
           create latest release tag
         do:
-          - git push --delete origin latest
-          - git tag -d latest
-          - git tag latest
-          - git push origin refs/tags/latest
+          - 'git tag rolling-{{now|date "20060102"}}'
+          - 'git push origin refs/tags/rolling-{{now|date "20060102"}}'
         flags:
           - ignoreError
 
       - func: shell
-        desc: create the latest master release
+        desc: create the latest rolling release
         do: |
           curl -s -d '
           {
-            "tag_name": "latest",
+            "tag_name": "rolling-{{now|date "20060102"}}",
             "target_commitish": "master",
-            "name": "latest",
-            "body": "latest bleeding-edge release from master: full regression tested and stable",
+            "name": "rolling-{{now|date "20060102"}}",
+            "body": "bleeding-edge rolling release: full regression tested and stable",
             "draft": false,
             "prerelease": false
           }
@@ -439,10 +399,10 @@ tasks:
               - |
                 curl -s \
                 -X POST \
-                --data-binary '@build/up_{{.os}}_{{.arch}}_latest' \
+                --data-binary '@build/up_{{.os}}_{{.arch}}_rolling-{{now|date "20060102"}}' \
                 -u ${GITHUB_USERNAME}:${GITHUB_TOKEN} \
                 -H "Content-Type: application/json" \
-                {{.release_upload_ep}}/{{.releaseid}}/assets?name=up_{{.os}}_{{.arch}}_latest
+                {{.release_upload_ep}}/{{.releaseid}}/assets?name=up_{{.os}}_{{.arch}}_rolling-{{now|date "20060102"}}
         if: '{{ne (printf "%s" .releaseid)  "None" }}'
 
   -
