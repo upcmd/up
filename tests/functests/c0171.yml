@@ -1,0 +1,45 @@
+doc_meta: |
+  folder: shell-func
+  title: finally to ensure clean up/rescue
+  head: |
+    ignoreError will make the workflow to continue
+
+  sections:
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: shell func
+        link: ../../quick-start/c0002/
+      - title: error handling
+        link: ../../test-debug/error_handling/
+
+notes:
+  - pre/post task without using finally element
+
+tasks:
+
+  -
+    name: task
+    task:
+
+      -
+        func: shell
+        desc: |
+          task fails
+        do:
+          - echo "open a file ....."
+          - echo "reading the file" |grep "cause an exception"
+        finally: close_file
+
+  -
+    name: close_file
+    task:
+      -
+        func: shell
+        name: close_file
+        desc: |
+          ensure the opened file is closed
+        do:
+          - echo "close the file ....."

@@ -1,0 +1,58 @@
+#doc_meta: |
+#  folder: shell-func
+#  title: finally to ensure clean up/rescue
+#  head: |
+#    ignoreError will make the workflow to continue
+#
+#  sections:
+#    - title: Demo
+#      log: yes
+#
+#  related:
+#    refs:
+#      - title: shell func
+#        link: ../../quick-start/c0002/
+#      - title: error handling
+#        link: ../../test-debug/error_handling/
+
+notes:
+  - test finally block implementation
+
+tasks:
+
+  -
+    name: task
+    task:
+
+      -
+        func: cmd
+        desc: step 1
+        do:
+          - name: print
+            cmd: step 1
+          - name: panic
+          - name: print
+            cmd: extra step ......... it will never reach here
+        rescue: true
+        finally:
+          -
+            func: shell
+            name: close_file
+            desc: |
+              ensure the opened file is closed
+            do:
+              - echo "close the file ....."
+
+          -
+            func: cmd
+            desc: extra steps
+            do:
+              - name: print
+                cmd: extra step
+
+      -
+        func: cmd
+        desc: step 2
+        do:
+          - name: print
+            cmd: step 2
