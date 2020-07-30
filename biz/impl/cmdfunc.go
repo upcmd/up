@@ -190,6 +190,11 @@ func (f *CmdFuncAction) Exec() {
 				u.Ptrace("Trace:", cmdRendered)
 			})
 
+		case "panic":
+			s := "manual trigger a panic cmd"
+			u.LogWarn("manual panic", s)
+			panic(s)
+
 		case "printObj":
 			u.Dvvvv(cmdItem.Cmd)
 			cmdItem.runCmd("string", func() {

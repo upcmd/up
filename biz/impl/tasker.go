@@ -768,11 +768,17 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 						rtContext.ExecbaseVars = t.RuntimeVarsAndDvarsMerged
 						rtContext.TasknameLayered = taskname
 					} else {
-						rtContext.ExecbaseVars = callerVars
+						rtContext.ExecbaseVars = func() *core.Cache {
+							if *callerVars == nil {
+								return core.NewCache()
+							} else {
+								return callerVars
+							}
+						}()
+
 						rtContext.TasknameLayered = u.Spf("%s/%s", TaskRuntime().TasknameLayered, taskname)
 					}
 				}
-
 				u.Pdebugvvvvvvv(rtContext.ExecbaseVars)
 
 				func() {
@@ -787,7 +793,9 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 					}
 				}()
 
+				u.Pln("pre task .........", TaskRuntime().Taskname)
 				steps.Exec(false)
+				u.Pln("post task .........", TaskRuntime().Taskname)
 
 				returnVars := TaskRuntime().ReturnVars
 

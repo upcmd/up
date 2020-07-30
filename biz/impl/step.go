@@ -41,6 +41,8 @@ type Step struct {
 	RefDir   string
 	VarsFile string
 	Timeout  int //milli seconds, only for shell func
+	Finally  interface{}
+	Rescue   bool
 }
 
 type Steps []Step
@@ -158,6 +160,35 @@ func validation(vars *core.Cache) {
 
 func (step *Step) Exec(fromBlock bool) {
 	var action biz.Do
+
+	defer func() {
+		u.PlnBlue("Step Finally:")
+		u.Ppmsg(StepRuntime().Result)
+		u.Ppmsg(step.Vars)
+		paniced := false
+		//u.Pdebug(step)
+		if step.Vars == nil {
+			step.Vars = *core.NewCache()
+		}
+
+		step.Vars.Put(UP_RUNTIME_SHELL_EXEC_RESULT, StepRuntime().Result)
+		//debugVars()
+		if r := recover(); r != nil {
+			u.Pln("Recovered", r)
+			paniced = true
+		}
+
+		if step.Finally != nil && step.Finally != "" {
+			stepFinally(step.Finally, &step.Vars)
+		}
+
+		if paniced && step.Rescue == false {
+			u.InvalidAndExit("No rescued", "please assess the panic problem and cause, fix it before re-run the task")
+		} else if paniced {
+			u.LogWarn("Rescued, but not advised!", "setting rescue to yes/true to continue is not recommended\nit is advised to locate root cause of the problem, fix it and re-run the task again\nit is the best practice to test the execution in your ci pipeline to eliminate problems rather than dynamically fix using rescue")
+		}
+		step.Vars.Delete(UP_RUNTIME_SHELL_EXEC_RESULT)
+	}()
 
 	var bizErr *ee.Error = ee.New()
 	var stepExecVars *core.Cache
@@ -398,6 +429,40 @@ func doElse(elseCalls interface{}, execVars *core.Cache) {
 
 }
 
+func stepFinally(finally interface{}, execVars *core.Cache) {
+	var taskname string
+	var tasknames []string
+	var flow Steps
+	switch finally.(type) {
+	case string:
+		taskname = finally.(string)
+		tasknames = append(tasknames, taskname)
+
+	case []interface{}:
+		elseStr := u.Spf("%s", finally)
+		if strings.Index(elseStr, "map") != -1 && strings.Index(elseStr, "func:") != -1 {
+			err := ms.Decode(finally, &flow)
+			u.LogErrorAndExit("load steps in finally", err, "steps/flow has configuration problem, please fix it")
+			BlockFlowRun(&flow, execVars)
+		} else {
+			err := ms.Decode(finally, &tasknames)
+			u.LogErrorAndExit("load task names in finally", err, "please ref to a task name only")
+		}
+
+	default:
+		u.LogWarn("finally ..", "Not implemented or void for no action!")
+	}
+
+	if len(tasknames) > 0 {
+		for _, tmptaskname := range tasknames {
+			taskname := Render(tmptaskname, execVars)
+			u.PpmsgvvvvvhintHigh(u.Spf("finally caller vars to task (%s):", taskname), execVars)
+			ExecTask(taskname, execVars)
+		}
+	}
+
+}
+
 func (steps *Steps) InspectSteps(tree treeprint.Tree, level *int) bool {
 	for _, step := range *steps {
 		desc := strings.Split(step.Desc, "\n")[0]
@@ -486,7 +551,9 @@ func (steps *Steps) Exec(fromBlock bool) {
 			if step.Do == nil && step.Dox != nil {
 				u.LogWarn("*", "Step is deactivated!")
 			} else {
+				u.Pln("pre step .........", StepRuntime().Stepname)
 				step.Exec(fromBlock)
+				u.Pln("post step .........", StepRuntime().Stepname)
 			}
 
 			result := StepRuntime().Result

@@ -83,6 +83,10 @@ func PlnInfo(info string) {
 	msg_color_printf("%s\n", info)
 }
 
+func PlnBlue(info string) {
+	blue_color_printf("%s\n", info)
+}
+
 func PlnInfoHighlight(info string) {
 	hilight_color_printf("%s\n", info)
 }
@@ -246,6 +250,7 @@ func Pfvvvvv(format string, a ...interface{}) {
 
 func PStackTrace() {
 	if permitted("vvvvv") {
+		Pln("-----trace for reference-----")
 		debug.PrintStack()
 	}
 }
@@ -338,7 +343,6 @@ func LogErrorAndExit(mark string, err interface{}, hint string) {
 func LogError(mark string, err interface{}) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
-		Pln("-----trace for reference-----")
 		PStackTrace()
 	}
 }
@@ -356,7 +360,6 @@ func LogErrorAndContinue(mark string, err interface{}, hint string) {
 `)
 		}
 
-		Pln("-----trace for reference-----")
 		PStackTrace()
 	}
 }

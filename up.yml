@@ -22,17 +22,7 @@ vars:
      * License, v. 2.0. If a copy of the MPL was not distributed with this
      * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-  version_gofile_origin: |
-    package main
-
-    var version_info = `
-    version_info:
-      Type: bleeding-edge-rolling
-      Tag: master
-      Vesion: latest
-      Source: https://github.com/upcmd/up/commits/master
-      Note: daily build regular rolling release
-    `
+  latest_tagged_version: 0.9.1
 
   version_gofile_template: |
     package main
@@ -50,6 +40,11 @@ vars:
       Changes: |
     {{.releaseNote | indent 4}}
 
+  rolling_version_notes: |
+    bleeding-edge rolling release
+    based on {{.latest_tagged_version}} with updates
+    full regression tested and stable
+
   rolling_version_template: |
 
     version_info:
@@ -59,8 +54,13 @@ vars:
       SHA: {{.releaseSHA}}
       Source: https://github.com/upcmd/up/tree/{{.releaseSHA}}
       ReleaseDate: {{now|date "20060102"}}
-      Note: regular rolling release
+      BaseVersion: {{.latest_tagged_version}}
+      Note: {{.rolling_version_notes}}
 
+  latest_version_notes: |
+    latest bleeding-edge release
+    based on {{.latest_tagged_version}} with updates
+    full regression tested and stable
 
   latest_version_template: |
 
@@ -71,7 +71,8 @@ vars:
       SHA: {{.releaseSHA}}
       Source: https://github.com/upcmd/up/tree/{{.releaseSHA}}
       ReleaseDate: {{now|date "20060102"}}
-      Note: regular rolling release - latest
+      BaseVersion: {{.latest_tagged_version}}
+      Note: {{.latest_version_notes}}
 
 tasks:
   -
@@ -229,13 +230,17 @@ tasks:
 
       - func: shell
         desc: create the latest master release
+        dvars:
+          - name: quick_notes
+            value: '{{.rolling_version_notes}}'
+            expand: 2
         do: |
           curl -s -d '
           {
             "tag_name": "latest",
             "target_commitish": "master",
             "name": "latest",
-            "body": "latest bleeding-edge release from master: full regression tested and stable",
+            "body": "{{.quick_notes}}",
             "draft": false,
             "prerelease": false
           }
@@ -357,13 +362,17 @@ tasks:
 
       - func: shell
         desc: create the latest rolling release
+        dvars:
+          - name: quick_notes
+            value: '{{.rolling_version_notes}}'
+            expand: 2
         do: |
           curl -s -d '
           {
             "tag_name": "rolling-{{now|date "20060102"}}",
             "target_commitish": "master",
             "name": "rolling-{{now|date "20060102"}}",
-            "body": "bleeding-edge rolling release: full regression tested and stable",
+            "body": "{{.quick_notes}}",
             "draft": false,
             "prerelease": false
           }
@@ -604,15 +613,6 @@ tasks:
         do:
           - name: print
             cmd: 'distro list: {{.distList}}'
-
-          - name: writeFile
-            desc: restore original versioning file
-            cmd:
-              content: "{{.version_gofile_origin}}"
-              filename: version.go
-              dir: ./app/up
-
-          - namex: pause
 
       - func: shell
         desc: create the tagged release
@@ -1069,3 +1069,13 @@ tasks:
             if: '{{ not (regexMatch "MPL/2.0" .content) }}'
 
         loop: caselist
+
+
+  -
+    name: how_many_stars
+    desc: get the number of star of the project
+    task:
+      - func: shell
+        do: |
+          curl --silent 'https://api.github.com/repos/upcmd/up' -H 'Accept: application/vnd.github.preview' | grep  stargazers_count
+        reg: result
