@@ -74,6 +74,11 @@ vars:
       BaseVersion: {{.latest_tagged_version}}
       Note: {{.latest_version_notes}}
 
+dvars:
+  - name: rolling_version_notes
+    value: '{{.rolling_version_notes}}'
+    expand: 2
+
 tasks:
   -
     name: deps
@@ -107,6 +112,15 @@ tasks:
           - name: return
             cmd:
               - os
+
+  -
+    name: Publish_untagged
+    desc: publish both rolling and latest releases
+    task:
+      - func: call
+        do:
+          - Publish_rolling
+          - Publish_latest
 
   -
     name: Publish_latest
@@ -232,7 +246,7 @@ tasks:
         desc: create the latest master release
         dvars:
           - name: quick_notes
-            value: '{{.rolling_version_notes}}'
+            value: '{{.latest_version_notes| replace "\n" "\\n"}}'
             expand: 2
         do: |
           curl -s -d '
@@ -352,8 +366,7 @@ tasks:
 
       - func: shell
         desc: |
-          delete the remote tag latest
-          create latest release tag
+          create rolling release tag
         do:
           - 'git tag rolling-{{now|date "20060102"}}'
           - 'git push origin refs/tags/rolling-{{now|date "20060102"}}'
@@ -364,7 +377,7 @@ tasks:
         desc: create the latest rolling release
         dvars:
           - name: quick_notes
-            value: '{{.rolling_version_notes}}'
+            value: '{{.rolling_version_notes| replace "\n" "\\n"}}'
             expand: 2
         do: |
           curl -s -d '
