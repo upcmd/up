@@ -1,0 +1,57 @@
+#doc_meta: |
+#  folder: shell-func
+#  title: finally to ensure clean up/rescue
+#  head: |
+#    ignoreError will make the workflow to continue
+#
+#  sections:
+#    - title: Demo
+#      log: yes
+#
+#  related:
+#    refs:
+#      - title: shell func
+#        link: ../../quick-start/c0002/
+#      - title: error handling
+#        link: ../../test-debug/error_handling/
+
+notes:
+  - add finally support to tasks level
+
+tasks:
+
+  -
+    name: task
+    task:
+
+      -
+        func: shell
+        name: step1
+        desc: step 1
+        do:
+          - echo "opening file"
+          - echo "hello"|grep "world"
+
+      -
+        func: cmd
+        name: step2
+        desc: |
+          in this case, since there is no ignoreError, the exception was captured by task level finaly code block
+          opened file is safely closed
+          to make the flow to continue to reach step2, use ignoreError
+        do:
+          - name: print
+            cmd: step 2
+
+    desc: |
+      without rescue, the execution will return a non-zero  return code in shell and also report the error
+      with rescue, the program will return 0
+    rescue: true
+    finally:
+      -
+        func: shell
+        name: close_file
+        desc: |
+          ensure the opened file is closed
+        do:
+          - echo "close the file ....."

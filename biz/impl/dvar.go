@@ -48,15 +48,15 @@ func (dvars *Dvars) ValidateAndLoading(contextVars *core.Cache) {
 
 		if strings.Contains(dvar.Name, "-") {
 			identified = true
-			u.InvalidAndExit("validating dvar name", "dvar name can not contain '-', please use '_' instead")
+			u.InvalidAndPanic("validating dvar name", "dvar name can not contain '-', please use '_' instead")
 		}
 		if u.CharIsNum(dvar.Name[0:1]) != -1 {
 			identified = true
-			u.InvalidAndExit("validating dvar name", "dvar name can not start with number")
+			u.InvalidAndPanic("validating dvar name", "dvar name can not start with number")
 		}
 
 		if dvar.Ref != "" && dvar.Value != "" {
-			u.InvalidAndExit("validating dvar ref and value", "ref and value can not both exist at the same time")
+			u.InvalidAndPanic("validating dvar ref and value", "ref and value can not both exist at the same time")
 		}
 
 		refdir := ConfigRuntime().RefDir
@@ -70,13 +70,13 @@ func (dvars *Dvars) ValidateAndLoading(contextVars *core.Cache) {
 			ref := Render(rawref, contextVars)
 
 			data, err := ioutil.ReadFile(path.Join(refdir, ref))
-			u.LogErrorAndExit("load dvar value from ref file", err, "please fix file loading problem")
+			u.LogErrorAndPanic("load dvar value from ref file", err, "please fix file loading problem")
 			(*dvars)[idx].Value = string(data)
 		}
 	}
 
 	if identified {
-		u.InvalidAndExit("dvar validate", "the dvar name identified above should be fixed before continue")
+		u.InvalidAndPanic("dvar validate", "the dvar name identified above should be fixed before continue")
 	}
 
 }
@@ -127,7 +127,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 		var rval string
 
 		if dvar.DataKey != "" && dvar.DataPath != "" && dvar.DataTemplate != "" {
-			u.InvalidAndExit("validating datasource", "datakey, datapath and datatemplate can not coexist at the same time")
+			u.InvalidAndPanic("validating datasource", "datakey, datapath and datatemplate can not coexist at the same time")
 		}
 
 		//the rendering using the datakey is the post rendering process
@@ -187,7 +187,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 					rawyml := dvar.Rendered
 
 					err := yaml.Unmarshal([]byte(rawyml), objConverted)
-					u.LogErrorAndExit("dvar conversion to object:", err, u.ContentWithLineNumber(rawyml))
+					u.LogErrorAndPanic("dvar conversion to object:", err, u.ContentWithLineNumber(rawyml))
 
 					dvarObjName = func() (dvarname string) {
 						if u.Contains(dvar.Flags, "keepName") {

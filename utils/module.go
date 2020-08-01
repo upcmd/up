@@ -59,10 +59,10 @@ func LoadModuleLockRevs() *ModuleLockMap {
 	lockfile := "./modlock.yml"
 	if _, err := os.Stat(lockfile); !os.IsNotExist(err) {
 		yml, err := ioutil.ReadFile(lockfile)
-		LogErrorAndExit("load locked file", err, "read file problem, please fix it")
+		LogErrorAndPanic("load locked file", err, "read file problem, please fix it")
 		revs := ModuleLockMap{}
 		err = yaml.Unmarshal(yml, &revs)
-		LogErrorAndExit("load locked revs", err, "the lock file has got configuration problem, please fix it")
+		LogErrorAndPanic("load locked revs", err, "the lock file has got configuration problem, please fix it")
 		return &revs
 	} else {
 		return nil
@@ -210,19 +210,19 @@ func (m *Module) PullRepo(revMap *ModuleLockMap, uselock bool) {
 			URL:      m.Repo,
 			Progress: os.Stdout,
 		})
-		LogErrorAndExit("Clone Module", err, "Clone errored, please fix the issue first and retry")
+		LogErrorAndPanic("Clone Module", err, "Clone errored, please fix the issue first and retry")
 	}
 
 	if _, err := os.Stat(clonePath); !os.IsNotExist(err) {
 		if m.PullPolicy == "always" {
 			Pf("removing %s ...", clonePath)
 			err := os.RemoveAll(clonePath)
-			LogErrorAndExit("Remove directory", err, Spf("removing [%s] failed", clonePath))
+			LogErrorAndPanic("Remove directory", err, Spf("removing [%s] failed", clonePath))
 			clone()
 		} else if m.PullPolicy == "skip" {
 			LogWarn("module repo exist: skipped", Spf("repo: [%s]", clonePath))
 		} else if m.PullPolicy == "manual" {
-			InvalidAndExit(Spf("repo: [%s] already exist", clonePath),
+			InvalidAndPanic(Spf("repo: [%s] already exist", clonePath),
 				`manual resolution need:
 1. You can git pull to update the module
 2. If you work on the module, then you will need to commit and push your code accordingly, or
@@ -251,7 +251,7 @@ You may want to re-pull the repo again to ensure it is up to date to avoid missi
 
 func GetHeadRev(repodir string) string {
 	r, err := git.PlainOpen(repodir)
-	LogErrorAndExit("Open repo", err, Spf("please check repo:[%s]", repodir))
+	LogErrorAndPanic("Open repo", err, Spf("please check repo:[%s]", repodir))
 	h, err := r.ResolveRevision(plumbing.Revision("HEAD"))
 	return (h.String())
 }
@@ -273,7 +273,7 @@ func (m *Module) ShowDetails() {
 
 func (m *Module) Normalize() {
 	if m.Dir != "" && m.Alias == "" {
-		InvalidAndExit("module validation", Spf("You need to use a alias to name the module: dir [%s]", m.Dir))
+		InvalidAndPanic("module validation", Spf("You need to use a alias to name the module: dir [%s]", m.Dir))
 	}
 
 	if m.Iid == "" {
@@ -291,7 +291,7 @@ func (m *Module) Normalize() {
 
 		if m.Alias == "" {
 			if m.Subdir != "" {
-				InvalidAndExit("module validation", Spf("a alias is needed to avoid confusion i use subdir [%s]", m.Subdir))
+				InvalidAndPanic("module validation", Spf("a alias is needed to avoid confusion i use subdir [%s]", m.Subdir))
 			} else {
 				m.Alias = GetGitRepoName(m.Repo)
 			}

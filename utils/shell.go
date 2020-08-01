@@ -98,7 +98,7 @@ func RunSimpleCmd(dir string, command string) error {
 	if dir != "" {
 		if _, err := os.Stat(dir); !os.IsNotExist(err) {
 		} else {
-			LogErrorAndExit("check dir existence", err, "exec path does not exist")
+			LogErrorAndPanic("check dir existence", err, "exec path does not exist")
 		}
 	}
 

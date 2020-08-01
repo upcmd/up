@@ -330,14 +330,20 @@ func LogErrorMsg(mark string, reason string) {
 	color.Red(" Error must fix: [%s] - [%s]", mark, reason)
 }
 
-func LogErrorAndExit(mark string, err interface{}, hint string) {
+func LogErrorAndPanic(mark string, err interface{}, hint string) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
 		hiColor := color.New(color.FgHiCyan, color.BgRed)
 		hiColor.Printf("ERROR: \n%s\n", hint)
 		PStackTrace()
-		os.Exit(-1)
+		panic(err.(error).Error())
 	}
+}
+
+func PanicExit(mark string, err interface{}) {
+	color.Red("%s -> %s", mark, err)
+	PStackTrace()
+	os.Exit(-1)
 }
 
 func LogError(mark string, err interface{}) {
@@ -364,10 +370,10 @@ func LogErrorAndContinue(mark string, err interface{}, hint string) {
 	}
 }
 
-func InvalidAndExit(mark string, hint string) {
+func InvalidAndPanic(mark string, hint string) {
 	hiColor := color.New(color.FgHiCyan, color.BgRed)
-	hiColor.Printf("  ERROR: %s [%s]\n", mark, hint)
-	os.Exit(-3)
+	e := hiColor.Sprintf("  ERROR: %s [%s]\n", mark, hint)
+	panic(e)
 }
 
 func GraceExit(mark string, hint string) {

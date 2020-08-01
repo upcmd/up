@@ -128,7 +128,7 @@ func FuncMapInit() {
 		},
 		"validateMandatoryFailIfNone": func(varname, varvalue string) string {
 			if varvalue == "" {
-				u.InvalidAndExit("validateMandatoryFailIfNone", u.Spf("Required var:(%s) must not be empty, please fix it", varname))
+				u.InvalidAndPanic("validateMandatoryFailIfNone", u.Spf("Required var:(%s) must not be empty, please fix it", varname))
 			}
 			return varvalue
 		},
@@ -156,7 +156,7 @@ func Render(tstr string, obj interface{}) string {
 	tname := "."
 	t, err := template.New(tname).Funcs(templateFuncs).Parse(tstr)
 
-	u.LogErrorAndExit("template creating", err, u.ContentWithLineNumber(tstr))
+	u.LogErrorAndPanic("template creating", err, u.ContentWithLineNumber(tstr))
 
 	var result bytes.Buffer
 	err = t.Execute(&result, obj)

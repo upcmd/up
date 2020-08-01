@@ -123,7 +123,7 @@ func (t *Tasker) loadInstancesContext() {
 
 		if s.Ref != "" && s.Vars != nil {
 			u.Dvvvvv(s)
-			u.InvalidAndExit("verify scope ref and member coexistence", "ref and members can not both exist")
+			u.InvalidAndPanic("verify scope ref and member coexistence", "ref and members can not both exist")
 		}
 		refdir := ConfigRuntime().RefDir
 		if s.Ref != "" {
@@ -147,7 +147,7 @@ func (t *Tasker) loadInstancesContext() {
 	for idx, s := range *ss {
 		if s.Name == "global" {
 			if s.Members != nil {
-				u.InvalidAndExit("scope expand", "global scope should not contains members")
+				u.InvalidAndPanic("scope expand", "global scope should not contains members")
 			}
 			globalScope = &(*ss)[idx]
 		}
@@ -165,7 +165,7 @@ func (t *Tasker) loadInstancesContext() {
 		if s.Members != nil {
 			for _, m := range s.Members {
 				if u.Contains(t.GroupMembersList, m) {
-					u.InvalidAndExit("scope expand", u.Spfv("duplicated member: %s\n", m))
+					u.InvalidAndPanic("scope expand", u.Spfv("duplicated member: %s\n", m))
 				}
 				t.GroupMembersList = append(t.GroupMembersList, m)
 				t.MemberGroupMap[m] = s.Name
@@ -214,7 +214,7 @@ func (t *Tasker) loadExecProfileEnvVars() {
 	if p := t.getExecProfile(t.ExecProfilename); p != nil {
 
 		if p.Ref != "" && p.Evars != nil {
-			u.InvalidAndExit("exec proile validation", "You can only setup either ref file to load the env vars or use evars tag to config env vars, but not both")
+			u.InvalidAndPanic("exec proile validation", "You can only setup either ref file to load the env vars or use evars tag to config env vars, but not both")
 		}
 
 		refdir := ConfigRuntime().RefDir
@@ -374,7 +374,7 @@ func (t *Tasker) ListAllTasks() {
 
 func (t *Tasker) LockModules() {
 	if !t.ValidateAllModules() {
-		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
+		u.InvalidAndPanic("modules configuration is not valid", "please fix the problem and try again")
 	}
 	u.Pln("-lock repos:")
 
@@ -403,7 +403,7 @@ func (t *Tasker) LockModules() {
 func (t *Tasker) CleanModules() {
 
 	if !t.ValidateAllModules() {
-		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
+		u.InvalidAndPanic("modules configuration is not valid", "please fix the problem and try again")
 	}
 	u.Pln("-clean repos:")
 	//u.Pdebug(u.MainConfig.AbsWorkDir, u.GetDefaultModuleDir())
@@ -412,7 +412,7 @@ func (t *Tasker) CleanModules() {
 
 func (t *Tasker) PullModules() {
 	if !t.ValidateAllModules() {
-		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
+		u.InvalidAndPanic("modules configuration is not valid", "please fix the problem and try again")
 	}
 
 	u.Pln("-pull repos:")
@@ -508,7 +508,7 @@ func (tasker *Tasker) ListTask(taskname string) {
 			u.Pf("%s: %s", color.BlueString("%s", task.Name), desc)
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
-			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
+			u.LogErrorAndPanic("decode steps:", err, "please fix data type in yaml config")
 			steps.InspectSteps(tree, &level)
 		}
 	}
@@ -528,7 +528,7 @@ func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level 
 			br := branch.AddMetaBranch(color.BlueString("%s", task.Name), desc)
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
-			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
+			u.LogErrorAndPanic("decode steps:", err, "please fix data type in yaml config")
 
 			for _, step := range steps {
 				desc := strings.Split(step.Desc, "\n")[0]
@@ -582,7 +582,7 @@ func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level 
 						//detailed steps
 						var steps Steps
 						err := ms.Decode(step.Do, &steps)
-						u.LogErrorAndExit("load steps", err, "configuration problem, please fix it")
+						u.LogErrorAndPanic("load steps", err, "configuration problem, please fix it")
 						steps.InspectSteps(branch, level)
 
 					default:
@@ -610,7 +610,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 	func() {
 		subnames := strings.Split(fulltaskname, ".")
 		if len(subnames) > 2 {
-			u.InvalidAndExit("task name validation", "task naming pattern: modulename.taskname")
+			u.InvalidAndPanic("task name validation", "task naming pattern: modulename.taskname")
 		}
 
 		if len(subnames) == 1 {
@@ -626,13 +626,13 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 		TaskerRuntime().Tasker.ExecTask(taskname, callerVars, false)
 	} else {
 		if modname == GetBaseModuleName() {
-			u.InvalidAndExit("module name should not be the same as the main caller", "please check your task configuration")
+			u.InvalidAndPanic("module name should not be the same as the main caller", "please check your task configuration")
 		} else {
 
 			cwd, err := os.Getwd()
 
 			if err != nil {
-				u.LogErrorAndExit("cwd", err, "working directory error")
+				u.LogErrorAndPanic("cwd", err, "working directory error")
 			}
 
 			mods := TaskerRuntime().Tasker.Config.Modules
@@ -678,10 +678,10 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 								UpRunTimeVars.Put(UP_RUNTIME_TASKER_LAYER_NUMBER, taskerLayer)
 								u.Pvvvv("Executing tasker layer:", taskerLayer)
 								maxLayers, err := strconv.Atoi(u.MainConfig.MaxModuelCallLayers)
-								u.LogErrorAndExit("evaluate max tasker module call layer", err, "please setup max MaxModuelCallLayers properly for your case")
+								u.LogErrorAndPanic("evaluate max tasker module call layer", err, "please setup max MaxModuelCallLayers properly for your case")
 
 								if maxLayers != 0 && taskerLayer > maxLayers {
-									u.InvalidAndExit("Module call layer check:", u.Spf("Too many layers of recursive module executions, max allowed(%d), please fix your recursive call", maxLayers))
+									u.InvalidAndPanic("Module call layer check:", u.Spf("Too many layers of recursive module executions, max allowed(%d), please fix your recursive call", maxLayers))
 								}
 							}()
 
@@ -690,7 +690,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 							os.Chdir(cwd)
 						} else {
 							//TODO: put the reasoning into the doco: not to auto update to avoid evil code injection problem
-							u.InvalidAndExit(u.Spf("module dir: [%s] does not exist under: [%s]\n", mod.Dir, cwd), "double check if you have change your module configuration, then you will probably need to update module again")
+							u.InvalidAndPanic(u.Spf("module dir: [%s] does not exist under: [%s]\n", mod.Dir, cwd), "double check if you have change your module configuration, then you will probably need to update module again")
 						}
 					}()
 				} else {
@@ -700,7 +700,7 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 
 			} else {
 				callerName := TaskerRuntime().Tasker.Config.ModuleName
-				u.InvalidAndExit(u.Spf("caller Module [%s] is not configured,", callerName), u.Spf("module: [%s], task: [%s]", modname, taskname))
+				u.InvalidAndPanic(u.Spf("caller Module [%s] is not configured,", callerName), u.Spf("module: [%s], task: [%s]", modname, taskname))
 			}
 		}
 
@@ -712,11 +712,35 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 	found := false
 	for idx, task := range *t.Tasks {
 		if taskname == task.Name {
+
+			defer func() {
+				if task.Finally != nil && task.Finally != "" {
+					u.PlnBlue("task Finally:")
+				}
+				paniced := false
+				var panicInfo interface{}
+				if r := recover(); r != nil {
+					u.Pvvvvv(u.Spf("Recovered from: %s", r))
+					paniced = true
+					panicInfo = r
+				}
+
+				if task.Finally != nil && task.Finally != "" {
+					execFinally(task.Finally, core.NewCache())
+				}
+
+				if paniced && task.Rescue == false {
+					u.LogWarn("No rescued in task level", "please assess the panic problem and cause, fix it before re-run the task")
+					u.PanicExit("task finally", panicInfo)
+				} else if paniced {
+					u.LogWarn("Rescued in task level, but not advised!", "setting rescue to yes/true to continue is not recommended\nit is advised to locate root cause of the problem, fix it and re-run the task again\nit is the best practice to test the execution in your ci pipeline to eliminate problems rather than dynamically fix using rescue")
+				}
+
+			}()
+
 			u.Pfvvvv("  located task-> %d [%s]: \n", idx+1, task.Name)
 
 			var ctxCallerTaskname string
-
-			//u.Ptmpdebug("RRR", TaskerStack.GetLen())
 
 			if isExternalCall {
 				ctxCallerTaskname = "TODO: Main Caller Taskname"
@@ -734,7 +758,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
 
-			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
+			u.LogErrorAndPanic("decode steps:", err, "please fix data type in yaml config")
 			func() {
 				//step name validation
 				invalidNames := []string{}
@@ -745,7 +769,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 				}
 
 				if len(invalidNames) > 0 {
-					u.InvalidAndExit(u.Spf("validating step name fails: %s ", invalidNames), "task name can not contain '-', please use '_' instead, failed names:")
+					u.InvalidAndPanic(u.Spf("validating step name fails: %s ", invalidNames), "task name can not contain '-', please use '_' instead, failed names:")
 				}
 			}()
 
@@ -786,16 +810,14 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 					TaskerRuntime().Tasker.TaskStack.Push(&rtContext)
 					u.Pvvvv("Executing task stack layer:", TaskerRuntime().Tasker.TaskStack.GetLen())
 					maxLayers, err := strconv.Atoi(ConfigRuntime().MaxCallLayers)
-					u.LogErrorAndExit("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
+					u.LogErrorAndPanic("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
 
 					if maxLayers != 0 && TaskerRuntime().Tasker.TaskStack.GetLen() > maxLayers {
-						u.InvalidAndExit("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
+						u.InvalidAndPanic("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
 					}
 				}()
 
-				u.Pln("pre task .........", TaskRuntime().Taskname)
 				steps.Exec(false)
-				u.Pln("post task .........", TaskRuntime().Taskname)
 
 				returnVars := TaskRuntime().ReturnVars
 
@@ -830,7 +852,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 	if !found {
 		u.Pferror("Task %s is not defined!", taskname)
 		t.ListTasks()
-		u.InvalidAndExit("Task call failed", "Task does not exist")
+		u.InvalidAndPanic("Task call failed", "Task does not exist")
 	}
 }
 
@@ -844,7 +866,7 @@ func (t *Tasker) validateAndLoadTaskRef() {
 		}
 
 		if task.Task != nil && task.Ref != "" {
-			u.InvalidAndExit("validate task node and ref", "task and ref can not coexist")
+			u.InvalidAndPanic("validate task node and ref", "task and ref can not coexist")
 		}
 
 		//load ref task
@@ -866,7 +888,7 @@ func (t *Tasker) validateAndLoadTaskRef() {
 	}
 
 	if len(invalidNames) > 0 {
-		u.InvalidAndExit(u.Spf("validating task name fails: %s ", invalidNames), "task name can not contain '-', please use '_' instead, failed names:")
+		u.InvalidAndPanic(u.Spf("validating task name fails: %s ", invalidNames), "task name can not contain '-', please use '_' instead, failed names:")
 	}
 }
 
@@ -880,7 +902,7 @@ func (t *Tasker) loadRefTasks() {
 			var tasks model.Tasks
 			tasksData := tasksYmlRoot.Get("tasks")
 			err := ms.Decode(tasksData, &tasks)
-			u.LogErrorAndExit(u.Spf("decode tasks:%s", tasksYamlName), err, "please fix configuration in tasks yaml file")
+			u.LogErrorAndPanic(u.Spf("decode tasks:%s", tasksYamlName), err, "please fix configuration in tasks yaml file")
 			for _, task := range tasks {
 				*t.Tasks = append(*t.Tasks, task)
 			}
@@ -892,7 +914,7 @@ func (t *Tasker) loadTasks() error {
 	tasksData := t.TaskYmlRoot.Get("tasks")
 	var tasks model.Tasks
 	err := ms.Decode(tasksData, &tasks)
-	u.LogErrorAndExit("decode tasks:main", err, "please fix configuration in tasks yaml file")
+	u.LogErrorAndPanic("decode tasks:main", err, "please fix configuration in tasks yaml file")
 	t.Tasks = &tasks
 	t.loadRefTasks()
 	t.validateAndLoadTaskRef()
@@ -904,7 +926,7 @@ func loadRefFlow(yamlroot *viper.Viper) *Steps {
 	flowData := yamlroot.Get("flow")
 	var flow Steps
 	err := ms.Decode(flowData, &flow)
-	u.LogErrorAndExit("load ref flow", err, "flow of the steps has configuration problem, please fix it")
+	u.LogErrorAndPanic("load ref flow", err, "flow of the steps has configuration problem, please fix it")
 	return &flow
 }
 
@@ -914,7 +936,7 @@ func (t *Tasker) loadScopes() {
 	err := ms.Decode(scopesData, &scopes)
 	t.ScopeProfiles = &scopes
 
-	u.LogErrorAndExit("load full scopes", err, "please assess your scope configuration carefully")
+	u.LogErrorAndPanic("load full scopes", err, "please assess your scope configuration carefully")
 }
 
 func (t *Tasker) loadExecProfiles() {
@@ -923,7 +945,7 @@ func (t *Tasker) loadExecProfiles() {
 	err := ms.Decode(eprofileData, &eprofiles)
 	t.ExecProfiles = &eprofiles
 
-	u.LogErrorAndExit("load exec profiles", err, "please assess your exec profiles configuration carefully")
+	u.LogErrorAndPanic("load exec profiles", err, "please assess your exec profiles configuration carefully")
 }
 
 func (t *Tasker) getExecProfile(pname string) *ExecProfile {
@@ -991,7 +1013,7 @@ func (t *Tasker) loadRuntimeGlobalDvars() {
 	dvarsData := t.TaskYmlRoot.Get("dvars")
 	var dvars Dvars
 	err := ms.Decode(dvarsData, &dvars)
-	u.LogErrorAndExit("loadRuntimeGlobalDvars",
+	u.LogErrorAndPanic("loadRuntimeGlobalDvars",
 		err,
 		"You must fix the data type to be\n string for a dvar value and try again. possible problems:\nthe name can not be single character 'y' or 'n' ",
 	)

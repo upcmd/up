@@ -35,7 +35,7 @@ func (cfg *UpConfig) SetRefdir(refdir string) {
 func (cfg *UpConfig) GetWorkdirOld() (wkdir string) {
 	cwd, err := os.Getwd()
 	if err != nil {
-		LogErrorAndExit("SetAbsWorkdir", err, "working directory error")
+		LogErrorAndPanic("SetAbsWorkdir", err, "working directory error")
 	}
 
 	if cfg.WorkDir == "cwd" {
@@ -51,7 +51,7 @@ func (cfg *UpConfig) GetWorkdirOld() (wkdir string) {
 			}
 		}
 	} else {
-		InvalidAndExit("SetAbsWorkdir", "Work dir setup is not proper")
+		InvalidAndPanic("SetAbsWorkdir", "Work dir setup is not proper")
 	}
 	return
 }
@@ -62,7 +62,7 @@ func (cfg *UpConfig) SetAbsWorkdir() {
 	var wkdir string
 	cwd, err := os.Getwd()
 	if err != nil {
-		LogErrorAndExit("SetAbsWorkdir", err, "working directory error")
+		LogErrorAndPanic("SetAbsWorkdir", err, "working directory error")
 	}
 
 	if cfg.WorkDir == "cwd" {
@@ -79,7 +79,7 @@ func (cfg *UpConfig) SetAbsWorkdir() {
 			}
 		}
 	} else {
-		InvalidAndExit("SetAbsWorkdir", "Work dir setup is not proper")
+		InvalidAndPanic("SetAbsWorkdir", "Work dir setup is not proper")
 	}
 
 	cfg.AbsWorkDir = wkdir
@@ -118,5 +118,3 @@ func (cfg *UpConfig) ShowCoreConfig(mark string) {
 		}
 	}
 }
-
-

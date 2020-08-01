@@ -47,7 +47,7 @@ func (f *CmdFuncAction) Adapt() {
 	switch f.Do.(type) {
 	case []interface{}:
 		err := ms.Decode(f.Do, &cmds)
-		u.LogErrorAndExit("Cmd adapter", err, "please fix cmd command configuration")
+		u.LogErrorAndPanic("Cmd adapter", err, "please fix cmd command configuration")
 
 	default:
 		u.LogWarn("cmd", "Not implemented or void for no action!")
@@ -252,7 +252,7 @@ func (f *CmdFuncAction) Exec() {
 
 				if failed {
 					doFlag("failFast", func() {
-						u.InvalidAndExit("Assert Failed", "failFast and STOPS here!!!")
+						u.InvalidAndPanic("Assert Failed", "failFast and STOPS here!!!")
 					})
 				}
 
@@ -316,7 +316,7 @@ func (f *CmdFuncAction) Exec() {
 				filepath := path.Join(dir, filename)
 
 				content, err := ioutil.ReadFile(filepath)
-				u.LogErrorAndExit("cmd readFile", err, "please fix file path and name issues")
+				u.LogErrorAndPanic("cmd readFile", err, "please fix file path and name issues")
 
 				if localOnly {
 					f.Vars.Put(varname, string(content))
@@ -388,7 +388,7 @@ func (f *CmdFuncAction) Exec() {
 				}
 
 				if dataCnt > 1 {
-					u.InvalidAndExit("data validation", "only one data source is alllowed")
+					u.InvalidAndPanic("data validation", "only one data source is alllowed")
 				}
 
 				if datafile != "" {
@@ -402,9 +402,9 @@ func (f *CmdFuncAction) Exec() {
 					rendered = Render(string(tbuf), data)
 				}
 
-				u.LogErrorAndExit("read template", err, "please fix file path and name issues")
+				u.LogErrorAndPanic("read template", err, "please fix file path and name issues")
 				err = ioutil.WriteFile(dest, []byte(rendered), 0644)
-				u.LogErrorAndExit("write template", err, "please fix file path and name issues")
+				u.LogErrorAndPanic("write template", err, "please fix file path and name issues")
 
 			})
 
@@ -449,13 +449,13 @@ func (f *CmdFuncAction) Exec() {
 				})
 
 				if yqpath == "" || reg == "" {
-					u.InvalidAndExit("query cmd mandatory attribute validation", "path and reg are all mandatory and required")
+					u.InvalidAndPanic("query cmd mandatory attribute validation", "path and reg are all mandatory and required")
 				}
 
 				if ymlkey != "" {
 					tmpymlstr := f.Vars.Get(ymlkey)
 					if tmpymlstr == nil {
-						u.InvalidAndExit("data validation", "ymlkey does not exist, please fix it")
+						u.InvalidAndPanic("data validation", "ymlkey does not exist, please fix it")
 					}
 					ymlstr := tmpymlstr.(string)
 					if ymlOnly {
@@ -523,11 +523,11 @@ func (f *CmdFuncAction) Exec() {
 				})
 
 				if yqpath == "" || ymlfile == "" {
-					u.InvalidAndExit("mandatory attribute validation", "ymlfile and path are mandatory and required")
+					u.InvalidAndPanic("mandatory attribute validation", "ymlfile and path are mandatory and required")
 				}
 
 				if inplace == true && reg != "" {
-					u.InvalidAndExit("ymlDelete criteria validation", "inplace and reg are mutual exclusive")
+					u.InvalidAndPanic("ymlDelete criteria validation", "inplace and reg are mutual exclusive")
 				}
 
 				modified, err := yq.UpDeletePathFromFile(path.Join(refdir, ymlfile), yqpath, inplace, verbose)
@@ -578,11 +578,11 @@ func (f *CmdFuncAction) Exec() {
 				})
 
 				if ymlstr == "" || yqpath == "" || reg == "" {
-					u.InvalidAndExit("mandatory attribute validation", "ymlstr, path and reg are required")
+					u.InvalidAndPanic("mandatory attribute validation", "ymlstr, path and reg are required")
 				}
 
 				if value != "" && nodevalue != "" {
-					u.InvalidAndExit("value validation", "value and nodevalue are mutual exclusive")
+					u.InvalidAndPanic("value validation", "value and nodevalue are mutual exclusive")
 				}
 
 				if value != "" {
@@ -624,7 +624,7 @@ func (f *CmdFuncAction) Exec() {
 				})
 
 				if varname == "" {
-					u.InvalidAndExit("validate varname", "the reg varname must not be empty")
+					u.InvalidAndPanic("validate varname", "the reg varname must not be empty")
 				}
 				if localOnly {
 					f.Vars.Put(varname, varvalue)
@@ -705,7 +705,7 @@ func (f *CmdFuncAction) Exec() {
 
 				srcyml := func() string {
 					if src != "" && fromkey != "" {
-						u.InvalidAndExit("locate yml string", "you can only use either key or src, but not both")
+						u.InvalidAndPanic("locate yml string", "you can only use either key or src, but not both")
 					}
 					if src != "" {
 						return src
@@ -715,7 +715,7 @@ func (f *CmdFuncAction) Exec() {
 						if t != nil {
 							return t.(string)
 						} else {
-							u.InvalidAndExit("locate yml string", "please use a valid addressable varkey to locate a yml document")
+							u.InvalidAndPanic("locate yml string", "please use a valid addressable varkey to locate a yml document")
 							return ""
 						}
 					}
@@ -723,7 +723,7 @@ func (f *CmdFuncAction) Exec() {
 				}()
 				obj := new(interface{})
 				err := yaml.Unmarshal([]byte(srcyml), obj)
-				u.LogErrorAndExit("cmd toObj:", err, "please validate the ymal content")
+				u.LogErrorAndPanic("cmd toObj:", err, "please validate the ymal content")
 
 				if localOnly {
 					(*f.Vars).Put(reg, *obj)

@@ -144,16 +144,16 @@ func validation(vars *core.Cache) {
 
 	for k, _ := range *vars {
 		if k == "" {
-			u.InvalidAndExit("validating var name", "var name can not be empty")
+			u.InvalidAndPanic("validating var name", "var name can not be empty")
 		}
 		if u.CharIsNum(k[0:1]) != -1 {
 			identified = true
-			u.InvalidAndExit("validating var name", u.Spf("var name (%s) can not start with number", k))
+			u.InvalidAndPanic("validating var name", u.Spf("var name (%s) can not start with number", k))
 		}
 	}
 
 	if identified {
-		u.InvalidAndExit("vars validation", "please fix all validation before continue")
+		u.InvalidAndPanic("vars validation", "please fix all validation before continue")
 	}
 
 }
@@ -162,32 +162,37 @@ func (step *Step) Exec(fromBlock bool) {
 	var action biz.Do
 
 	defer func() {
-		u.PlnBlue("Step Finally:")
-		u.Ppmsg(StepRuntime().Result)
-		u.Ppmsg(step.Vars)
+		if step.Finally != nil && step.Finally != "" {
+			u.PlnBlue("Step Finally:")
+			u.Ppmsg(StepRuntime().Result)
+			u.Ppmsg(step.Vars)
+		}
 		paniced := false
-		//u.Pdebug(step)
 		if step.Vars == nil {
 			step.Vars = *core.NewCache()
 		}
 
 		step.Vars.Put(UP_RUNTIME_SHELL_EXEC_RESULT, StepRuntime().Result)
 		//debugVars()
+		var panicInfo interface{}
 		if r := recover(); r != nil {
-			u.Pln("Recovered", r)
+			u.PlnBlue(u.Spf("Recovered from: %s", r))
 			paniced = true
+			panicInfo = r
 		}
 
 		if step.Finally != nil && step.Finally != "" {
-			stepFinally(step.Finally, &step.Vars)
+			execFinally(step.Finally, &step.Vars)
 		}
 
-		if paniced && step.Rescue == false {
-			u.InvalidAndExit("No rescued", "please assess the panic problem and cause, fix it before re-run the task")
-		} else if paniced {
-			u.LogWarn("Rescued, but not advised!", "setting rescue to yes/true to continue is not recommended\nit is advised to locate root cause of the problem, fix it and re-run the task again\nit is the best practice to test the execution in your ci pipeline to eliminate problems rather than dynamically fix using rescue")
-		}
 		step.Vars.Delete(UP_RUNTIME_SHELL_EXEC_RESULT)
+
+		if paniced && step.Rescue == false {
+			u.LogWarn("No rescued in step level", "please assess the panic problem and cause, fix it before re-run the task")
+			panic(panicInfo)
+		} else if paniced {
+			u.LogWarn("Rescued in step level, but not advised!", "setting rescue to yes/true to continue is not recommended\nit is advised to locate root cause of the problem, fix it and re-run the task again\nit is the best practice to test the execution in your ci pipeline to eliminate problems rather than dynamically fix using rescue")
+		}
 	}()
 
 	var bizErr *ee.Error = ee.New()
@@ -237,11 +242,11 @@ func (step *Step) Exec(fromBlock bool) {
 			action = biz.Do(&funcAction)
 
 		case "":
-			u.InvalidAndExit("Step dispatch", "func name is empty and not defined")
+			u.InvalidAndPanic("Step dispatch", "func name is empty and not defined")
 			bizErr.Mark = "func name not implemented"
 
 		default:
-			u.InvalidAndExit("Step dispatch", u.Spf("func name(%s) is not recognised and implemented", step.Func))
+			u.InvalidAndPanic("Step dispatch", u.Spf("func name(%s) is not recognised and implemented", step.Func))
 			bizErr.Mark = "func name not implemented"
 		}
 	}
@@ -271,7 +276,7 @@ func (step *Step) Exec(fromBlock bool) {
 								loopVarName := Render(step.Loop.(string), stepExecVars)
 								loopObj := stepExecVars.Get(loopVarName)
 								if loopObj == nil {
-									u.InvalidAndExit("Evaluating loop var and object", u.Spf("Please use a correct varname:(%s) containing a list of values", loopVarName))
+									u.InvalidAndPanic("Evaluating loop var and object", u.Spf("Please use a correct varname:(%s) containing a list of values", loopVarName))
 								}
 								if reflect.TypeOf(loopObj).Kind() == reflect.Slice {
 									switch loopObj.(type) {
@@ -281,7 +286,7 @@ func (step *Step) Exec(fromBlock bool) {
 											if rawUtil != "" {
 												untilEval := Render(rawUtil, stepExecVars)
 												toBreak, err := strconv.ParseBool(untilEval)
-												u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
+												u.LogErrorAndPanic("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
 												if toBreak {
 													u.Pvvvv("loop util conditional break")
 													break
@@ -299,7 +304,7 @@ func (step *Step) Exec(fromBlock bool) {
 											if rawUtil != "" {
 												untilEval := Render(rawUtil, stepExecVars)
 												toBreak, err := strconv.ParseBool(untilEval)
-												u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
+												u.LogErrorAndPanic("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
 												if toBreak {
 													u.Pvvvv("loop util conditional break")
 													break
@@ -317,7 +322,7 @@ func (step *Step) Exec(fromBlock bool) {
 											if rawUtil != "" {
 												untilEval := Render(rawUtil, stepExecVars)
 												toBreak, err := strconv.ParseBool(untilEval)
-												u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
+												u.LogErrorAndPanic("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
 												if toBreak {
 													u.Pvvvv("loop util conditional break")
 													break
@@ -333,7 +338,7 @@ func (step *Step) Exec(fromBlock bool) {
 										u.LogWarn("loop item evaluation", "Loop item type is not supported yet!")
 									}
 								} else {
-									u.InvalidAndExit("evaluate loop var", "loop var is not a array/list/slice")
+									u.InvalidAndPanic("evaluate loop var", "loop var is not a array/list/slice")
 								}
 							} else if reflect.TypeOf(step.Loop).Kind() == reflect.Slice {
 								//loop itself is a slice
@@ -342,7 +347,7 @@ func (step *Step) Exec(fromBlock bool) {
 									if rawUtil != "" {
 										untilEval := Render(rawUtil, stepExecVars)
 										toBreak, err := strconv.ParseBool(untilEval)
-										u.LogErrorAndExit("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
+										u.LogErrorAndPanic("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
 										if toBreak {
 											u.Pvvvv("loop util conditional break")
 											break
@@ -354,7 +359,7 @@ func (step *Step) Exec(fromBlock bool) {
 									}
 								}
 							} else {
-								u.InvalidAndExit("evaluate loop items", "please either use a list or a template evaluation which could result in a value of a list")
+								u.InvalidAndPanic("evaluate loop items", "please either use a list or a template evaluation which could result in a value of a list")
 							}
 						}()
 
@@ -373,7 +378,7 @@ func (step *Step) Exec(fromBlock bool) {
 			IfEval := Render(step.If, stepExecVars)
 			if IfEval != NONE_VALUE {
 				goahead, err := strconv.ParseBool(IfEval)
-				u.LogErrorAndExit("evaluate condition", err, u.Spf("please fix if condition evaluation: [%s]", IfEval))
+				u.LogErrorAndPanic("evaluate condition", err, u.Spf("please fix if condition evaluation: [%s]", IfEval))
 				if goahead {
 					dryRunOrContinue()
 				} else {
@@ -408,11 +413,11 @@ func doElse(elseCalls interface{}, execVars *core.Cache) {
 		elseStr := u.Spf("%s", elseCalls)
 		if strings.Index(elseStr, "map") != -1 && strings.Index(elseStr, "func:") != -1 {
 			err := ms.Decode(elseCalls, &flow)
-			u.LogErrorAndExit("load steps in else", err, "steps has configuration problem, please fix it")
+			u.LogErrorAndPanic("load steps in else", err, "steps has configuration problem, please fix it")
 			BlockFlowRun(&flow, execVars)
 		} else {
 			err := ms.Decode(elseCalls, &tasknames)
-			u.LogErrorAndExit("call func alias: else", err, "please ref to a task name only")
+			u.LogErrorAndPanic("call func alias: else", err, "please ref to a task name only")
 		}
 
 	default:
@@ -429,7 +434,7 @@ func doElse(elseCalls interface{}, execVars *core.Cache) {
 
 }
 
-func stepFinally(finally interface{}, execVars *core.Cache) {
+func execFinally(finally interface{}, execVars *core.Cache) {
 	var taskname string
 	var tasknames []string
 	var flow Steps
@@ -442,11 +447,11 @@ func stepFinally(finally interface{}, execVars *core.Cache) {
 		elseStr := u.Spf("%s", finally)
 		if strings.Index(elseStr, "map") != -1 && strings.Index(elseStr, "func:") != -1 {
 			err := ms.Decode(finally, &flow)
-			u.LogErrorAndExit("load steps in finally", err, "steps/flow has configuration problem, please fix it")
+			u.LogErrorAndPanic("load steps in finally", err, "steps/flow has configuration problem, please fix it")
 			BlockFlowRun(&flow, execVars)
 		} else {
 			err := ms.Decode(finally, &tasknames)
-			u.LogErrorAndExit("load task names in finally", err, "please ref to a task name only")
+			u.LogErrorAndPanic("load task names in finally", err, "please ref to a task name only")
 		}
 
 	default:
@@ -519,7 +524,7 @@ func (steps *Steps) InspectSteps(tree treeprint.Tree, level *int) bool {
 				//detailed steps
 				var steps Steps
 				err := ms.Decode(step.Do, &steps)
-				u.LogErrorAndExit("load steps", err, "configuration problem, please fix it")
+				u.LogErrorAndPanic("load steps", err, "configuration problem, please fix it")
 				steps.InspectSteps(branch, level)
 
 			default:
@@ -551,9 +556,7 @@ func (steps *Steps) Exec(fromBlock bool) {
 			if step.Do == nil && step.Dox != nil {
 				u.LogWarn("*", "Step is deactivated!")
 			} else {
-				u.Pln("pre step .........", StepRuntime().Stepname)
 				step.Exec(fromBlock)
-				u.Pln("post step .........", StepRuntime().Stepname)
 			}
 
 			result := StepRuntime().Result
@@ -585,7 +588,7 @@ func (steps *Steps) Exec(fromBlock bool) {
 
 				if !u.Contains(step.Flags, "ignoreError") {
 					if result != nil && result.Code != 0 {
-						u.InvalidAndExit("Failed And Not Ignored!", "You may want to continue and ignore the error")
+						u.InvalidAndPanic("Failed And Not Ignored!", "You may want to continue and ignore the error")
 					}
 				} else {
 					if result != nil && result.Code != 0 {

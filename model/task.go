@@ -8,13 +8,13 @@
 package model
 
 type Task struct {
-	Task   interface{} //Steps
-	Desc   string
-	Name   string
-	Ref    string
-	RefDir string
+	Task    interface{} //Steps
+	Desc    string
+	Name    string
+	Ref     string
+	RefDir  string
+	Finally interface{}
+	Rescue  bool
 }
 
 type Tasks []Task
-
-
