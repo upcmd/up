@@ -70,7 +70,7 @@ func main() {
 		if *ngoTaskName != "" {
 			u.Pln("-exec task:", *ngoTaskName)
 			if *instanceName != "" && *execprofile != "" {
-				u.InvalidAndExit("parameter validation", "instanceid (-i) and execprofile (-p) can not coexist, please only use one of them")
+				u.InvalidAndPanic("parameter validation", "instanceid (-i) and execprofile (-p) can not coexist, please only use one of them")
 			}
 			t := impl.NewTasker(*instanceName, *execprofile, initConfig)
 			impl.Pipein()

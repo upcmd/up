@@ -24,6 +24,8 @@ const (
 	UP_RUNTIME_TASK_LAYER_NUMBER    = "up_runtime_task_layer_number"
 	UP_RUNTIME_TASKER_LAYER_NUMBER  = "up_runtime_tasker_layer_number"
 	UP_RUNTIME_TASK_PIPE_IN_CONTENT = "up_runtime_task_pipe_in_content"
+	//accessible only during the deferred finally processing
+	UP_RUNTIME_SHELL_EXEC_RESULT = "up_runtime_shell_exec_result"
 )
 
 type TaskRuntimeContext struct {
@@ -95,11 +97,13 @@ func ConfigRuntime() *utils.UpConfig {
 }
 
 func debugVars() {
+	u.Ppmsg("UpRunTimeVars", UpRunTimeVars)
+
 	if taskRuntime := TaskRuntime(); taskRuntime != nil {
 		u.Ppmsg("ExecbaseVars", taskRuntime.ExecbaseVars)
 	}
+
 	if stepRuntime := StepRuntime(); stepRuntime != nil {
 		u.Ppmsg("ExecContextVars", stepRuntime.ContextVars)
 	}
-
 }

@@ -1,0 +1,66 @@
+#doc_meta: |
+#  folder: shell-func
+#  title: finally to ensure clean up/rescue
+#  head: |
+#    ignoreError will make the workflow to continue
+#
+#  sections:
+#    - title: Demo
+#      log: yes
+#
+#  related:
+#    refs:
+#      - title: shell func
+#        link: ../../quick-start/c0002/
+#      - title: error handling
+#        link: ../../test-debug/error_handling/
+
+notes:
+  - all finally block/task to access the failed exec contextual info and conditionally handle the error
+
+tasks:
+
+  -
+    name: task
+    task:
+
+      -
+        func: shell
+        do:
+          - echo "opening file"
+          - echo "hello"|grep "world"
+        flags:
+          - ignoreError
+        finally:
+          -
+            func: shell
+            desc: |
+              ensure the opened file is closed
+            do:
+              - echo "close the file ....."
+              - |
+                echo """
+                exec command: {{.up_runtime_shell_exec_result.Cmd}}
+                error code: {{.up_runtime_shell_exec_result.Code}}
+                error message: {{.up_runtime_shell_exec_result.ErrMsg}}
+                error output: {{.up_runtime_shell_exec_result.Output}}
+                """
+
+          -
+            func: cmd
+            desc: |
+              see if the exec context result: up_runtime_shell_exec_result is still availabe
+              conditional do something about the error etc
+            do:
+              - name: print
+                cmd: |
+                  error message: {{.up_runtime_shell_exec_result.ErrMsg}}
+            if: '{{ne .up_runtime_shell_exec_result.Code 0}}'
+
+      -
+        func: shell
+        desc: |
+          this step will not be reached if the ignoreError flag is not set
+          try it yourself to remove the ignoreError flag and see difference
+        do:
+          - echo "extra step ..."

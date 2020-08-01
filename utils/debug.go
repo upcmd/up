@@ -83,6 +83,10 @@ func PlnInfo(info string) {
 	msg_color_printf("%s\n", info)
 }
 
+func PlnBlue(info string) {
+	blue_color_printf("%s\n", info)
+}
+
 func PlnInfoHighlight(info string) {
 	hilight_color_printf("%s\n", info)
 }
@@ -246,6 +250,7 @@ func Pfvvvvv(format string, a ...interface{}) {
 
 func PStackTrace() {
 	if permitted("vvvvv") {
+		Pln("-----trace for reference-----")
 		debug.PrintStack()
 	}
 }
@@ -325,20 +330,25 @@ func LogErrorMsg(mark string, reason string) {
 	color.Red(" Error must fix: [%s] - [%s]", mark, reason)
 }
 
-func LogErrorAndExit(mark string, err interface{}, hint string) {
+func LogErrorAndPanic(mark string, err interface{}, hint string) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
 		hiColor := color.New(color.FgHiCyan, color.BgRed)
 		hiColor.Printf("ERROR: \n%s\n", hint)
 		PStackTrace()
-		os.Exit(-1)
+		panic(err.(error).Error())
 	}
+}
+
+func PanicExit(mark string, err interface{}) {
+	color.Red("%s -> %s", mark, err)
+	PStackTrace()
+	os.Exit(-1)
 }
 
 func LogError(mark string, err interface{}) {
 	if err != nil {
 		color.Red("      %s -> %s", mark, err)
-		Pln("-----trace for reference-----")
 		PStackTrace()
 	}
 }
@@ -356,15 +366,14 @@ func LogErrorAndContinue(mark string, err interface{}, hint string) {
 `)
 		}
 
-		Pln("-----trace for reference-----")
 		PStackTrace()
 	}
 }
 
-func InvalidAndExit(mark string, hint string) {
+func InvalidAndPanic(mark string, hint string) {
 	hiColor := color.New(color.FgHiCyan, color.BgRed)
-	hiColor.Printf("  ERROR: %s [%s]\n", mark, hint)
-	os.Exit(-3)
+	e := hiColor.Sprintf("  ERROR: %s [%s]\n", mark, hint)
+	panic(e)
 }
 
 func GraceExit(mark string, hint string) {

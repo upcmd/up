@@ -42,12 +42,12 @@ func DecryptAndRegister(securetag *u.SecureSetting, dvar *Dvar, contextVars *cor
 	s := securetag
 
 	if s == nil {
-		u.InvalidAndExit("check secure setting", "secure setting has to be explicit in dvar secure node, or as a default setting in upconfig.yml")
+		u.InvalidAndPanic("check secure setting", "secure setting has to be explicit in dvar secure node, or as a default setting in upconfig.yml")
 	}
 	var encryptionkey string
 	if s.KeyRef != "" {
 		data, err := ioutil.ReadFile(s.KeyRef)
-		u.LogErrorAndExit("load secure key from ref file", err, "please fix file loading problem")
+		u.LogErrorAndPanic("load secure key from ref file", err, "please fix file loading problem")
 		encryptionkey = string(data)
 	}
 
@@ -63,7 +63,7 @@ func DecryptAndRegister(securetag *u.SecureSetting, dvar *Dvar, contextVars *cor
 		secureName := u.Spf("%s_%s", "secure", dvar.Name)
 		(*mergeTarget).Put(secureName, decrypted)
 	} else {
-		u.InvalidAndExit("dvar decrypt", u.Spf("please double check secure settings for [%s]", dvar.Name))
+		u.InvalidAndPanic("dvar decrypt", u.Spf("please double check secure settings for [%s]", dvar.Name))
 	}
 
 }

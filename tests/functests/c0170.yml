@@ -1,0 +1,67 @@
+notes:
+  - pre/post task without using finally element
+
+tasks:
+  -
+    name: task
+    task:
+      - func: call
+        do:
+          - pre_task
+          - my_task
+          - post_task
+
+  -
+    name: pre_task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: pre-task
+
+  -
+    name: post_task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: post-task
+
+  -
+    name: final_task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: final-task even there is failure/exception
+
+  -
+    name: my_task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: my task step 1
+          - name: print
+            cmd: my task step 2
+
+      -
+        func: shell
+        desc: |
+          task fails
+        do:
+          - echo "step a - hello"
+          - echo "step b - hello" |grep "world"
+          - echo "step c - after the exception"
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: my task step 3
+          - name: print
+            cmd: my task step 4

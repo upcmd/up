@@ -17,7 +17,7 @@ import (
 
 func ObjToYaml(obj interface{}) string {
 	ymlbytes, err := yaml.Marshal(&obj)
-	u.LogErrorAndExit("obj to yaml converstion", err, "yml convesion failed")
+	u.LogErrorAndPanic("obj to yaml converstion", err, "yml convesion failed")
 	yml := string(ymlbytes)
 	//TODO: revist for the extra \n at the end of string
 	cleaned := u.RemoveEmptyLines(yml)
@@ -29,7 +29,7 @@ func ObjToYaml(obj interface{}) string {
 
 func LoadObjectFromFile(filepath string) interface{} {
 	data, err := ioutil.ReadFile(filepath)
-	u.LogErrorAndExit("load object", err, "read file error")
+	u.LogErrorAndPanic("load object", err, "read file error")
 	return YamlToObj(string(data))
 }
 
@@ -85,7 +85,7 @@ func GetSubYmlFromCache(cache *Cache, path string, collect bool, verboseLevel st
 	elist := strings.Split(path, ".")
 	func() {
 		if elist[0] == "" {
-			u.InvalidAndExit("yml path validation", u.Spf("path format is not correct, use format like:\n %s", u.Yq_read_hint))
+			u.InvalidAndPanic("yml path validation", u.Spf("path format is not correct, use format like:\n %s", u.Yq_read_hint))
 		}
 	}()
 	yqpath := strings.Join(elist[1:], ".")

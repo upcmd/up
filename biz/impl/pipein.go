@@ -17,7 +17,7 @@ import (
 func Pipein() {
 	info, err := os.Stdin.Stat()
 	if err != nil {
-		u.LogErrorAndExit("Pipe in error", err, "please double check you CLI pipe in syntax")
+		u.LogErrorAndPanic("Pipe in error", err, "please double check you CLI pipe in syntax")
 	}
 
 	if info.Mode()&os.ModeCharDevice != 0 {
