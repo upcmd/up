@@ -1,19 +1,26 @@
-#doc_meta: |
-#  folder: shell-func
-#  title: finally to ensure clean up/rescue
-#  head: |
-#    ignoreError will make the workflow to continue
-#
-#  sections:
-#    - title: Demo
-#      log: yes
-#
-#  related:
-#    refs:
-#      - title: shell func
-#        link: ../../quick-start/c0002/
-#      - title: error handling
-#        link: ../../test-debug/error_handling/
+doc_meta: |
+  folder: flow-controll
+  title: finally steps block
+  head: |
+    Introduce to use the func block instead of routing it to a task
+
+  sections:
+    - title: Demo
+      log: yes
+
+
+    - title: use the anonymouse func block
+      content: |
+        Compare to the example of c0172, this shows that you can simply use a steps block for the cleanup steps
+
+  related:
+    refs:
+      - title: shell func
+        link: ../../quick-start/c0002/
+      - title: error handling
+        link: ../../test-debug/error_handling/
+      - title: finally and rescue
+        link: ../../flow-controll/c0172/
 
 notes:
   - test finally block implementation

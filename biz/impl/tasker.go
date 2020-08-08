@@ -104,7 +104,7 @@ func NewTasker(instanceId string, eprofiename string, cfg *u.UpConfig) *Tasker {
 	tasker.MergeUptoRuntimeGlobalVars()
 	tasker.MergeRuntimeGlobalDvars()
 	tasker.loadTasks()
-
+	tasker.validateTasks()
 	return tasker
 }
 
@@ -598,7 +598,7 @@ func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level 
 	return true
 }
 
-func (t *Tasker) ValidateTask(taskname string) {
+func (t *Tasker) DryrunTask(taskname string) {
 	SetDryrun()
 	t.ExecTask(taskname, nil, false)
 }
@@ -706,6 +706,24 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 
 	}
 
+}
+
+func (t *Tasker) validateTasks() {
+	for _, x := range *t.Tasks {
+		if x.Name == "" {
+			continue
+		}
+		var cnt int = 0
+		for _, y := range *t.Tasks {
+			if y.Name == x.Name {
+				cnt += 1
+			}
+		}
+
+		if cnt > 1 {
+			u.InvalidAndExit("Duplicated task name", u.Spf("task name:[%s]", x.Name))
+		}
+	}
 }
 
 func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCall bool) {

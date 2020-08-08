@@ -1,22 +1,23 @@
 doc_meta: |
-#  folder: shell-func
-#  title: finally to ensure clean up/rescue
-#  head: |
-#    ignoreError will make the workflow to continue
-#
-#  sections:
-#    - title: Demo
-#      log: yes
-#
-#  related:
-#    refs:
-#      - title: shell func
-#        link: ../../quick-start/c0002/
-#      - title: error handling
-#        link: ../../test-debug/error_handling/
+  folder: flow-controll
+  title: final cleanup without resuce
+  head: |
+    demo the finally cleanup without a rescue in func step
 
-notes:
-  - pre/post task without using finally element
+  sections:
+    - title: Demo
+      log: yes
+
+    - title: what will happen if there is no rescue when panic
+      content: |
+        This demos that the execution will abort if you do not explicitly resuce the panic
+
+  related:
+    refs:
+      - title: shell func
+        link: ../../quick-start/c0002/
+      - title: error handling
+        link: ../../test-debug/error_handling/
 
 tasks:
 

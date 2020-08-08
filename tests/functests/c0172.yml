@@ -1,19 +1,29 @@
 doc_meta: |
-#  folder: shell-func
-#  title: finally to ensure clean up/rescue
-#  head: |
-#    ignoreError will make the workflow to continue
-#
-#  sections:
-#    - title: Demo
-#      log: yes
-#
-#  related:
-#    refs:
-#      - title: shell func
-#        link: ../../quick-start/c0002/
-#      - title: error handling
-#        link: ../../test-debug/error_handling/
+  folder: flow-controll
+  title: guaranteed final step to ensure clean up/rescue
+  head: |
+    Introduce to use finally/rescue in task step for a guranteed cleanup when task step has got panic
+
+  sections:
+    - title: Demo
+      log: yes
+
+
+    - title: what will happen if there is no rescue for the task without rescue
+      content: |
+        This showcases that the finally step invokes the close_file task to ensure the opened file is closed
+
+        The task will fail if there is no rescue to be "true", in this case, user choose to fail the task, or if rescue is set, then the execution will continue to the next func step call
+
+
+  related:
+    refs:
+      - title: shell func
+        link: ../../quick-start/c0002/
+      - title: error handling
+        link: ../../test-debug/error_handling/
+      - title: shell step fails
+        link: ../../flow-controll/f0171/
 
 notes:
   - add feature of finally run code

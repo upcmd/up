@@ -1,12 +1,20 @@
 doc_meta: |
-  folder: shell-func
-  title: finally to ensure clean up/rescue
+  folder: flow-controll
+  title: final cleanup when shell exceution fails
   head: |
-    ignoreError will make the workflow to continue
+    demo the finally element will guarantee the resource cleanup when shell execution fails
 
   sections:
     - title: Demo
       log: yes
+
+    - title: what will happen if there is no ignoreError for the task
+      content: |
+        The shell step failed, the finally step invokes the close_file task to ensure the opened file is closed
+
+        In this way, user has the control to gracefully cleanup all relevant resources used and terminate the process to continue further. The task fails, but it is intended.
+
+        In case user would like to continue, use can still choose to use ignoreError, then it will continue to execute the "step 2"
 
   related:
     refs:
@@ -14,9 +22,6 @@ doc_meta: |
         link: ../../quick-start/c0002/
       - title: error handling
         link: ../../test-debug/error_handling/
-
-notes:
-  - pre/post task without using finally element
 
 tasks:
 
@@ -32,6 +37,13 @@ tasks:
           - echo "open a file ....."
           - echo "reading the file" |grep "cause an exception"
         finally: close_file
+
+      -
+        func: cmd
+        desc: step 2
+        do:
+          - name: print
+            cmd: step 2
 
   -
     name: close_file

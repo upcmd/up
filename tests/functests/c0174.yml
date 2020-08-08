@@ -1,19 +1,27 @@
-#doc_meta: |
-#  folder: shell-func
-#  title: finally to ensure clean up/rescue
-#  head: |
-#    ignoreError will make the workflow to continue
-#
-#  sections:
-#    - title: Demo
-#      log: yes
-#
-#  related:
-#    refs:
-#      - title: shell func
-#        link: ../../quick-start/c0002/
-#      - title: error handling
-#        link: ../../test-debug/error_handling/
+doc_meta: |
+  folder: flow-controll
+  title: conditionally error handling
+  head: |
+    Showcases that you can use internal var up_runtime_shell_exec_result to conditionally do your own customised cleanup or business
+
+  sections:
+    - title: Demo
+      log: yes
+
+    - title: What if I want to handle a specific error
+      content: |
+        Note that in the finally steps, it uses up_runtime_shell_exec_result to obtain the shell exec exit code, error message and regular output.
+
+        In case you need to deal with a specific error, eg, by exit code, or error message, you can use if condition to implement that
+
+  related:
+    refs:
+      - title: shell func
+        link: ../../quick-start/c0002/
+      - title: error handling
+        link: ../../test-debug/error_handling/
+      - title: finally and rescue
+        link: ../../flow-controll/c0172/
 
 notes:
   - all finally block/task to access the failed exec contextual info and conditionally handle the error

@@ -1,19 +1,25 @@
-#doc_meta: |
-#  folder: shell-func
-#  title: finally to ensure clean up/rescue
-#  head: |
-#    ignoreError will make the workflow to continue
-#
-#  sections:
-#    - title: Demo
-#      log: yes
-#
-#  related:
-#    refs:
-#      - title: shell func
-#        link: ../../quick-start/c0002/
-#      - title: error handling
-#        link: ../../test-debug/error_handling/
+doc_meta: |
+  folder: flow-controll
+  title: finally/resuce support in task level
+  head: |
+    Showcases that you can can do finally cleanup and resuce the panic in the task level
+
+  sections:
+    - title: Demo
+      log: yes
+
+    - title: What's the difference betwee the step level and task level finally cleanup and rescue?
+      content: |
+        The only difference would be that in the step level, you would be able to obtain the exec result and then conditionally do something about it
+
+  related:
+    refs:
+      - title: shell func
+        link: ../../quick-start/c0002/
+      - title: error handling
+        link: ../../test-debug/error_handling/
+      - title: finally and rescue
+        link: ../../flow-controll/c0174/
 
 notes:
   - add finally support to tasks level

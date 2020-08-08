@@ -376,6 +376,12 @@ func InvalidAndPanic(mark string, hint string) {
 	panic(e)
 }
 
+func InvalidAndExit(mark string, hint string) {
+	hiColor := color.New(color.FgHiCyan, color.BgRed)
+	hiColor.Printf("  Invalid: %s [%s]\n", mark, hint)
+	os.Exit(-255)
+}
+
 func GraceExit(mark string, hint string) {
 	hiColor := color.New(color.FgHiCyan, color.FgHiWhite)
 	hiColor.Printf("  Exit: %s [%s]\n", mark, hint)
