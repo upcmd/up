@@ -256,10 +256,16 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 				}
 
 				if u.Contains(dvar.Flags, "taskScope") {
-					if !(dvarObjName != "" && dvarNameKept) {
+					if !dvarNameKept {
 						TaskRuntime().TaskVars.Put(dvar.Name, dvar.Rendered)
-					} else {
-						TaskRuntime().TaskVars.Put(dvarObjName, *objConverted)
+					}
+					if dvarObjName != "" {
+						//keepname only applies to toObj case
+						if dvarNameKept {
+							TaskRuntime().TaskVars.Put(dvar.Name, *objConverted)
+						} else {
+							TaskRuntime().TaskVars.Put(dvarObjName, *objConverted)
+						}
 					}
 				}
 			}
@@ -273,9 +279,6 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 	}
 
 	u.Pfvvvvv("[%s] dvar expanded result:\n%s\n", mark, u.Sppmsg(*expandedVars))
-
-	//debugVars()
-
 	if stepRuntime != nil {
 		stepRuntime.DataSyncInDvarExpand = transientSyncVoid
 	}

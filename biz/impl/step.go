@@ -188,7 +188,7 @@ func (step *Step) Exec(fromBlock bool) {
 		step.Vars.Delete(UP_RUNTIME_SHELL_EXEC_RESULT)
 
 		if paniced && step.Rescue == false {
-			u.LogWarn("No rescued in step level", "please assess the panic problem and cause, fix it before re-run the task")
+			u.LogWarn("Not rescued in step level", "please assess the panic problem and cause, fix it before re-run the task")
 			panic(panicInfo)
 		} else if paniced {
 			u.LogWarn("Rescued in step level, but not advised!", "setting rescue to yes/true to continue is not recommended\nit is advised to locate root cause of the problem, fix it and re-run the task again\nit is the best practice to test the execution in your ci pipeline to eliminate problems rather than dynamically fix using rescue")

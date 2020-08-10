@@ -718,12 +718,12 @@ tasks:
           - 'echo "log will be generated at {{.hugo_doc_log_dir}}"'
           - 'rm -rf {{.hugo_doc_log_dir}}'
           - 'mkdir -p {{.hugo_doc_log_dir}}'
-          - cp ./build/linux/up /bin/
+          - zsh -c "cp ./build/**/up_linux* /bin/up"
 
       -
         func: call
         vars:
-          upcmd: ./build/linux/up
+          upcmd: up
         do:
           - log_gen_main
 

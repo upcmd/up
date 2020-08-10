@@ -1,0 +1,34 @@
+notes:
+  - testonly
+  - test that the taskScope object should exist in the next func impl
+
+vars:
+  json: |
+    person:
+      name: tom
+      sex: male
+      age: 18
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        dvars:
+          - name: person_text
+            value: '{{ .json }}'
+            flags:
+              - toObj
+              - taskScope
+              - v
+
+      -
+        func: cmd
+        do:
+          -
+            name: inspect
+            cmd:
+              - exec_vars
+

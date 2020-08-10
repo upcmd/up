@@ -748,7 +748,7 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 				}
 
 				if paniced && task.Rescue == false {
-					u.LogWarn("No rescued in task level", "please assess the panic problem and cause, fix it before re-run the task")
+					u.LogWarn("Not rescued in task level", "please assess the panic problem and cause, fix it before re-run the task")
 					u.PanicExit("task finally", panicInfo)
 				} else if paniced {
 					u.LogWarn("Rescued in task level, but not advised!", "setting rescue to yes/true to continue is not recommended\nit is advised to locate root cause of the problem, fix it and re-run the task again\nit is the best practice to test the execution in your ci pipeline to eliminate problems rather than dynamically fix using rescue")

@@ -1,0 +1,31 @@
+notes:
+  - test the duplicated task name
+
+tasks:
+
+  -
+    name: task
+    task:
+
+      -
+        func: shell
+        do:
+          - echo "hello"
+
+  -
+    desc: |
+      a anonymous/empty named task could be used for a place holder for developement
+      so it is still treated as valid task, since there is no name, it will not be used and invoked as an entry point
+    task:
+      -
+        func: shell
+        do:
+          - echo "i am a no name task"
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo "world"

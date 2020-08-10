@@ -97,13 +97,18 @@ func ConfigRuntime() *utils.UpConfig {
 }
 
 func debugVars() {
+	u.PlnBlue("-debug vars-")
+
 	u.Ppmsg("UpRunTimeVars", UpRunTimeVars)
 
 	if taskRuntime := TaskRuntime(); taskRuntime != nil {
 		u.Ppmsg("ExecbaseVars", taskRuntime.ExecbaseVars)
+		u.Ppmsg("TaskVars", taskRuntime.TaskVars)
 	}
 
 	if stepRuntime := StepRuntime(); stepRuntime != nil {
 		u.Ppmsg("ExecContextVars", stepRuntime.ContextVars)
 	}
+
+	u.PlnBlue("--")
 }
