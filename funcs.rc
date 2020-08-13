@@ -167,8 +167,6 @@ echo "syntax: uptestx c0033"
     goup ngo task -d ./tests/functests -t $1 -i dev -v vv --configdir=./tests/functests
 }
 
-
-
 uptestxvvvv(){
 echo "syntax: uptestx c0033"
     goup ngo task -d ./tests/functests -t $1 -i dev -v vvvv --configdir=./tests/functests
@@ -219,3 +217,51 @@ up_test_stack_trace_linux(){
 goup_test_stack_trace(){
  goup ngo -d ./tests/modtests/0001 -i dev --configdir=./tests/modtests/0001 -w refdir -v vvvvvv
 }
+
+
+run_example(){
+echo """syntax: run_example case_file_name verbose_level
+example:
+  run_example c0033 v
+  run_example c0033 vvv
+"""
+
+  if [ "$1" == "" ];then
+    echo "please input the casename, eg c0033, which could be located at ./tests/functests"
+  else
+
+    if [ "$2" == "" ];then
+      verbose=v
+    else
+      verbose=$2
+    fi
+
+  up ngo task -d ./tests/functests -t $1 --configdir=./tests/functests -v $verbose
+  fi
+}
+
+
+
+run_module_example(){
+
+echo """syntax: run_module_example case_name verbose_level
+example:
+  run_module_example 0003 v
+  run_module_example 0003 vvv
+"""
+
+  if [ "$1" == "" ];then
+    echo "please input the module casename(dir name) located at ./tests/modtests"
+  else
+
+    if [ "$2" == "" ];then
+      verbose=v
+    else
+      verbose=$2
+    fi
+
+    dir=./tests/modtests/$1
+    up ngo -d $dir --configdir=$dir -w refdir -v $verbose
+  fi
+}
+

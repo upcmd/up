@@ -1,0 +1,35 @@
+doc_meta: |
+  folder: vars
+  title: use vars in desc
+  head: |
+    You can use vars in description
+
+  sections:
+    - title: Demo
+      log: yes
+
+vars:
+  person:
+    name: tom
+    sex: male
+    age: 18
+
+tasks:
+
+  -
+    name: task
+    desc: |
+      this is a story about {{.person.name}}
+    task:
+      -
+        func: cmd
+        desc: |
+          {{.person.name}} is {{.person.sex}}
+        vars:
+          school: sydney grammar
+        do:
+          - name: print
+            desc: |
+              his age is {{.person.age}}
+              he is in school: {{.school}}
+            cmd: 'what gender is {{.person.name}}'

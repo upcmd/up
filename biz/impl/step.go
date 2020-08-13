@@ -470,7 +470,8 @@ func execFinally(finally interface{}, execVars *core.Cache) {
 
 func (steps *Steps) InspectSteps(tree treeprint.Tree, level *int) bool {
 	for _, step := range *steps {
-		desc := strings.Split(step.Desc, "\n")[0]
+		descRaw := strings.Split(step.Desc, "\n")[0]
+		desc := Render(descRaw, TaskerRuntime().Tasker.RuntimeVarsAndDvarsMerged)
 		if step.Func == FUNC_CALL {
 			branch := tree.AddMetaBranch(func() string {
 				if step.Loop != "" {
@@ -541,9 +542,9 @@ func (steps *Steps) InspectSteps(tree treeprint.Tree, level *int) bool {
 func (steps *Steps) Exec(fromBlock bool) {
 
 	for idx, step := range *steps {
-
 		taskLayerCnt := TaskerRuntime().Tasker.TaskStack.GetLen()
-		u.LogDesc("step", idx+1, taskLayerCnt, step.Name, step.Desc)
+		desc := Render(step.Desc, TaskRuntime().ExecbaseVars)
+		u.LogDesc("step", idx+1, taskLayerCnt, step.Name, desc)
 		u.Ppmsgvvvvv(step)
 
 		execStep := func() {

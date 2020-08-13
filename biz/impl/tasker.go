@@ -531,7 +531,8 @@ func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level 
 			u.LogErrorAndPanic("decode steps:", err, "please fix data type in yaml config")
 
 			for _, step := range steps {
-				desc := strings.Split(step.Desc, "\n")[0]
+				descRaw := strings.Split(step.Desc, "\n")[0]
+				desc := Render(descRaw, TaskerRuntime().Tasker.RuntimeVarsAndDvarsMerged)
 				if step.Func == FUNC_CALL {
 					var callee string
 					switch t := step.Do.(type) {
@@ -771,7 +772,9 @@ func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCal
 			}
 
 			taskLayerCnt := TaskerRuntime().Tasker.TaskStack.GetLen()
-			u.LogDesc("task", idx+1, taskLayerCnt, u.Spf("%s ==> %s", ctxCallerTaskname, taskname), task.Desc)
+			desc := Render(task.Desc, TaskerRuntime().Tasker.RuntimeVarsAndDvarsMerged)
+
+			u.LogDesc("task", idx+1, taskLayerCnt, u.Spf("%s ==> %s", ctxCallerTaskname, taskname), desc)
 			found = true
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
@@ -936,7 +939,6 @@ func (t *Tasker) loadTasks() error {
 	t.Tasks = &tasks
 	t.loadRefTasks()
 	t.validateAndLoadTaskRef()
-
 	return err
 }
 

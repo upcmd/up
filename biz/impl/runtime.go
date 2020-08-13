@@ -100,6 +100,7 @@ func debugVars() {
 	u.PlnBlue("-debug vars-")
 
 	u.Ppmsg("UpRunTimeVars", UpRunTimeVars)
+	u.Ppmsg("RuntimeVarsAndDvarsMerged", TaskerRuntime().Tasker.RuntimeVarsAndDvarsMerged)
 
 	if taskRuntime := TaskRuntime(); taskRuntime != nil {
 		u.Ppmsg("ExecbaseVars", taskRuntime.ExecbaseVars)
@@ -109,6 +110,5 @@ func debugVars() {
 	if stepRuntime := StepRuntime(); stepRuntime != nil {
 		u.Ppmsg("ExecContextVars", stepRuntime.ContextVars)
 	}
-
 	u.PlnBlue("--")
 }

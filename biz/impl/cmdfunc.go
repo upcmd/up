@@ -109,7 +109,8 @@ func (f *CmdFuncAction) Exec() {
 		}
 
 		taskLayerCnt := TaskerRuntime().Tasker.TaskStack.GetLen()
-		u.LogDesc("substep", idx+1, taskLayerCnt, cmdItem.Name, cmdItem.Desc)
+		desc := Render(cmdItem.Desc, f.Vars)
+		u.LogDesc("substep", idx+1, taskLayerCnt, cmdItem.Name, desc)
 
 		doFlag := func(flag string, doFlagFunc func()) {
 			if cmdItem.Flags != nil && u.Contains(cmdItem.Flags, flag) {
