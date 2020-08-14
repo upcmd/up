@@ -3,19 +3,18 @@
 The Ultimate Provisioner: the modern configuration management, build and automation tool
 
 * Sick of using Makefile, Ansible, Ant, Gradle, Rake and different frameworks ... ?
-* Tired of a patching Shell scripts, gluing different tools together, elegantly?
+* Tired of patching Shell scripts, integrating different tools together, elegantly?
 * Lacking of an overall simple solution of automation, nicely integrated in a Cloud environments?
-* Feeling the pains of your DevOps, Ci/CD best practice? 
+* Feeling the pains of your DevOps, Ci/CD best practice?
+* Need the interoperability to collaborate with popular tools: terraform, packer, vagrant, docker, kubectl, helm .... ? 
 
-Try UPcmd - One For All! Built with Experience, Love and Soul! 
+No worries of replacing anything you already setup, UPcmd does not dictate and work exclusively with other tools, rather it incorporates and collaborates with others, but it is capable to be a framework in case you do need it    
 
-No worries of replacing anything you already setup, UPcmd does not dictate and work exclusively with other tools, rather it incorporates and collaborates with others    
+## How does it look like?
 
-## Unix is sexy, however it is black and dull, how does it look like?
+All the project build, test, regression tests, the documentation site generation, publishing the tagged release and latest rolling release are using Up tasks
 
-All the project build, test, regression tests, the documentation site generation, publish the tagged release and latest rolling release are done using one Up task
-
-This is how the publish latest bleeding edge release look like when you run [UP task](https://github.com/upcmd/up/blob/master/up.yml)
+This is how publishing latest bleeding edge release look like when you run [UP task](https://github.com/upcmd/up/blob/master/up.yml)
 
 ![up ngo Publish_latest](https://raw.githubusercontent.com/upcmd/up-demo/master/demos/publish_latest.gif) 
 
@@ -25,16 +24,16 @@ UP is designed and implemented to shine as a modern tool for below:
 
   * Configuration management
   * Build, continuous delivery, integration with CI/CD
-  * Comprehensive workflow orchestration: full support of almost all type of condition, loop(recursive), break
+  * Comprehensive workflow orchestration: full support of almost all type of condition, loop(recursive), break, until 
   * Flexible configuration organisation
   * No dependency hell issue
   * Precise modeling, data is object, object is the data
   * Design of composition, separate func type, data and implementation
   * Use inteface(call func) for abstraction of intention, data input and implementation
-  * Many builtin dry run, assert, debugging features for the insights, developer friendly
+  * Many builtin features: dry run, assert, pause, user prompt, input validation, debugging/trace/inspect, developer friendly
   * ... many more for you to discover, check out the docs
 
-It is a build tool like Ansible, Make, Rake, Ant, Gradle, Puppet, Taskfile etc, but it is a little smarter to try to make things a little easier.
+It is a build tool like Ansible, Make, Rake, Ant, Gradle, Puppet, Taskfile etc, but it is  little smarter to try to make things a little easier
 
 The goal of UP is to provide a quick (I'd say the quickest) solution to enable continuous integration and continuous deployment (CI/CD). It is simple to use and yet powerful to address many common challenges nowadays devop teams facing in the Cloud environment.
 
@@ -199,85 +198,52 @@ There are 32 different distro for different combination of OS and Arch type, che
 2. Rename it to up, or up.exe in windows
 3. Move it to be under your one of your env PATH 
 
-###### Install from command line
+###### Installation
 
-Below are common one for latest tagged stable release:
+Always try to use the latest unless you have CI/CD pipeline to progressively to promote to production, then use tagged version
 
-* Install for Mac OSX:
-
-```
-curl -s https://api.github.com/repos/upcmd/up/releases \
-    |grep darwin_amd64_v \
-    |grep download \
-    |head -n 1 \
-    |awk '{print $2}' \
-    |xargs -I % curl -L % -o up \
-    && chmod +x up
-```
-
-* Install for Linux:
+* Source this shell function
 
 ```
-curl -s https://api.github.com/repos/upcmd/up/releases \
-    |grep linux_amd64_v \
-    |grep download \
-    |head -n 1 \
-    |awk '{print $2}' \
-    |xargs -I % curl -L % -o up \
-    && chmod +x up
+install_latest(){
+if [ "$1" == "" ];then
+    echo "syntax exaple: install_latest darwin | linux | windows"
+else
+    os=$1
+    curl -s https://api.github.com/repos/upcmd/up/releases \
+        |grep ${os}_amd64_latest \
+        |grep download \
+        |head -n 1 \
+        |awk '{print $2}' \
+        |xargs -I % curl -L % -o up \
+        && chmod +x up
+fi
+}
 ```
 
-* Install for Windows:
+1. install for mac: 
 
 ```
-curl -s https://api.github.com/repos/upcmd/up/releases \
-    |grep windows_amd64_v \
-    |grep download \
-    |head -n 1 \
-    |awk '{print $2}' \
-    |xargs -I % curl -L % -o up \
-    && chmod +x up
+install_latest darwin
 ```
 
-Below are for latest bleeding-edge release from master branch:
-
-* Install for Mac OSX:
+2. install for linux: 
 
 ```
-curl -s https://api.github.com/repos/upcmd/up/releases \
-    |grep darwin_amd64_latest \
-    |grep download \
-    |head -n 1 \
-    |awk '{print $2}' \
-    |xargs -I % curl -L % -o up \
-    && chmod +x up
+install_latest linux
 ```
 
-* Install for Linux:
+1. install for windows: 
 
 ```
-curl -s https://api.github.com/repos/upcmd/up/releases \
-    |grep linux_amd64_latest \
-    |grep download \
-    |head -n 1 \
-    |awk '{print $2}' \
-    |xargs -I % curl -L % -o up \
-    && chmod +x up
+install_latest windows
 ```
 
-* Install for Windows:
-
-```
-curl -s https://api.github.com/repos/upcmd/up/releases \
-    |grep windows_amd64_latest \
-    |grep download \
-    |head -n 1 \
-    |awk '{print $2}' \
-    |xargs -I % curl -L % -o up \
-    && chmod +x up
-```
+* Manual install
 
 Move the downloaded UP command executable to an executable path, eg. /usr/local/bin, so you can use it system wide
+
+* [tagged install details](https://upcmd.netlify.app/usage/installation/)
 
 #### Install from source
 
@@ -418,15 +384,17 @@ Check it out yourself: [source](https://github.com/upcmd/up-demo/blob/master/dem
 
 ###  Why yet another build tool
 
-* Make was initially designed and used for building C program, even though it could be adopted for other purpose, some of the hard to learn trivials often cause problems than the benefits added to the team, and it is burning the brain. It is hard to make automation task extended to a more advanced level, readbility degrades rapidly and it is risky to implement critical logic using Make. Make is just a little old for modern business requirements. (Sorry, maybe this is just from some one not good at using Makefile)
+* Make was initially designed and used for building C program, even though it could be adopted for other purpose, the hard to learn trivial often causes problems than the benefits added to the team, and it is burning the brain. It is hard to make automation task extended to a more advanced level, readability degrades rapidly, and it is risky to implement critical logic using Make. Make is just a little old for modern business requirements. (Sorry, maybe this is just from one not good at using Makefile)
 
-* Rake is smart and powerful. If you don't mind learning a little bit of Ruby, it is a good choice of building tool. Similarly to Ant, Gradle. They are all bind to a language specific, it is just not right when it comes to the case that you want to automate things in cloud environment. In most of cases when it requires automation in a cloud environment, in a given spun up AWS EC2 instance, a shell session, a kubernete pod, you would want some thing just works without any dependencies. You simply do not want to mantain the consistency of chain of upgrding path for all language pkgs in multiple environments. In these cases, Rake, Gradle, Ant are not best options.
+* Rake is smart and powerful. If you don't mind learning Ruby, it is a good choice of building tool. Similarly Ant and Gradle are all bind to a language specific, it is just not right when it comes to the case that you want to automate things in cloud environment. In most cases when it requires automation in a cloud environment, in a given spun up AWS EC2 instance, a shell session, a kubernete pod, you would want something just works without any dependencies. You simply do not want to maintain the consistency of chain of upgrading path for all language packages in multiple environments. In these cases, Rake, Gradle, Ant are not best options. Due to history reasons, devops teams might have adopted them and take the advantages in the early phase. When it comes to gradual improvement and upgrade consistently in long term, the effort and cost to upgrade the whole ecosystem is just too huge and often wrong solution used in order to keep it going, until it is start sinking.      
 
-* Ansible, Puppet are configuration management tools. They are powerful, there are many builtin well tested modules you could use. However Ansible might be too huge for little job and most of the time it tends to over kill, also it suffers the same problem of python/python packages dependencies.
+* Ansible, Puppet and chef are configuration management tools. They are powerful, there are many builtin well tested modules you could use. However, Ansible might be too huge for little job. Most of the time it tends to over kill, also it suffers the same problem of python/python packages dependencies. Using it means bringing the whole hard to maintain forest of software packages, os libraries all into your execution context.  
 
-  A common usage of Ansible for many teams is to use the local ssh execution with group/host vars for templating and workflow automation, which is simply not right. Also the way the vars being managed is not fine grained. The ansible role as a reusable module is not flexible to implement more complicated tasks.
+  A common usage of Ansible for many teams is to use the local ssh execution with group/host vars for templating and workflow automation, which is simply not right. The way the vars managed are not fine-grained. The ansible role as a reusable module is not flexible to implement for more complicated tasks. Specifically, it does not support leaf level merge; it is hard and nearly not possible(elegantly) to do a simple validation of command line input; its controller and role one-way communication is not flexible ...   
 
-* Inspired by https://taskfile.dev/,  it is tiny tool making build and automation easier and elegant, however it lacks some of the features in a practical cloud environment for CI/CD, devops automation, hence this project is born for that purpose
+* Inspired by https://taskfile.dev/,  it is tiny tool making build and automation easier and elegant, however it lacks some features in a practical cloud environment for CI/CD, devops automation
+
+With all above considerations, UP is designed to be a generic, tiny footprint (zero depedency), effective automation tool in a cloud environment. 
 
 ### Features
 
@@ -450,8 +418,9 @@ Allow empty skeleton to be laid for testing driving process or guide as seudo co
       * dry run
       * if condition support
       * loop support to iterate through a list of items
-      * mult-layered loop and break
+      * mult-layered loop, break and until condition
       * block and embedded block of code for execution
+      * finally/rescue to ensure cleanup
 8. Flexible configuration style to load dvar, scope, flow from external yaml so that the programming code will be a little cleaner and organised. Your code could evolve starting from simple, then externalize detailed implementation to files.
 9. Support the unlimited yml object, so yml config in var is text and it is also object.It could be merged in scopes automatically, it could be processed using go template
 10. Battery included for common builtin commands: print, reg, deReg, template, readFile, writeFile
@@ -460,7 +429,7 @@ Allow empty skeleton to be laid for testing driving process or guide as seudo co
     * Compose the sequential execution of block of code
     * Use the stack design, so it segregates all its local vars so that the vars used in its implementation will not pollute the caller's vars
     * It serves like a interface to separates the goal and implementation and makes the code is reusable
-13. The shell execution binary is configurable, builtin support for GOSH (mvdan.cc/sh). This means that you do not need native shell/bash/zsh installed in order for task execution, you can run task from a windows machine.
+13. The shell execution binary is configurable, builtin support for GOSH (mvdan.cc/sh). This means that you do not need native shell/bash/zsh installed in order for task execution, you can run task from windows machine.
 14. It provides a module mechanism to encourage community to share modular code so that you do not need to reinvent the wheel to develop the same function again
 
 ### Real Examples

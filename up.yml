@@ -54,8 +54,7 @@ vars:
       SHA: {{.releaseSHA}}
       Source: https://github.com/upcmd/up/tree/{{.releaseSHA}}
       ReleaseDate: {{now|date "20060102"}}
-      BaseVersion: {{.latest_tagged_version}}
-      Note: {{.rolling_version_notes}}
+      BaseOn: {{.latest_tagged_version}} with updates
 
   latest_version_notes: |
     latest bleeding-edge release
@@ -71,8 +70,7 @@ vars:
       SHA: {{.releaseSHA}}
       Source: https://github.com/upcmd/up/tree/{{.releaseSHA}}
       ReleaseDate: {{now|date "20060102"}}
-      BaseVersion: {{.latest_tagged_version}}
-      Note: {{.latest_version_notes}}
+      BaseOn: {{.latest_tagged_version}} with updates
 
 dvars:
   - name: rolling_version_notes
