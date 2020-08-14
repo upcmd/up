@@ -184,13 +184,11 @@ There could be application as below, but not limit to:
 * Resolve the dependencies issue by simply invoking different version of the relevant CLI/docker run
 * The orchestration of UPcmd task itself could be seen as prototyping tool and design tool, or use the defined workflow as skeleton to guide the implementation from different part        
 
-### Quick install
-
-#### Install the binary
+### Installation
 
 There are 32 different distro for different combination of OS and Arch type, check them out: [release](https://github.com/upcmd/up/releases)
 
-###### Generic Installation
+#### Generic Installation
 
 1. Download the binary for your platform from the 
     * [latest stable tagged release](https://github.com/upcmd/up/releases/latest) or
@@ -198,7 +196,7 @@ There are 32 different distro for different combination of OS and Arch type, che
 2. Rename it to up, or up.exe in windows
 3. Move it to be under your one of your env PATH 
 
-###### Installation
+#### Auto Latest Installation (recommended)
 
 Always try to use the latest unless you have CI/CD pipeline to progressively to promote to production, then use tagged version
 
@@ -239,10 +237,6 @@ install_latest linux
 install_latest windows
 ```
 
-* Manual install
-
-Move the downloaded UP command executable to an executable path, eg. /usr/local/bin, so you can use it system wide
-
 * [tagged install details](https://upcmd.netlify.app/usage/installation/)
 
 #### Install from source
@@ -250,7 +244,7 @@ Move the downloaded UP command executable to an executable path, eg. /usr/local/
 Ensure you use go 1.14 (prefered)
 
 ```
-go install github.com/upcmd/up/app/up
+go get -v github.com/upcmd/up/app/up
 ```
 
 The up CLI command will be installed to: $HOME/go/bin, make sure you have this in your PATH
