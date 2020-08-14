@@ -14,6 +14,7 @@ import (
 	ms "github.com/mitchellh/mapstructure"
 	"github.com/upcmd/up/model/core"
 	u "github.com/upcmd/up/utils"
+	"io"
 	"os"
 	"os/exec"
 	"strconv"
@@ -72,29 +73,24 @@ func runCmd(f *ShellFuncAction, cmd string) {
 			}()
 
 			stdout, err := cmdExec.StdoutPipe()
-
 			if err != nil {
-				u.LogError("exec pipe", err)
+				u.LogError("stdout pipe", err)
+			}
+
+			stderr, stderrErr := cmdExec.StderrPipe()
+			if err != nil {
+				u.LogError("stderr pipe", err)
 			}
 
 			if err = cmdExec.Start(); err != nil {
-				u.LogError("exec pipe started", err)
+				u.LogError("exec started", err)
 			}
 
-			var outputResult *bytes.Buffer = bytes.NewBufferString("")
-			buff := make([]byte, 5120)
-			var n int
-			for err == nil {
-				n, err = stdout.Read(buff)
-				if n > 0 {
-					u.Pfv("%s", color.HiGreenString("%s", string(buff[:n])))
-					outputResult.Write(buff[:n])
-				}
-			}
-
-			if err = cmdExec.Wait(); err != nil {
-				u.LogError("exec wait", err)
-			}
+			u.PlnInfo("-")
+			outputResult := asyncStdReader(stdout, err, color.HiGreenString)
+			stdErrorResult := asyncStdReader(stderr, stderrErr, color.HiRedString)
+			u.PlnInfo("-")
+			err = cmdExec.Wait()
 
 			if ctx.Err() == context.DeadlineExceeded {
 				u.LogWarn("timeout", "shell execution timed out")
@@ -103,16 +99,34 @@ func runCmd(f *ShellFuncAction, cmd string) {
 			if err != nil {
 				if exitError, ok := err.(*exec.ExitError); ok {
 					result.Code = exitError.ExitCode()
-					result.ErrMsg = err.Error()
+					if len(stdErrorResult) > 0 {
+						result.ErrMsg = stdErrorResult
+					} else {
+						result.ErrMsg = err.Error()
+					}
 				}
 			} else {
 				result.Code = 0
-				result.Output = strings.TrimSpace(outputResult.String())
 			}
 
+			result.Output = strings.TrimSpace(outputResult)
 			f.Result = result
 		}
 	}
+}
+
+func asyncStdReader(ch io.ReadCloser, err error, colorfunc func(format string, a ...interface{}) string) string {
+	var result *bytes.Buffer = bytes.NewBufferString("")
+	buff := make([]byte, 5120)
+	var n int
+	for err == nil {
+		n, err = ch.Read(buff)
+		if n > 0 {
+			u.Pfv("%s", colorfunc("%s", string(buff[:n])))
+			result.Write(buff[:n])
+		}
+	}
+	return result.String()
 }
 
 type ShellFuncAction struct {
@@ -151,10 +165,6 @@ func (f *ShellFuncAction) Exec() {
 		cmd := Render(tcmd, f.Vars)
 		u.Pfvvvv("cmd=>:\n%s\n", color.HiBlueString("%s", cmd))
 		runCmd(f, cmd)
-		//u.Pfv("%s\n", color.HiGreenString("%s", f.Result.Output))
-		if f.Result.Code != 0 {
-			u.Pfv("      %s\n", color.RedString("%s", f.Result.ErrMsg))
-		}
 		u.SubStepStatus("..", f.Result.Code)
 		u.Dvvvvv(f.Result)
 	}

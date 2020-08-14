@@ -164,9 +164,9 @@ func (step *Step) Exec(fromBlock bool) {
 	defer func() {
 		if step.Finally != nil && step.Finally != "" {
 			u.PlnBlue("Step Finally:")
-			u.Ppmsg(StepRuntime().Result)
-			u.Ppmsg(step.Vars)
+			u.Ppmsgvvvvv(StepRuntime().Result)
 		}
+
 		paniced := false
 		if step.Vars == nil {
 			step.Vars = *core.NewCache()
