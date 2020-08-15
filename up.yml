@@ -997,6 +997,34 @@ tasks:
           - testc
 
   -
+    name: Build_upcli_docker_image
+    desc: build a docker image to use up CLI command
+    task:
+      - func: call
+        do:
+          - build
+      -
+        func: shell
+        dvars:
+          - name: docker_version
+            value: '{{now|date "20060102"}}'
+          - name: docker_tag
+            value: 'docker.pkg.github.com/upcmd/up/upcli:{{.docker_version}}'
+          - name: docker_latest_tag
+            value: 'docker.pkg.github.com/upcmd/up/upcli:latest'
+          - name: warn
+            value: please ensure the docker build follows a release so that version.go is updated properly
+            flags:
+              - prompt
+        do:
+          - 'docker build -t {{.docker_tag}} .'
+          - 'docker build -t {{.docker_latest_tag}} .'
+          - |
+            docker login docker.pkg.github.com -u ${GITHUB_USERNAME} --password ${GITHUB_TOKEN}
+            docker push {{.docker_tag}}
+            docker push {{.docker_latest_tag}}
+
+  -
     name: build_dev_docker_image
     desc: run in linux | build a nix docker image
     task:

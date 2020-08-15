@@ -249,7 +249,27 @@ go get -v github.com/upcmd/up/app/up
 
 The up CLI command will be installed to: $HOME/go/bin, make sure you have this in your PATH
 
-#### Usage: followup the detailed documentation site: [https://upcmd.netlify.app/](https://upcmd.netlify.app/usage/cli_usage/)
+#### Use up cli command in docker
+
+This will map your current working directory as /workspace directory inside of docker container:
+
+```
+docker run -it --rm  -v `pwd`:/workspace docker.pkg.github.com/upcmd/up/upcli:latest /bin/sh  
+```
+
+Or you can source this from the funcs.rc
+
+```
+. ./funcs.rc
+run_upcli_docker
+```
+
+In the container:
+
+```
+cd /workspace
+up ngo
+```
 
 ### A little taste of UPcmd
 

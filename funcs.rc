@@ -265,3 +265,6 @@ example:
   fi
 }
 
+run_upcli_docker(){
+  docker run -it --rm  -v `pwd`:/workspace docker.pkg.github.com/upcmd/up/upcli:latest /bin/sh
+}
