@@ -70,7 +70,7 @@ enter: continue
     q: quit
     i: inspect
 `
-	u.Ppromptvvvvv("pause action to continue", hint)
+	u.Pprompt("pause action to continue", hint)
 	reader := bufio.NewReader(os.Stdin)
 	keyinput, _ := reader.ReadString('\n')
 

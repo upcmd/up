@@ -716,7 +716,7 @@ tasks:
           - 'echo "log will be generated at {{.hugo_doc_log_dir}}"'
           - 'rm -rf {{.hugo_doc_log_dir}}'
           - 'mkdir -p {{.hugo_doc_log_dir}}'
-          - zsh -c "cp ./build/**/up_linux* /bin/up"
+          - zsh -c "cp ./build/**/up_linux* /bin/up || cp ./build/linux/up /bin/up"
 
       -
         func: call

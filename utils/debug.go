@@ -157,9 +157,9 @@ func PpmsgvvvhintHigh(hint string, a ...interface{}) {
 	}
 }
 
-func Ppromptvvvvv(valueName, hint string) {
+func Pprompt(valueName, hint string) {
 	hiColor := color.New(color.FgHiWhite, color.BgBlack)
-	hiColor.Printf("Enter Value For %s: \n%s\n", valueName, hint)
+	hiColor.Printf("Enter Value For [%s]: \n%s\n", valueName, hint)
 
 }
 

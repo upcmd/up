@@ -13,6 +13,7 @@ vars:
     name: tom
     sex: male
     age: 18
+  env: dev
 
 tasks:
 
@@ -27,9 +28,15 @@ tasks:
           {{.person.name}} is {{.person.sex}}
         vars:
           school: sydney grammar
+        dvars:
+          - name: continue
+            value: "N"
+            desc: "Are you sure ? all items in {{.env}} infrastructure will be destroyed ! (yes/N)"
+            flags: [prompt]
         do:
           - name: print
             desc: |
               his age is {{.person.age}}
               he is in school: {{.school}}
+              ?continue: {{.continue}}
             cmd: 'what gender is {{.person.name}}'

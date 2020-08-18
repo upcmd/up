@@ -240,9 +240,9 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 				}
 
 				if u.Contains(dvar.Flags, "prompt") {
-					u.Ppromptvvvvv(dvar.Name, func() string {
+					u.Pprompt(dvar.Name, func() string {
 						if dvar.Desc != "" {
-							return dvar.Desc
+							return Render(dvar.Desc, tmpVars)
 						} else {
 							return u.Spf("This will be saved as %s's value", dvar.Name)
 						}
@@ -250,8 +250,19 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 					reader := bufio.NewReader(os.Stdin)
 					dvarInputValue, _ := reader.ReadString('\n')
 					saneValue := u.RemoveCr(dvarInputValue)
-					(*mergeTarget).Put(dvar.Name, saneValue)
-					(*expandedVars).Put(dvar.Name, saneValue)
+					pval := func() (v string) {
+						if saneValue != "" {
+							v = saneValue
+						} else if saneValue == "" && dvar.Value == "" {
+							v = NONE_VALUE
+						} else {
+							v = dvar.Value
+						}
+						return
+					}()
+
+					(*mergeTarget).Put(dvar.Name, pval)
+					(*expandedVars).Put(dvar.Name, pval)
 					dvar.Rendered = saneValue
 				}
 
