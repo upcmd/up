@@ -52,6 +52,8 @@ tasks:
           - name: inspect
             cmd:
               - exec_vars
+              - debug_vars
+
           - name: print
             cmd: '{{.api_response_object.headers.Host}}'
           - name: printObj

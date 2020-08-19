@@ -80,6 +80,15 @@ func FuncMapInit() {
 			u.PpmsgvvvvvHigh("ymlToObj", obj)
 			return obj
 		},
+		//regObj will keep the golang object intact and register it to cache
+		//same effect of: '{{ func_return_a_obj arg | objToYml|ymlToObj|reg "instances" }}'
+		"regObj": func(varname string, obj interface{}) interface{} {
+			yml := core.ObjToYaml(obj)
+			regObj := core.YamlToObj(yml)
+			safeReg(varname, regObj)
+			u.PpmsgvvvvvHigh("ymlToObj", regObj)
+			return obj
+		},
 		"loopRange": func(start, end int64, regname string) string {
 			var looplist []int64 = []int64{}
 			for i := start; i <= end; i++ {

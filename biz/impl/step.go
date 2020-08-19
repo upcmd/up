@@ -336,6 +336,8 @@ func (step *Step) Exec(fromBlock bool) {
 
 									default:
 										u.LogWarn("loop item evaluation", "Loop item type is not supported yet!")
+										u.LogWarn("supported:", "[]interface, []string, []int64")
+										u.LogWarn("got:", u.Spf("%T\n", loopObj))
 									}
 								} else {
 									u.InvalidAndPanic("evaluate loop var", "loop var is not a array/list/slice")

@@ -275,6 +275,8 @@ func (f *CmdFuncAction) Exec() {
 						TaskerRuntime().Tasker.reportContextualEnvVars(TaskRuntime().ExecbaseVars)
 					case "exec_env_vars_configured":
 						TaskerRuntime().Tasker.reportContextualEnvVars(f.Vars)
+					case "debug_vars":
+						debugVars()
 					}
 
 				}

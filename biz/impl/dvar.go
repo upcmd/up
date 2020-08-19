@@ -230,7 +230,10 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 				if TaskerRuntime().Tasker.TaskStack.GetLen() > 0 {
 					if u.Contains(dvar.Flags, "reg") {
 						if dvar.Name != "void" {
-							TaskRuntime().ExecbaseVars.Put(dvar.Name, dvar.Rendered)
+							//assume keepname indicates toObj: this is to ensure the object is not overridden by the dvar string value
+							if !dvarNameKept {
+								TaskRuntime().ExecbaseVars.Put(dvar.Name, dvar.Rendered)
+							}
 						}
 					}
 				}
