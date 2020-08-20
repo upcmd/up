@@ -542,7 +542,10 @@ func (steps *Steps) InspectSteps(tree treeprint.Tree, level *int) bool {
 }
 
 func (steps *Steps) Exec(fromBlock bool) {
-
+	if fromBlock {
+		TaskRuntime().ExecbaseVars.Delete(LAST_RESULT)
+		StepRuntime().ContextVars.Delete(LAST_RESULT)
+	}
 	for idx, step := range *steps {
 		taskLayerCnt := TaskerRuntime().Tasker.TaskStack.GetLen()
 		desc := Render(step.Desc, TaskRuntime().ExecbaseVars)
@@ -577,9 +580,8 @@ func (steps *Steps) Exec(fromBlock bool) {
 					TaskRuntime().ExecbaseVars.Put(u.Spf("%s", step.Reg), result)
 				}
 				if step.Func == FUNC_SHELL {
-					TaskRuntime().ExecbaseVars.Put("last_result", result)
+					TaskRuntime().ExecbaseVars.Put(LAST_RESULT, result)
 				}
-
 			}
 
 			func() {

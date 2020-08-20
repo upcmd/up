@@ -1,0 +1,53 @@
+doc_meta: |
+  folder: error_handling
+  title: last_result pass through block func
+  head: |
+    Even though calling a block func is same as calling an internal or external call func, the regular vars override from current task to the block, it means this will apply to last_result, so that the the last_result will be the value from parent called
+
+    This is to demo that the correct behavior should be that last_result will be an exception of the rule so that called func could get correct shell execution result
+
+    Be cautious that when you register a name the shell execution result, do not use the duplicated name in the block func, as the rule will make the caller's var available in the funcs of the block, this will confuse you but it is correct.
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do: echo hello
+
+      - func: cmd
+        do:
+          - name: print
+            cmd: '{{.last_result.Output}}'
+
+      - func: block
+        do:
+          -
+            func: shell
+            do: echo world
+
+          - func: cmd
+            do:
+              - name: print
+                cmd: '{{.last_result.Output}}'
+
+              -
+                name: assert
+                cmd:
+                  - '{{eq .last_result.Output "world" }}'
+
+      - func: cmd
+        desc: after the block func call
+        do:
+          - name: print
+            cmd: '{{.last_result.Output}}'
+
+          -
+            name: assert
+            cmd:
+              - '{{eq .last_result.Output "world" }}'

@@ -22,7 +22,8 @@ const (
 	FUNC_BLOCK = "block"
 	FUNC_CMD   = "cmd"
 
-	NONE_VALUE = "None"
+	NONE_VALUE  = "None"
+	LAST_RESULT = "last_result"
 )
 
 type MustConditionToContinueFunc func() bool
