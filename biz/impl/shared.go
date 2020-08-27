@@ -24,6 +24,7 @@ const (
 
 	NONE_VALUE  = "None"
 	LAST_RESULT = "last_result"
+	FLAG_SILENT = "silent"
 )
 
 type MustConditionToContinueFunc func() bool

@@ -119,7 +119,8 @@ func main() {
 		} else {
 			u.LogWarn("What kind of assist do you need?", "Please input a name:")
 			u.Pln(`#supported:
-templatefunc
+all_template_func
+upcmd_template_func
 version
 `)
 		}

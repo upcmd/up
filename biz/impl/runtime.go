@@ -69,6 +69,7 @@ type StepRuntimeContext struct {
 	ContextVars          *core.Cache
 	DataSyncInDvarExpand TransientSyncFunc
 	Timeout              int
+	Flags                *[]string
 }
 
 func StepRuntime() *StepRuntimeContext {

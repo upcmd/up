@@ -22,7 +22,7 @@ import (
 	"time"
 )
 
-func runCmd(f *ShellFuncAction, cmd string) {
+func runCmd(f *ShellFuncAction, cmd string, idx1 int) {
 	var result u.ExecResult
 	result.Cmd = cmd
 	if TaskerRuntime().Tasker.Dryrun {
@@ -87,8 +87,8 @@ func runCmd(f *ShellFuncAction, cmd string) {
 			}
 
 			u.PlnInfo("-")
-			outputResult := asyncStdReader(stdout, err, color.HiGreenString)
-			stdErrorResult := asyncStdReader(stderr, stderrErr, color.HiRedString)
+			outputResult := asyncStdReader("stdout", stdout, err, color.HiGreenString, idx1)
+			stdErrorResult := asyncStdReader("stderr", stderr, stderrErr, color.HiRedString, idx1)
 			u.PlnInfo("-")
 			err = cmdExec.Wait()
 
@@ -115,14 +115,19 @@ func runCmd(f *ShellFuncAction, cmd string) {
 	}
 }
 
-func asyncStdReader(ch io.ReadCloser, err error, colorfunc func(format string, a ...interface{}) string) string {
+func asyncStdReader(readtype string, ch io.ReadCloser, err error, colorfunc func(format string, a ...interface{}) string, idx1 int) string {
 	var result *bytes.Buffer = bytes.NewBufferString("")
 	buff := make([]byte, 5120)
 	var n int
 	for err == nil {
 		n, err = ch.Read(buff)
 		if n > 0 {
-			u.Pfv("%s", colorfunc("%s", string(buff[:n])))
+			if !(u.Contains(*StepRuntime().Flags, FLAG_SILENT) && readtype == "stdout") {
+				if u.Contains(*StepRuntime().Flags, u.Spf("%s-%d", FLAG_SILENT, idx1)) && readtype == "stdout" {
+				} else {
+					u.Pfv("%s", colorfunc("%s", string(buff[:n])))
+				}
+			}
 			result.Write(buff[:n])
 		}
 	}
@@ -164,7 +169,7 @@ func (f *ShellFuncAction) Exec() {
 		u.Pvv(tcmd)
 		cmd := Render(tcmd, f.Vars)
 		u.Pfvvvv("cmd=>:\n%s\n", color.HiBlueString("%s", cmd))
-		runCmd(f, cmd)
+		runCmd(f, cmd, idx+1)
 		u.SubStepStatus("..", f.Result.Code)
 		u.Dvvvvv(f.Result)
 	}

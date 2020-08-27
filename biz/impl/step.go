@@ -556,6 +556,7 @@ func (steps *Steps) Exec(fromBlock bool) {
 			rtContext := StepRuntimeContext{
 				Stepname: step.Name,
 				Timeout:  step.Timeout,
+				Flags:    &step.Flags,
 			}
 			StepStack().Push(&rtContext)
 

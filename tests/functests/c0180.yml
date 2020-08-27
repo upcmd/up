@@ -1,0 +1,91 @@
+doc_meta: |
+  folder: shell-func
+  title: silent the shell execution
+  head: |
+    You can use the flag silent to silent the shell execution, or silent-x to silent the sub step of the shell execution
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+
+      - func: shell
+        desc: the output of cat would be silent
+        vars:
+          msg: |
+            hello, world
+            thank you
+            hello tom
+            good buy
+        do:
+          - echo """{{.msg}}""" > /tmp/msg
+          - cat /tmp/msg
+        flags:
+          - silent
+
+      -
+        func: cmd
+        desc: explicitly show the the shell exec result
+        do:
+          - name: print
+            cmd: '{{.last_result.Output}}'
+
+      - func: shell
+        desc: the silent will not affect output of failed shell execution
+        vars:
+          msg: |
+            hello, world
+            thank you
+            hello tom
+            good buy
+        do:
+          - |
+            >&2 echo "encountering an error"
+            exit -1
+        flags:
+          - silent
+          - ignoreError
+
+
+      - func: shell
+        desc: |
+          silient only one sub step but not all
+          in this case, it will make sub step 1 msg1 silent but not the msg2
+        vars:
+          msg1: sub step1
+          msg2: sub step2
+        do:
+          - echo """{{.msg1}}"""
+          - echo """{{.msg2}}"""
+        flags:
+          - silent-1
+
+      - func: shell
+        desc: |
+          silient only one sub step but not all
+          in this case, it will make sub step 2 msg2 silent but not the msg1
+        vars:
+          msg1: sub step1
+          msg2: sub step2
+        do:
+          - echo """{{.msg1}}"""
+          - echo """{{.msg2}}"""
+        flags:
+          - silent-2
+
+      - func: shell
+        desc: |
+          if there are combined flags of silent and silent-x, silent will take priority, then there will be no output for all of the sub steps
+        vars:
+          msg1: sub step1
+          msg2: sub step2
+        do:
+          - echo """{{.msg1}}"""
+          - echo """{{.msg2}}"""
+        flags:
+          - silent-1
+          - silent
