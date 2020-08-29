@@ -1,0 +1,124 @@
+doc_meta: |
+  folder: loop
+  title: use dynamic variable in until
+  head: |
+    This shows how to use a dynamic variable to end the loop, which uses a changing variable in block func, callee task
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+
+      -
+        func: block
+        desc: |
+          break loop using until condition
+        do:
+          -
+            func: cmd
+            do:
+              - name: print
+                cmd: '{{.loopitem}}'
+
+        loop:
+          - item1
+          - item2
+          - item3
+          - item4
+          - item5
+          - item6
+        until: '{{eq .loopitem "item4"}}'
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '----------------------------------------------------'
+
+      -
+        func: block
+        desc: |
+          in this case the until condition will use a var which is chaning in block func
+          in order to make the interal var accessible by parent block func, you will have to use return cmd to return the value, otherwise the block func can not use right changing value in the condition
+          also the_internal_var has be be defined somewhere: scope/global/local, otherwise it will result in a golang templating error
+        dvars:
+            - name: the_internal_var
+              value: 'None'
+        do:
+          -
+            func: cmd
+            dvars:
+              - name: the_internal_var
+                value: '{{.loopitem}}'
+                flags:
+                  - taskScope
+            do:
+              - name: print
+                cmd: '{{.loopitem}}'
+
+              - name: return
+                cmd:
+                  - the_internal_var
+          -
+            func: cmd
+            do:
+              - name: print
+                cmd: 'post process {{.the_internal_var}} to see if this is executed'
+
+        loop:
+          - item1
+          - item2
+          - item3
+          - item4
+          - item5
+          - item6
+        until: '{{eq .the_internal_var "item4"}}'
+
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: '----------------------------------------------------'
+
+      -
+        func: call
+        vars:
+          the_internal_var2: 'None'
+        do: sub_task
+        loop:
+          - item1
+          - item2
+          - item3
+          - item4
+          - item5
+          - item6
+        until: '{{eq .the_internal_var2 "item4"}}'
+
+
+      -
+        func: cmd
+        do:
+          - name: inspect
+            cmd:
+              - exec_vars
+
+  -
+    name: sub_task
+    task:
+      -
+        func: cmd
+        dvars:
+          - name: the_internal_var2
+            value: '{{.loopitem}}'
+        do:
+          - name: print
+            cmd: '{{.loopitem}}'
+
+          - name: return
+            cmd:
+              - the_internal_var2
+

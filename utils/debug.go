@@ -389,7 +389,7 @@ func GraceExit(mark string, hint string) {
 }
 
 func Fail(mark string, hint string) {
-	hiColor := color.New(color.FgHiCyan, color.FgHiWhite)
+	hiColor := color.New(color.BgRed, color.FgHiWhite)
 	hiColor.Printf("  Failed: %s [%s]\n", mark, hint)
 	os.Exit(-255)
 }

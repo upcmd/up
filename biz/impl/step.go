@@ -284,6 +284,9 @@ func (step *Step) Exec(fromBlock bool) {
 										for idx, item := range loopObj.([]interface{}) {
 											routeFuncType(&LoopItem{idx, idx + 1, item})
 											if rawUtil != "" {
+												if TaskRuntime().ReturnVars != nil {
+													mergo.Merge(stepExecVars, TaskRuntime().ReturnVars, mergo.WithOverride)
+												}
 												untilEval := Render(rawUtil, stepExecVars)
 												toBreak, err := strconv.ParseBool(untilEval)
 												u.LogErrorAndPanic("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
@@ -302,6 +305,9 @@ func (step *Step) Exec(fromBlock bool) {
 										for idx, item := range loopObj.([]string) {
 											routeFuncType(&LoopItem{idx, idx + 1, item})
 											if rawUtil != "" {
+												if TaskRuntime().ReturnVars != nil {
+													mergo.Merge(stepExecVars, TaskRuntime().ReturnVars, mergo.WithOverride)
+												}
 												untilEval := Render(rawUtil, stepExecVars)
 												toBreak, err := strconv.ParseBool(untilEval)
 												u.LogErrorAndPanic("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
@@ -320,6 +326,9 @@ func (step *Step) Exec(fromBlock bool) {
 										for idx, item := range loopObj.([]int64) {
 											routeFuncType(&LoopItem{idx, idx + 1, item})
 											if rawUtil != "" {
+												if TaskRuntime().ReturnVars != nil {
+													mergo.Merge(stepExecVars, TaskRuntime().ReturnVars, mergo.WithOverride)
+												}
 												untilEval := Render(rawUtil, stepExecVars)
 												toBreak, err := strconv.ParseBool(untilEval)
 												u.LogErrorAndPanic("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))
@@ -347,6 +356,10 @@ func (step *Step) Exec(fromBlock bool) {
 								for idx, item := range step.Loop.([]interface{}) {
 									routeFuncType(&LoopItem{idx, idx + 1, item})
 									if rawUtil != "" {
+										//make the return value could be evaluated in until
+										if TaskRuntime().ReturnVars != nil {
+											mergo.Merge(stepExecVars, TaskRuntime().ReturnVars, mergo.WithOverride)
+										}
 										untilEval := Render(rawUtil, stepExecVars)
 										toBreak, err := strconv.ParseBool(untilEval)
 										u.LogErrorAndPanic("evaluate until condition", err, u.Spf("please fix until condition evaluation: [%s]", untilEval))

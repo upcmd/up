@@ -243,6 +243,11 @@ dvars:
     desc: Test to see if a list has a particular element
     flags: [vvvv,]
 
+  - name: sprig_string_contains
+    value: '{{ "hello, world" |contains "world"}}'
+    desc: Test if a string contains substr
+    flags: [v,]
+
   - name: sprig_slice_compact
     value: '{{  $list := list 1 "a" "foo" ""  }}
             {{    $copy := compact $list  }}
