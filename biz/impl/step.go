@@ -556,9 +556,14 @@ func (steps *Steps) InspectSteps(tree treeprint.Tree, level *int) bool {
 
 func (steps *Steps) Exec(fromBlock bool) {
 	if fromBlock {
-		TaskRuntime().ExecbaseVars.Delete(LAST_RESULT)
-		StepRuntime().ContextVars.Delete(LAST_RESULT)
+		if TaskRuntime() != nil && TaskRuntime().ExecbaseVars != nil {
+			TaskRuntime().ExecbaseVars.Delete(LAST_RESULT)
+		}
+		if StepRuntime() != nil && StepRuntime().ContextVars != nil {
+			StepRuntime().ContextVars.Delete(LAST_RESULT)
+		}
 	}
+
 	for idx, step := range *steps {
 		taskLayerCnt := TaskerRuntime().Tasker.TaskStack.GetLen()
 		desc := Render(step.Desc, TaskRuntime().ExecbaseVars)
@@ -580,9 +585,8 @@ func (steps *Steps) Exec(fromBlock bool) {
 			}
 
 			result := StepRuntime().Result
-			taskname := TaskerRuntime().Tasker.TaskStack.GetTop().(*TaskRuntimeContext).Taskname
+			taskname := TaskRuntime().Taskname
 
-			//TODO: add support for block
 			if u.Contains([]string{FUNC_SHELL, FUNC_CALL}, step.Func) {
 				if step.Reg == "auto" {
 					if step.Name == "" {

@@ -1,0 +1,52 @@
+doc_meta: |
+  folder: flow-controll
+  title: final step using block
+  head: |
+    It is a option to use the block instead of callee task. How you use it is a style preference
+
+  sections:
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: shell func
+        link: ../../quick-start/c0002/
+      - title: error handling
+        link: ../../test-debug/error_handling/
+      - title: shell step fails
+        link: ../../flow-controll/f0171/
+      - title: shell step fails
+        link: ../../flow-controll/c0172/
+
+tasks:
+
+  -
+    name: task
+    task:
+
+      -
+        func: cmd
+        desc: step 1
+        do:
+          - name: print
+            cmd: step 1
+          - name: panic
+          - name: print
+            cmd: extra step ......... it will never reach here
+        rescue: true
+        finally:
+          -
+            func: shell
+            name: close_file
+            desc: |
+              ensure the opened file is closed
+            do:
+              - echo "close the file ....."
+
+      -
+        func: cmd
+        desc: step 2
+        do:
+          - name: print
+            cmd: step 2

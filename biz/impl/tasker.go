@@ -43,6 +43,7 @@ type Tasker struct {
 	TaskStack        *stack.ExecStack
 	StepStack        *stack.ExecStack
 	BlockStack       *stack.ExecStack
+	FinallyStack     *stack.ExecStack
 	TaskBreak        bool
 	Config           *u.UpConfig
 	GroupMembersList []string
@@ -59,6 +60,7 @@ type Tasker struct {
 	RuntimeVarsAndDvarsMerged *core.Cache
 	RuntimeGlobalVars         *core.Cache
 	RuntimeGlobalDvars        *Dvars
+	InFinalExec               bool
 }
 
 type ScopeContext map[string]*core.Cache
@@ -337,6 +339,7 @@ func (t *Tasker) initRuntime() {
 	t.TaskStack = stack.New("task")
 	t.StepStack = stack.New("step")
 	t.BlockStack = stack.New("block")
+	t.FinallyStack = stack.New("block")
 	//TaskBreak    bool
 
 }
@@ -727,146 +730,155 @@ func (t *Tasker) validateTasks() {
 	}
 }
 
+func execTask(t *Tasker, taskname string, idx int, task model.Task, callerVars *core.Cache, isExternalCall bool) {
+	var rtContextFinal *TaskRuntimeContext
+	defer func(currentTask *model.Task) {
+		TaskerRuntime().Tasker.InFinalExec = true
+		TaskFinallyStack().Push(rtContextFinal)
+		if currentTask.Finally != nil && currentTask.Finally != "" {
+			u.PlnBlue("task Finally:")
+		}
+
+		paniced := false
+		var panicInfo interface{}
+		if r := recover(); r != nil {
+			u.Pvvvvv(u.Spf("Recovered from: %s", r))
+			paniced = true
+			panicInfo = r
+		}
+
+		if currentTask.Finally != nil && currentTask.Finally != "" {
+			execFinally(currentTask.Finally, core.NewCache())
+		}
+
+		if paniced && currentTask.Rescue == false {
+			u.LogWarn("Not rescued in task level", "please assess the panic problem and cause, fix it before re-run the task")
+			u.PanicExit("task finally", panicInfo)
+		} else if paniced {
+			u.LogWarn("Rescued in task level, but not advised!", "setting rescue to yes/true to continue is not recommended\nit is advised to locate root cause of the problem, fix it and re-run the task again\nit is the best practice to test the execution in your ci pipeline to eliminate problems rather than dynamically fix using rescue")
+		}
+		TaskerRuntime().Tasker.InFinalExec = false
+		TaskFinallyStack().Pop()
+	}(&task)
+
+	u.Pfvvvv("  located task-> %d [%s]: \n", idx+1, task.Name)
+
+	var ctxCallerTaskname string
+
+	if isExternalCall {
+		ctxCallerTaskname = "TODO: Main Caller Taskname"
+	} else {
+		if IsAtRootTaskLevel() {
+			ctxCallerTaskname = taskname
+		} else {
+			ctxCallerTaskname = TaskRuntime().TasknameLayered
+		}
+	}
+
+	taskLayerCnt := TaskerRuntime().Tasker.TaskStack.GetLen()
+	desc := Render(task.Desc, TaskerRuntime().Tasker.RuntimeVarsAndDvarsMerged)
+
+	u.LogDesc("task", idx+1, taskLayerCnt, u.Spf("%s ==> %s", ctxCallerTaskname, taskname), desc)
+
+	var steps Steps
+	err := ms.Decode(task.Task, &steps)
+
+	u.LogErrorAndPanic("decode steps:", err, "please fix data type in yaml config")
+	func() {
+		//step name validation
+		invalidNames := []string{}
+		for _, step := range steps {
+			if strings.Contains(step.Name, "-") {
+				invalidNames = append(invalidNames, step.Name)
+			}
+		}
+
+		if len(invalidNames) > 0 {
+			u.InvalidAndPanic(u.Spf("validating step name fails: %s ", invalidNames), "task name can not contain '-', please use '_' instead, failed names:")
+		}
+	}()
+
+	func() {
+		rtContext := TaskRuntimeContext{
+			Taskname:           taskname,
+			TaskVars:           core.NewCache(),
+			IsCalledExternally: isExternalCall,
+		}
+		rtContextFinal = &rtContext
+
+		u.Pdebugvvvvvvv(callerVars)
+		if isExternalCall {
+			var passinvars core.Cache
+			passinvars = deepcopy.Copy(*t.RuntimeVarsAndDvarsMerged).(core.Cache)
+			mergo.Merge(&passinvars, callerVars, mergo.WithOverride)
+			rtContext.ExecbaseVars = &passinvars
+			rtContext.TasknameLayered = u.Spf("%s/%s", "TODO: Main Caller Taskname", taskname)
+		} else {
+			if IsAtRootTaskLevel() {
+				rtContext.ExecbaseVars = t.RuntimeVarsAndDvarsMerged
+				rtContext.TasknameLayered = taskname
+			} else {
+				rtContext.ExecbaseVars = func() *core.Cache {
+					if *callerVars == nil {
+						return core.NewCache()
+					} else {
+						return callerVars
+					}
+				}()
+
+				rtContext.TasknameLayered = u.Spf("%s/%s", TaskRuntime().TasknameLayered, taskname)
+			}
+		}
+		u.Pdebugvvvvvvv(rtContext.ExecbaseVars)
+
+		func() {
+			UpRunTimeVars.Put(UP_RUNTIME_TASK_LAYER_NUMBER, TaskerRuntime().Tasker.TaskStack.GetLen())
+			TaskerRuntime().Tasker.TaskStack.Push(&rtContext)
+			u.Pvvvv("Executing task stack layer:", TaskerRuntime().Tasker.TaskStack.GetLen())
+			maxLayers, err := strconv.Atoi(ConfigRuntime().MaxCallLayers)
+			u.LogErrorAndPanic("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
+
+			if maxLayers != 0 && TaskerRuntime().Tasker.TaskStack.GetLen() > maxLayers {
+				u.InvalidAndPanic("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
+			}
+		}()
+
+		steps.Exec(false)
+
+		returnVars := TaskRuntime().ReturnVars
+
+		TaskerRuntime().Tasker.TaskStack.Pop()
+		func() {
+			//this will ensure the local caller vars are synced with return values, typically useful for chained tasks in call func
+			if returnVars != nil {
+				mergo.Merge(callerVars, returnVars, mergo.WithOverride)
+			}
+
+			if isExternalCall {
+				if returnVars != nil {
+					callerExecBaseVars := TaskerRuntime().TaskerCaller.TaskStack.GetTop().(*TaskRuntimeContext).ExecbaseVars
+					mergo.Merge(callerExecBaseVars, returnVars, mergo.WithOverride)
+				}
+			} else {
+				if !IsAtRootTaskLevel() && returnVars != nil {
+					mergo.Merge(TaskRuntime().ExecbaseVars, returnVars, mergo.WithOverride)
+				} else if IsAtRootTaskLevel() && returnVars != nil {
+					mergo.Merge(t.RuntimeVarsAndDvarsMerged, returnVars, mergo.WithOverride)
+				}
+			}
+
+		}()
+
+	}()
+
+}
+
 func (t *Tasker) ExecTask(taskname string, callerVars *core.Cache, isExternalCall bool) {
 	found := false
 	for idx, task := range *t.Tasks {
 		if taskname == task.Name {
-
-			defer func() {
-				if task.Finally != nil && task.Finally != "" {
-					u.PlnBlue("task Finally:")
-				}
-				paniced := false
-				var panicInfo interface{}
-				if r := recover(); r != nil {
-					u.Pvvvvv(u.Spf("Recovered from: %s", r))
-					paniced = true
-					panicInfo = r
-				}
-
-				if task.Finally != nil && task.Finally != "" {
-					execFinally(task.Finally, core.NewCache())
-				}
-
-				if paniced && task.Rescue == false {
-					u.LogWarn("Not rescued in task level", "please assess the panic problem and cause, fix it before re-run the task")
-					u.PanicExit("task finally", panicInfo)
-				} else if paniced {
-					u.LogWarn("Rescued in task level, but not advised!", "setting rescue to yes/true to continue is not recommended\nit is advised to locate root cause of the problem, fix it and re-run the task again\nit is the best practice to test the execution in your ci pipeline to eliminate problems rather than dynamically fix using rescue")
-				}
-
-			}()
-
-			u.Pfvvvv("  located task-> %d [%s]: \n", idx+1, task.Name)
-
-			var ctxCallerTaskname string
-
-			if isExternalCall {
-				ctxCallerTaskname = "TODO: Main Caller Taskname"
-			} else {
-				if IsAtRootTaskLevel() {
-					ctxCallerTaskname = taskname
-				} else {
-					ctxCallerTaskname = TaskRuntime().TasknameLayered
-				}
-			}
-
-			taskLayerCnt := TaskerRuntime().Tasker.TaskStack.GetLen()
-			desc := Render(task.Desc, TaskerRuntime().Tasker.RuntimeVarsAndDvarsMerged)
-
-			u.LogDesc("task", idx+1, taskLayerCnt, u.Spf("%s ==> %s", ctxCallerTaskname, taskname), desc)
 			found = true
-			var steps Steps
-			err := ms.Decode(task.Task, &steps)
-
-			u.LogErrorAndPanic("decode steps:", err, "please fix data type in yaml config")
-			func() {
-				//step name validation
-				invalidNames := []string{}
-				for _, step := range steps {
-					if strings.Contains(step.Name, "-") {
-						invalidNames = append(invalidNames, step.Name)
-					}
-				}
-
-				if len(invalidNames) > 0 {
-					u.InvalidAndPanic(u.Spf("validating step name fails: %s ", invalidNames), "task name can not contain '-', please use '_' instead, failed names:")
-				}
-			}()
-
-			func() {
-				rtContext := TaskRuntimeContext{
-					Taskname:           taskname,
-					TaskVars:           core.NewCache(),
-					IsCalledExternally: isExternalCall,
-				}
-
-				u.Pdebugvvvvvvv(callerVars)
-				if isExternalCall {
-					var passinvars core.Cache
-					passinvars = deepcopy.Copy(*t.RuntimeVarsAndDvarsMerged).(core.Cache)
-					mergo.Merge(&passinvars, callerVars, mergo.WithOverride)
-					rtContext.ExecbaseVars = &passinvars
-					rtContext.TasknameLayered = u.Spf("%s/%s", "TODO: Main Caller Taskname", taskname)
-				} else {
-					if IsAtRootTaskLevel() {
-						rtContext.ExecbaseVars = t.RuntimeVarsAndDvarsMerged
-						rtContext.TasknameLayered = taskname
-					} else {
-						rtContext.ExecbaseVars = func() *core.Cache {
-							if *callerVars == nil {
-								return core.NewCache()
-							} else {
-								return callerVars
-							}
-						}()
-
-						rtContext.TasknameLayered = u.Spf("%s/%s", TaskRuntime().TasknameLayered, taskname)
-					}
-				}
-				u.Pdebugvvvvvvv(rtContext.ExecbaseVars)
-
-				func() {
-					UpRunTimeVars.Put(UP_RUNTIME_TASK_LAYER_NUMBER, TaskerRuntime().Tasker.TaskStack.GetLen())
-					TaskerRuntime().Tasker.TaskStack.Push(&rtContext)
-					u.Pvvvv("Executing task stack layer:", TaskerRuntime().Tasker.TaskStack.GetLen())
-					maxLayers, err := strconv.Atoi(ConfigRuntime().MaxCallLayers)
-					u.LogErrorAndPanic("evaluate max task stack layer", err, "please setup max MaxCallLayers correctly")
-
-					if maxLayers != 0 && TaskerRuntime().Tasker.TaskStack.GetLen() > maxLayers {
-						u.InvalidAndPanic("Task exec stack layer check:", u.Spf("Too many layers of task executions, max allowed(%d), please fix your recursive call", maxLayers))
-					}
-				}()
-
-				steps.Exec(false)
-
-				returnVars := TaskRuntime().ReturnVars
-
-				TaskerRuntime().Tasker.TaskStack.Pop()
-
-				func() {
-					//this will ensure the local caller vars are synced with return values, typically useful for chained tasks in call func
-					if returnVars != nil {
-						mergo.Merge(callerVars, returnVars, mergo.WithOverride)
-					}
-
-					if isExternalCall {
-						if returnVars != nil {
-							callerExecBaseVars := TaskerRuntime().TaskerCaller.TaskStack.GetTop().(*TaskRuntimeContext).ExecbaseVars
-							mergo.Merge(callerExecBaseVars, returnVars, mergo.WithOverride)
-						}
-					} else {
-						if !IsAtRootTaskLevel() && returnVars != nil {
-							mergo.Merge(TaskRuntime().ExecbaseVars, returnVars, mergo.WithOverride)
-						} else if IsAtRootTaskLevel() && returnVars != nil {
-							mergo.Merge(t.RuntimeVarsAndDvarsMerged, returnVars, mergo.WithOverride)
-						}
-					}
-
-				}()
-
-			}()
-
+			execTask(t, taskname, idx, task, callerVars, isExternalCall)
 		}
 	}
 

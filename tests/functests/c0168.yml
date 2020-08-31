@@ -36,4 +36,4 @@ tasks:
         do:
           - name: print
             cmd: '{{.loopitem}}'
-        loop: '{{ loopRange 321 343 "myrange"}}'
+        loop: '{{ loopRange 321 330 "myrange"}}'

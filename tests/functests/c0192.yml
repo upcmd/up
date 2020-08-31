@@ -1,0 +1,92 @@
+doc_meta: |
+  folder: flow-controll
+  title: finally/resuce support in task level
+  head: |
+    Showcases that all tasks with finally block will be guranteed to do the final code block
+
+  sections:
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: shell func
+        link: ../../quick-start/c0002/
+      - title: error handling
+        link: ../../test-debug/error_handling/
+      - title: finally and rescue
+        link: ../../flow-controll/c0174/
+      - title: finally in task
+        link: ../../flow-controll/c0191/
+      - title: finally in task
+        link: ../../flow-controll/c0189/
+      - title: finally block
+        link: ../../flow-controll/c0183/
+      - title: finally block
+        link: ../../flow-controll/c0184/
+      - title: finally block
+        link: ../../flow-controll/c0187/
+      - title: finally block
+        link: ../../flow-controll/f0188/
+      - title: finally block
+        link: ../../flow-controll/f0185/
+      - title: finally block
+        link: ../../flow-controll/f0186/
+
+notes:
+  - add finally support to tasks level
+
+vars:
+  global_aa: aa
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: block
+        desc: loop through test cases
+        vars:
+          local_bb: bb
+        dvars:
+          - name: task_tt
+            value: tt
+            flags: [taskScope]
+        loop:
+          - item1
+          - item2
+        do:
+          -
+            func: shell
+            do:
+              - 'echo "main task start"'
+
+          - func: call
+            do: cc
+
+    finally:
+      -
+        func: shell
+        vars:
+          finally_task: ff
+        do:
+          - 'echo "main task final"'
+
+  -
+    name: cc
+    task:
+      -
+        func: shell
+        do:
+          - echo "in cc ...."
+    finally:
+      -
+        func: shell
+        vars:
+          finally_cc: cc
+        name: close_file
+        desc: |
+          ensure the opened file is closed
+        do:
+          - 'echo "close the file {{.loopitem}}"'

@@ -1,0 +1,68 @@
+doc_meta: |
+  folder: flow-controll
+  title: task finally always emit
+  head: |
+    Showcases that the finally block will be always fired even there is no exception / error
+
+  sections:
+    - title: Demo
+      log: yes
+
+  related:
+    refs:
+      - title: shell func
+        link: ../../quick-start/c0002/
+      - title: error handling
+        link: ../../test-debug/error_handling/
+      - title: finally and rescue
+        link: ../../flow-controll/c0174/
+      - title: finally block
+        link: ../../flow-controll/c0183/
+      - title: finally block
+        link: ../../flow-controll/c0184/
+      - title: finally block
+        link: ../../flow-controll/c0187/
+      - title: finally block
+        link: ../../flow-controll/f0188/
+      - title: finally block
+        link: ../../flow-controll/f0185/
+      - title: finally block
+        link: ../../flow-controll/f0186/
+
+notes:
+  - add finally support to tasks level
+
+vars:
+  global_aa: aa
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: shell
+        vars:
+          local_bb: bb
+        dvars:
+          - name: task_tt
+            value: tt
+            flags: [taskScope]
+        name: step1
+        desc: step 1
+        do:
+          - echo "opening file"
+
+    desc: |
+      without rescue, the execution will return a non-zero  return code in shell and also report the error
+      with rescue, the program will return 0
+    rescue: true
+    finally:
+      -
+        func: shell
+        vars:
+          finally_cc: cc
+        name: close_file
+        desc: |
+          ensure the opened file is closed
+        do:
+          - echo "close the file ....."

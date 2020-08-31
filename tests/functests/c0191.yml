@@ -1,0 +1,65 @@
+notes:
+  - inernal test case only
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: block
+        desc: loop through test cases
+        loop:
+          - item1
+          - item2
+        do:
+          - func: call
+            do: bb
+
+  -
+    name: bb
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: |
+              {{.loopitem}}
+
+      -
+        func: block
+        desc: obtain the instances and loop through each instance
+        loop:
+          - instance1
+          - instance2
+          - instance3
+        do:
+          -
+            func: cmd
+            desc: processing instance .....
+            do:
+              - name: print
+                cmd: '{{.loopitem}}'
+
+          -
+            func: call
+            do: cc
+            if: '{{ne .loopitem "instance2"}}'
+
+  -
+    name: cc
+    task:
+      -
+        func: shell
+        do:
+          - echo "in cc ...."
+    finally:
+      -
+        func: shell
+        vars:
+          finally_cc: cc
+        name: close_file
+        desc: |
+          ensure the opened file is closed
+        do:
+          - echo "close the file ....."

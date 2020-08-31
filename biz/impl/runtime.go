@@ -41,11 +41,24 @@ func TaskerRuntime() *TaskerRuntimeContext {
 	return TaskerStack.GetTop().(*TaskerRuntimeContext)
 }
 
+func TaskFinallyStack() *stack.ExecStack {
+	return TaskerRuntime().Tasker.FinallyStack
+}
+
 func TaskRuntime() *TaskRuntimeContext {
-	if taskStack := TaskerRuntime().Tasker.TaskStack; taskStack != nil {
-		top := taskStack.GetTop()
-		if top != nil {
-			return top.(*TaskRuntimeContext)
+	if TaskerRuntime().Tasker.InFinalExec {
+		if TaskFinallyStack() != nil {
+			top := TaskFinallyStack().GetTop()
+			if top != nil {
+				return top.(*TaskRuntimeContext)
+			}
+		}
+	} else {
+		if taskStack := TaskerRuntime().Tasker.TaskStack; taskStack != nil {
+			top := taskStack.GetTop()
+			if top != nil {
+				return top.(*TaskRuntimeContext)
+			}
 		}
 	}
 	return nil
@@ -110,6 +123,8 @@ func debugVars() {
 
 	if stepRuntime := StepRuntime(); stepRuntime != nil {
 		u.Ppmsg("ExecContextVars", stepRuntime.ContextVars)
+	} else {
+		u.PlnInfo("ExecContextVars is nil")
 	}
 	u.PlnBlue("--")
 }
