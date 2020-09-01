@@ -340,6 +340,15 @@ func LogErrorAndPanic(mark string, err interface{}, hint string) {
 	}
 }
 
+func LogErrorAndExit(mark string, err interface{}, hint string) {
+	if err != nil {
+		color.Red("      %s -> %s", mark, err)
+		hiColor := color.New(color.FgHiCyan, color.BgRed)
+		hiColor.Printf("ERROR: \n%s\n", hint)
+		os.Exit(-1)
+	}
+}
+
 func PanicExit(mark string, err interface{}) {
 	color.Red("%s -> %s", mark, err)
 	PStackTrace()
