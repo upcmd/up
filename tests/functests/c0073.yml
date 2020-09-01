@@ -56,6 +56,10 @@ tasks:
         do:
           -
             name: print
+            cmd: "{{if .isnew}}aa{{else}}bb{{end}}"
+
+          -
+            name: print
             desc: literal style, there will be a line break
             cmd: "[{{.my_interesting_story1}}]"
 
