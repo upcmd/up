@@ -354,13 +354,14 @@ func (t *Tasker) ListTasks() {
 			maxlen = tasknamelen
 		}
 	}
-	format := "  %4d  | %" + u.Spf("%d", maxlen) + "s: |%9s| %s "
+	format := "  %4d  | %" + u.Spf("%d", maxlen) + "s |%9s| %s "
 	for idx, task := range *t.Tasks {
 		start := task.Name[0:1]
+		desc := strings.Split(task.Desc, "\n")[0]
 		if strings.Contains(caps, start) {
-			color.HiGreen("%s", u.Spf(format, idx+1, task.Name, "public", task.Desc))
+			color.HiGreen("%s", u.Spf(format, idx+1, task.Name, "public", desc))
 		} else {
-			color.Yellow("%s", u.Spf(format, idx+1, task.Name, "protected", task.Desc))
+			color.Yellow("%s", u.Spf(format, idx+1, task.Name, "protected", desc))
 		}
 
 		u.Ppmsgvvvv(task)
