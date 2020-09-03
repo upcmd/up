@@ -237,9 +237,17 @@ func (t *Tasker) loadExecProfileEnvVars() {
 
 		if evars != nil {
 			for _, v := range *evars {
-				envvarName := u.Spf("%s_%s", "envVar", v.Name)
-				envVars.Put(envvarName, v.Value)
-				os.Setenv(v.Name, v.Value)
+				switch v.Name {
+				case "UP_EXEC_ENTRY_TASK_NAME":
+					u.MainConfig.EntryTask = v.Value
+				case "UP_EXEC_VERBOSE_LEVEL":
+					u.MainConfig.Verbose = v.Value
+				default:
+					envvarName := u.Spf("%s_%s", "envVar", v.Name)
+					envVars.Put(envvarName, v.Value)
+					os.Setenv(v.Name, v.Value)
+				}
+
 			}
 		}
 	}

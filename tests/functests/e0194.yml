@@ -36,6 +36,9 @@ eprofiles:
     instance: dev
 
     evars:
+      - name: ENV_VAR_AAA
+        value: aaa
+
       - name: UP_EXEC_ENTRY_TASK_NAME
         value: task_to_call_dictated_by_eprofile
 
@@ -45,6 +48,7 @@ eprofiles:
 tasks:
   -
     name: task
+    desc: this task now is not entry anymore
     task:
       -
         func: cmd
@@ -62,3 +66,12 @@ tasks:
         do:
           - name: print
             cmd: this is a entry task according to the evar - UP_EXEC_ENTRY_TASK_NAME
+      -
+        func: shell
+        desc: |
+          UP_EXEC_ENTRY_TASK_NAME should be empty as it is not register into env vars but only used for program entry
+        do:
+          - echo """UP_EXEC_ENTRY_TASK_NAME:${UP_EXEC_ENTRY_TASK_NAME}"""
+          - echo """ENV_VAR_AAA:${ENV_VAR_AAA}"""
+          - env |grep ENV_VAR_AAA
+          - source ./tests/functests/test_env.src; env |grep UP_GLOBAL

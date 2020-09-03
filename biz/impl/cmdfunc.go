@@ -8,6 +8,8 @@
 package impl
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
@@ -16,8 +18,11 @@ import (
 	yq "github.com/upcmd/yq/v3/cmd"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"os"
+	"os/exec"
 	"path"
 	"strconv"
+	"strings"
 )
 
 type CmdFuncAction struct {
@@ -231,6 +236,110 @@ func (f *CmdFuncAction) Exec() {
 
 		case "break":
 			TaskerRuntime().Tasker.TaskBreak = true
+
+		case "virtualEnv":
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+				var raw, name, source, srcfile, action string
+
+				for k, v := range cmd {
+					switch k.(string) {
+					case "name":
+						raw = v.(string)
+						name = Render(raw, f.Vars)
+					case "source":
+						raw = v.(string)
+						source = Render(raw, f.Vars)
+					case "action":
+						raw = v.(string)
+						action = Render(raw, f.Vars)
+					case "srcfile":
+						raw = v.(string)
+						srcfile = Render(raw, f.Vars)
+					}
+				}
+
+				if (name == "" && action == "") || (name != "" && action != "") {
+				} else {
+					u.InvalidAndExit("param validation", "name and action are required or missed at the same time")
+				}
+
+				if source != "" && srcfile != "" {
+					u.InvalidAndExit("param validation", "source and srcfile can not coexist at the same time")
+				}
+
+				defer func() {
+					if srcfile != "" && source != "" {
+						os.Remove(srcfile)
+					}
+				}()
+
+				if source != "" {
+
+					u.Pdebug(source)
+					//save source content to a file
+					func() {
+						content := bytes.NewBufferString(source)
+
+						tmpfile, err := ioutil.TempFile("", "upVenv")
+						if err != nil {
+							u.LogErrorAndExit("upVenv source creation", err, "can not create upVenv file")
+						}
+
+						if _, err := tmpfile.Write(content.Bytes()); err != nil {
+							u.LogErrorAndExit("upVenv source write", err, "can not write to upVenv file")
+						}
+						if err := tmpfile.Close(); err != nil {
+							u.LogErrorAndExit("upVenv source close", err, "can not close to upVenv file")
+						}
+
+						srcfile = tmpfile.Name()
+
+					}()
+
+				}
+
+				if _, err := os.Stat(srcfile); os.IsNotExist(err) {
+					u.LogErrorAndExit("check upVenv source file existence", err, u.Spf("file %s does not exist", srcfile))
+				}
+
+				switch u.MainConfig.ShellType {
+				case "GOSH":
+					u.InvalidAndExit("TODO", "to be implementated in future")
+
+				default:
+
+					sourceContent := u.Spf(`
+set -e
+source %s
+echo '<<<ENVIRONMENT>>>'
+env
+`, srcfile)
+					//TODO: get the output before ENV flag and output
+					cmd := exec.Command(u.MainConfig.ShellType, "-c", sourceContent)
+					bs, err := cmd.CombinedOutput()
+					if err != nil {
+						u.LogErrorAndExit("source upVenv", err, srcfile)
+					}
+					//u.PlnBlue(sourceContent)
+					//fmt.Println("=======================")
+					//u.PlnBlue(string(bs))
+					//fmt.Println("=======================")
+					s := bufio.NewScanner(bytes.NewReader(bs))
+					start := false
+					for s.Scan() {
+						if s.Text() == "<<<ENVIRONMENT>>>" {
+							start = true
+						} else if start {
+							kv := strings.SplitN(s.Text(), "=", 2)
+							if len(kv) == 2 {
+								os.Setenv(kv[0], kv[1])
+							}
+						}
+					}
+				}
+
+			})
 
 		case "assert":
 			cmdItem.runCmd("array", func() {
