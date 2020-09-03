@@ -47,6 +47,7 @@ func main() {
 		cfg.SetRefdir(*refdir)
 		cfg.SetWorkdir(*workdir)
 		cfg.SetTaskfile(*taskfile)
+		cfg.SetEntryTask(*ngoTaskName)
 		cfg.InitConfig()
 		u.MainConfig = cfg
 		cfg.ShowCoreConfig("Main")
@@ -69,11 +70,11 @@ func main() {
 		if *ngoTaskName != "" {
 			u.Pln("-exec task:", *ngoTaskName)
 			if *instanceName != "" && *execprofile != "" {
-				u.InvalidAndPanic("parameter validation", "instanceid (-i) and execprofile (-p) can not coexist, please only use one of them")
+				u.InvalidAndExit("parameter validation", "instanceid (-i) and execprofile (-p) can not coexist, please only use one of them")
 			}
 			t := impl.NewTasker(*instanceName, *execprofile, initConfig)
 			impl.Pipein()
-			t.ExecTask(*ngoTaskName, nil, false)
+			t.ExecTask(u.MainConfig.EntryTask, nil, false)
 		}
 
 	case list.FullCommand():

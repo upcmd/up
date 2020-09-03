@@ -1,0 +1,64 @@
+notes: |
+  documented in docs:
+  goup ngo -p test_eprofile_exec -d ./tests/functests -t wip.yml --configdir=./tests/functests
+
+  ### CICD Pipeline integration
+
+  To integrate with pipeline, one challenge is to manage the input args. By using execution profile, we aim to reduce the number of input parameters and fill in or configure the manually in many places in cicd platforms or pipelines
+
+  In order to achieve this, we can use two evars:
+
+  ```
+    evars:
+      - name: UP_EXEC_ENTRY_TASK_NAME
+        value: a_entry_task_name
+
+      - name: UP_EXEC_VERBOSE_LEVEL
+        value: vvv
+  ```
+
+  It simply instruct up cli to use the indicated task name and verbose level instead of the task name and verbose as command line argument
+
+  so this turns the command line from:
+
+  ```
+  up ngo task_to_call_dictated_by_eprofile -v v
+  ```
+
+  to:
+
+  ```
+  up ngo -p test_eprofile_exec
+  ```
+
+eprofiles:
+  - name: test_eprofile_exec
+    instance: dev
+
+    evars:
+      - name: UP_EXEC_ENTRY_TASK_NAME
+        value: task_to_call_dictated_by_eprofile
+
+      - name: UP_EXEC_VERBOSE_LEVEL
+        value: vvv
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        do:
+          - name: print
+            cmd: hahaha
+
+  -
+    name: task_to_call_dictated_by_eprofile
+    task:
+      -
+        func: cmd
+        desc: |
+          if you use eprofile, then evar UP_EXEC_ENTRY_TASK_NAME's value will be used as entry task, it will override whatever has been input from command line
+        do:
+          - name: print
+            cmd: this is a entry task according to the evar - UP_EXEC_ENTRY_TASK_NAME

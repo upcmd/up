@@ -49,6 +49,8 @@ type UpConfig struct {
 	Secure     *SecureSetting
 	Modules    Modules
 	ModuleLock bool
+	//Exec Profile
+	EntryTask string
 }
 
 type Modules []Module

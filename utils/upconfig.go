@@ -101,6 +101,12 @@ func (cfg *UpConfig) SetTaskfile(taskfile string) {
 	}
 }
 
+func (cfg *UpConfig) SetEntryTask(taskname string) {
+	if taskname != "" {
+		cfg.EntryTask = taskname
+	}
+}
+
 func (cfg *UpConfig) SetModulename(modulename string) {
 	if modulename != "" {
 		cfg.ModuleName = modulename

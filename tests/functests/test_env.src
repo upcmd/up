@@ -1,0 +1,8 @@
+
+# both worked
+# with: #!/usr/bin/env bash
+# or with out it
+
+echo "start of source test"
+export UP_GLOBAL_TEST_ENV_VAR_AAA=up_global_test_env_var_aaa
+echo "end of source test"

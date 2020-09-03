@@ -19,7 +19,7 @@ notes:
 
 vars:
   a: aaa
-  b: bbb
+  b: bbb-global
   c: ccc
 
 tasks:
@@ -67,3 +67,9 @@ tasks:
               cmd:
                 - exec_vars
                 - exec_base_vars
+            -
+              name: assert
+              cmd:
+                - '{{eq .f  "first_level_fff"}}'
+                - '{{eq .e  "first_level_eee"}}'
+                - '{{eq .g  "ggg"}}'
