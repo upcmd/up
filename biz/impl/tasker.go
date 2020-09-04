@@ -235,19 +235,18 @@ func (t *Tasker) loadExecProfileEnvVars() {
 			evars = &p.Evars
 		}
 
+		if p.Taskname != "" {
+			u.MainConfig.EntryTask = p.Taskname
+		}
+		if p.Verbose != "" {
+			u.MainConfig.Verbose = p.Verbose
+		}
+
 		if evars != nil {
 			for _, v := range *evars {
-				switch v.Name {
-				case "UP_EXEC_ENTRY_TASK_NAME":
-					u.MainConfig.EntryTask = v.Value
-				case "UP_EXEC_VERBOSE_LEVEL":
-					u.MainConfig.Verbose = v.Value
-				default:
-					envvarName := u.Spf("%s_%s", "envVar", v.Name)
-					envVars.Put(envvarName, v.Value)
-					os.Setenv(v.Name, v.Value)
-				}
-
+				envvarName := u.Spf("%s_%s", "envVar", v.Name)
+				envVars.Put(envvarName, v.Value)
+				os.Setenv(v.Name, v.Value)
 			}
 		}
 	}
@@ -386,7 +385,7 @@ func (t *Tasker) ListAllTasks() {
 
 func (t *Tasker) LockModules() {
 	if !t.ValidateAllModules() {
-		u.InvalidAndPanic("modules configuration is not valid", "please fix the problem and try again")
+		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
 	}
 	u.Pln("-lock repos:")
 
@@ -415,7 +414,7 @@ func (t *Tasker) LockModules() {
 func (t *Tasker) CleanModules() {
 
 	if !t.ValidateAllModules() {
-		u.InvalidAndPanic("modules configuration is not valid", "please fix the problem and try again")
+		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
 	}
 	u.Pln("-clean repos:")
 	//u.Pdebug(u.MainConfig.AbsWorkDir, u.GetDefaultModuleDir())
@@ -424,7 +423,7 @@ func (t *Tasker) CleanModules() {
 
 func (t *Tasker) PullModules() {
 	if !t.ValidateAllModules() {
-		u.InvalidAndPanic("modules configuration is not valid", "please fix the problem and try again")
+		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
 	}
 
 	u.Pln("-pull repos:")
@@ -520,7 +519,7 @@ func (tasker *Tasker) ListTask(taskname string) {
 			u.Pf("%s: %s", color.BlueString("%s", task.Name), desc)
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
-			u.LogErrorAndPanic("decode steps:", err, "please fix data type in yaml config")
+			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
 			steps.InspectSteps(tree, &level)
 		}
 	}
@@ -540,7 +539,7 @@ func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level 
 			br := branch.AddMetaBranch(color.BlueString("%s", task.Name), desc)
 			var steps Steps
 			err := ms.Decode(task.Task, &steps)
-			u.LogErrorAndPanic("decode steps:", err, "please fix data type in yaml config")
+			u.LogErrorAndExit("decode steps:", err, "please fix data type in yaml config")
 
 			for _, step := range steps {
 				descRaw := strings.Split(step.Desc, "\n")[0]
@@ -595,7 +594,7 @@ func (tasker *Tasker) InspectTask(taskname string, branch treeprint.Tree, level 
 						//detailed steps
 						var steps Steps
 						err := ms.Decode(step.Do, &steps)
-						u.LogErrorAndPanic("load steps", err, "configuration problem, please fix it")
+						u.LogErrorAndExit("load steps", err, "configuration problem, please fix it")
 						steps.InspectSteps(branch, level)
 
 					default:
@@ -1058,6 +1057,5 @@ func (t *Tasker) loadRuntimeGlobalDvars() {
 		err,
 		"You must fix the data type to be\n string for a dvar value and try again. possible problems:\nthe name can not be single character 'y' or 'n' ",
 	)
-	//dvars.ValidateAndLoading()
 	t.RuntimeGlobalDvars = &dvars
 }

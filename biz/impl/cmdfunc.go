@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
+	"github.com/upcmd/up/model"
 	"github.com/upcmd/up/model/core"
 	u "github.com/upcmd/up/utils"
 	yq "github.com/upcmd/yq/v3/cmd"
@@ -261,11 +262,13 @@ func (f *CmdFuncAction) Exec() {
 
 				if (name == "" && action == "") || (name != "" && action != "") {
 				} else {
-					u.InvalidAndExit("param validation", "name and action are required or missed at the same time")
+					u.InvalidAndPanic("param validation", "name and action are required or missed at the same time")
 				}
 
-				if source != "" && srcfile != "" {
-					u.InvalidAndExit("param validation", "source and srcfile can not coexist at the same time")
+				if action == "restore" {
+					if source != "" || srcfile != "" {
+						u.InvalidAndPanic("param validation", "no source or srcfile is required when restore")
+					}
 				}
 
 				defer func() {
@@ -275,8 +278,6 @@ func (f *CmdFuncAction) Exec() {
 				}()
 
 				if source != "" {
-
-					u.Pdebug(source)
 					//save source content to a file
 					func() {
 						content := bytes.NewBufferString(source)
@@ -299,8 +300,10 @@ func (f *CmdFuncAction) Exec() {
 
 				}
 
-				if _, err := os.Stat(srcfile); os.IsNotExist(err) {
-					u.LogErrorAndExit("check upVenv source file existence", err, u.Spf("file %s does not exist", srcfile))
+				if source != "" || srcfile != "" {
+					if _, err := os.Stat(srcfile); os.IsNotExist(err) {
+						u.LogErrorAndExit("check upVenv source file existence", err, u.Spf("file %s does not exist", srcfile))
+					}
 				}
 
 				switch u.MainConfig.ShellType {
@@ -308,37 +311,76 @@ func (f *CmdFuncAction) Exec() {
 					u.InvalidAndExit("TODO", "to be implementated in future")
 
 				default:
-
-					sourceContent := u.Spf(`
+					var sourceContent string
+					if source == "" && srcfile == "" {
+						sourceContent = `
+set -e
+echo '<<<ENVIRONMENT>>>'
+env
+`
+					} else {
+						sourceContent = u.Spf(`
 set -e
 source %s
 echo '<<<ENVIRONMENT>>>'
 env
 `, srcfile)
-					//TODO: get the output before ENV flag and output
+					}
+
 					cmd := exec.Command(u.MainConfig.ShellType, "-c", sourceContent)
 					bs, err := cmd.CombinedOutput()
 					if err != nil {
-						u.LogErrorAndExit("source upVenv", err, srcfile)
+						u.LogErrorAndPanic("source upVenv", err, srcfile)
 					}
-					//u.PlnBlue(sourceContent)
-					//fmt.Println("=======================")
-					//u.PlnBlue(string(bs))
-					//fmt.Println("=======================")
-					s := bufio.NewScanner(bytes.NewReader(bs))
-					start := false
-					for s.Scan() {
-						if s.Text() == "<<<ENVIRONMENT>>>" {
-							start = true
-						} else if start {
-							kv := strings.SplitN(s.Text(), "=", 2)
-							if len(kv) == 2 {
-								os.Setenv(kv[0], kv[1])
+					venv := func() model.Venv {
+						s := bufio.NewScanner(bytes.NewReader(bs))
+						start := false
+						output := bytes.NewBufferString("")
+						venv := model.Venv{}
+						for s.Scan() {
+							if s.Text() == "<<<ENVIRONMENT>>>" {
+								start = true
+							} else if start {
+								kv := strings.SplitN(s.Text(), "=", 2)
+								if len(kv) == 2 {
+									k := kv[0]
+									v := kv[1]
+									os.Setenv(k, v)
+									venv = append(venv, model.Env{
+										Name:  k,
+										Value: v,
+									})
+								}
+							} else if !start {
+								output.WriteString(s.Text() + "\n")
+							}
+						}
+						u.PlnInfoHighlight("-sourcing execution result:")
+						u.PlnBlue(output.String())
+
+						if name != "" && action != "" {
+							if action == "save" {
+								model.PutVenv(name, venv)
+							}
+						}
+						return venv
+					}()
+
+					if action == "restore" {
+						venvSaved := model.GetVenv(name)
+						if venvSaved == nil {
+							u.LogWarn(name, " does not exist")
+						} else {
+							for _, x := range venv {
+								os.Unsetenv(x.Name)
+							}
+							for _, x := range venvSaved {
+								os.Setenv(x.Name, x.Value)
 							}
 						}
 					}
-				}
 
+				}
 			})
 
 		case "assert":

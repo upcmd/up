@@ -34,6 +34,9 @@ type ExecProfile struct {
 	RefDir   string
 	Instance string
 	Evars    EnvVars
+	//optional
+	Taskname string
+	Verbose  string
 }
 
 type ExecProfiles []ExecProfile

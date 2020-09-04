@@ -1,0 +1,197 @@
+doc_meta: |
+  folder: env-vars
+  title: virtualEnv cmd
+  head: |
+    This introduces a cmd virtualEnv to manage the shell execution enviornment, which you can source shell script/file, you can save the current enviornment as a named venv, and you can also restore your shell environment from the saved venv
+
+
+  sections:
+    - title: Demo
+      log: yes
+
+    - title: Demo
+      content: |
+
+        params:
+          name: the venv name
+          action: save | restore
+          source: the source content
+          srcfiles: a list of file to source
+
+        rules:
+
+          * source and srcfiles can not coexit but require at least one of them
+          * source and srcfiles are not required if you just want to save current shell session
+          * name and action can be both non exist or must both exist
+
+tasks:
+
+  -
+    name: task
+    desc: please switch to use case1|case2 ...
+    task:
+      -
+        func: call
+        do: case3
+
+  -
+    name: case1
+    desc: |
+    task:
+      -
+        func: shell
+        desc: |
+          before sourcing, the env var: AAA does not exist
+          this will cause an error
+        do:
+          - env |grep AAA
+        flags:
+          - ignoreError
+
+      -
+        func: cmd
+        desc: |
+          case1: only source
+          source via the source content
+        do:
+          - name: virtualEnv
+            cmd:
+              source: |
+                echo "start of source"
+                export AAA=sourced_aaa
+                echo "end of source"
+
+      -
+        func: shell
+        desc: |
+          after sourcing, the env var: AAA exist
+        do:
+          - env |grep AAA
+
+  -
+    name: case2
+    desc: |
+    task:
+      -
+        func: shell
+        desc: |
+          before sourcing, the env var: AAA does not exist
+          this will cause an error
+        do:
+          - env |grep AAA
+        flags:
+          - ignoreError
+
+      -
+        func: cmd
+        desc: |
+          case2: only source
+          source via srcfile
+        do:
+          - name: virtualEnv
+            cmd:
+              srcfile: ./tests/functests/test_env.rc
+      -
+        func: shell
+        desc: |
+          after sourcing, the env var: AAA exist
+        do:
+          - env |grep AAA
+
+  -
+    name: case3
+    desc: |
+    task:
+      -
+        func: shell
+        desc: |
+          before sourcing, the env var: AAA does not exist
+          this will cause an error
+        do:
+          - env |grep AAA
+        flags:
+          - ignoreError
+
+      -
+        func: cmd
+        desc: |
+          no source/srcfile input
+          with name and action
+          now it will save current shell env
+          which has got no AAA in it
+        do:
+          - name: virtualEnv
+            cmd:
+              name: venv0
+              action: save
+
+      -
+        func: shell
+        desc: |
+          since there is no source, this will still cause an error
+        do:
+          - env |grep AAA
+        flags:
+          - ignoreError
+
+      -
+        func: cmd
+        desc: |
+          now source and save current shell environment variables
+        do:
+          - name: virtualEnv
+            cmd:
+              name: venv1
+              action: save
+              srcfile: ./tests/functests/test_env.rc
+
+      -
+        func: shell
+        desc: |
+          after sourcing, the env var: AAA exist
+          the error should be cleared
+        do:
+          - env |grep AAA
+
+      -
+        func: cmd
+        desc: |
+          now let's restore to the point of venv0
+          which has got no AAA in it
+        do:
+          - name: virtualEnv
+            cmd:
+              name: venv0
+              action: restore
+
+      -
+        func: shell
+        desc: |
+          this will still cause an error
+          as now the shell env is restored to venv0
+          which has got no AAA in it
+        do:
+          - env |grep AAA
+        flags:
+          - ignoreError
+
+      -
+        func: cmd
+        desc: |
+          now let's restore to the point of venv1
+          which has got AAA in it
+          we expect the error is clear
+        do:
+          - name: virtualEnv
+            cmd:
+              name: venv1
+              action: restore
+
+      -
+        func: shell
+        desc: |
+          after sourcing, the env var: AAA exist
+          the error should be cleared
+        do:
+          - env |grep AAA
+
