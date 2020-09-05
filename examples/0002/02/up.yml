@@ -1,0 +1,75 @@
+notes: |
+  change test_case_name to case1 or case2 for different test
+
+  compared to case 01, it uses a builder pattern to construct the steps of testing
+
+  it dynamically fills in the detailed implementation step, such as case1 or case2 to test different scenario
+
+vars:
+  test_case_name: case2
+
+tasks:
+
+  -
+    name: Main
+    task:
+      -
+        func: call
+        do: test_skeleton
+
+  -
+    name: test_skeleton
+    desc: |
+    task:
+      -
+        func: shell
+        desc: |
+          before sourcing, the env var: AAA does not exist
+          this will cause an error
+        do:
+          - env |grep AAA
+        flags:
+          - ignoreError
+
+      -
+        func: call
+        desc: |
+          call the setup step
+        do: '{{.test_case_name}}'
+
+      -
+        func: shell
+        desc: |
+          after sourcing, the env var: AAA exist
+        do:
+          - env |grep AAA
+
+  -
+    name: case1
+    task:
+      -
+        func: cmd
+        desc: |
+          case1: only source
+          source via the source content
+        do:
+          - name: virtualEnv
+            cmd:
+              source: |
+                echo "start of source"
+                export AAA=sourced_aaa
+                echo "end of source"
+
+  -
+    name: case2
+    task:
+
+      -
+        func: cmd
+        desc: |
+          case2: only source
+          source via srcfile
+        do:
+          - name: virtualEnv
+            cmd:
+              srcfile: ./test_env.rc

@@ -382,13 +382,11 @@ func LogErrorAndContinue(mark string, err interface{}, hint string) {
 func InvalidAndPanic(mark string, hint string) {
 	hiColor := color.New(color.FgHiCyan, color.BgRed)
 	e := hiColor.Sprintf("  ERROR: %s [%s]\n", mark, hint)
-	panic(e)
-}
-
-func InvalidAndExit(mark string, hint string) {
-	hiColor := color.New(color.FgHiCyan, color.BgRed)
-	hiColor.Printf("  Invalid: %s [%s]\n", mark, hint)
-	os.Exit(-255)
+	if TaskPanicCount == 0 && StepPanicCount == 0 {
+		os.Exit(-255)
+	} else {
+		panic(e)
+	}
 }
 
 func GraceExit(mark string, hint string) {

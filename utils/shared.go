@@ -19,6 +19,9 @@ import (
 )
 
 var (
+	StepPanicCount int = 0
+	TaskPanicCount int = 0
+
 	P   = fmt.Print
 	Pln = fmt.Println
 	Pf  = fmt.Printf

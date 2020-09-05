@@ -261,6 +261,10 @@ func (f *CmdFuncAction) Exec() {
 				}
 
 				if (name == "" && action == "") || (name != "" && action != "") {
+				} else if action == "pure" {
+					if source != "" || srcfile != "" || name != "" {
+						u.InvalidAndPanic("param validation", "no name, source and srcfile is required when clean")
+					}
 				} else {
 					u.InvalidAndPanic("param validation", "name and action are required or missed at the same time")
 				}
@@ -308,7 +312,7 @@ func (f *CmdFuncAction) Exec() {
 
 				switch u.MainConfig.ShellType {
 				case "GOSH":
-					u.InvalidAndExit("TODO", "to be implementated in future")
+					u.InvalidAndPanic("TODO", "to be implementated in future")
 
 				default:
 					var sourceContent string
@@ -359,7 +363,7 @@ env
 						u.PlnBlue(output.String())
 
 						if name != "" && action != "" {
-							if action == "save" {
+							if action == "snapshot" {
 								model.PutVenv(name, venv)
 							}
 						}
@@ -377,6 +381,12 @@ env
 							for _, x := range venvSaved {
 								os.Setenv(x.Name, x.Value)
 							}
+						}
+					}
+
+					if action == "pure" {
+						for _, x := range venv {
+							os.Unsetenv(x.Name)
 						}
 					}
 

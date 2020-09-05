@@ -385,7 +385,7 @@ func (t *Tasker) ListAllTasks() {
 
 func (t *Tasker) LockModules() {
 	if !t.ValidateAllModules() {
-		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
+		u.InvalidAndPanic("modules configuration is not valid", "please fix the problem and try again")
 	}
 	u.Pln("-lock repos:")
 
@@ -414,7 +414,7 @@ func (t *Tasker) LockModules() {
 func (t *Tasker) CleanModules() {
 
 	if !t.ValidateAllModules() {
-		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
+		u.InvalidAndPanic("modules configuration is not valid", "please fix the problem and try again")
 	}
 	u.Pln("-clean repos:")
 	//u.Pdebug(u.MainConfig.AbsWorkDir, u.GetDefaultModuleDir())
@@ -423,7 +423,7 @@ func (t *Tasker) CleanModules() {
 
 func (t *Tasker) PullModules() {
 	if !t.ValidateAllModules() {
-		u.InvalidAndExit("modules configuration is not valid", "please fix the problem and try again")
+		u.InvalidAndPanic("modules configuration is not valid", "please fix the problem and try again")
 	}
 
 	u.Pln("-pull repos:")
@@ -733,13 +733,14 @@ func (t *Tasker) validateTasks() {
 		}
 
 		if cnt > 1 {
-			u.InvalidAndExit("Duplicated task name", u.Spf("task name:[%s]", x.Name))
+			u.InvalidAndPanic("Duplicated task name", u.Spf("task name:[%s]", x.Name))
 		}
 	}
 }
 
 func execTask(t *Tasker, taskname string, idx int, task model.Task, callerVars *core.Cache, isExternalCall bool) {
 	var rtContextFinal *TaskRuntimeContext
+	u.TaskPanicCount += 1
 	defer func(currentTask *model.Task) {
 		TaskerRuntime().Tasker.InFinalExec = true
 		TaskFinallyStack().Push(rtContextFinal)
@@ -767,6 +768,7 @@ func execTask(t *Tasker, taskname string, idx int, task model.Task, callerVars *
 		}
 		TaskerRuntime().Tasker.InFinalExec = false
 		TaskFinallyStack().Pop()
+		u.TaskPanicCount -= 1
 	}(&task)
 
 	u.Pfvvvv("  located task-> %d [%s]: \n", idx+1, task.Name)

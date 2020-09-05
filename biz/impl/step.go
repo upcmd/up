@@ -155,12 +155,11 @@ func validation(vars *core.Cache) {
 	if identified {
 		u.InvalidAndPanic("vars validation", "please fix all validation before continue")
 	}
-
 }
 
 func (step *Step) Exec(fromBlock bool) {
 	var action biz.Do
-
+	u.StepPanicCount += 1
 	defer func() {
 		if step.Finally != nil && step.Finally != "" {
 			u.PlnBlue("Step Finally:")
@@ -193,6 +192,7 @@ func (step *Step) Exec(fromBlock bool) {
 		} else if paniced {
 			u.LogWarn("Rescued in step level, but not advised!", "setting rescue to yes/true to continue is not recommended\nit is advised to locate root cause of the problem, fix it and re-run the task again\nit is the best practice to test the execution in your ci pipeline to eliminate problems rather than dynamically fix using rescue")
 		}
+		u.StepPanicCount -= 1
 	}()
 
 	var bizErr *ee.Error = ee.New()
@@ -615,7 +615,7 @@ func (steps *Steps) Exec(fromBlock bool) {
 					}
 				} else {
 					if result != nil && result.Code != 0 {
-						u.LogWarn("HightLight:", "Error ignored!!!")
+						u.LogWarn("ignoreError:", "Error ignored!!!")
 					}
 				}
 

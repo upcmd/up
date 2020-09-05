@@ -2,7 +2,7 @@ doc_meta: |
   folder: env-vars
   title: virtualEnv cmd
   head: |
-    This introduces a cmd virtualEnv to manage the shell execution enviornment, which you can source shell script/file, you can save the current enviornment as a named venv, and you can also restore your shell environment from the saved venv
+    This introduces a cmd virtualEnv to manage the shell execution enviornment, which you can source shell script/file, you can take a snapshot and save the current enviornment as a named venv, and you can also restore your shell environment from the saved venv
 
 
   sections:
@@ -14,7 +14,7 @@ doc_meta: |
 
         params:
           name: the venv name
-          action: save | restore
+          action: snapshot | restore
           source: the source content
           srcfiles: a list of file to source
 
@@ -28,7 +28,10 @@ tasks:
 
   -
     name: task
-    desc: please switch to use case1|case2 ...
+    desc: |
+      please switch to use case1|case2 ...
+      the reason we do not chain all cases together is because
+      the venv will pollute the entire running session unless you mananage to restore it
     task:
       -
         func: call
@@ -123,7 +126,7 @@ tasks:
           - name: virtualEnv
             cmd:
               name: venv0
-              action: save
+              action: snapshot
 
       -
         func: shell
@@ -142,7 +145,7 @@ tasks:
           - name: virtualEnv
             cmd:
               name: venv1
-              action: save
+              action: snapshot
               srcfile: ./tests/functests/test_env.rc
 
       -
@@ -195,3 +198,46 @@ tasks:
         do:
           - env |grep AAA
 
+  -
+    name: case4
+    desc: |
+    task:
+
+      -
+        func: cmd
+        desc: |
+          source via the source content
+        do:
+          - name: virtualEnv
+            cmd:
+              source: |
+                echo "start of source"
+                export AAA=sourced_aaa
+                echo "end of source"
+
+      -
+        func: shell
+        desc: |
+          after sourcing, the env var: AAA exist
+        do:
+          - env |grep AAA
+
+      -
+        func: cmd
+        desc: |
+          if you use clean param
+          it will unset all env vars from the current execution context
+        do:
+          - name: virtualEnv
+            cmd:
+              action: pure
+
+      -
+        func: shell
+        desc: |
+          before sourcing, the env var: AAA does not exist
+          this will cause an error
+        do:
+          - env |grep AAA
+        flags:
+          - ignoreError
