@@ -40,6 +40,10 @@ vars:
       this_is_a_field_with_dash: you will have to use index func to access the field
       note: direct access this field will trigger template rendering error
 
+  #we intend to access the dynamic value of the pod_name, which has got value of web_app
+  #this is an example of indirect access of varname
+  where_is_my_deploy: pod_name
+
 dvars:
   - name: instance_full_name
     value: "{{.ns}}-{{.pod_name}}"
@@ -113,6 +117,10 @@ dvars:
 
   - name: out_of_normal_field_name
     value: '{{ index .fieldnames "name-with-dash" }}'
+    flags: [vvvv,]
+
+  - name: indirect_var_reference
+    value: '{{ index . ".where_is_my_deploy" }}'
     flags: [vvvv,]
 
   - name: var_slice

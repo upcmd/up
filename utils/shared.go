@@ -18,6 +18,8 @@ import (
 	"time"
 )
 
+const charBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
 var (
 	StepPanicCount int = 0
 	TaskPanicCount int = 0
@@ -176,4 +178,12 @@ func RemoveEmptyLines(s string) string {
 	}
 	s = regex.ReplaceAllString(s, "\n")
 	return s
+}
+
+func RandString(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = charBytes[rand.Intn(len(charBytes))]
+	}
+	return string(b)
 }

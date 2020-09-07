@@ -89,7 +89,7 @@ func runCmd(f *ShellFuncAction, cmd string, idx1 int) {
 			u.PlnInfo("-")
 			outputResult := asyncStdReader("stdout", stdout, err, color.HiGreenString, idx1)
 			stdErrorResult := asyncStdReader("stderr", stderr, stderrErr, color.HiRedString, idx1)
-			u.PlnInfo("-")
+			u.PlnInfo("\n-")
 			err = cmdExec.Wait()
 
 			if ctx.Err() == context.DeadlineExceeded {

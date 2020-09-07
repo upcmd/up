@@ -131,6 +131,42 @@ func (f *CmdFuncAction) Exec() {
 				u.Pfv("%s\n", color.HiGreenString("%s", cmdRendered))
 			})
 
+		case "tmpFile":
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+
+				var raw, reg, content string
+
+				for k, v := range cmd {
+					switch k.(string) {
+					case "reg":
+						raw = v.(string)
+						reg = Render(raw, f.Vars)
+					case "content":
+						raw = v.(string)
+						content = Render(raw, f.Vars)
+					}
+				}
+
+				u.Pfv("tmp file handler: %s\n", color.HiGreenString("%s", reg))
+				tmpfile, err := ioutil.TempFile("", u.RandString(24))
+				if err != nil {
+					u.LogErrorAndExit("tmpfile creation", err, "can not create tmp file")
+				}
+
+				contentBuf := bytes.NewBufferString(content)
+				if _, err := tmpfile.Write(contentBuf.Bytes()); err != nil {
+					u.LogErrorAndExit("upVenv source write", err, "can not write to upVenv file")
+				}
+				if err := tmpfile.Close(); err != nil {
+					u.LogErrorAndExit("upVenv source close", err, "can not close upVenv file")
+				}
+
+				filename := tmpfile.Name()
+				f.Vars.Put(reg, filename)
+				TaskRuntime().ExecbaseVars.Put(reg, filename)
+			})
+
 		case "colorPrint":
 
 			cmdItem.runCmd("map", func() {
@@ -295,7 +331,7 @@ func (f *CmdFuncAction) Exec() {
 							u.LogErrorAndExit("upVenv source write", err, "can not write to upVenv file")
 						}
 						if err := tmpfile.Close(); err != nil {
-							u.LogErrorAndExit("upVenv source close", err, "can not close to upVenv file")
+							u.LogErrorAndExit("upVenv source close", err, "can not close upVenv file")
 						}
 
 						srcfile = tmpfile.Name()
@@ -457,7 +493,7 @@ env
 		case "readFile":
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
-				var varname, filename, dir, raw string
+				var varname, filename, dir, filepath, raw string
 				var localOnly bool
 				for k, v := range cmd {
 					switch k.(string) {
@@ -470,6 +506,9 @@ env
 					case "dir":
 						raw = v.(string)
 						dir = Render(raw, f.Vars)
+					case "filepath":
+						raw = v.(string)
+						filepath = Render(raw, f.Vars)
 					}
 				}
 
@@ -477,10 +516,16 @@ env
 					localOnly = true
 				})
 
-				filepath := path.Join(dir, filename)
+				if filepath != "" && (filename != "" || dir != "") {
+					u.InvalidAndPanic("param validation", "filename and dir are not required when filepath is set")
+				}
+
+				if filepath == "" {
+					filepath = path.Join(dir, filename)
+				}
 
 				content, err := ioutil.ReadFile(filepath)
-				u.LogErrorAndPanic("cmd readFile", err, "please fix file path and name issues")
+				u.LogErrorAndPanic("cmd readFile", err, u.Spf("please fix filepath: %s", filepath))
 
 				if localOnly {
 					f.Vars.Put(varname, string(content))
@@ -497,7 +542,7 @@ env
 		case "writeFile":
 			cmdItem.runCmd("map", func() {
 				cmd := cmdItem.Cmd.(map[interface{}]interface{})
-				var content, filename, dir, raw string
+				var content, filename, dir, filepath, raw string
 				for k, v := range cmd {
 					switch k.(string) {
 					case "content":
@@ -509,9 +554,20 @@ env
 					case "dir":
 						raw = v.(string)
 						dir = Render(raw, f.Vars)
+					case "filepath":
+						raw = v.(string)
+						filepath = Render(raw, f.Vars)
 					}
 				}
-				filepath := path.Join(dir, filename)
+
+				if filepath != "" && (filename != "" || dir != "") {
+					u.InvalidAndPanic("param validation", "filename and dir are not required when filepath is set")
+				}
+
+				if filepath == "" {
+					filepath = path.Join(dir, filename)
+				}
+
 				ioutil.WriteFile(filepath, []byte(content), 0644)
 			})
 

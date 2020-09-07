@@ -1,0 +1,66 @@
+doc_meta: |
+  folder: cmd-func
+  title: tmp file
+  head: |
+    This shows how to create a tmp file with content
+
+    params:
+    * reg: register the file path to a name, so you can reference the file using this reg name
+    * content: the content of the file to be created
+
+    Note:
+    You will have to manage to delete or clean up the tmp file in either step finally or task finally if you wish to
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        do:
+          - name: tmpFile
+            cmd:
+              reg: myfile
+              content: hello, world
+          - name: print
+            cmd: 'filename: {{.myfile}}'
+
+          - name: readFile
+            cmd:
+              filename: '{{.myfile}}'
+              reg: my_file_content
+          - name: print
+            cmd: 'file content: {{.my_file_content}}'
+
+
+        finally:
+          -
+            func: shell
+            do: 'cat {{.myfile}}'
+          -
+            func: shell
+            desc: |
+              this shows you delete the tmp file in step finally
+            do: 'rm -f {{.myfile}}'
+          -
+            func: shell
+            do: 'cat {{.myfile}}'
+            flags: [ignoreError]
+    finally:
+      -
+        func: shell
+        desc: |
+          this shows you delete the tmp file in task finally
+          this is deactivated
+          just for reference
+        dox: 'rm -f {{.myfile}}'
+
+      -
+        func: shell
+        do: 'cat {{.myfile}}'
+        flags: [ignoreError]

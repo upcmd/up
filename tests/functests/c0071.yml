@@ -37,6 +37,14 @@ tasks:
 
   - name: task
     task:
+      - func: call
+        do:
+          - case1
+          - case2
+
+  - name: case1
+    task:
+
       - func: cmd
         do:
           -
@@ -57,6 +65,37 @@ tasks:
             cmd:
               filename: mystory.txt
               dir: /tmp
+              reg: my_interesting_story
+
+          -
+            name: print
+            cmd: "{{.my_interesting_story}}"
+
+  - name: case2
+    task:
+
+      - func: cmd
+        do:
+          -
+            name: print
+            cmd: "{{.mystory}}"
+
+          -
+            name: writeFile
+            desc: write content to a file
+            cmd:
+              content: "{{.mystory}}"
+#              filename: mystory.txt
+#              dir: /tmp
+              filepath: /tmp/mystory.txt
+
+          -
+            name: readFile
+            desc: read content of a file and register it to a var
+            cmd:
+#              filename: mystory.txt
+#              dir: /tmp
+              filepath: /tmp/mystory.txt
               reg: my_interesting_story
 
           -

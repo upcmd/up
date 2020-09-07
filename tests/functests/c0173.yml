@@ -25,6 +25,10 @@ doc_meta: |
 notes:
   - test finally block implementation
 
+
+vars:
+  global_aaa: aaa
+
 tasks:
 
   -
@@ -34,6 +38,8 @@ tasks:
       -
         func: cmd
         desc: step 1
+        vars:
+          local_aaa: local_aaa
         do:
           - name: print
             cmd: step 1
@@ -42,6 +48,14 @@ tasks:
             cmd: extra step ......... it will never reach here
         rescue: true
         finally:
+          -
+            func: cmd
+            do:
+              - name: print
+                cmd: 'global aaa: {{.global_aaa}}'
+              - name: print
+                cmd: 'local aaa: {{.local_aaa}}'
+
           -
             func: shell
             name: close_file

@@ -1,0 +1,44 @@
+doc_meta: |
+  folder: cmd-func
+  title: tmp file with dynamic file handler
+  head: |
+    This shows in case you need to make filename dynamic and not hard coded, then you can use a varname for the file handler, which indirectly point to file path
+
+  sections:
+    - title: Demo
+      log: yes
+
+vars:
+  my_secrete_file_reg_name: my_secret
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        do:
+          - name: tmpFile
+            cmd:
+              reg: '{{.my_secrete_file_reg_name}}'
+              content: hello, world
+
+      -
+        func: cmd
+        dvars:
+          - name: filepath
+            value: '{{index . .my_secrete_file_reg_name}}'
+            flags:
+              - v
+        do:
+          - name: inspect
+            cmd:
+              - debug_vars
+
+          - name: readFile
+            cmd:
+              filename: '{{.filepath}}'
+              reg: my_file_content
+          - name: print
+            cmd: 'file content: {{.my_file_content}}'
