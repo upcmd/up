@@ -1,0 +1,8 @@
+
+version: 1.0.0
+Verbose: v
+MaxCallLayers: 8
+RefDir: ./ups
+Secure:
+  Type: default_aes
+  Key: enc_key

@@ -1,77 +1,58 @@
+scopes:
+  - name: global
+    vars:
+      a: global-a
+
+  - name: prod
+    members: [prod]
+    vars:
+      a: prod-a
+    dvars:
+      - name: enc_key
+        value: '{{ env "ENC_KEY_PROD" |validateMandatoryFailIfNone "enc_key"}}'
+
+  - name: nonprod
+    members:
+      - dev
+    vars:
+      a: non-prod-a
+    dvars:
+      - name: enc_key
+        value: '{{ env "ENC_KEY_NP" |validateMandatoryFailIfNone "enc_key"}}'
+
+  - name: dev
+    vars:
+      a: dev-a
+
+    dvars:
+      - name: api_username
+        value: i_am_the_api_uer
+
+      - name: api_password
+        value: the_api_password
+
+vars:
+  api_ep: 'http://httpbin.org/post'
+
 tasks:
 
   -
     name: Main
-    desc: |
-      please switch to use case1|case2 ...
-      the reason we do not chain all cases together is because
-      the venv will pollute the entire running session unless you mananage to restore it
-    task:
-      -
-        func: call
-        do: case2
-
-  -
-    name: case1
-    desc: |
     task:
       -
         func: shell
-        desc: |
-          before sourcing, the env var: AAA does not exist
-          this will cause an error
-        do:
-          - env |grep AAA
-        flags:
-          - ignoreError
-
-      -
-        func: cmd
-        desc: |
-          case1: only source
-          source via the source content
-        do:
-          - name: virtualEnv
-            cmd:
-              source: |
-                echo "start of source"
-                export AAA=sourced_aaa
-                echo "end of source"
-
-      -
-        func: shell
-        desc: |
-          after sourcing, the env var: AAA exist
-        do:
-          - env |grep AAA
-
-  -
-    name: case2
-    desc: |
-    task:
-      -
-        func: shell
-        desc: |
-          before sourcing, the env var: AAA does not exist
-          this will cause an error
-        do:
-          - env |grep AAA
-        flags:
-          - ignoreError
-
-      -
-        func: cmd
-        desc: |
-          case2: only source
-          source via srcfile
-        do:
-          - name: virtualEnv
-            cmd:
-              srcfile: ./test_env.rc
-      -
-        func: shell
-        desc: |
-          after sourcing, the env var: AAA exist
-        do:
-          - env |grep AAA
-
+        name: a_mockup_api_call
+        desc: if this step does not have a name, then the auto reg name would be task_0_reslt
+        do: |
+              curl -s -d '
+              {
+                "name": "tom",
+                "class": "year12-k",
+                "school": "SG"
+                "username": "{{.api_username}}"
+                "password": "{{.api_password}}"
+              }' \
+              -X POST \
+              -H "accept: application/json" \
+              {{.api_ep}}
+        reg: result

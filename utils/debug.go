@@ -383,6 +383,7 @@ func InvalidAndPanic(mark string, hint string) {
 	hiColor := color.New(color.FgHiCyan, color.BgRed)
 	e := hiColor.Sprintf("  ERROR: %s [%s]\n", mark, hint)
 	if TaskPanicCount == 0 && StepPanicCount == 0 {
+		Pln(e)
 		os.Exit(-255)
 	} else {
 		panic(e)

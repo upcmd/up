@@ -338,6 +338,9 @@ func (t *Tasker) setInstanceName(id, eprofilename string) {
 
 	t.InstanceName = instanceName
 	u.Pf("module: [%s], instance id: [%s], exec profile: [%s]\n", ConfigRuntime().ModuleName, t.InstanceName, t.ExecProfilename)
+	if t.InstanceName == "nonamed" && t.ExecProfilename == "" {
+		u.LogWarn("*be aware*", "both instance id and exec profile are not set")
+	}
 }
 
 func (t *Tasker) initRuntime() {

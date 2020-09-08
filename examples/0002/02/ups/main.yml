@@ -1,0 +1,17 @@
+tasks:
+  -
+    name: Main
+    task:
+      - func: cmd
+        do:
+          - name: print
+            cmd: |
+              Kick start usage:
+
+                up list
+                up list mytask
+                up ngo -i myenv taskname
+
+              Common Utils:
+                encrypt/decrypt: up ngo Utils_crypt_interactive
+

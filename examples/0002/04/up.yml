@@ -2,6 +2,9 @@ scopes:
   - name: global
     vars:
       a: global-a
+    dvars:
+      - name: app_name
+        value: '{{ env "APP_NAME" |validateMandatoryFailIfNone "app_name"}}'
 
   - name: prod
     members: [prod]
@@ -41,6 +44,17 @@ vars:
 tasksref:
   - ./main.yml
   - ./utils/encrypt.yml
+  - ./utils/venv.yml
   - ./myapp/create.yml
+
+eprofiles:
+  - name: dev_test
+    instance: dev
+    taskname: CreateMyAppStack
+    verbose: vvv
+
+    evars:
+      - name: APP_NAME
+        value: my_dev_test_app
 
 tasks:

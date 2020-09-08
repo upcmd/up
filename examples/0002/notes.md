@@ -1,4 +1,4 @@
 ### Notes
 
-Demo to optimise the repetitive workflow using builder pattern
+Demo to optimise the code base by re-organize the directory and file structure
 

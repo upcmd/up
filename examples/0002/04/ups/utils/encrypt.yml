@@ -1,0 +1,56 @@
+learnings:
+  - https://github.com/upcmd/up/blob/master/tests/functests/p0193.yml
+
+tasks:
+  -
+    name: Utils_crypt_interactive
+    task:
+      - func: call
+        dvars:
+          - name: choice
+            desc: choose 1 to encrypt or anyting else to decrypt
+            flags: [prompt]
+        do: encrypt
+        if: '{{eq .choice "1"}}'
+        else:
+          - func: call
+            do: decrypt
+
+  -
+    name: encrypt
+    task:
+      -
+        func: cmd
+        dvars:
+          - name: raw
+            flags:
+              - prompt
+          - name: encrypted
+            value: '{{ .raw | encryptAES .enc_key}}'
+          - name: decrypted
+            value: '{{ .encrypted | decryptAES .enc_key}}'
+        do:
+          - name: print
+            cmd: '{{ .raw }}'
+          - name: print
+            cmd: '{{ .encrypted }}'
+          - name: print
+            cmd: '{{ .decrypted }}'
+
+  -
+    name: decrypt
+    task:
+      -
+        func: cmd
+        dvars:
+          - name: encrypted
+            desc: please input the encrypted value
+            flags:
+              - prompt
+          - name: decrypted
+            value: '{{ .encrypted | decryptAES .enc_key}}'
+        do:
+          - name: print
+            cmd: '{{ .encrypted }}'
+          - name: print
+            cmd: '{{ .decrypted }}'

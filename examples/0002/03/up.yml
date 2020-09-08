@@ -41,6 +41,7 @@ vars:
 tasksref:
   - ./main.yml
   - ./utils/encrypt.yml
+  - ./utils/venv.yml
   - ./myapp/create.yml
 
 tasks:

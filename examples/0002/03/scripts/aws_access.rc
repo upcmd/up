@@ -1,0 +1,7 @@
+echo "start sourcing ....."
+export AWS_ACCESS_KEY_ID=my_aws_key_id
+export AWS_SECRET_ACCESS_KEY=my_aws_key
+export AWS_SESSION_TOKEN=my_aws_session_token
+export AWS_SECURITY_TOKEN=my_aws_security_token
+export AWS_DEFAULT_REGION=ap-southeast-2
+echo "end sourcing ....."

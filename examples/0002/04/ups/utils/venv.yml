@@ -1,0 +1,12 @@
+tasks:
+
+  -
+    name: set_aws_credential
+    task:
+      -
+        func: cmd
+        do:
+          - name: virtualEnv
+            desc: source all needed aws credential and apply accross the full execution session
+            cmd:
+              srcfile: ./scripts/aws_access.rc

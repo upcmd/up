@@ -1,0 +1,29 @@
+tasks:
+
+  -
+    name: CreateMyAppStack
+    task:
+      -
+        func: call
+        do: set_aws_credential
+
+      -
+        func: shell
+        name: create_my_application
+        desc: fake mock up only
+        do:
+          - echo "AWS_SESSION_TOKEN is - ${AWS_SESSION_TOKEN}"
+          - |
+              curl -s -d """
+              {
+                "name": "tom",
+                "class": "year12-k",
+                "school": "SG"
+                "username": "{{.secure_api_username}}"
+                "password": "{{.secure_api_password}}"
+                "token": "${AWS_SESSION_TOKEN}"
+              }""" \
+              -X POST \
+              -H "accept: application/json" \
+              {{.api_ep}}
+        reg: result
