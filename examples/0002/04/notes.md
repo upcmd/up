@@ -193,8 +193,8 @@ curl -s -d """
   "data": "", 
   "files": {}, 
   "form": {
-    "\n{\n  name: tom,\n  class: year12-k,\n  school: SG\n  username: api_username\n  password: the_api_password\n  token: my_aws_session_token\n}": ""
-  }, 
+    "\n{\n  name: tom,\n  class: year12-k,\n  school: SG\n  username: api_username\n  password: the_api_password\n  token: my_aws_session_token\n  appname: my_dev_test_app\n}": ""
+  },  
   "headers": {
     "Accept": "application/json", 
     "Content-Length": "133", 

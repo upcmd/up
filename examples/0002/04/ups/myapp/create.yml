@@ -22,6 +22,7 @@ tasks:
                 "username": "{{.secure_api_username}}"
                 "password": "{{.secure_api_password}}"
                 "token": "${AWS_SESSION_TOKEN}"
+                "appname": "{{.app_name}}"
               }""" \
               -X POST \
               -H "accept: application/json" \
