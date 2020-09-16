@@ -1,0 +1,40 @@
+doc_meta: |
+  folder: security
+  title: secure env var
+  head: |
+    Show case the support of declarative secure env var if you use both envVar and secure flag together
+
+  sections:
+    - title: Demo
+      log: yes
+
+
+tasks:
+
+  -
+    name: task
+    task:
+      -
+        func: shell
+        vars:
+          enc_key: my_enc_key
+        dvars:
+        - name: value_encrypted
+          value: '{{ "ENV_AAA" | encryptAES .enc_key }}'
+          flags: [vvvv]
+
+        - name: ENV_BBB
+          value: I_AM_ENV_VAR_BBB
+          flags:
+            - envVar
+
+        - name: ENV_AAA
+          value: tdRdCpkHCVz0xzzkthoPUsD6yS6w439zPMDNUot84mM=
+          flags:
+            - envVar
+            - secure
+
+        do: |
+          echo """normal env var: $ENV_BBB"""
+          echo """expected decrypted secure env var: $ENV_AAA"""
+          echo """normal secure var: {{.secure_ENV_AAA}}"""

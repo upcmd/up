@@ -220,13 +220,6 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 					}
 				}
 
-				if u.Contains(dvar.Flags, "envVar") {
-					envvarName := u.Spf("%s_%s", "envVar", dvar.Name)
-					(*mergeTarget).Put(envvarName, dvar.Rendered)
-					(*expandedVars).Put(envvarName, dvar.Rendered)
-					os.Setenv(dvar.Name, dvar.Rendered)
-				}
-
 				if TaskerRuntime().Tasker.TaskStack.GetLen() > 0 {
 					if u.Contains(dvar.Flags, "reg") {
 						if dvar.Name != "void" {
@@ -240,6 +233,21 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 
 				if u.Contains(dvar.Flags, "secure") {
 					DecryptAndRegister(ConfigRuntime().Secure, &dvar, mergeTarget, expandedVars)
+				}
+
+				if u.Contains(dvar.Flags, "envVar") {
+					var secureValue string
+					envvarName := u.Spf("%s_%s", "envVar", dvar.Name)
+					if u.Contains(dvar.Flags, "secure") {
+						secureValue = Decrypt(ConfigRuntime().Secure, &dvar, mergeTarget)
+						(*mergeTarget).Put(envvarName, secureValue)
+						(*expandedVars).Put(envvarName, secureValue)
+						os.Setenv(dvar.Name, secureValue)
+					} else {
+						(*mergeTarget).Put(envvarName, dvar.Rendered)
+						(*expandedVars).Put(envvarName, dvar.Rendered)
+						os.Setenv(dvar.Name, dvar.Rendered)
+					}
 				}
 
 				if u.Contains(dvar.Flags, "prompt") {

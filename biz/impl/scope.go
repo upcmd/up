@@ -71,6 +71,34 @@ func DecryptAndRegister(securetag *u.SecureSetting, dvar *Dvar, contextVars *cor
 
 }
 
+func Decrypt(securetag *u.SecureSetting, dvar *Dvar, contextVars *core.Cache) string {
+	s := securetag
+	var decrypted string
+	if s == nil {
+		u.InvalidAndPanic("check secure setting", "secure setting has to be explicit in dvar secure node, or as a default setting in upconfig.yml")
+	}
+	var encryptionkey string
+	if s.KeyRef != "" {
+		data, err := ioutil.ReadFile(s.KeyRef)
+		u.LogErrorAndExit("load secure key from ref file", err, "please fix file loading problem")
+		encryptionkey = string(data)
+	}
+
+	if s.Key != "" {
+		encryptionkey = (*contextVars).Get(s.Key).(string)
+	}
+
+	encrypted := dvar.Rendered
+
+	if encrypted != "" && encryptionkey != "" {
+		data := map[string]string{"enc_key": encryptionkey, "encrypted": encrypted}
+		decrypted = Render("{{ decryptAES .enc_key .encrypted}}", data)
+	} else {
+		u.InvalidAndPanic("dvar decrypt", u.Spf("please double check secure settings for [%s]", dvar.Name))
+	}
+	return decrypted
+}
+
 func GlobalVarsMergedWithDvars(scope *Scope) (vars *core.Cache) {
 	return VarsMergedWithDvars(scope.Name, &scope.Vars, &scope.Dvars, &(scope.Vars))
 }
