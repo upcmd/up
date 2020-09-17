@@ -8,6 +8,7 @@
 package impl
 
 import (
+	"bufio"
 	"bytes"
 	"github.com/fatih/color"
 	"github.com/imdario/mergo"
@@ -21,6 +22,7 @@ import (
 	"github.com/xlab/treeprint"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -238,6 +240,9 @@ func (t *Tasker) loadExecProfileEnvVars() {
 		if p.Taskname != "" {
 			u.MainConfig.EntryTask = p.Taskname
 		}
+		if p.Pure {
+			pureEnv()
+		}
 		if p.Verbose != "" {
 			u.MainConfig.Verbose = p.Verbose
 		}
@@ -253,6 +258,50 @@ func (t *Tasker) loadExecProfileEnvVars() {
 
 	t.ExecProfileEnvVars = envVars
 	u.Ppmsgvvvhint(u.Spf("profile - %s envVars:", t.ExecProfilename), envVars)
+}
+
+func pureEnv() {
+	sourceContent := `
+set -e
+echo '<<<ENVIRONMENT>>>'
+env
+`
+
+	cmd := exec.Command(u.MainConfig.ShellType, "-c", sourceContent)
+	bs, err := cmd.CombinedOutput()
+	if err != nil {
+		u.LogErrorAndExit("set pure env", err, "something is wrong obtaining system env vars")
+	}
+	venv := func() model.Venv {
+		s := bufio.NewScanner(bytes.NewReader(bs))
+		start := false
+		output := bytes.NewBufferString("")
+		venv := model.Venv{}
+		for s.Scan() {
+			if s.Text() == "<<<ENVIRONMENT>>>" {
+				start = true
+			} else if start {
+				kv := strings.SplitN(s.Text(), "=", 2)
+				if len(kv) == 2 {
+					k := kv[0]
+					v := kv[1]
+					os.Setenv(k, v)
+					venv = append(venv, model.Env{
+						Name:  k,
+						Value: v,
+					})
+				}
+			} else if !start {
+				output.WriteString(s.Text() + "\n")
+			}
+		}
+		return venv
+	}()
+
+	for _, x := range venv {
+		os.Unsetenv(x.Name)
+	}
+	u.PlnInfoHighlight("-set pure env context done.")
 }
 
 //clear up everything in scope and cache

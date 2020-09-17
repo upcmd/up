@@ -36,6 +36,7 @@ type ExecProfile struct {
 	Evars    EnvVars
 	//optional
 	Taskname string
+	Pure     bool
 	Verbose  string
 }
 
