@@ -25,6 +25,8 @@ const (
 	NONE_VALUE  = "None"
 	LAST_RESULT = "last_result"
 	FLAG_SILENT = "silent"
+
+	UP_ENTRY_TASK_NAME = "UP_ENTRY_TASK"
 )
 
 type MustConditionToContinueFunc func() bool

@@ -240,9 +240,17 @@ func (t *Tasker) loadExecProfileEnvVars() {
 		if p.Taskname != "" {
 			u.MainConfig.EntryTask = p.Taskname
 		}
+
+		alternativeEntryTaskname := os.Getenv(UP_ENTRY_TASK_NAME)
+		if alternativeEntryTaskname != "" {
+			u.PlnBlue(u.Spf("entry task: %s", alternativeEntryTaskname))
+			u.MainConfig.EntryTask = alternativeEntryTaskname
+		}
+
 		if p.Pure {
 			pureEnv()
 		}
+
 		if p.Verbose != "" {
 			u.MainConfig.Verbose = p.Verbose
 		}
