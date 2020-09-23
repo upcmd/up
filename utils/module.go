@@ -51,6 +51,7 @@ type UpConfig struct {
 	ModuleLock bool
 	//Exec Profile
 	EntryTask string
+	Pure      bool
 }
 
 type Modules []Module

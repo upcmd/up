@@ -36,6 +36,7 @@ var (
 	execprofile    = app.Flag("execprofile", "profile name for execution to setup a group environment variables").Short('p').String()
 	configDir      = app.Flag("configdir", "config file directory to load from|default .").String()
 	configFile     = app.Flag("configfile", "config file name to load without yml extension|default config").String()
+	pure           = app.Flag("pure", "use pure env").Bool()
 )
 
 func main() {
@@ -48,6 +49,7 @@ func main() {
 		cfg.SetWorkdir(*workdir)
 		cfg.SetTaskfile(*taskfile)
 		cfg.SetEntryTask(*ngoTaskName)
+		cfg.SetPure(*pure)
 		cfg.InitConfig()
 		u.MainConfig = cfg
 		cfg.ShowCoreConfig("Main")

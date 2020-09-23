@@ -98,6 +98,7 @@ func NewTasker(instanceId string, eprofiename string, cfg *u.UpConfig) *Tasker {
 
 	TaskerStack.Push(&taskerContext)
 
+	tasker.loadPureEnv()
 	tasker.loadExecProfiles()
 	tasker.setInstanceName(instanceId, eprofiename)
 	tasker.loadExecProfileEnvVars()
@@ -1048,6 +1049,13 @@ func (t *Tasker) loadExecProfiles() {
 	t.ExecProfiles = &eprofiles
 
 	u.LogErrorAndPanic("load exec profiles", err, "please assess your exec profiles configuration carefully")
+}
+
+func (t *Tasker) loadPureEnv() {
+	if u.MainConfig.Pure {
+		pureEnv()
+	}
+
 }
 
 func (t *Tasker) getExecProfile(pname string) *ExecProfile {

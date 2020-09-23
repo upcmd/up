@@ -95,6 +95,10 @@ func (cfg *UpConfig) SetWorkdir(workdir string) {
 	}
 }
 
+func (cfg *UpConfig) SetPure(pure bool) {
+	cfg.Pure = pure
+}
+
 func (cfg *UpConfig) SetTaskfile(taskfile string) {
 	if taskfile != "" {
 		cfg.TaskFile = taskfile

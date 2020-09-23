@@ -445,6 +445,8 @@ Allow empty skeleton to be laid for testing driving process or guide as seudo co
     * It serves like a interface to separates the goal and implementation and makes the code is reusable
 13. The shell execution binary is configurable, builtin support for GOSH (mvdan.cc/sh). This means that you do not need native shell/bash/zsh installed in order for task execution, you can run task from windows machine.
 14. It provides a module mechanism to encourage community to share modular code so that you do not need to reinvent the wheel to develop the same function again
+15. Use execution profile to simplify your Ci/CD pipeline integration with zero arguments in your command line but all managed in a nice configurable way.
+16. Use virtualEnv cmd to snapshot an env context, unset all env vars to create a pure clean execution env context, or restore to a point of time of the execution  
 
 ### Real Examples
 
