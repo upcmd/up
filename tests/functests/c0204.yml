@@ -1,0 +1,30 @@
+doc_meta: |
+  folder: security
+  title: retrieve secret from valut
+  head: |
+    When you put senstive information into vault, you can use a template func to retrieve it and use it in template rendering
+
+    This example shows that you can not get the secret value in general cache, unless you use fromVault template func
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        dvars:
+          - name: my_secret
+            value: you_will_never_know
+            flags:
+              - secret
+
+        do:
+          - name: print
+            cmd: |
+              hello, this is a secrt value: {{.my_secret}}
+              hello, this is a secrt value: {{ "my_secret" | fromVault}}
+              hello, this is a secrt value: {{ "a_secret_does_not_exist_in_vault" | fromVault}}

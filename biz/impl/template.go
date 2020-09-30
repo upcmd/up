@@ -96,6 +96,16 @@ func FuncMapInit() {
 
 			return encrypted
 		},
+		//retrieve value from vault
+		"fromVault": func(varname string) string {
+			var val string = "NotExistInVault"
+			opt := GetVault().Get(varname)
+			if opt != nil {
+				val = opt.(string)
+			}
+
+			return val
+		},
 		//regObj will keep the golang object intact and register it to cache
 		//same effect of: '{{ func_return_a_obj arg | objToYml|ymlToObj|reg "instances" }}'
 		"regObj": func(varname string, obj interface{}) interface{} {

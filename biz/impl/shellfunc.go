@@ -17,6 +17,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -167,13 +168,17 @@ func (f *ShellFuncAction) Exec() {
 	for idx, tcmd := range f.Cmds {
 		u.Pfv("cmd(%2d):\n", idx+1)
 		u.Pvv(tcmd)
+		cleansed := func() string {
+			re := regexp.MustCompile(`{{.*\.secure_.*}}`)
+			return re.ReplaceAllString(tcmd, `SECURE_SENSITIVE_INFO_MASKED`)
+		}()
 		cmd := Render(tcmd, f.Vars)
-		u.Pfvvvv("cmd=>:\n%s\n", color.HiBlueString("%s", cmd))
+		cleansedCmd := Render(cleansed, f.Vars)
+		u.Pfvvvv("cmd=>:\n%s\n", color.HiBlueString("%s", cleansedCmd))
 		runCmd(f, cmd, idx+1)
 		u.SubStepStatus("..", f.Result.Code)
 		u.Dvvvvv(f.Result)
 	}
 
 	StepRuntime().Result = &f.Result
-
 }

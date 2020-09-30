@@ -1,0 +1,35 @@
+doc_meta: |
+  folder: security
+  title: mask senstive info in shell execution
+  head: |
+    When you use verbose level greater than vvv, it will print out the debugging final shell scripts rendered, which possiblly contains the secure vars. In such a case, upcmd will automatically mask the senstive variable with SECURE_SENSITIVE_INFO_MASKED
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: shell
+        dvars:
+          - name: enc_key
+            value: my_enc_key
+            flags:
+              - secret
+
+          - name: value_encrypted
+            value: '{{ "ENV_AAA" | encryptAES .enc_key }}'
+            flags:
+              - vvvv
+              - taskScope
+
+          - name: ENV_AAA
+            value: '{{.value_encrypted}}'
+            flags:
+              - secure
+
+        do: |
+          echo "hello, this is a secrt value: {{.secure_ENV_AAA}}"
