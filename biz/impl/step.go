@@ -112,7 +112,7 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 		}
 	}
 	u.Pfvvvv("current exec runtime vars:")
-	u.Ppmsgvvvv(resultVars)
+	u.Ppmsgvvvv(secureCache(resultVars))
 
 	StepRuntime().ContextVars = resultVars
 	//so far the execvars includes: scope vars + scope dvars + global runtime vars + task vars
@@ -123,7 +123,7 @@ func (step *Step) getRuntimeExecVars(fromBlock bool) *core.Cache {
 	mergo.Merge(resultVars, varsWithDvars, mergo.WithOverride)
 
 	//so far the resultVars includes: the local vars + dvars rendered using execvars
-	u.Ppmsgvvvhint(u.Spf("%s: final context exec vars:", ConfigRuntime().ModuleName), resultVars)
+	u.Ppmsgvvvhint(u.Spf("%s: final context exec vars:", ConfigRuntime().ModuleName), secureCache(resultVars))
 	//debugVars()
 	return resultVars
 }

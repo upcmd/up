@@ -80,6 +80,22 @@ func FuncMapInit() {
 			u.PpmsgvvvvvHigh("ymlToObj", obj)
 			return obj
 		},
+		//use the encryption key stored in vault instead of plain value in general cache
+		"encrypteAesWithVault": func(enckeyName string, plain string) string {
+			var encryptionkey string
+			if enckeyName != "" {
+				//use vault as first priority
+				opt := GetVault().Get(enckeyName)
+				if opt == nil {
+					opt = (StepRuntime().ContextVars).Get(enckeyName)
+				}
+				encryptionkey = opt.(string)
+			}
+
+			encrypted := Render(u.Spf(`{{encryptAES "%s" "%s"}}`, encryptionkey, plain), "")
+
+			return encrypted
+		},
 		//regObj will keep the golang object intact and register it to cache
 		//same effect of: '{{ func_return_a_obj arg | objToYml|ymlToObj|reg "instances" }}'
 		"regObj": func(varname string, obj interface{}) interface{} {

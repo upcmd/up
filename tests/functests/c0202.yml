@@ -1,0 +1,57 @@
+doc_meta: |
+  folder: security
+  title: encrypteAesWithVault template func to retrieve and encrypt
+  head: |
+    Add a template func encrypteAesWithVault to retrieve the encryption key stored in vault and encypt based on the key
+
+  sections:
+    - title: Demo
+      log: yes
+
+scopes:
+
+  - name: nonprod
+    members:
+      - dev
+    dvars:
+      - name: enc_key
+        value: my_enc_key
+        flags:
+          - secret
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        dvars:
+
+          - name: value_encrypted
+            desc: |
+              encrypteAesWithVault will use the encryption key named enc_key stored in vault to encrypt
+              it falls back to the normal cached store to get the enc_key if it does not exist
+            value: '{{ "ENV_AAA" | encrypteAesWithVault "enc_key" }}'
+            flags:
+              - vvvv
+              - taskScope
+
+          - name: ENV_AAA
+            value: '{{.value_encrypted}}'
+            flags:
+              - secure
+
+        do:
+          - name: print
+            cmd: |
+              var: {{.ENV_AAA}}
+              decrypted secure var: {{.secure_ENV_AAA}}
+          -
+            name: inspect
+            desc: the vars in caller after invoking module task
+            cmd:
+              - exec_vars
+              - exec_base_vars
+              - exec_base_env_vars_configured
+              - exec_env_vars_configured
+              - debug_vars

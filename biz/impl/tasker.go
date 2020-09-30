@@ -193,7 +193,7 @@ func (t *Tasker) loadInstancesContext() {
 	func() {
 		u.Pvvvv("---------group vars----------")
 		for k, v := range t.ExpandedContext {
-			u.Pfvvvv("%s: %s", k, u.Sppmsg(*v))
+			u.Pfvvvv("%s: %s", k, u.Sppmsg(secureCache(v)))
 		}
 		u.Pfvvvv("groups members:%s\n", t.GroupMembersList)
 
@@ -212,7 +212,7 @@ func (t *Tasker) MergeRuntimeGlobalDvars() {
 	}
 
 	t.RuntimeVarsAndDvarsMerged = &mergedVars
-	u.Ppmsgvvvvhint("-------runtime global final merged with dvars-------", mergedVars)
+	u.Ppmsgvvvvhint("-------runtime global final merged with dvars-------", secureCache(&mergedVars))
 }
 
 func (t *Tasker) loadExecProfileEnvVars() {
@@ -377,8 +377,8 @@ func (t *Tasker) MergeUptoRuntimeGlobalVars() {
 	mergo.Merge(&runtimevars, *t.RuntimeGlobalVars, mergo.WithOverride)
 
 	u.Pfvvvv("merged[ %s ] runtime vars:", t.InstanceName)
-	u.Ppmsgvvvv(runtimevars)
-	u.Dvvvvv(runtimevars)
+	u.Ppmsgvvvv(secureCache(&runtimevars))
+	u.Dvvvvv(secureCache(&runtimevars))
 
 	t.RuntimeVarsMerged = &runtimevars
 }

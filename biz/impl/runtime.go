@@ -8,10 +8,12 @@
 package impl
 
 import (
+	"github.com/mohae/deepcopy"
 	"github.com/upcmd/up/model/core"
 	"github.com/upcmd/up/model/stack"
 	"github.com/upcmd/up/utils"
 	u "github.com/upcmd/up/utils"
+	"strings"
 )
 
 var (
@@ -112,6 +114,20 @@ func BlockStack() *stack.ExecStack {
 
 func ConfigRuntime() *utils.UpConfig {
 	return TaskerRuntime().Tasker.Config
+}
+
+func debugVault() {
+	u.Ppmsg("Vault", GetVault())
+}
+
+func secureCache(cache *core.Cache) *core.Cache {
+	tmpCache := deepcopy.Copy(*cache).(core.Cache)
+	for k, _ := range tmpCache {
+		if strings.HasPrefix(k, "secure_") {
+			tmpCache.Delete(k)
+		}
+	}
+	return &tmpCache
 }
 
 func debugVars() {
