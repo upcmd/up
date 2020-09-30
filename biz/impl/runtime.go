@@ -98,6 +98,10 @@ func StepStack() *stack.ExecStack {
 	return TaskerRuntime().Tasker.StepStack
 }
 
+func GetVault() *core.Cache {
+	return TaskerRuntime().Tasker.SecretVars
+}
+
 type BlockRuntimeContext struct {
 	BlockBaseVars *core.Cache
 }

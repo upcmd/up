@@ -89,6 +89,7 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 
 	dvars.ValidateAndLoading(contextVars)
 	var expandedVars *core.Cache = core.NewCache()
+	var secretVarList []string = []string{}
 
 	if *contextVars == nil {
 		contextVars = core.NewCache()
@@ -174,6 +175,10 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 			var dvarNameKept bool
 			var objConverted = new(interface{})
 			if dvar.Flags != nil && len(dvar.Flags) != 0 {
+				if u.Contains(dvar.Flags, "secret") {
+					GetVault().Put(dvar.Name, dvar.Rendered)
+					secretVarList = append(secretVarList, dvar.Name)
+				}
 
 				for _, vlevel := range vlevels {
 					if u.Contains(dvar.Flags, vlevel) {
@@ -303,6 +308,10 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 	u.Pfvvvvv("[%s] dvar expanded result:\n%s\n", mark, u.Sppmsg(*expandedVars))
 	if stepRuntime != nil {
 		stepRuntime.DataSyncInDvarExpand = transientSyncVoid
+	}
+
+	for _, x := range secretVarList {
+		expandedVars.Delete(x)
 	}
 
 	return expandedVars

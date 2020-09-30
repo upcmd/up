@@ -57,6 +57,7 @@ type Tasker struct {
 	//this is the merged vars from within scope: global, groups level (if there is), instance varss, then global runtime vars
 	RuntimeVarsMerged  *core.Cache
 	ExecProfileEnvVars *core.Cache
+	SecretVars         *core.Cache
 	//this is the merged vars and dvars to a vars cache from within scope: global, groups level (if there is), instance varss, then global runtime vars
 	//this vars should be used instead of RuntimeVarsMerged as it include both runtime vars and dvars except the local vars and dvars
 	RuntimeVarsAndDvarsMerged *core.Cache
@@ -98,6 +99,7 @@ func NewTasker(instanceId string, eprofiename string, cfg *u.UpConfig) *Tasker {
 
 	TaskerStack.Push(&taskerContext)
 
+	tasker.initSecureVault()
 	tasker.loadPureEnv()
 	tasker.loadExecProfiles()
 	tasker.setInstanceName(instanceId, eprofiename)
@@ -1056,6 +1058,10 @@ func (t *Tasker) loadPureEnv() {
 		pureEnv()
 	}
 
+}
+
+func (t *Tasker) initSecureVault() {
+	t.SecretVars = core.NewCache()
 }
 
 func (t *Tasker) getExecProfile(pname string) *ExecProfile {

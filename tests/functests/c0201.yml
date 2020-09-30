@@ -1,0 +1,65 @@
+doc_meta: |
+  folder: security
+  title: use valut to store secrets
+  head: |
+    It is most important of the all the vars/dvars containing sensitive information will not be revealed while we use different verbose level or doing the debug
+
+    For this purpose, we introduce a vault cache store to store all the secrets masked using 'secret' flag
+
+    When a dvar is masked as secret, it is stored in vault and this will not be printed out or exposed
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        dvars:
+          - name: enc_key
+            value: my_enc_key
+            flags:
+              - secret
+
+          - name: value_encrypted
+            value: '{{ "ENV_AAA" | encryptAES .enc_key }}'
+            flags:
+              - vvvv
+              - taskScope
+
+          - name: ENV_AAA
+            value: '{{.value_encrypted}}'
+            flags:
+              - secure
+
+        do:
+          - name: print
+            cmd: |
+              var: {{.ENV_AAA}}
+              decrypted secure var: {{.secure_ENV_AAA}}
+          -
+            name: inspect
+            desc: the vars in caller after invoking module task
+            cmd:
+              - exec_vars
+              - exec_base_vars
+              - exec_base_env_vars_configured
+              - exec_env_vars_configured
+              - debug_vars
+
+      -
+        func: cmd
+        dvars:
+          - name: ENV_BBB
+            value: '{{.value_encrypted}}'
+            flags:
+              - secure
+
+        do:
+          - name: print
+            cmd: |
+              var: {{.ENV_BBB}}
+              decrypted secure var: {{.secure_ENV_BBB}}

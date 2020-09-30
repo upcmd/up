@@ -56,7 +56,12 @@ func DecryptAndRegister(securetag *u.SecureSetting, dvar *Dvar, contextVars *cor
 	}
 
 	if s.Key != "" {
-		encryptionkey = (*contextVars).Get(s.Key).(string)
+		//use vault as first priority
+		opt := GetVault().Get(s.Key)
+		if opt == nil {
+			opt = (*contextVars).Get(s.Key)
+		}
+		encryptionkey = opt.(string)
 	}
 
 	encrypted := dvar.Rendered
