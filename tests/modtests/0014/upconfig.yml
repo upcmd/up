@@ -1,0 +1,39 @@
+version: 1.0.0
+Verbose: v
+MaxCallLayers: 8
+RefDir: .
+TaskFile: up.yml
+ConfigDir: .
+ConfigFile: upconfig.yml
+ModuleLock: true
+Secure:
+  Type: default_aes
+  #the key value will be a var name used for the value
+  Key: enc_key
+#      keyref: /a/secure/location/key.file
+
+ModRepoUsernameRef: GIT_USERNAME
+ModRepoPasswordRef: GIT_PASSWORD
+
+Modules:
+#By default: UPcmd will try to detect:
+#the global setting of git username and password: ModRepoUsernameRef and ModRepoPasswordRef
+#if individual repo UsernameRef and PasswordRef exist, then use the individual credential
+
+  - repo: https://github.com/upcmd/auth_test_module.git
+    alias: hello
+    #ref to an env var name
+    #this example shows it obtains a pre set credential from current shell context
+    UsernameRef: AUTH_TEST_MODULE_GIT_USERNAME
+    PasswordRef: AUTH_TEST_MODULE_GIT_PASSWORD
+    PullPolicy: always
+
+  - repo: https://github.com/upcmd/auth_test_module.git
+    alias: hi
+    #ref to an env var name
+    #this example shows it obtain the configured credential from up.yml in secure context
+    UsernameRef: GITHUB_USERNAME
+    PasswordRef: GITHUB_PASSWORD_ENCRYPTED
+    PullPolicy: always
+
+#* a side note: if you use token, then please use whatever value(not empty) for username, set the the ref value in env var to be the token's value

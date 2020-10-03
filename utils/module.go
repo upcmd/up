@@ -10,6 +10,7 @@ package utils
 import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/olekukonko/tablewriter"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -28,6 +29,9 @@ type Module struct {
 	Subdir     string
 	Iid        string
 	PullPolicy string
+	//ref to an env var name
+	UsernameRef string
+	PasswordRef string
 }
 
 type UpConfig struct {
@@ -50,8 +54,10 @@ type UpConfig struct {
 	Modules    Modules
 	ModuleLock bool
 	//Exec Profile
-	EntryTask string
-	Pure      bool
+	EntryTask          string
+	Pure               bool
+	ModRepoUsernameRef string
+	ModRepoPasswordRef string
 }
 
 type Modules []Module
@@ -179,21 +185,19 @@ func (ms *Modules) PullMainModules() (clonedList []string) {
 func (m *Module) getVersionAndPath() (string, string) {
 	var versionDecided string
 	lockMap := LoadModuleLockRevs()
-	if m.Version != "" {
-		if MainConfig.ModuleLock {
-			if lockedVersion, ok := (*lockMap)[m.Alias]; ok {
-				if lockedVersion != m.Version {
-					if !strings.Contains(lockedVersion, m.Version) {
-						LogWarn("Locked version differs, use locked version", Spf("locked: %s, configured: %s", lockedVersion, m.Version))
-						versionDecided = lockedVersion
-					}
+	if MainConfig.ModuleLock && lockMap != nil {
+		if lockedVersion, ok := (*lockMap)[m.Alias]; ok {
+			if lockedVersion != m.Version {
+				if !strings.Contains(lockedVersion, m.Version) {
+					LogWarn("Locked version differs, use locked version", Spf("locked: %s, configured: %s", lockedVersion, m.Version))
+					versionDecided = lockedVersion
 				}
 			}
 		}
+	}
 
-		if versionDecided == "" {
-			versionDecided = m.Version
-		}
+	if versionDecided == "" {
+		versionDecided = m.Version
 	}
 
 	clonePath := m.Dir
@@ -205,15 +209,65 @@ func (m *Module) getVersionAndPath() (string, string) {
 }
 
 func (m *Module) PullRepo(revMap *ModuleLockMap, uselock bool) {
-
 	clonePath := m.Dir
 	m.ShowDetails()
 	clone := func() {
 		_, err := git.PlainClone(clonePath, false, &git.CloneOptions{
+			Auth: func() *http.BasicAuth {
+				auth := http.BasicAuth{}
+				gu := MainConfig.ModRepoUsernameRef
+				gp := MainConfig.ModRepoPasswordRef
+				var gvalid, ivalid bool
+
+				var guv, gpv string
+				if gu != "" && gp != "" {
+					guv = os.Getenv(gu)
+					gpv = os.Getenv(gp)
+					if guv != "" && gpv != "" {
+						gvalid = true
+					}
+				}
+
+				u := m.UsernameRef
+				p := m.PasswordRef
+
+				var uv, pv string
+				if u != "" && p != "" {
+					uv = os.Getenv(u)
+					pv = os.Getenv(p)
+					if uv != "" && pv != "" {
+						ivalid = true
+					}
+				}
+
+				if ivalid {
+					auth.Username = uv
+					auth.Password = pv
+					return &auth
+				}
+
+				if gvalid {
+					auth.Username = guv
+					auth.Password = gpv
+					return &auth
+				}
+				//fall back to empty auth for public accessible repo
+				return &auth
+			}(),
 			URL:      m.Repo,
 			Progress: os.Stdout,
 		})
-		LogErrorAndPanic("Clone Module", err, "Clone errored, please fix the issue first and retry")
+		LogErrorAndExit("Clone Module", err, `Clone errored, please fix the issue first and retry
+Please either ues global repo settings:
+	ModRepoUsernameRef: GIT_USERNAME
+	ModRepoPasswordRef: GIT_PASSWORD
+
+Or individual repo settings:
+    UsernameRef: AUTH_TEST_MODULE_GIT_USERNAME
+    PasswordRef: AUTH_TEST_MODULE_GIT_PASSWORD
+
+They refer to the environment variable username and password
+`)
 	}
 
 	if _, err := os.Stat(clonePath); !os.IsNotExist(err) {

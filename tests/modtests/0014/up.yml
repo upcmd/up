@@ -1,0 +1,38 @@
+notes:
+  - add username/password auth support
+
+dvars:
+  - name: enc_key
+    value: my_enc_key
+    flags:
+      - secret
+
+  - name: github_password
+    value: '{{ "something_secret" | encryptAES .enc_key }}'
+    flags:
+      - v
+
+  - name: GITHUB_USERNAME
+    value: my_github_username
+    flags:
+      - envVar
+      - v
+
+  - name: GITHUB_PASSWORD_ENCRYPTED
+    value: '{{.github_password}}'
+    flags:
+      - secure
+      - envVar
+      - v
+
+tasks:
+  -
+    name: Main
+    desc: main entry
+    task:
+
+      -
+        func: call
+        desc: |
+          note that the module dir is: hello-module, but in upconfig.yml you give the alias hello as module name
+        do: hello.Say_world

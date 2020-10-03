@@ -7,3 +7,4 @@ functests-mock
 nix-container/
 vendor
 app/up/version.go
+.upmodules
