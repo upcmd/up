@@ -1,0 +1,25 @@
+doc_meta: |
+  folder: shell-func
+  title: support interactive session
+  head: |
+    If there is login shell in interactive session, it will enter the interactive session until the session is exited
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: shell
+        desc: |
+          it will print hello
+          then traped in a shell session in docker run
+          once user exits the session
+          then it will continue the proc to print the world
+        do:
+          - echo "hello"
+          - docker run -it --rm --name cmnix docker.pkg.github.com/upcmd/up/upcli:latest /bin/sh -l
+          - echo "world"
