@@ -73,6 +73,8 @@ func runCmd(f *ShellFuncAction, cmd string, idx1 int) {
 				}
 			}()
 
+			cmdExec.Stdin = os.Stdin
+
 			stdout, err := cmdExec.StdoutPipe()
 			if err != nil {
 				u.LogError("stdout pipe", err)

@@ -157,6 +157,13 @@ echo "syntax: uptestx c0033"
     goup ngo task -d ./tests/functests -t $1 -i dev --configdir=./tests/functests
 }
 
+
+showcodex(){
+echo "syntax: showcodex c0033"
+    highlight ./tests/functests/$1.yml --syntax=yaml
+}
+
+
 uptestxvvv(){
 echo "syntax: uptestx c0033"
     goup ngo task -d ./tests/functests -t $1 -i dev -v vvv --configdir=./tests/functests
