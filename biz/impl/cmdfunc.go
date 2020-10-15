@@ -10,6 +10,7 @@ package impl
 import (
 	"bufio"
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"github.com/fatih/color"
 	ms "github.com/mitchellh/mapstructure"
@@ -107,6 +108,45 @@ func (cmdCmd *CmdCmd) runCmd(whichtype string, f func()) {
 
 }
 
+func decodeABinaryFile(srcpath, destpath string) {
+	if _, err := os.Stat(srcpath); !os.IsNotExist(err) {
+		f, _ := os.Open(srcpath)
+		defer f.Close()
+		reader := bufio.NewReader(f)
+		encoded, _ := ioutil.ReadAll(reader)
+
+		decoded, err := base64.StdEncoding.DecodeString(string(encoded))
+		if err != nil {
+			u.LogWarn("base64 decode", "base64 decoding failed")
+		}
+
+		e := ioutil.WriteFile(destpath, decoded, 0644)
+
+		if e != nil {
+			u.LogWarn("base64 decode create file", "create file failed")
+			return
+		}
+
+	} else {
+		u.LogWarn("base64 decode binary file", "file does not exist")
+	}
+
+}
+
+func encodeABinaryFile(filepath string) string {
+	if _, err := os.Stat(filepath); !os.IsNotExist(err) {
+		f, _ := os.Open(filepath)
+		defer f.Close()
+		reader := bufio.NewReader(f)
+		content, _ := ioutil.ReadAll(reader)
+		encoded := base64.StdEncoding.EncodeToString(content)
+		return encoded
+	} else {
+		u.LogWarn("base64 encode binary file", "file does not exist")
+		return ""
+	}
+}
+
 func (f *CmdFuncAction) Exec() {
 
 	for idx, cmdItem := range *f.Cmds {
@@ -165,6 +205,52 @@ func (f *CmdFuncAction) Exec() {
 				filename := tmpfile.Name()
 				f.Vars.Put(reg, filename)
 				TaskRuntime().ExecbaseVars.Put(reg, filename)
+			})
+
+		case "base64EncodeFile":
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+
+				var raw, dest, src string
+
+				for k, v := range cmd {
+					switch k.(string) {
+					case "dest":
+						raw = v.(string)
+						dest = Render(raw, f.Vars)
+					case "src":
+						raw = v.(string)
+						src = Render(raw, f.Vars)
+					}
+				}
+				if src == "" || dest == "" {
+					u.LogWarn("param validate", "src and dest can not be empty")
+				}
+
+				b64Str := encodeABinaryFile(src)
+				ioutil.WriteFile(dest, []byte(b64Str), 0644)
+			})
+
+		case "base64DecodeFile":
+			cmdItem.runCmd("map", func() {
+				cmd := cmdItem.Cmd.(map[interface{}]interface{})
+
+				var raw, dest, src string
+
+				for k, v := range cmd {
+					switch k.(string) {
+					case "dest":
+						raw = v.(string)
+						dest = Render(raw, f.Vars)
+					case "src":
+						raw = v.(string)
+						src = Render(raw, f.Vars)
+					}
+				}
+				if src == "" || dest == "" {
+					u.LogWarn("param validate", "src and dest can not be empty")
+				}
+				decodeABinaryFile(src, dest)
 			})
 
 		case "colorPrint":
