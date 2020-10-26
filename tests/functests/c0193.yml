@@ -225,7 +225,7 @@ tasks:
       -
         func: cmd
         desc: |
-          if you use clean param
+          if you use pure param
           it will unset all env vars from the current execution context
         do:
           - name: virtualEnv

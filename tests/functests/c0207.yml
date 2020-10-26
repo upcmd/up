@@ -1,0 +1,20 @@
+notes: |
+  test an edge case that secure var can not be decrypted due to the non existence of the enc_key
+
+scopes:
+  - name: global
+    dvars:
+      - name: ENV_AAA
+        value: tdRdCpkHCVz0xzzkthoPUsD6yS6w439zPMDNUot84mM=
+        flags:
+          - envVar
+          - secure
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do:
+          - echo "hello"

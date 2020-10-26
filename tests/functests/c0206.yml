@@ -1,0 +1,26 @@
+doc_meta: |
+  folder: cmd-func
+  title: base64 encode/decode binary file
+  head: |
+    Showcase how to do base64 encode and decode a binary file
+
+  sections:
+    - title: Demo
+      log: yes
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        do:
+          - name: base64EncodeFile
+            cmd:
+              src: ./tests/functests/binary.jpg
+              dest: /tmp/binaryencoded
+
+          - name: base64DecodeFile
+            cmd:
+              src: /tmp/binaryencoded
+              dest: /tmp/binarydecoded.jpg

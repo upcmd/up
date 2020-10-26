@@ -61,11 +61,12 @@ func DecryptAndRegister(securetag *u.SecureSetting, dvar *Dvar, contextVars *cor
 		if opt == nil {
 			opt = (*contextVars).Get(s.Key)
 		}
-		encryptionkey = opt.(string)
+		if opt != nil {
+			encryptionkey = opt.(string)
+		}
 	}
 
 	encrypted := dvar.Rendered
-
 	if encrypted != "" && encryptionkey != "" {
 		data := map[string]string{"enc_key": encryptionkey, "encrypted": encrypted}
 		decrypted := Render("{{ decryptAES .enc_key .encrypted}}", data)
