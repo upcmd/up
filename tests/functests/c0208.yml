@@ -1,0 +1,26 @@
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        desc: |
+          a alternative solution for https://github.com/direnv/direnv/issues/385
+          compared to using .envrc, which loads the env vars into current shell exec context, this
+          will load the env vars during the execution instead. It meanage the bundle of env vars plus
+          the execution
+        do:
+          - name: virtualEnv
+            cmd:
+              srcfile: ./tests/functests/test_env.rc
+
+      -
+        func: shell
+        do:
+          - echo "starting the main"
+          - |
+            echo """
+            AAA = $AAA
+            BBB = $BBB
+            """

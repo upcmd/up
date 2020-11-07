@@ -73,7 +73,7 @@ func DecryptAndRegister(securetag *u.SecureSetting, dvar *Dvar, contextVars *cor
 		secureName := u.Spf("%s_%s", "secure", dvar.Name)
 		(*mergeTarget).Put(secureName, decrypted)
 	} else {
-		u.InvalidAndPanic("dvar decrypt", u.Spf("please double check secure settings for [%s]", dvar.Name))
+		u.InvalidAndPanic("dvar decrypt", u.Spf("please double check secure settings for [%s]\nyou might need to associate an instance id or an exec profile", dvar.Name))
 	}
 
 }
@@ -101,7 +101,7 @@ func Decrypt(securetag *u.SecureSetting, dvar *Dvar, contextVars *core.Cache) st
 		data := map[string]string{"enc_key": encryptionkey, "encrypted": encrypted}
 		decrypted = Render("{{ decryptAES .enc_key .encrypted}}", data)
 	} else {
-		u.InvalidAndPanic("dvar decrypt", u.Spf("please double check secure settings for [%s]", dvar.Name))
+		u.InvalidAndPanic("dvar decrypt", u.Spf("please double check secure settings for [%s]\nyou might need to associate an instance id or an exec profile", dvar.Name))
 	}
 	return decrypted
 }

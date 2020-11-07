@@ -1,8 +1,8 @@
-
 # both worked
 # with: #!/usr/bin/env bash
 # or with out it
 
 echo "start of source"
 export AAA=sourced_aaa
+export BBB=sourced_bbb
 echo "end of source"

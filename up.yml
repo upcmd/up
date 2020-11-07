@@ -685,10 +685,12 @@ tasks:
             cmd: 'OS is: {{.os}}'
 
       - func: shell
+        desc: copy the binary to path in osx
         do: cp -f build/mac/up /usr/local/bin/
         if: '{{ eq .os "Darwin" }}'
 
       - func: shell
+        desc: copy the binary to path in linux
         do: cp -f build/linux/up /bin/
         if: '{{ eq .os "Linux" }}'
 
