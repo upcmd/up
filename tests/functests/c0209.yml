@@ -1,0 +1,63 @@
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: shell
+        desc: shows that all exit codes are 0 in the test of curl even though the http responses are different
+        do:
+          - |
+            curl http://httpbin.org/status/200 --write-out "%{http_code}"
+            echo " \nexit code:$?"
+
+          - |
+            curl http://httpbin.org/status/401 --write-out "%{http_code}"
+            echo " \nexit code:$?"
+
+          - |
+            curl http://httpbin.org/status/500 --write-out "%{http_code}"
+            echo " \nexit code:$?"
+
+      -
+        func: call
+        desc: |
+          wrap up a task to deal with return codes
+          treat the transactions with code 200 and 201 as successful
+          the handle_exit_code task could be extend to take more input variable such as endpoint etc
+        do: handle_exit_code
+        loop: '{{loopRange 1 50 "try5times"}}'
+
+      - func: cmd
+        desc: show if the above http request is successful
+        do:
+          - name: print
+            cmd: '?success: {{.success}}'
+
+  -
+    name: handle_exit_code
+    task:
+      -
+        func: shell
+        desc: prototyping the case to randomly get a http response either 200 or 201
+        do: |
+          array[0]=200
+          array[1]=201
+          array[2]=301
+          array[3]=302
+          array[4]=404
+          array[5]=500
+          size=${#array[@]}
+          index=$(($RANDOM % $size))
+          echo ${array[$index]}
+        reg: result
+
+      - func: cmd
+        dvars:
+          - name: success
+            value: '{{ list "200" "201" | has .result.Output }}'
+            flags:
+              - v
+        do:
+          - name: return
+            cmd:
+              - success
