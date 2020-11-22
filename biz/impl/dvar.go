@@ -9,6 +9,7 @@ package impl
 
 import (
 	"bufio"
+	"github.com/howeyc/gopass"
 	"github.com/mohae/deepcopy"
 	"github.com/upcmd/up/model/core"
 	u "github.com/upcmd/up/utils"
@@ -175,6 +176,41 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 			var dvarNameKept bool
 			var objConverted = new(interface{})
 			if dvar.Flags != nil && len(dvar.Flags) != 0 {
+				if u.Contains(dvar.Flags, "prompt") {
+					u.Pprompt(dvar.Name, func() string {
+						if dvar.Desc != "" {
+							return Render(dvar.Desc, tmpVars)
+						} else {
+							return u.Spf("This will be saved as %s's value", dvar.Name)
+						}
+					}())
+
+					var saneValue string
+					if u.Contains(dvar.Flags, "masked") {
+						maskedPassword, _ := gopass.GetPasswdMasked()
+						saneValue = string(maskedPassword)
+					} else {
+
+						reader := bufio.NewReader(os.Stdin)
+						dvarInputValue, _ := reader.ReadString('\n')
+						saneValue = u.RemoveCr(dvarInputValue)
+					}
+					pval := func() (v string) {
+						if saneValue != "" {
+							v = saneValue
+						} else if saneValue == "" && dvar.Value == "" {
+							v = NONE_VALUE
+						} else {
+							v = dvar.Value
+						}
+						return
+					}()
+
+					(*mergeTarget).Put(dvar.Name, pval)
+					(*expandedVars).Put(dvar.Name, pval)
+					dvar.Rendered = saneValue
+				}
+
 				if u.Contains(dvar.Flags, "secret") {
 					GetVault().Put(dvar.Name, dvar.Rendered)
 					secretVarList = append(secretVarList, dvar.Name)
@@ -253,33 +289,6 @@ func (dvars *Dvars) Expand(mark string, contextVars *core.Cache) *core.Cache {
 						(*expandedVars).Put(envvarName, dvar.Rendered)
 						os.Setenv(dvar.Name, dvar.Rendered)
 					}
-				}
-
-				if u.Contains(dvar.Flags, "prompt") {
-					u.Pprompt(dvar.Name, func() string {
-						if dvar.Desc != "" {
-							return Render(dvar.Desc, tmpVars)
-						} else {
-							return u.Spf("This will be saved as %s's value", dvar.Name)
-						}
-					}())
-					reader := bufio.NewReader(os.Stdin)
-					dvarInputValue, _ := reader.ReadString('\n')
-					saneValue := u.RemoveCr(dvarInputValue)
-					pval := func() (v string) {
-						if saneValue != "" {
-							v = saneValue
-						} else if saneValue == "" && dvar.Value == "" {
-							v = NONE_VALUE
-						} else {
-							v = dvar.Value
-						}
-						return
-					}()
-
-					(*mergeTarget).Put(dvar.Name, pval)
-					(*expandedVars).Put(dvar.Name, pval)
-					dvar.Rendered = saneValue
 				}
 
 				if u.Contains(dvar.Flags, "taskScope") {

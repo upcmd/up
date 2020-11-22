@@ -7,6 +7,7 @@ require (
 	github.com/alecthomas/kingpin v2.2.6+incompatible
 	github.com/fatih/color v1.9.0
 	github.com/go-git/go-git/v5 v5.1.0
+	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c
 	github.com/imdario/mergo v0.3.11
 	github.com/leekchan/gtf v0.0.0-20190214083521-5fba33c5b00b
 	github.com/mitchellh/mapstructure v1.1.2
