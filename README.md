@@ -1,4 +1,4 @@
-# UPcmd [docs site](https://upcmd.netlify.app/)
+# UPcmd [Docs](https://upcmd.netlify.app/) [Telegram Channel](https://t.me/joinchat/CM3uyxPLSPFPbrbttCQiow)
 
 The Ultimate Provisioner: the modern configuration management, build and automation tool
 
