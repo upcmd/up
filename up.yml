@@ -80,6 +80,9 @@ dvars:
   - name: rolling_version_notes
     value: '{{.rolling_version_notes}}'
     expand: 2
+  - name: latest_version_notes
+    value: '{{.latest_version_notes}}'
+    expand: 2
 
 tasks:
   -
@@ -250,6 +253,8 @@ tasks:
           - name: quick_notes
             value: '{{.latest_version_notes| replace "\n" "\\n"}}'
             expand: 2
+            flags:
+              - v
         do: |
           curl -s -d '
           {
