@@ -370,11 +370,24 @@ tasks:
               - v
         do: buildDistro
 
+      - func: shell
+        desc: |
+          delete the remote tag latest
+          create latest release tag
+        do:
+          - git push --delete origin latest
+          - git tag -d latest
+          - git tag latest
+          - git push origin refs/tags/latest
+        flags:
+          - ignoreError
 
       - func: shell
         desc: |
           create rolling release tag
         do:
+          - 'git push --delete origin rolling-{{now|date "20060102"}}'
+          - 'git tag -d rolling-{{now|date "20060102"}}'
           - 'git tag rolling-{{now|date "20060102"}}'
           - 'git push origin refs/tags/rolling-{{now|date "20060102"}}'
         flags:
