@@ -1,0 +1,17 @@
+doc_meta: |
+  folder: shell-func
+  title: support user input
+  head: |
+    If there is user input in the script, it will prompt user for input
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: shell
+        do:
+          - |
+            echo "Hello, who am I talking to? your name:"
+            read varname
+            echo "It's nice to meet you, $varname"

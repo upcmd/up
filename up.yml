@@ -44,6 +44,7 @@ vars:
     bleeding-edge rolling release
     based on {{.latest_tagged_version}} with updates
     full regression tested and stable
+    {{ printf "./release/rolling/%s.md" .releaseDate |fileContent}}
 
   rolling_version_template: |
 
@@ -60,6 +61,7 @@ vars:
     latest bleeding-edge release
     based on {{.latest_tagged_version}} with updates
     full regression tested and stable
+    {{ printf "./release/rolling/%s.md" .releaseDate |fileContent}}
 
   latest_version_template: |
 
@@ -73,6 +75,8 @@ vars:
       BaseOn: {{.latest_tagged_version}} with updates
 
 dvars:
+  - name: releaseDate
+    value: '{{now|date "20060102"}}'
   - name: rolling_version_notes
     value: '{{.rolling_version_notes}}'
     expand: 2

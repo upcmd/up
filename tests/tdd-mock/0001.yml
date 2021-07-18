@@ -1,0 +1,18 @@
+note: |
+  quick test loading the release changes into a dynamic variable
+
+tasks:
+  -
+    name: task
+    task:
+      -
+        func: cmd
+        dvars:
+          - name: releaseDate
+            value: '{{now|date "20060102"}}'
+          - name: changes
+            value: |
+              {{ printf "./release/rolling/%s.md" .releaseDate |fileContent}}
+        do:
+          - name: print
+            cmd: 'changes: {{.changes}}'
