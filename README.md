@@ -11,6 +11,8 @@ The Ultimate Provisioner: the modern configuration management, build and automat
 No worries of replacing anything you already setup, UPcmd does not dictate and work exclusively with other tools, rather it incorporates and collaborates with others, but it is capable to be a framework in case you do need it    
 
 ## How does it look like?
+You could use a quick terminal GUI to select the task to execute
+![Interactive GUI in terminal](https://raw.githubusercontent.com/upcmd/up-demo/master/demos/menu_selection.png)
 
 All the project build, test, regression tests, the documentation site generation, publishing the tagged release and latest rolling release are using Up tasks
 

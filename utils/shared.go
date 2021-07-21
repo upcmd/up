@@ -18,7 +18,10 @@ import (
 	"time"
 )
 
-const charBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+const (
+	CharBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+	CapsChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+)
 
 var (
 	StepPanicCount int = 0
@@ -183,7 +186,24 @@ func RemoveEmptyLines(s string) string {
 func RandString(n int) string {
 	b := make([]byte, n)
 	for i := range b {
-		b[i] = charBytes[rand.Intn(len(charBytes))]
+		b[i] = CharBytes[rand.Intn(len(CharBytes))]
 	}
 	return string(b)
+}
+
+func StringCharToRune(s string) rune {
+	if len(s) > 1 {
+		LogErrorAndExit("StringCharToRune", nil, "func input only take one char")
+	}
+	rlist := []rune(s)
+	return rlist[0]
+}
+
+func GetMenuCharRune(idx int) rune {
+	if idx > (len(CharBytes) - 1) {
+		return 0
+	} else {
+		bt := CharBytes[idx]
+		return StringCharToRune(string(bt))
+	}
 }

@@ -9,9 +9,11 @@ package main
 
 import (
 	"github.com/alecthomas/kingpin"
+	"github.com/rivo/tview"
 	"github.com/upcmd/up/biz/impl"
 	u "github.com/upcmd/up/utils"
 	"os"
+	"strings"
 )
 
 var (
@@ -20,6 +22,7 @@ var (
 	ngo            = app.Command("ngo", "run an entry task")
 	ngoTaskName    = ngo.Arg("taskname", "task name to run").Default("Main").String()
 	initDefault    = app.Command("init", "create a default skeleton for a quick start")
+	ui             = app.Command("ui", "list tasks in interactive ui")
 	list           = app.Command("list", "list tasks")
 	listName       = list.Arg("taskname|=", "task name to inspect").String()
 	mod            = app.Command("mod", "module cmd: list | pull | lock | clean | probe")
@@ -39,6 +42,15 @@ var (
 	pure           = app.Flag("pure", "use pure env").Bool()
 )
 
+func execTask(taskname string, cfg *u.UpConfig) {
+	u.Pln("-exec task:", *ngoTaskName)
+	if *instanceName != "" && *execprofile != "" {
+		u.InvalidAndPanic("parameter validation", "instanceid (-i) and execprofile (-p) can not coexist, please only use one of them")
+	}
+	t := impl.NewTasker(*instanceName, *execprofile, cfg)
+	impl.Pipein()
+	t.ExecTask(u.MainConfig.EntryTask, nil, false)
+}
 func main() {
 	cmd := kingpin.MustParse(app.Parse(os.Args[1:]))
 
@@ -70,13 +82,58 @@ func main() {
 
 	case ngo.FullCommand():
 		if *ngoTaskName != "" {
-			u.Pln("-exec task:", *ngoTaskName)
-			if *instanceName != "" && *execprofile != "" {
-				u.InvalidAndPanic("parameter validation", "instanceid (-i) and execprofile (-p) can not coexist, please only use one of them")
+			execTask(*ngoTaskName, initConfig)
+		}
+
+	case ui.FullCommand():
+		t := impl.NewTasker(*instanceName, *execprofile, initConfig)
+		if *listName == "=" {
+			t.ListAllTasks()
+		} else if *listName != "" {
+			t.ListTask(*listName)
+		} else {
+			app := tview.NewApplication()
+			list := tview.NewList()
+			infoview := tview.NewTextView().
+				SetDynamicColors(true).
+				SetRegions(true).
+				SetWordWrap(true).
+				SetChangedFunc(func() {
+					app.Draw()
+				})
+
+			infoview.SetText(`help:[pink]use shortcut key to quickly locate and exec a task
+[pink]or use arrow key(up/down) to select the task to execute
+[pink]the task in green color is a task consumable externally
+[pink]the task in yellow color is a internal task only
+[yellow]?ShortcutKey: (a,b..z, A, B..Z,1,2..0) | ctrl-c to exit`)
+			layout := tview.NewFlex().
+				SetDirection(tview.FlexRow).
+				AddItem(infoview, 6, 1, false).
+				AddItem(list, 0, 1, true)
+
+			f := func() {
+				app.Stop()
+				taskComName, taskDesc := list.GetItemText(list.GetCurrentItem())
+				taskName := strings.Split(taskComName, ":")[1]
+				initConfig.SetEntryTask(taskName)
+				u.Pf("selected task:[%s]\n", taskName)
+				u.Pln("start the task:", taskDesc)
+				execTask(taskName, initConfig)
 			}
-			t := impl.NewTasker(*instanceName, *execprofile, initConfig)
-			impl.Pipein()
-			t.ExecTask(u.MainConfig.EntryTask, nil, false)
+
+			tasks := t.GetUiTasks()
+
+			for idx, task := range tasks {
+				if task.Public {
+					list.AddItem(u.Spf("\U0001F7E2%3d:%s", idx+1, task.Name), u.Spf("        %s", task.Desc), u.GetMenuCharRune(idx), f)
+				} else {
+					list.AddItem(u.Spf("\U0001f7e0%3d:%s", idx+1, task.Name), u.Spf("        %s", task.Desc), u.GetMenuCharRune(idx), f)
+				}
+			}
+			if err := app.SetRoot(layout, true).EnableMouse(true).Run(); err != nil {
+				panic(err)
+			}
 		}
 
 	case list.FullCommand():

@@ -439,6 +439,22 @@ func (t *Tasker) ListTasks() {
 	u.Pln("-\n")
 }
 
+func (t *Tasker) GetUiTasks() []model.Task {
+	caps := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	tasks := []model.Task{}
+	for _, task := range *t.Tasks {
+		start := task.Name[0:1]
+		if strings.Contains(caps, start) {
+			task.Public = true
+		} else {
+			task.Public = false
+		}
+		tasks = append(tasks, task)
+	}
+
+	return tasks
+}
+
 func (t *Tasker) ListAllTasks() {
 	u.Pln("-inspect all tasks:")
 	for _, task := range *t.Tasks {
@@ -967,6 +983,13 @@ func (t *Tasker) validateAndLoadTaskRef() {
 
 	invalidNames := []string{}
 	for idx, task := range *t.Tasks {
+		start := task.Name[0:1]
+		if strings.Contains(u.CapsChars, start) {
+			task.Public = true
+		} else {
+			task.Public = false
+		}
+
 		if strings.Contains(task.Name, "-") {
 			invalidNames = append(invalidNames, task.Name)
 		}

@@ -1,0 +1,11 @@
+note: |
+  add feature of gui task selection
+
+tasks:
+  -
+    name: Public_Task
+    desc: A public task could be used externally
+
+  -
+    name: internal_task
+    desc: A internal protected task better not to be consumed

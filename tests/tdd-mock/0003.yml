@@ -1,0 +1,48 @@
+note: |
+  test task execution using gui menu item selection
+
+tasks:
+
+  -
+    name: Public_Task
+    desc: A public task could be used externally
+    task:
+      -
+        func: shell
+        do:
+          - echo "hello, this is the Public Task"
+
+  -
+    name: internal_task
+    desc: A internal protected task better not to be consumed
+    task:
+      -
+        func: shell
+        do:
+          - echo "hello, this is the internal Task"
+
+  -
+    name: Task3
+    desc: A public Task3 consuamable
+    task:
+      -
+        func: shell
+        do:
+          - echo "hello, this is the public Task3"
+
+  -
+    name: task4
+    desc: A protected internal Task4
+    task:
+      -
+        func: shell
+        do:
+          - echo "hello, this is the internal Task4"
+  -
+    name: task5
+    desc: A protected internal Task5
+    task:
+      -
+        func: shell
+        do:
+          - echo "hello, this is the internal Task5"
