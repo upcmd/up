@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/Masterminds/sprig/v3 v3.0.2
 	github.com/alecthomas/kingpin v2.2.6+incompatible
+	github.com/eiannone/keyboard v0.0.0-20200508000154-caf4b762e807 // indirect
 	github.com/fatih/color v1.9.0
 	github.com/go-git/go-git/v5 v5.1.0
 	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c

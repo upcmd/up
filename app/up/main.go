@@ -122,6 +122,7 @@ func main() {
 				execTask(taskName, initConfig)
 			}
 
+			u.Pause()
 			tasks := t.GetUiTasks()
 
 			for idx, task := range tasks {

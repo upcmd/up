@@ -9,6 +9,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/eiannone/keyboard"
 	"github.com/fatih/color"
 	"io/ioutil"
 	"math/rand"
@@ -206,4 +207,25 @@ func GetMenuCharRune(idx int) rune {
 		bt := CharBytes[idx]
 		return StringCharToRune(string(bt))
 	}
+}
+
+func Pause() {
+	hint := `
+	enter: continue
+	    q: quit
+	`
+	hiColor := color.New(color.FgHiBlue, color.BgBlack)
+	hiColor.Printf("%s\n", hint)
+
+	char, _, err := keyboard.GetSingleKey()
+	if err != nil {
+		panic(err)
+	}
+	switch char {
+	case 'q':
+		GraceExit("quit", "client choose to quit")
+	default:
+		//continue
+	}
+
 }
