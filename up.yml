@@ -9,6 +9,8 @@ vars:
   dists_for_latest:
     - os: darwin
       arch: amd64
+    - os: darwin
+      arch: arm64
     - os: linux
       arch: amd64
     - os: windows
@@ -458,7 +460,9 @@ tasks:
           - rm -rf ./build
           - mkdir -p ./build/linux
           - mkdir -p ./build/mac
+          - mkdir -p ./build/arm
           - GOOS=darwin GOARCH=amd64 go build -o build/mac/up app/up/*.go
+          - GOOS=darwin GOARCH=arm64 go build -o build/m1/up app/up/*.go
           - GOOS=linux GOARCH=amd64 go build -o build/linux/up app/up/*.go
 
   -
@@ -715,6 +719,13 @@ tasks:
         desc: copy the binary to path in linux
         do: cp -f build/linux/up /bin/
         if: '{{ eq .os "Linux" }}'
+
+      - func: shell
+        desc: |
+          copy the binary to path in Mac with M1 Chip
+          TODO: add if condition to use arch == arm64
+        do: cp -f build/m1/up /bin/
+        if: '{{ eq .os "Darwin" }}'
 
   -
     name: testc
