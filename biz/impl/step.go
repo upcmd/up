@@ -503,7 +503,6 @@ func (steps *Steps) InspectSteps(tree treeprint.Tree, level *int) bool {
 					break
 				}
 				*level -= 1
-				//branch.AddBranch("aa")
 			case []interface{}:
 				calleeTasknames := step.Do.([]interface{})
 				breakFlag := false
