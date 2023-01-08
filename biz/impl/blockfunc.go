@@ -32,7 +32,6 @@ func (f *BlockFuncAction) Adapt() {
 		u.P(flowname)
 
 	case []interface{}:
-		//detailed steps
 		err := ms.Decode(f.Do, &flow)
 		u.LogErrorAndPanic("load steps", err, "steps has configuration problem, please fix it")
 
@@ -53,8 +52,6 @@ func BlockFlowRun(flow *Steps, execVars *core.Cache) {
 	}
 	BlockStack().Push(&rtContext)
 
-	//switch to test code
-	//flow.ExecFlow()
 	flow.Exec(true)
 	BlockStack().Pop()
 }

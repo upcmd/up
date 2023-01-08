@@ -114,9 +114,7 @@ func ScopeVarsMergedWithDvars(scope *Scope, contextMergedVars *core.Cache) *core
 	return VarsMergedWithDvars(scope.Name, &scope.Vars, &scope.Dvars, contextMergedVars)
 }
 
-/*
-given vars as base vars space to expand from, expand dvars against contextVars
-*/
+//given vars as base vars space to expand from, expand dvars against contextVars
 func VarsMergedWithDvars(mark string, baseVars *core.Cache, dvars *Dvars, contextMergedVars *core.Cache) *core.Cache {
 	var mergedVars core.Cache
 	mergedVars = deepcopy.Copy(*baseVars).(core.Cache)

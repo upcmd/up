@@ -72,8 +72,6 @@ type ContextInstances []ScopeContext
 type TaskerRuntimeContext struct {
 	Tasker       *Tasker
 	TaskerCaller *Tasker
-	//TaskVars        *Cache
-	//ReturnVars      *Cache
 }
 
 func NewTasker(instanceId string, eprofiename string, cfg *u.UpConfig) *Tasker {
@@ -147,7 +145,6 @@ func (t *Tasker) loadInstancesContext() {
 	}
 
 	u.Pvvvvv("-------full vars in scopes------")
-	//u.Dpplnvvvv(ss)
 	u.Dvvvvv(ss)
 
 	var globalScope *Scope
@@ -404,14 +401,10 @@ func (t *Tasker) setInstanceName(id, eprofilename string) {
 }
 
 func (t *Tasker) initRuntime() {
-	//InstanceName string
-	//Dryrun       bool
 	t.TaskStack = stack.New("task")
 	t.StepStack = stack.New("step")
 	t.BlockStack = stack.New("block")
 	t.FinallyStack = stack.New("block")
-	//TaskBreak    bool
-
 }
 
 func (t *Tasker) ListTasks() {
@@ -496,8 +489,6 @@ func (t *Tasker) CleanModules() {
 		u.InvalidAndPanic("modules configuration is not valid", "please fix the problem and try again")
 	}
 	u.Pln("-clean repos:")
-	//u.Pdebug(u.MainConfig.AbsWorkDir, u.GetDefaultModuleDir())
-	//TODO
 }
 
 func (t *Tasker) PullModules() {
@@ -727,12 +718,8 @@ func ExecTask(fulltaskname string, callerVars *core.Cache) {
 			}
 
 			mods := TaskerRuntime().Tasker.Config.Modules
-			//u.Pdebug(TaskerRuntime().Tasker.Config)
 			if mods != nil {
 				mod := TaskerRuntime().Tasker.Config.Modules.LocateModule(modname)
-				//u.Pdebug(cwd, mod)
-				//mdir := "hello-module/"
-				//iid := "dev"
 
 				if mod != nil {
 					func() {
