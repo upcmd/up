@@ -45,7 +45,6 @@ func runCmd(f *ShellFuncAction, cmd string, idx1 int) {
 			)
 
 			u.Pfv("%s\n", color.HiGreenString("%s", result.Output))
-
 		default:
 			defaultTimeout, _ := strconv.Atoi(ConfigRuntime().Timeout)
 			timeout := func() time.Duration {
@@ -112,9 +111,14 @@ func runCmd(f *ShellFuncAction, cmd string, idx1 int) {
 				result.Code = 0
 			}
 
-			result.Output = strings.TrimSpace(outputResult)
-			f.Result = result
+			result.Output = outputResult
 		}
+	}
+	f.Result = u.ExecResult{
+		ErrMsg: strings.TrimSpace(result.ErrMsg),
+		Output: strings.TrimSpace(result.Output),
+		Cmd:    result.Cmd,
+		Code:   result.Code,
 	}
 }
 
