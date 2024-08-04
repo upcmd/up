@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "2024-update" ]
   pull_request:
-    branches: [ "2024-update" ]
+    branches: [ "feature" ]
 
 jobs:
 
@@ -18,5 +18,8 @@ jobs:
       with:
         go-version: '1.22'
 
-    - name: Build
+    - name: Show go version
       run: go version
+
+    - name: Run single wip test
+      run: go run app/up/*.go ngo task -d ./tests/functests -t wip.yml -i dev --configdir=./tests/functests
