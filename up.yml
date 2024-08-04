@@ -1153,3 +1153,10 @@ tasks:
         do: |
           curl --silent 'https://api.github.com/repos/upcmd/up' -H 'Accept: application/vnd.github.preview' | grep  stargazers_count
         reg: result
+
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v ./...
