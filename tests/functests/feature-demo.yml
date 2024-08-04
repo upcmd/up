@@ -4,10 +4,10 @@ note: |
 tasks:
 
   -
-    name: Public_Task
-    desc: A public task could be used externally
+    name: task
+    desc: test github action
     task:
       -
         func: shell
         do:
-          - echo "hello, this is the Public Task"
+          - echo "Test github action feature request test"
