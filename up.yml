@@ -1154,9 +1154,17 @@ tasks:
           curl --silent 'https://api.github.com/repos/upcmd/up' -H 'Accept: application/vnd.github.preview' | grep  stargazers_count
         reg: result
 
+  -
+    name: check_github_action_log
+    desc: check the latest github action log
+    task:
+      - func: shell
+        do:
+          - |
+            curl -s \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/upcmd/up/actions/workflows/feature-request.yml/runs |grep jobs_url |tail -n1| sed -n 's#.*/runs/\([0-9]*\)/.*#\1#p'
 
-      - name: Build
-        run: go build -v ./...
-
-      - name: Test
-        run: go test -v ./...
+      - func: shell
+        do:
+          - gh run view {{ .last_result.Output }} --log
