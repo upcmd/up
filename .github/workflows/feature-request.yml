@@ -23,7 +23,6 @@ jobs:
 
     - name: Run individual feature request test
       run: |
+        set -e
         . ./funcs.rc
         feature_test_x 00001
-        
-        
