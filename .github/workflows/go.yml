@@ -21,5 +21,12 @@ jobs:
     - name: Show go version
       run: go version
 
-    - name: Run single wip test
+    - name: Run single feature test
       run: go run app/up/*.go ngo task -d ./tests/functests -t feature-demo.yml -i dev --configdir=./tests/functests
+
+    - name: Run individual feature request test
+      run: |
+        . ./funcs.rc
+        uptestx c0001
+        
+        
