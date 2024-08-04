@@ -1,0 +1,13 @@
+note: |
+  test task showing feature request test
+
+tasks:
+
+  -
+    name: Public_Task
+    desc: A public task could be used externally
+    task:
+      -
+        func: shell
+        do:
+          - echo "hello, this is the Public Task"

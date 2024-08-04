@@ -22,4 +22,4 @@ jobs:
       run: go version
 
     - name: Run single wip test
-      run: go run app/up/*.go ngo task -d ./tests/functests -t wip.yml -i dev --configdir=./tests/functests
+      run: go run app/up/*.go ngo task -d ./tests/functests -t feature-demo.yml -i dev --configdir=./tests/functests
