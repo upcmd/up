@@ -1,0 +1,29 @@
+name: Go
+
+on:
+  push:
+    branches: [ "2024-update" ]
+  pull_request:
+    branches: [ "feature-*" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.22'
+
+    - name: Show go version
+      run: go version
+
+    - name: Run individual feature request test
+      run: |
+        . ./funcs.rc
+        feature_test_x 00001
+        
+        

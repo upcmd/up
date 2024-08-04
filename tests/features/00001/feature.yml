@@ -1,0 +1,13 @@
+note: |
+  test task showing feature request test
+
+tasks:
+
+  -
+    name: task
+    desc: test github action
+    task:
+      -
+        func: shell
+        do:
+          - echo "Test github action feature request test"
