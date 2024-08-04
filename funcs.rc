@@ -169,7 +169,7 @@ feature_test_x(){
 echo "syntax: feature_test_x testing_folder"
     testing_folder=$1
     if [ "${testing_folder}" != "" ];then
-        goup ngo task -d ./tests/functests/features/${testing_folder} -t feature -i dev --configdir=./tests/functests
+        goup ngo task -d ./tests/features/${testing_folder} -t feature -i dev --configdir=./tests/functests
     else
         echo "Please input a feature test folder name"
         exit -1
