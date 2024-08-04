@@ -1,4 +1,4 @@
-name: Go
+name: Github_Action_Test
 
 on:
   push:

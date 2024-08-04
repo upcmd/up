@@ -1,4 +1,4 @@
-name: Go
+name: Feature_Request_Tests
 
 on:
   push:
